@@ -5,6 +5,12 @@ import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
+// Vitest levanta un servidor de Vite para las pruebas. En CI (CI=true) el
+// plugin de Laravel lo bloquea porque cree que es el servidor de desarrollo.
+if (process.env.VITEST) {
+    process.env.LARAVEL_BYPASS_ENV_CHECK = '1';
+}
+
 export default defineConfig({
     plugins: lazyPlugins(() => [
         laravel({
