@@ -36,6 +36,11 @@ export default defineConfig({
             ],
         },
     },
+    test: {
+        // Pruebas de Vitest de las piezas del frontend (docs/19_PRUEBAS.md).
+        include: ['resources/js/**/*.test.ts'],
+        environment: 'jsdom',
+    },
     lint: {
         ignorePatterns: [
             'vendor/**',

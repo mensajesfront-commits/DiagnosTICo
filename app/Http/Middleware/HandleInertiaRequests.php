@@ -40,8 +40,10 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                // Cada cuenta tiene un solo rol (RN-027).
+                'rol' => $request->user()?->getRoleNames()->first(),
+                'permisos' => $request->user()?->getAllPermissions()->pluck('name')->values() ?? [],
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }

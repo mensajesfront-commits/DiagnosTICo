@@ -9,3 +9,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+if (app()->environment(['local', 'testing'])) {
+    require __DIR__.'/prueba-tecnica.php';
+}
