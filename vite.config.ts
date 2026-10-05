@@ -67,6 +67,8 @@ export default defineConfig({
         htmlWhitespaceSensitivity: 'css',
         ignorePatterns: [
             '.github/**',
+            // La documentación se escribe a mano; el formateador reacomodaría las tablas.
+            '**/*.md',
             'composer.json',
             'resources/js/components/ui/*',
             'resources/views/mail/*',
