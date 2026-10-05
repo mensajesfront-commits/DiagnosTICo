@@ -2,17 +2,75 @@
 
 @import 'tw-animate-css';
 
+/* Tipografía del wireframe: IBM Plex Sans (texto) e IBM Plex Mono (puntajes y
+   cifras). Se sirven desde el propio proyecto (@fontsource) para que el PDF y
+   las pantallas no dependan de internet. */
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-sans/700.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
+/*
+  Colores del wireframe (docs/18_UI_UX.md).
+  - marca: azul de botones y enlaces principales.
+  - lienzo: fondo gris cálido de todas las pantallas.
+  - nivel-*: los cuatro niveles del resultado (RN-019). Cada uno tiene un
+    color fuerte (barras, gráficas) y uno suave (fondo de etiquetas).
+*/
+@theme {
     --font-sans:
-        Instrument Sans, ui-sans-serif, system-ui, sans-serif,
+        'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+    --font-mono:
+        'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
+    --color-marca: #2d4a7a;
+    --color-marca-hover: #253e67;
+    --color-marca-suave: #e5eff9;
+
+    --color-lienzo: #f5f4f0;
+    --color-lienzo-oscuro: #f1f0eb;
+    --color-tinta: #1e2533;
+    --color-tinta-suave: #5f6470;
+    --color-linea: #e3e2dd;
+    --color-linea-fuerte: #cfcdc7;
+
+    --color-menu: #1e293b;
+    --color-menu-activo: #334259;
+    --color-menu-texto: #cbd5e1;
+    --color-menu-marca: #9db7dc;
+
+    --color-nivel-critico: #d85249;
+    --color-nivel-critico-suave: #fbe7e5;
+    --color-nivel-critico-texto: #a8362e;
+    --color-nivel-mejorar: #e39938;
+    --color-nivel-mejorar-suave: #fcefdf;
+    --color-nivel-mejorar-texto: #9a5d12;
+    --color-nivel-camino: #4a85c7;
+    --color-nivel-camino-suave: #e5eff9;
+    --color-nivel-camino-texto: #2a5f99;
+    --color-nivel-sigue: #4e9954;
+    --color-nivel-sigue-suave: #e5f2e6;
+    --color-nivel-sigue-texto: #2f6e35;
+    --color-nivel-sin: #c9c8c3;
+
+    --color-aviso: #a8362e;
+    --color-aviso-suave: #fbe7e5;
+    --color-exito: #2f6e35;
+    --color-exito-suave: #e5f2e6;
+    --color-alerta: #9a5d12;
+    --color-alerta-suave: #fcefdf;
+}
+
+/* Tokens que usan los componentes de Reka UI / shadcn-vue del kit, apuntando
+   a la paleta del wireframe para que todo se vea igual. */
+@theme inline {
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
@@ -61,105 +119,41 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-    *,
-    ::after,
-    ::before,
-    ::backdrop,
-    ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
-    }
-}
-
-@layer utilities {
-    body,
-    html {
-        --font-sans:
-            'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-            'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-            'Noto Color Emoji';
-    }
-}
-
 :root {
-    --background: hsl(0 0% 100%);
-    --foreground: hsl(0 0% 3.9%);
-    --card: hsl(0 0% 100%);
-    --card-foreground: hsl(0 0% 3.9%);
-    --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(0 0% 3.9%);
-    --primary: hsl(0 0% 9%);
-    --primary-foreground: hsl(0 0% 98%);
-    --secondary: hsl(0 0% 92.1%);
-    --secondary-foreground: hsl(0 0% 9%);
-    --muted: hsl(0 0% 96.1%);
-    --muted-foreground: hsl(0 0% 45.1%);
-    --accent: hsl(0 0% 96.1%);
-    --accent-foreground: hsl(0 0% 9%);
-    --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 92.8%);
-    --input: hsl(0 0% 89.8%);
-    --ring: hsl(0 0% 3.9%);
-    --chart-1: hsl(12 76% 61%);
-    --chart-2: hsl(173 58% 39%);
-    --chart-3: hsl(197 37% 24%);
-    --chart-4: hsl(43 74% 66%);
-    --chart-5: hsl(27 87% 67%);
-    --radius: 0.5rem;
-    --sidebar-background: hsl(0 0% 98%);
-    --sidebar-foreground: hsl(240 5.3% 26.1%);
-    --sidebar-primary: hsl(0 0% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(0 0% 94%);
-    --sidebar-accent-foreground: hsl(0 0% 30%);
-    --sidebar-border: hsl(0 0% 91%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(0 0% 98%);
-}
-
-.dark {
-    --background: hsl(0 0% 3.9%);
-    --foreground: hsl(0 0% 98%);
-    --card: hsl(0 0% 3.9%);
-    --card-foreground: hsl(0 0% 98%);
-    --popover: hsl(0 0% 3.9%);
-    --popover-foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(0 0% 9%);
-    --secondary: hsl(0 0% 14.9%);
-    --secondary-foreground: hsl(0 0% 98%);
-    --muted: hsl(0 0% 16.08%);
-    --muted-foreground: hsl(0 0% 63.9%);
-    --accent: hsl(0 0% 14.9%);
-    --accent-foreground: hsl(0 0% 98%);
-    --destructive: hsl(0 84% 60%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 14.9%);
-    --input: hsl(0 0% 14.9%);
-    --ring: hsl(0 0% 83.1%);
-    --chart-1: hsl(220 70% 50%);
-    --chart-2: hsl(160 60% 45%);
-    --chart-3: hsl(30 80% 55%);
-    --chart-4: hsl(280 65% 60%);
-    --chart-5: hsl(340 75% 55%);
-    --sidebar-background: hsl(0 0% 7%);
-    --sidebar-foreground: hsl(0 0% 95.9%);
-    --sidebar-primary: hsl(360, 100%, 100%);
-    --sidebar-primary-foreground: hsl(0 0% 100%);
-    --sidebar-accent: hsl(0 0% 15.9%);
-    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-border: hsl(0 0% 15.9%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(240 5.9% 10%);
+    --background: #f5f4f0;
+    --foreground: #1e2533;
+    --card: #ffffff;
+    --card-foreground: #1e2533;
+    --popover: #ffffff;
+    --popover-foreground: #1e2533;
+    --primary: #2d4a7a;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f0eb;
+    --secondary-foreground: #1e2533;
+    --muted: #f4f3ef;
+    --muted-foreground: #5f6470;
+    --accent: #f1f0eb;
+    --accent-foreground: #1e2533;
+    --destructive: #d85249;
+    --destructive-foreground: #ffffff;
+    --border: #e3e2dd;
+    --input: #cfcdc7;
+    --ring: #2d4a7a;
+    --chart-1: #2d4a7a;
+    --chart-2: #4a85c7;
+    --chart-3: #4e9954;
+    --chart-4: #e39938;
+    --chart-5: #d85249;
+    --radius: 0.625rem;
+    --sidebar-background: #1e293b;
+    --sidebar-foreground: #cbd5e1;
+    --sidebar-primary: #ffffff;
+    --sidebar-primary-foreground: #1e293b;
+    --sidebar-accent: #334259;
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: #2d3a4f;
+    --sidebar-ring: #9db7dc;
+    --sidebar: #1e293b;
 }
 
 @layer base {
