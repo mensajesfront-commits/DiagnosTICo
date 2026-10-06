@@ -2,7 +2,8 @@
 /**
  * Estructura de las pantallas de acceso (L1–L4): a la izquierda (42%) el panel
  * oscuro con el mensaje del sistema; a la derecha el formulario sobre el
- * fondo gris cálido. En pantallas pequeñas el panel se reduce a la marca.
+ * fondo gris cálido. El panel queda fijo: solo se desplaza el formulario
+ * (el registro es largo). En pantallas pequeñas el panel se reduce a la marca.
  */
 import Logo from '@/components/marca/Logo.vue';
 
@@ -21,7 +22,7 @@ const {
 <template>
     <div class="flex min-h-screen bg-lienzo text-tinta">
         <aside
-            class="hidden w-[42%] shrink-0 flex-col justify-between bg-menu px-12 py-12 text-menu-texto lg:flex xl:px-20"
+            class="sticky top-0 hidden h-screen w-[42%] shrink-0 flex-col justify-between self-start overflow-y-auto bg-menu px-12 py-12 text-menu-texto lg:flex xl:px-20"
         >
             <p
                 class="flex items-center gap-3 text-base font-semibold text-white"
