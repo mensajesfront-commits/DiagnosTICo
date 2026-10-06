@@ -42,7 +42,7 @@ Desde la semana 3 también tiene las primeras pantallas del negocio (frontend), 
 | Tarea | Qué quedó | Pendiente |
 |---|---|---|
 | T-005 Definición de terminado | `28_CONVENCIONES_DESARROLLO.md` | Que el equipo la apruebe |
-| T-006 Matriz de roles y permisos | `17_SEGURIDAD.md` (propuesta de 15 permisos en 6 bloques) | Compararla con el wireframe A5.2 |
+| T-006 Matriz de roles y permisos | `17_SEGURIDAD.md` y el seeder con los 15 permisos de A5.2 | — (quedan por validar «Ver como» y el rol Consultor) |
 | T-007 MER | `12_BASE_DE_DATOS.md` (borrador en Mermaid) | Revisión T-039 y aprobación T-044 |
 | T-015 Repositorio | Repositorio en GitHub con el código | Crear `develop` y proteger `main` y `develop` en GitHub |
 | T-016 Proyecto y Sail | Kit de Vue + Sail (PHP 8.4, PostgreSQL 18, Mailpit, Chromium) | Construir la imagen en los equipos (ISSUE-009) |

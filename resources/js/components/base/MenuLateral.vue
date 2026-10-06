@@ -9,7 +9,12 @@ import { ChevronRight } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import Logo from '@/components/marca/Logo.vue';
-import { filtrarMenu, menuAdministrador, menuEmpresa } from '@/lib/menu';
+import {
+    filtrarMenu,
+    menuAdministrador,
+    menuEmpresa,
+    rolesDeEmpresa,
+} from '@/lib/menu';
 import type { ItemMenu } from '@/lib/menu';
 import { cn, toUrl } from '@/lib/utils';
 import { logout } from '@/routes';
@@ -21,10 +26,15 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 const usuario = computed(() => page.props.auth.user);
 const rol = computed(() => page.props.auth.rol);
 
+// Empresa y Colaborador usan el menú de empresa; el Administrador y los
+// roles creados en A5.1 usan el del Administrador, filtrado por permisos.
 const items = computed(() =>
     filtrarMenu(
-        rol.value === 'Administrador' ? menuAdministrador : menuEmpresa,
+        rolesDeEmpresa.includes(rol.value ?? '')
+            ? menuEmpresa
+            : menuAdministrador,
         page.props.auth.permisos,
+        rol.value ?? null,
     ),
 );
 

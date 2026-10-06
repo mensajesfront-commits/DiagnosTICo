@@ -2,8 +2,9 @@
  * Secciones del menú lateral por tipo de cuenta (A1 y E1–E11).
  *
  * `permiso` es el permiso de spatie/laravel-permission que debe tener la
- * cuenta para ver la sección (matriz en docs/17_SEGURIDAD.md). Sin permiso,
- * la sección siempre se muestra. El servidor bloquea las rutas igual; ocultar
+ * cuenta para ver la sección (matriz en docs/17_SEGURIDAD.md) y `roles`, los
+ * roles que la ven cuando no depende de un permiso (Colaboradores). Sin
+ * ninguno de los dos, la sección siempre se muestra. El servidor bloquea las rutas igual; ocultar
  * en el menú es solo para no mostrar lo que no se puede abrir.
  *
  * Las rutas de las secciones se crean en las semanas 3 a 6; mientras tanto
@@ -16,6 +17,7 @@ export type ItemMenu = {
     titulo: string;
     href?: NonNullable<InertiaLinkProps['href']>;
     permiso?: string;
+    roles?: string[];
     /** Submenú plegable. */
     hijos?: ItemMenu[];
 };
@@ -32,33 +34,41 @@ export const menuAdministrador: ItemMenu[] = [
     {
         titulo: 'Configuración IA',
         href: '/configuracion-ia',
-        permiso: 'ia.configurar',
+        permiso: 'ia.ver',
     },
     {
         titulo: 'Usuarios y roles',
         href: '/usuarios',
-        permiso: 'usuarios.gestionar',
+        permiso: 'usuarios.ver',
     },
 ];
 
 export const menuEmpresa: ItemMenu[] = [
     { titulo: 'Inicio', href: dashboard() },
     { titulo: 'Mi historial', href: '/historial', permiso: 'resultados.ver' },
-    // HU-076 / RN-025: el colaborador no ve esta sección.
-    {
-        titulo: 'Colaboradores',
-        href: '/colaboradores',
-        permiso: 'colaboradores.gestionar',
-    },
+    // HU-076 / RN-025: solo la cuenta principal; el colaborador no la ve.
+    // A5.2 no tiene un permiso para esto: lo decide el rol.
+    { titulo: 'Colaboradores', href: '/colaboradores', roles: ['Empresa'] },
 ];
+
+/** Roles de las cuentas de empresa; el resto usa el menú del Administrador. */
+export const rolesDeEmpresa = ['Empresa', 'Colaborador'];
 
 /**
  * Deja solo las secciones (y subsecciones) que la cuenta puede ver. Un grupo
  * con submenú desaparece si no le queda ninguna subsección visible.
  */
-export function filtrarMenu(items: ItemMenu[], permisos: string[]): ItemMenu[] {
+export function filtrarMenu(
+    items: ItemMenu[],
+    permisos: string[],
+    rol: string | null = null,
+): ItemMenu[] {
     return items.flatMap((item) => {
         if (item.permiso && !permisos.includes(item.permiso)) {
+            return [];
+        }
+
+        if (item.roles && (rol === null || !item.roles.includes(rol))) {
             return [];
         }
 
@@ -66,7 +76,7 @@ export function filtrarMenu(items: ItemMenu[], permisos: string[]): ItemMenu[] {
             return [item];
         }
 
-        const hijos = filtrarMenu(item.hijos, permisos);
+        const hijos = filtrarMenu(item.hijos, permisos, rol);
 
         return hijos.length > 0 ? [{ ...item, hijos }] : [];
     });
