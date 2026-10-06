@@ -65,7 +65,7 @@ Al terminar deben estar corriendo `laravel.test`, `pgsql` y `mailpit`. Lo compru
 
 ```bash
 ./vendor/bin/sail artisan key:generate
-./vendor/bin/sail artisan migrate
+./vendor/bin/sail artisan migrate --seed
 ./vendor/bin/sail npm ci
 ./vendor/bin/sail npm run build
 ```
@@ -98,18 +98,10 @@ El envío de correos y el análisis de la IA corren en segundo plano. Para que f
 ./vendor/bin/sail artisan prueba:ia                     # una llamada real a OpenAI (necesita la clave)
 ```
 
-Las pantallas de la prueba técnica solo existen con `APP_ENV=local`. Para verlas:
+`migrate --seed` crea los roles con sus permisos, los sectores de ejemplo y la cuenta del Administrador. El correo y la contraseña salen de `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `.env`; si dejas la contraseña vacía, el seeder genera una y la muestra en la terminal. El seeder se puede correr de nuevo sin duplicar nada (`./vendor/bin/sail artisan db:seed`).
 
-1. Crea una cuenta en `/register`.
-2. Dale el rol de Administrador:
-
-   ```bash
-   ./vendor/bin/sail artisan tinker --execute 'Spatie\Permission\Models\Role::findOrCreate("Administrador"); App\Models\User::where("email", "TU_CORREO")->first()->assignRole("Administrador");'
-   ```
-
-3. Entra a `/prueba-tecnica/componentes` y a `/prueba-tecnica/graficas`.
-
-> Los datos iniciales (roles con permisos, sectores, categorías y el Administrador inicial) llegan en la semana 3 (T-046). Desde entonces bastará con `./vendor/bin/sail artisan migrate --seed`.
+- **Cuenta de empresa:** regístrate en `/register`. Queda con el rol Empresa y su menú.
+- **Cuenta de Administrador:** entra con la del seeder. Las pantallas de la prueba técnica y las vistas previas (`/prueba-tecnica/*`) solo existen con `APP_ENV=local`.
 
 ## Revisiones de código
 

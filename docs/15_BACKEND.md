@@ -12,10 +12,30 @@ Todas las rutas del Administrador van con `auth` y con el permiso indicado (matr
 |---|---|---|---|
 | GET / POST | `/login` | L1 | |
 | POST | `/logout` | Menú lateral | |
-| GET / POST | `/register` | L2 | Falta agregar los campos de empresa (T-047). Ver `14_FRONTEND.md`. |
+| GET / POST | `/register` | L2 | Crea la empresa y su usuario con rol Empresa (`CreateNewUser`). |
 | GET / POST | `/forgot-password` | L3 | Ajustar el aviso para cumplir RN-005. |
 | GET | `/reset-password/{token}` | L4 | |
 | POST | `/reset-password` | L4 | |
+
+## Lo que ya existe en el backend (versión mínima, 6 de octubre)
+
+Se hizo desde el frontend para poder probar el registro y el menú de la empresa. **Luis lo revisa en el pull request y puede cambiarlo.**
+
+| Pieza | Archivo | Nota |
+|---|---|---|
+| Tabla `sectores` | `database/migrations/2026_10_06_000001_create_sectores_table.php` | `nombre` (40, único), `descripcion`, `activo` |
+| Tabla `empresas` y columnas nuevas en `users` | `database/migrations/2026_10_06_000002_create_empresas_table.php` | `empresas`: `nombre`, `sector_id`, `ciudad`, `pais`, `activa`. `users`: `empresa_id`, `cargo`, `telefono`, `activo` |
+| Modelos | `app/Models/Sector.php`, `app/Models/Empresa.php`, `User::empresa()` | `Sector::activos()` para RN-003 |
+| Roles y permisos | `database/seeders/RolesYPermisosSeeder.php` | La matriz de `17_SEGURIDAD.md` (3 roles, 15 permisos) |
+| Sectores de ejemplo | `database/seeders/SectoresSeeder.php` | Los 7 del wireframe. **[INFORMACIÓN PENDIENTE]** lista real |
+| Administrador inicial | `database/seeders/DatabaseSeeder.php`, `config/diagnostico.php` | `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `.env` |
+| Registro | `app/Actions/Fortify/CreateNewUser.php` | Valida los campos de L2 y crea empresa + usuario en una transacción |
+| Pruebas | `tests/Feature/Auth/RegistrationTest.php` | Solo sectores activos, registro completo, sector inactivo y términos |
+
+Pendiente para Luis:
+
+- **RN-001:** fuera de producción, la regla de contraseña del kit solo pide 8 caracteres. El frontend exige los 5 requisitos, pero el servidor todavía no.
+- **RN-005:** que "olvidé mi contraseña" responda lo mismo exista o no el correo.
 
 ## Diagnósticos y sectores (T-049, T-050)
 

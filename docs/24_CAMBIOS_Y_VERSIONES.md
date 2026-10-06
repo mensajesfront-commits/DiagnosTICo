@@ -16,6 +16,8 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - `lib/contrasena.ts` (requisitos de RN-001, con pruebas) y `lib/rutas.ts` (URLs propuestas).
 - Vistas previas con datos de ejemplo: `/prueba-tecnica/vistas/{vista}` lee `resources/datos-ejemplo/{vista}.json`.
 - Documentos `14_FRONTEND.md`, `15_BACKEND.md` y `18_UI_UX.md`.
+- Backend mínimo para el registro: tablas `sectores` y `empresas`, roles y permisos, 7 sectores de ejemplo, Administrador inicial (`migrate --seed`) y registro que crea la empresa con su usuario de rol Empresa.
+- Inicio provisional en español para revisar el menú de cada rol.
 
 ### Cambiado
 

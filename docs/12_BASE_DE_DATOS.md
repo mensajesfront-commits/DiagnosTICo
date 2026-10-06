@@ -2,6 +2,8 @@
 
 **Estado:** EN CURSO · el MER es un BORRADOR que REQUIERE VALIDACIÓN (T-007)
 
+Ya existen las migraciones de `sectores`, `empresas` y las columnas `empresa_id`, `cargo`, `telefono` y `activo` de `users` (6 de octubre; ver `15_BACKEND.md`). El resto del MER sigue sin migración.
+
 **Motor:** PostgreSQL 18.
 
 Este documento tiene el modelo entidad-relación (MER) armado a partir de los wireframes y de `05_REQUISITOS_FUNCIONALES.md`.

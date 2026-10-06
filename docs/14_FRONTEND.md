@@ -84,8 +84,8 @@ Envía `email`, `password` y `remember` a Fortify (`POST /login`). Los errores n
 
 | Prop | Tipo | Nota |
 |---|---|---|
-| `sectores` | `{ id, nombre }[]` | **Nueva.** Solo sectores activos (RN-003). Sin ella, la lista sale vacía. |
-| `paises` | `string[]` | **Nueva, opcional.** Por defecto `['Colombia']`. **[INFORMACIÓN PENDIENTE]** lista de países. |
+| `sectores` | `{ id, nombre }[]` | Solo sectores activos (RN-003), en orden alfabético. |
+| `paises` | `string[]` | Por ahora `['Colombia']`. **[INFORMACIÓN PENDIENTE]** lista de países. |
 | `passwordRules` | `string` | Del kit (atributo `passwordrules`). |
 
 Envía a `POST /register`:
@@ -103,7 +103,7 @@ Envía a `POST /register`:
 | `password`, `password_confirmation` | Contraseña fuerte (RN-001) y confirmada |
 | `terminos` | Obligatorio (`accepted`) |
 
-> **Para Luis (T-047):** hoy `CreateNewUser` solo valida `name`, `email` y `password`, así que los demás campos se ignoran. Falta crear la empresa y el usuario principal con el rol Empresa en una sola operación, y entregar `sectores` desde `Fortify::registerView`.
+Ya funciona de punta a punta: `Fortify::registerView` entrega `sectores` y `paises`, y `CreateNewUser` crea la empresa y el usuario principal con el rol Empresa en una sola transacción (T-047, versión mínima; ver `15_BACKEND.md`).
 
 ### L3 · ¿Olvidaste tu contraseña? (`auth/ForgotPassword`)
 
