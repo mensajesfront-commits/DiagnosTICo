@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * Estructura de las pantallas de acceso (L1–L4): panel oscuro a la izquierda
- * con el mensaje del sistema y el formulario a la derecha sobre el fondo
- * gris cálido. En pantallas pequeñas el panel se reduce a la marca.
+ * Estructura de las pantallas de acceso (L1–L4): mitad izquierda con el panel
+ * oscuro y el mensaje del sistema, mitad derecha con el formulario sobre el
+ * fondo gris cálido. En pantallas pequeñas el panel se reduce a la marca.
  */
 const {
     title = '',
@@ -19,17 +19,17 @@ const {
 <template>
     <div class="flex min-h-screen bg-lienzo text-tinta">
         <aside
-            class="hidden w-[36%] max-w-md shrink-0 flex-col justify-between bg-menu px-10 py-12 text-menu-texto lg:flex"
+            class="hidden w-1/2 shrink-0 flex-col justify-between bg-menu px-12 py-12 text-menu-texto lg:flex xl:px-20"
         >
             <p class="text-base font-semibold text-white">
                 Diagnóstico <span class="text-menu-marca">Empresarial</span>
             </p>
 
-            <div>
-                <p class="text-2xl leading-snug font-semibold text-white">
+            <div class="max-w-lg">
+                <p class="text-3xl leading-snug font-semibold text-white">
                     Conoce en qué punto está el marketing digital de tu empresa.
                 </p>
-                <ul class="mt-5 space-y-2 text-sm">
+                <ul class="mt-6 space-y-2.5 text-base">
                     <li>
                         · Responde un diagnóstico por categorías, a tu ritmo.
                     </li>
