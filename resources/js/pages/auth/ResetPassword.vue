@@ -1,90 +1,126 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import InputError from '@/components/InputError.vue';
-import PasswordInput from '@/components/PasswordInput.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { update } from '@/routes/password';
+/**
+ * L4 · Crea una contraseña nueva (HU-004).
+ *
+ * Fortify recibe `token`, `email`, `password` y `password_confirmation`. El
+ * botón se activa cuando se cumplen todos los requisitos (RN-001). Al guardar
+ * se vuelve a L1 con el aviso de contraseña actualizada.
+ *
+ * Si el enlace ya se usó, el servidor responde con un error en `email`; se
+ * muestra "Este enlace ya no es válido" con el botón "Pedir otro enlace".
+ */
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import Aviso from '@/components/base/Aviso.vue';
+import Boton from '@/components/base/Boton.vue';
+import Campo from '@/components/base/Campo.vue';
+import CampoContrasena from '@/components/base/CampoContrasena.vue';
+import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
+import { revisarContrasena } from '@/lib/contrasena';
+import { request, update } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Reset password',
-        description: 'Please enter your new password below',
+        title: 'Crea una contraseña nueva',
     },
 });
 
 const props = defineProps<{
     token: string;
     email: string;
-    passwordRules: string;
+    passwordRules?: string;
 }>();
 
-const inputEmail = ref(props.email);
+const contrasena = ref('');
+const confirmacion = ref('');
+
+const completa = computed(
+    () => revisarContrasena(contrasena.value, confirmacion.value).completa,
+);
+const totalRequisitos = computed(
+    () => revisarContrasena('', '').requisitos.length,
+);
 </script>
 
 <template>
-    <Head title="Reset password" />
+    <Head title="Crea una contraseña nueva" />
+
+    <p class="-mt-3 mb-5 text-sm text-tinta-suave">
+        Para la cuenta <strong class="text-tinta">{{ props.email }}</strong
+        >.
+    </p>
 
     <Form
         v-bind="update.form()"
         :transform="(data) => ({ ...data, token, email })"
         :reset-on-success="['password', 'password_confirmation']"
         v-slot="{ errors, processing }"
+        class="flex flex-col gap-4"
     >
-        <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="email">Email</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    autocomplete="email"
-                    v-model="inputEmail"
-                    class="mt-1 block w-full"
-                    readonly
-                />
-                <InputError :message="errors.email" class="mt-2" />
-            </div>
+        <Aviso
+            v-if="errors.email"
+            tono="error"
+            titulo="Este enlace ya no es válido"
+        >
+            <p>{{ errors.email }}</p>
+            <Link
+                :href="request()"
+                class="mt-2 inline-block font-medium text-marca underline underline-offset-2"
+            >
+                Pedir otro enlace
+            </Link>
+        </Aviso>
 
-            <div class="grid gap-2">
-                <Label for="password">Password</Label>
-                <PasswordInput
-                    id="password"
-                    name="password"
-                    autocomplete="new-password"
-                    class="mt-1 block w-full"
-                    autofocus
-                    placeholder="Password"
-                    :passwordrules="passwordRules"
-                />
-                <InputError :message="errors.password" />
-            </div>
+        <Campo
+            etiqueta="Contraseña nueva"
+            para="password"
+            :error="errors.password"
+        >
+            <CampoContrasena
+                id="password"
+                v-model="contrasena"
+                name="password"
+                required
+                v-focus
+                autocomplete="new-password"
+                :passwordrules="passwordRules"
+                :invalida="!!errors.password"
+            />
+        </Campo>
 
-            <div class="grid gap-2">
-                <Label for="password_confirmation"> Confirm password </Label>
-                <PasswordInput
-                    id="password_confirmation"
-                    name="password_confirmation"
-                    autocomplete="new-password"
-                    class="mt-1 block w-full"
-                    placeholder="Confirm password"
-                    :passwordrules="passwordRules"
-                />
-                <InputError :message="errors.password_confirmation" />
-            </div>
+        <Campo
+            etiqueta="Confirmar contraseña"
+            para="password_confirmation"
+            :error="errors.password_confirmation"
+        >
+            <CampoContrasena
+                id="password_confirmation"
+                v-model="confirmacion"
+                name="password_confirmation"
+                required
+                autocomplete="new-password"
+                :passwordrules="passwordRules"
+            />
+        </Campo>
 
-            <Button
+        <RequisitosContrasena
+            :contrasena="contrasena"
+            :confirmacion="confirmacion"
+        />
+
+        <div>
+            <Boton
                 type="submit"
-                class="mt-4 w-full"
-                :disabled="processing"
+                class="w-full"
+                :disabled="!completa"
+                :cargando="processing"
                 data-test="reset-password-button"
             >
-                <Spinner v-if="processing" />
-                Reset password
-            </Button>
+                Guardar contraseña
+            </Boton>
+            <p v-if="!completa" class="mt-2 text-xs text-tinta-suave">
+                Se activa cuando cumplas los {{ totalRequisitos }} requisitos.
+            </p>
         </div>
     </Form>
 </template>

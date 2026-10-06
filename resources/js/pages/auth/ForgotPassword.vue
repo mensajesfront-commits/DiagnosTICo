@@ -1,66 +1,88 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+/**
+ * L3 · ¿Olvidaste tu contraseña? (HU-003).
+ *
+ * Fortify recibe `email`. Por seguridad, el aviso es el mismo aunque el correo
+ * no exista en el sistema (RN-005); aquí se muestra cuando el servidor
+ * devuelve `status`. El enlace sirve hasta que se cambie la contraseña (RN-006).
+ */
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import Aviso from '@/components/base/Aviso.vue';
+import Boton from '@/components/base/Boton.vue';
+import Campo from '@/components/base/Campo.vue';
+import Entrada from '@/components/base/Entrada.vue';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Forgot password',
-        description: 'Enter your email to receive a password reset link',
+        title: '¿Olvidaste tu contraseña?',
+        description:
+            'Escribe el correo de tu cuenta. Te enviamos un enlace para crear una contraseña nueva.',
     },
 });
 
 defineProps<{
     status?: string;
 }>();
+
+const correo = ref('');
 </script>
 
 <template>
-    <Head title="Forgot password" />
+    <Head title="Recuperar contraseña" />
 
-    <div
-        v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
+    <Form
+        v-bind="email.form()"
+        :options="{ preserveState: true }"
+        v-slot="{ errors, processing, submit }"
+        class="flex flex-col gap-4"
     >
-        {{ status }}
-    </div>
+        <Campo etiqueta="Correo" para="email" :error="errors.email">
+            <Entrada
+                id="email"
+                v-model="correo"
+                type="email"
+                name="email"
+                required
+                v-focus
+                autocomplete="email"
+                placeholder="nombre@empresa.com"
+                :invalida="!!errors.email"
+            />
+        </Campo>
 
-    <div class="space-y-6">
-        <Form v-bind="email.form()" v-slot="{ errors, processing }">
-            <div class="grid gap-2">
-                <Label for="email">Email address</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    autocomplete="off"
-                    v-focus
-                    placeholder="email@example.com"
-                />
-                <InputError :message="errors.email" />
-            </div>
+        <Boton
+            type="submit"
+            class="w-full"
+            :cargando="processing"
+            data-test="email-password-reset-link-button"
+        >
+            Enviar enlace
+        </Boton>
 
-            <div class="my-6 flex items-center justify-start">
-                <Button
-                    class="w-full"
-                    :disabled="processing"
-                    data-test="email-password-reset-link-button"
-                >
-                    <Spinner v-if="processing" />
-                    Email password reset link
-                </Button>
-            </div>
-        </Form>
+        <Link
+            :href="login()"
+            class="text-center text-sm text-marca underline underline-offset-2 hover:text-marca-hover"
+        >
+            ← Volver a iniciar sesión
+        </Link>
 
-        <div class="space-x-1 text-center text-sm text-muted-foreground">
-            <span>Or, return to</span>
-            <TextLink :href="login()">log in</TextLink>
-        </div>
-    </div>
+        <Aviso v-if="status" tono="exito" titulo="Revisa tu correo">
+            Enviamos un enlace
+            <template v-if="correo">
+                a <strong>{{ correo }}</strong></template
+            >. El enlace sirve hasta que cambies la contraseña. Si no llega,
+            revisa spam o
+            <button
+                type="button"
+                class="text-marca underline underline-offset-2"
+                :disabled="processing"
+                @click="submit"
+            >
+                reenvía el enlace</button
+            >.
+        </Aviso>
+    </Form>
 </template>

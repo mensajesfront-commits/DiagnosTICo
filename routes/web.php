@@ -2,7 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Welcome')->name('home');
+// Al abrir el sistema se entra directo al inicio de sesión; con sesión
+// iniciada, al inicio de la cuenta.
+Route::get('/', fn () => auth()->check()
+    ? to_route('dashboard')
+    : to_route('login'))->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

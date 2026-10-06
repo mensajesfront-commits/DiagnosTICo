@@ -1,6 +1,6 @@
 # Seguridad
 
-**Estado:** EN CURSO. La matriz de roles y permisos es una PROPUESTA que REQUIERE VALIDACIÓN (T-006).
+**Estado:** EN CURSO. La matriz de roles y permisos ya sigue el wireframe A5.2 (T-006, 6 de octubre).
 
 Más adelante se completan:
 
@@ -17,57 +17,71 @@ Hay tres roles del sistema. Son fijos: no se editan ni se eliminan, y cada cuent
 | Empresa | Usuario principal de una empresa cliente | Registro propio (L2) o por el Administrador (A3.2) |
 | Colaborador | Persona de la empresa con su propia cuenta | La crea la empresa (E12.1); la empresa define el correo y la contraseña (RN-025) |
 
-El Administrador puede crear roles nuevos con los permisos que elija (HU-049). Consultor y Usuario son roles posibles a futuro y no se crean ahora.
+El Administrador puede crear roles nuevos con los permisos que elija (HU-049); cada uno tiene nombre, descripción opcional y si está activo. Un rol con cuentas no se elimina (RN-027).
 
-**[INCONSISTENCIA DETECTADA]** El prototipo usa "Consultor" como ejemplo de rol creado (A5.1c). Ver PA-006.
+**Rol Consultor (PA-006, respondida el 6 de octubre):** existe pero está **inactivo** hasta que se le asigne a alguien; eso se probará más adelante. El seeder lo crea inactivo, con los 6 permisos de A5.2 (ver empresas, solo las vinculadas; responder; ver resultados; PDF; editar su perfil; cambiar su contraseña). No es del sistema: el Administrador lo puede editar o eliminar, y el seeder no pisa esos cambios.
+
+Cada rol guarda `descripcion`, `activo` y `del_sistema` (columnas agregadas a la tabla `roles` de spatie). Un rol inactivo no se puede asignar.
 
 ## Permisos
 
-Según HU-049, el modal "Crear rol" muestra **15 permisos en 6 bloques**. Los nombres exactos salen del wireframe A5.2, que no está en este repositorio.
+Son los **15 permisos en 6 bloques** del wireframe A5.2 (A5.1 "Crear rol" usa la misma lista). La columna "Texto en pantalla" es lo que muestra la casilla.
 
-**[INFORMACIÓN PENDIENTE]** Hay que comparar esta lista con A5.2 y ajustar los textos. Los nombres técnicos que siguen son una **propuesta**. El menú lateral ya usa algunos (`resources/js/lib/menu.ts`).
+| Bloque | Permiso (nombre técnico) | Texto en pantalla | Qué permite | Pantallas |
+|---|---|---|---|---|
+| Diagnósticos | `diagnosticos.ver` | Ver diagnósticos | Ver sectores, catálogo, diagnósticos y vista previa | A2, A2·T, A2.3, A2.4, A2.6 |
+| | `diagnosticos.editar` | Editar preguntas e importancia | Crear y editar sectores, categorías, diagnósticos, preguntas e importancia; duplicar y archivar | A2.1–A2.3c, A2.5, A2.7 |
+| | `diagnosticos.publicar` | Publicar versiones | Publicar una versión | A2.1c |
+| Empresas | `empresas.ver` | Ver empresas | Ver empresas y su ficha | A3, A3.1 |
+| | `empresas.registrar` | Registrar empresas | Registrar empresas, editar sus datos, desactivar y reactivar | A3.1d, A3.1f, A3.2 |
+| | `mediciones.asignar` | Asignar mediciones | Asignar mediciones, dar nueva fecha, recordatorios, correo de aviso y solicitudes | A1b–A1d, A3.1b, A3.1e |
+| Mediciones y resultados | `diagnostico.responder` | Responder el diagnóstico | Responder, revisar y enviar el diagnóstico | E2–E5 |
+| | `resultados.ver` | Ver resultados y respuestas | Ver resultados, historial y respuestas | A3.3–A3.5, E6–E10 |
+| | `resultados.pdf` | Descargar PDF | Descargar el informe PDF | E6, A3.3 |
+| Configuración IA | `ia.ver` | Ver configuración | Ver prompts, ajustes y el prompt final | A4 |
+| | `ia.editar` | Editar prompts | Editar prompts y ajustes por sector o empresa; probarlos | A4–A4.9 |
+| Usuarios y roles | `usuarios.ver` | Ver usuarios | Ver cuentas y roles | A5 |
+| | `usuarios.gestionar` | Gestionar usuarios y roles | Invitar, desactivar, reactivar, cambiar rol, crear y editar roles, "Ver como" | A5.1–A5.5 |
+| Su cuenta | `perfil.editar` | Editar su perfil | Cambiar sus datos personales. En el rol Empresa, también los de la empresa | A6, E11 |
+| | `contrasena.cambiar` | Cambiar su contraseña | Cambiar su contraseña | A6, E11 |
 
-| Bloque | Permiso (nombre técnico) | Qué permite | Pantallas |
-|---|---|---|---|
-| 1. Inicio | `inicio.ver` | Ver los indicadores y las mediciones de todas las empresas | A1, A1b–A1e |
-| 2. Diagnósticos | `diagnosticos.ver` | Ver sectores, catálogo y diagnósticos | A2, A2·T, A2.3, A2.4, A2.6 |
-| | `diagnosticos.editar` | Crear y editar sectores, categorías, diagnósticos, preguntas e importancia; duplicar y archivar | A2.1–A2.3c, A2.5, A2.7 |
-| | `diagnosticos.publicar` | Publicar una versión | A2.1c |
-| 3. Empresas y mediciones | `empresas.ver` | Ver empresas, su ficha, sus resultados, su historial y sus respuestas | A3, A3.1, A3.3–A3.5 |
-| | `empresas.gestionar` | Registrar empresas, editar sus datos, desactivar y reactivar | A3.1d, A3.1f, A3.2 |
-| | `mediciones.asignar` | Asignar mediciones, dar nueva fecha, enviar recordatorios, editar el correo y atender solicitudes | A1b–A1d, A3.1b, A3.1e |
-| 4. Configuración IA | `ia.configurar` | Editar prompts y ajustes por sector o empresa; ver el prompt completo y probarlo | A4–A4.9 |
-| 5. Usuarios y roles | `usuarios.gestionar` | Ver cuentas, desactivar y reactivar | A5, A5.3b |
-| | `roles.gestionar` | Crear, editar, eliminar, asignar y quitar roles | A5.1–A5.2, A5.5 |
-| | `usuarios.ver-como` | Usar "Ver como" (solo lectura, queda registrado, RN-026) | A5.4, A5.4b |
-| 6. Empresa | `diagnostico.responder` | Responder, revisar y enviar el diagnóstico de su empresa | E2–E5 |
-| | `resultados.ver` | Ver el resultado, el historial, las respuestas y el PDF de su empresa | E6–E10 |
-| | `colaboradores.gestionar` | Crear colaboradores, cambiarles la contraseña, desactivarlos y reactivarlos | E12–E12.3 |
-| | `empresa.editar` | Cambiar los datos de la empresa en el perfil | E11 (parte de empresa) |
+En la Empresa y el Colaborador, los permisos de "Mediciones y resultados" valen **solo para su empresa** (RN-007).
 
-Para todas las cuentas, sin necesidad de un permiso: iniciar y cerrar sesión, recuperar la contraseña y editar los datos propios y la contraseña propia (A6, E11).
+Lo que no tiene casilla en A5.2 se decide por el rol:
+
+- **Inicio del Administrador (A1):** cualquier rol interno (que no sea Empresa ni Colaborador). Lo que muestra depende de sus permisos.
+- **Colaboradores (E12):** solo el rol Empresa (RN-025, HU-076).
+- **"Ver como" (A5.4):** lo usa quien tiene `usuarios.gestionar`, en solo lectura y con registro (RN-026). Sirve para **comprobar que cada rol ve solo las pantallas que se le asignaron**, así que se usa sobre cuentas de Empresa, Colaborador, Consultor y cualquier rol creado, **no sobre cuentas de Administrador** (respuesta del equipo, 6 de octubre). **[INCONSISTENCIA DETECTADA]** El wireframe A5.4b muestra "Ver como" sobre un Administrador; queda fuera según esta respuesta.
+
+Para todas las cuentas, sin permiso: iniciar y cerrar sesión y recuperar la contraseña.
 
 ## Matriz por rol
 
+Los roles del sistema tienen permisos fijos (RN-027). Así los muestra A5.2:
+
 | Permiso | Administrador | Empresa | Colaborador |
 |---|:---:|:---:|:---:|
-| `inicio.ver` | ✓ | | |
 | `diagnosticos.ver` | ✓ | | |
 | `diagnosticos.editar` | ✓ | | |
 | `diagnosticos.publicar` | ✓ | | |
 | `empresas.ver` | ✓ | | |
-| `empresas.gestionar` | ✓ | | |
+| `empresas.registrar` | ✓ | | |
 | `mediciones.asignar` | ✓ | | |
-| `ia.configurar` | ✓ | | |
+| `diagnostico.responder` | ✓ | ✓ | ✓ |
+| `resultados.ver` | ✓ | ✓ | ✓ |
+| `resultados.pdf` | ✓ | ✓ | ✓ |
+| `ia.ver` | ✓ | | |
+| `ia.editar` | ✓ | | |
+| `usuarios.ver` | ✓ | | |
 | `usuarios.gestionar` | ✓ | | |
-| `roles.gestionar` | ✓ | | |
-| `usuarios.ver-como` | ✓ | | |
-| `diagnostico.responder` | | ✓ | ✓ |
-| `resultados.ver` | | ✓ | ✓ |
-| `colaboradores.gestionar` | | ✓ | |
-| `empresa.editar` | | ✓ | |
+| `perfil.editar` | ✓ | ✓ | ✓ |
+| `contrasena.cambiar` | ✓ | ✓ | ✓ |
+| **Total** | **15** | **5** | **5** |
 
-El colaborador tiene casi los mismos permisos que la empresa. No puede crear ni desactivar colaboradores ni cambiar los datos de la empresa (RN-025).
+- El Administrador tiene los 15, también "Responder el diagnóstico", aunque no responde por ninguna empresa (no tiene `empresa_id`).
+- El colaborador **sí edita su propio perfil** (su nombre, su teléfono…), respuesta del equipo del 6 de octubre. Lo que no puede es cambiar los datos de la empresa (RN-025): eso lo decide el rol Empresa, no el permiso. **[INCONSISTENCIA DETECTADA]** A5.2 muestra al Colaborador con 4 permisos, sin "Editar su perfil"; manda la respuesta del equipo.
+
+Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/Feature/RolesYPermisosTest.php`) y el menú en `resources/js/lib/menu.ts`.
 
 ## Reglas que se aplican en el servidor
 

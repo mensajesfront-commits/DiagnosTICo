@@ -1,0 +1,254 @@
+{
+    "componente": "diagnosticos/Index",
+    "props": {
+        "sectores": [
+            {
+                "id": 1,
+                "nombre": "Abogados",
+                "descripcion": "Bufetes, abogados independientes y notarías.",
+                "activo": true,
+                "diagnosticos": 3
+            },
+            {
+                "id": 2,
+                "nombre": "Inmobiliarias",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 2
+            },
+            {
+                "id": 3,
+                "nombre": "Médicos",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 2
+            },
+            {
+                "id": 4,
+                "nombre": "Comidas",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 4
+            },
+            {
+                "id": 5,
+                "nombre": "Alojamientos",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 1
+            },
+            {
+                "id": 6,
+                "nombre": "Turismo",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 1
+            },
+            {
+                "id": 7,
+                "nombre": "Talleres",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 0
+            }
+        ],
+        "sector": null,
+        "resumen": {
+            "empresas": 38,
+            "mediciones": 115,
+            "publicados": 10,
+            "borradores": 3,
+            "sectores_activos": 7,
+            "ultima_medicion": {
+                "en_curso": 3,
+                "no_iniciada": 3,
+                "vencida": 1,
+                "terminada": 31
+            }
+        },
+        "diagnosticos": [
+            {
+                "id": 1,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 1,
+                "sector_nombre": "Abogados",
+                "categorias": 10,
+                "preguntas": 46,
+                "empresas": 6,
+                "mediciones": 31,
+                "estado": "publicado",
+                "version_publicada": 2,
+                "borrador_pendiente": 3,
+                "actualizado_en": "2026-10-03T10:00:00Z"
+            },
+            {
+                "id": 2,
+                "nombre": "Diagnóstico rápido",
+                "sector_id": 1,
+                "sector_nombre": "Abogados",
+                "categorias": 5,
+                "preguntas": 22,
+                "empresas": 3,
+                "mediciones": 6,
+                "estado": "publicado",
+                "version_publicada": 1,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-20T10:00:00Z"
+            },
+            {
+                "id": 3,
+                "nombre": "Diagnóstico de redes sociales",
+                "sector_id": 1,
+                "sector_nombre": "Abogados",
+                "categorias": 3,
+                "preguntas": 18,
+                "empresas": 0,
+                "mediciones": 0,
+                "estado": "borrador",
+                "version_publicada": null,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-10-04T10:00:00Z"
+            },
+            {
+                "id": 4,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 5,
+                "sector_nombre": "Alojamientos",
+                "categorias": 10,
+                "preguntas": 42,
+                "empresas": 3,
+                "mediciones": 5,
+                "estado": "publicado",
+                "version_publicada": 1,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-15T10:00:00Z"
+            },
+            {
+                "id": 5,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 4,
+                "sector_nombre": "Comidas",
+                "categorias": 10,
+                "preguntas": 46,
+                "empresas": 6,
+                "mediciones": 27,
+                "estado": "publicado",
+                "version_publicada": 2,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-28T10:00:00Z"
+            },
+            {
+                "id": 6,
+                "nombre": "Diagnóstico de domicilios",
+                "sector_id": 4,
+                "sector_nombre": "Comidas",
+                "categorias": 4,
+                "preguntas": 20,
+                "empresas": 2,
+                "mediciones": 4,
+                "estado": "publicado",
+                "version_publicada": 1,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-18T10:00:00Z"
+            },
+            {
+                "id": 7,
+                "nombre": "Diagnóstico rápido",
+                "sector_id": 4,
+                "sector_nombre": "Comidas",
+                "categorias": 5,
+                "preguntas": 22,
+                "empresas": 2,
+                "mediciones": 2,
+                "estado": "publicado",
+                "version_publicada": 1,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-12T10:00:00Z"
+            },
+            {
+                "id": 8,
+                "nombre": "Diagnóstico de reseñas",
+                "sector_id": 4,
+                "sector_nombre": "Comidas",
+                "categorias": 2,
+                "preguntas": 9,
+                "empresas": 0,
+                "mediciones": 0,
+                "estado": "borrador",
+                "version_publicada": null,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-10-02T10:00:00Z"
+            },
+            {
+                "id": 9,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 2,
+                "sector_nombre": "Inmobiliarias",
+                "categorias": 10,
+                "preguntas": 44,
+                "empresas": 6,
+                "mediciones": 14,
+                "estado": "publicado",
+                "version_publicada": 1,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-10T10:00:00Z"
+            },
+            {
+                "id": 10,
+                "nombre": "Diagnóstico de portales",
+                "sector_id": 2,
+                "sector_nombre": "Inmobiliarias",
+                "categorias": 3,
+                "preguntas": 12,
+                "empresas": 0,
+                "mediciones": 0,
+                "estado": "borrador",
+                "version_publicada": null,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-30T10:00:00Z"
+            },
+            {
+                "id": 11,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 3,
+                "sector_nombre": "Médicos",
+                "categorias": 10,
+                "preguntas": 48,
+                "empresas": 6,
+                "mediciones": 22,
+                "estado": "publicado",
+                "version_publicada": 2,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-25T10:00:00Z"
+            },
+            {
+                "id": 12,
+                "nombre": "Diagnóstico de agenda en línea",
+                "sector_id": 3,
+                "sector_nombre": "Médicos",
+                "categorias": 3,
+                "preguntas": 15,
+                "empresas": 2,
+                "mediciones": 3,
+                "estado": "publicado",
+                "version_publicada": 1,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-08T10:00:00Z"
+            },
+            {
+                "id": 13,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 6,
+                "sector_nombre": "Turismo",
+                "categorias": 10,
+                "preguntas": 40,
+                "empresas": 2,
+                "mediciones": 1,
+                "estado": "publicado",
+                "version_publicada": 1,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-05T10:00:00Z"
+            }
+        ]
+    }
+}

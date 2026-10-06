@@ -29,11 +29,11 @@ Lista de los documentos del proyecto con su estado. Cada documento se escribe en
 | 11 | Diseño técnico (`11_DISENO_TECNICO.md`) | PENDIENTE | 4–6 | T-071 |
 | 12 | [Base de datos](12_BASE_DE_DATOS.md) | EN CURSO | 2–3 | T-007, T-040 |
 | 13 | API e integraciones (`13_API_E_INTEGRACIONES.md`) | PENDIENTE | 5 | T-113 |
-| 14 | Frontend (`14_FRONTEND.md`) | PENDIENTE | 4 | T-088 |
-| 15 | Backend (`15_BACKEND.md`) | PENDIENTE | 3 | T-043 |
+| 14 | [Frontend](14_FRONTEND.md) | EN CURSO | 3–6 | T-088 |
+| 15 | [Backend](15_BACKEND.md) | REQUIERE VALIDACIÓN | 3 | T-043 |
 | 16 | Infraestructura (`16_INFRAESTRUCTURA.md`) | PENDIENTE | 7 | T-154 |
 | 17 | [Seguridad](17_SEGURIDAD.md) | EN CURSO | 2–3 | T-006, T-065 |
-| 18 | UI/UX (`18_UI_UX.md`) | PENDIENTE | 3 | T-066 |
+| 18 | [UI/UX](18_UI_UX.md) | EN CURSO | 3–6 | T-066, T-089 |
 | 19 | Pruebas (`19_PRUEBAS.md`) | PENDIENTE | 6–7 | T-119 |
 | 20 | Despliegue (`20_DESPLIEGUE.md`) | PENDIENTE (casi todo NO APLICA) | 7 | T-155 |
 | 21 | Mantenimiento (`21_MANTENIMIENTO.md`) | PENDIENTE | 7 | T-156 |

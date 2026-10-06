@@ -1,107 +1,102 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
-import PasswordInput from '@/components/PasswordInput.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+/**
+ * L1 · Iniciar sesión (HU-001).
+ *
+ * Fortify recibe `email`, `password` y `remember`. Los mensajes de error no
+ * dicen si el correo existe (RN-005): llegan del servidor tal cual.
+ */
+import { Form, Head, Link } from '@inertiajs/vue3';
+import Aviso from '@/components/base/Aviso.vue';
+import Boton from '@/components/base/Boton.vue';
+import Campo from '@/components/base/Campo.vue';
+import CampoContrasena from '@/components/base/CampoContrasena.vue';
+import Entrada from '@/components/base/Entrada.vue';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Log in to your account',
-        description: 'Enter your email and password below to log in',
+        title: 'Iniciar sesión',
+        description: 'Entra con tu correo y contraseña.',
     },
 });
 
 defineProps<{
+    /** Aviso que deja el servidor, por ejemplo "Contraseña actualizada" (HU-004). */
     status?: string;
     canResetPassword: boolean;
 }>();
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Iniciar sesión" />
 
-    <div
-        v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
-    >
-        {{ status }}
-    </div>
+    <Aviso v-if="status" tono="exito" class="mb-5">{{ status }}</Aviso>
 
     <Form
         v-bind="store.form()"
         :reset-on-success="['password']"
         v-slot="{ errors, processing }"
-        class="flex flex-col gap-6"
+        class="flex flex-col gap-4"
     >
-        <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="email">Email address</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    required
-                    v-focus
-                    :tabindex="1"
-                    autocomplete="email"
-                    placeholder="email@example.com"
-                />
-                <InputError :message="errors.email" />
-            </div>
+        <Campo etiqueta="Correo" para="email" :error="errors.email">
+            <Entrada
+                id="email"
+                type="email"
+                name="email"
+                required
+                v-focus
+                autocomplete="email"
+                placeholder="nombre@empresa.com"
+                :invalida="!!errors.email"
+            />
+        </Campo>
 
-            <div class="grid gap-2">
-                <div class="flex items-center justify-between">
-                    <Label for="password">Password</Label>
-                    <TextLink
-                        v-if="canResetPassword"
-                        :href="request()"
-                        class="text-sm"
-                        :tabindex="5"
-                    >
-                        Forgot your password?
-                    </TextLink>
-                </div>
-                <PasswordInput
-                    id="password"
-                    name="password"
-                    required
-                    :tabindex="2"
-                    autocomplete="current-password"
-                    placeholder="Password"
-                />
-                <InputError :message="errors.password" />
-            </div>
+        <Campo etiqueta="Contraseña" para="password" :error="errors.password">
+            <template v-if="canResetPassword" #accion>
+                <Link
+                    :href="request()"
+                    class="text-xs text-marca underline underline-offset-2 hover:text-marca-hover"
+                >
+                    ¿Olvidaste tu contraseña?
+                </Link>
+            </template>
+            <CampoContrasena
+                id="password"
+                name="password"
+                required
+                autocomplete="current-password"
+                :invalida="!!errors.password"
+            />
+        </Campo>
 
-            <div class="flex items-center justify-between">
-                <Label for="remember" class="flex items-center space-x-3">
-                    <Checkbox id="remember" name="remember" :tabindex="3" />
-                    <span>Remember me</span>
-                </Label>
-            </div>
+        <label class="flex items-center gap-2 text-sm text-tinta">
+            <input
+                type="checkbox"
+                name="remember"
+                class="size-4 rounded border-linea-fuerte accent-marca"
+            />
+            Mantener la sesión iniciada en este equipo
+        </label>
 
-            <Button
-                type="submit"
-                class="mt-4 w-full"
-                :tabindex="4"
-                :disabled="processing"
-                data-test="login-button"
+        <Boton
+            type="submit"
+            class="mt-2 w-full"
+            :cargando="processing"
+            data-test="login-button"
+        >
+            Iniciar sesión
+        </Boton>
+
+        <p class="text-center text-sm text-tinta-suave">
+            ¿Aún no tienes cuenta?
+            <Link
+                :href="register()"
+                class="font-medium text-marca underline underline-offset-2 hover:text-marca-hover"
             >
-                <Spinner v-if="processing" />
-                Log in
-            </Button>
-        </div>
-
-        <div class="text-center text-sm text-muted-foreground">
-            Don't have an account?
-            <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
-        </div>
+                Registrar mi empresa
+            </Link>
+        </p>
     </Form>
 </template>

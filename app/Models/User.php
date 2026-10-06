@@ -6,6 +6,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -13,8 +14,20 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
+ * @property int|null $empresa_id
  * @property string $name
  * @property string $email
+ * @property string|null $cargo
+ * @property string|null $telefono
+ * @property string|null $ciudad
+ * @property string|null $pais
+ * @property string $zona_horaria
+ * @property string $idioma
+ * @property array<string, bool>|null $avisos
+ * @property string|null $foto_ruta
+ * @property Carbon|null $ultimo_acceso_en
+ * @property Carbon|null $contrasena_actualizada_en
+ * @property bool $activo
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $two_factor_secret
@@ -24,8 +37,11 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+#[Fillable([
+    'name', 'email', 'password', 'empresa_id', 'cargo', 'telefono', 'activo',
+    'ciudad', 'pais', 'zona_horaria', 'idioma', 'avisos',
+])]
+#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'foto_ruta'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -41,6 +57,20 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'activo' => 'boolean',
+            'avisos' => 'array',
+            'ultimo_acceso_en' => 'datetime',
+            'contrasena_actualizada_en' => 'datetime',
         ];
+    }
+
+    /**
+     * Empresa de la cuenta; null para el Administrador.
+     *
+     * @return BelongsTo<Empresa, $this>
+     */
+    public function empresa(): BelongsTo
+    {
+        return $this->belongsTo(Empresa::class);
     }
 }

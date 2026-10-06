@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\PruebaTecnicaController;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 | Rutas de la prueba técnica de la semana 2 (T-018, T-024, T-025).
@@ -26,4 +28,19 @@ Route::middleware(['auth', 'role:Administrador'])
 
         // T-025: el mismo radar dentro de un PDF.
         Route::get('pdf', [PruebaTecnicaController::class, 'pdf'])->name('pdf');
+
+        // Vistas previas de las pantallas con los datos de ejemplo del
+        // wireframe (resources/datos-ejemplo/*.json), para revisar el frontend
+        // mientras no existen las rutas reales. Cada JSON dice qué página
+        // abrir y con qué props, que son las mismas que debe entregar el
+        // controlador (docs/14_FRONTEND.md).
+        Route::get('vistas/{vista}', function (string $vista) {
+            $archivo = resource_path("datos-ejemplo/{$vista}.json");
+            abort_unless(File::exists($archivo), 404);
+
+            /** @var array{componente: string, props: array<string, mixed>} $datos */
+            $datos = File::json($archivo);
+
+            return Inertia::render($datos['componente'], $datos['props']);
+        })->where('vista', '[a-z0-9-]+')->name('vista');
     });

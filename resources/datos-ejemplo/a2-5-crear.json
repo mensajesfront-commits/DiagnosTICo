@@ -1,0 +1,282 @@
+{
+    "componente": "diagnosticos/Crear",
+    "props": {
+        "sectores": [
+            {
+                "id": 1,
+                "nombre": "Abogados",
+                "descripcion": "Bufetes, abogados independientes y notarías.",
+                "activo": true,
+                "diagnosticos": 3
+            },
+            {
+                "id": 2,
+                "nombre": "Inmobiliarias",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 2
+            },
+            {
+                "id": 3,
+                "nombre": "Médicos",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 2
+            },
+            {
+                "id": 4,
+                "nombre": "Comidas",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 4
+            },
+            {
+                "id": 5,
+                "nombre": "Alojamientos",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 1
+            },
+            {
+                "id": 6,
+                "nombre": "Turismo",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 1
+            },
+            {
+                "id": 7,
+                "nombre": "Talleres",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 0
+            }
+        ],
+        "sectorId": 7,
+        "categorias": [
+            {
+                "id": 1,
+                "nombre": "Análisis del mercado"
+            },
+            {
+                "id": 2,
+                "nombre": "Análisis de la competencia"
+            },
+            {
+                "id": 3,
+                "nombre": "Análisis del cliente"
+            },
+            {
+                "id": 4,
+                "nombre": "Análisis de la marca"
+            },
+            {
+                "id": 5,
+                "nombre": "Presencia en línea"
+            },
+            {
+                "id": 6,
+                "nombre": "Contenido y publicaciones"
+            },
+            {
+                "id": 7,
+                "nombre": "Herramientas de automatización"
+            },
+            {
+                "id": 8,
+                "nombre": "Análisis de la inversión"
+            },
+            {
+                "id": 9,
+                "nombre": "Medición de KPIs"
+            },
+            {
+                "id": 10,
+                "nombre": "Recursos humanos"
+            },
+            {
+                "id": 11,
+                "nombre": "Correo electrónico"
+            }
+        ],
+        "publicados": [
+            {
+                "id": 1,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 1,
+                "sector_nombre": "Abogados",
+                "version": 2,
+                "preguntas": 46,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca",
+                    "Presencia en línea",
+                    "Contenido y publicaciones",
+                    "Herramientas de automatización",
+                    "Análisis de la inversión",
+                    "Medición de KPIs",
+                    "Recursos humanos"
+                ]
+            },
+            {
+                "id": 2,
+                "nombre": "Diagnóstico rápido",
+                "sector_id": 1,
+                "sector_nombre": "Abogados",
+                "version": 1,
+                "preguntas": 22,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca",
+                    "Presencia en línea"
+                ]
+            },
+            {
+                "id": 4,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 5,
+                "sector_nombre": "Alojamientos",
+                "version": 1,
+                "preguntas": 42,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca",
+                    "Presencia en línea",
+                    "Contenido y publicaciones",
+                    "Herramientas de automatización",
+                    "Análisis de la inversión",
+                    "Medición de KPIs",
+                    "Recursos humanos"
+                ]
+            },
+            {
+                "id": 5,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 4,
+                "sector_nombre": "Comidas",
+                "version": 2,
+                "preguntas": 46,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca",
+                    "Presencia en línea",
+                    "Contenido y publicaciones",
+                    "Herramientas de automatización",
+                    "Análisis de la inversión",
+                    "Medición de KPIs",
+                    "Recursos humanos"
+                ]
+            },
+            {
+                "id": 6,
+                "nombre": "Diagnóstico de domicilios",
+                "sector_id": 4,
+                "sector_nombre": "Comidas",
+                "version": 1,
+                "preguntas": 20,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca"
+                ]
+            },
+            {
+                "id": 7,
+                "nombre": "Diagnóstico rápido",
+                "sector_id": 4,
+                "sector_nombre": "Comidas",
+                "version": 1,
+                "preguntas": 22,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca",
+                    "Presencia en línea"
+                ]
+            },
+            {
+                "id": 9,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 2,
+                "sector_nombre": "Inmobiliarias",
+                "version": 1,
+                "preguntas": 44,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca",
+                    "Presencia en línea",
+                    "Contenido y publicaciones",
+                    "Herramientas de automatización",
+                    "Análisis de la inversión",
+                    "Medición de KPIs",
+                    "Recursos humanos"
+                ]
+            },
+            {
+                "id": 11,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 3,
+                "sector_nombre": "Médicos",
+                "version": 2,
+                "preguntas": 48,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca",
+                    "Presencia en línea",
+                    "Contenido y publicaciones",
+                    "Herramientas de automatización",
+                    "Análisis de la inversión",
+                    "Medición de KPIs",
+                    "Recursos humanos"
+                ]
+            },
+            {
+                "id": 12,
+                "nombre": "Diagnóstico de agenda en línea",
+                "sector_id": 3,
+                "sector_nombre": "Médicos",
+                "version": 1,
+                "preguntas": 15,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente"
+                ]
+            },
+            {
+                "id": 13,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 6,
+                "sector_nombre": "Turismo",
+                "version": 1,
+                "preguntas": 40,
+                "categorias": [
+                    "Análisis del mercado",
+                    "Análisis de la competencia",
+                    "Análisis del cliente",
+                    "Análisis de la marca",
+                    "Presencia en línea",
+                    "Contenido y publicaciones",
+                    "Herramientas de automatización",
+                    "Análisis de la inversión",
+                    "Medición de KPIs",
+                    "Recursos humanos"
+                ]
+            }
+        ]
+    }
+}
