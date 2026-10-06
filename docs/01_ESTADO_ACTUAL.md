@@ -36,6 +36,7 @@ Desde la semana 3 también tiene las primeras pantallas del negocio (frontend), 
 | T-055 Catálogo de categorías | A2.3, A2.3b y A2.3c | Rutas de categorías (backend) |
 | T-056 Crear diagnóstico | A2.5, en blanco o copiando; también duplicar, archivar y eliminar | `POST /diagnosticos` (backend) |
 | T-043 Rutas del backend | Propuesta en `15_BACKEND.md` | Que Luis la valide |
+| T-042, T-059, T-060, T-062, T-063 Documentos | `09_FLUJOS_DEL_SISTEMA.md`, `02_VISION_Y_OBJETIVOS.md`, `04_STAKEHOLDERS.md`, `06_REQUISITOS_NO_FUNCIONALES.md`, `10_ARQUITECTURA.md` | Validar metas y datos de NuevasTIC marcados como pendientes |
 | T-066 / T-088 UI/UX y frontend | `18_UI_UX.md` y `14_FRONTEND.md` | Se completan cada semana |
 
 ## Semana 2: tareas "En curso"

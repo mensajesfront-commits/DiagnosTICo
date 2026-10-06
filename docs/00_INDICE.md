@@ -17,15 +17,15 @@ Lista de los documentos del proyecto con su estado. Cada documento se escribe en
 | 00 | [Índice](00_INDICE.md) | EN CURSO | 2 | T-027 |
 | 01 | [Contexto del proyecto](01_CONTEXTO_PROYECTO.md) | EN CURSO | 2 | T-028 |
 | 01 | [Estado actual](01_ESTADO_ACTUAL.md) | EN CURSO | todas | T-037 |
-| 02 | Visión y objetivos (`02_VISION_Y_OBJETIVOS.md`) | PENDIENTE | 3 | T-059 |
+| 02 | [Visión y objetivos](02_VISION_Y_OBJETIVOS.md) | REQUIERE VALIDACIÓN | 3 | T-059 |
 | 03 | [Alcance](03_ALCANCE.md) | REQUIERE VALIDACIÓN | 2 | T-029 |
-| 04 | Stakeholders (`04_STAKEHOLDERS.md`) | PENDIENTE | 3 | T-060 |
+| 04 | [Stakeholders](04_STAKEHOLDERS.md) | REQUIERE VALIDACIÓN | 3 | T-060 |
 | 05 | [Requisitos funcionales](05_REQUISITOS_FUNCIONALES.md) | REQUIERE VALIDACIÓN | 2 | T-003, T-061 |
-| 06 | Requisitos no funcionales (`06_REQUISITOS_NO_FUNCIONALES.md`) | PENDIENTE | 3 | T-062 |
+| 06 | [Requisitos no funcionales](06_REQUISITOS_NO_FUNCIONALES.md) | REQUIERE VALIDACIÓN | 3 | T-062 |
 | 07 | Reglas de negocio (`07_REGLAS_DE_NEGOCIO.md`) | PENDIENTE | 4–6 | T-086 |
 | 08 | Casos de uso (`08_CASOS_DE_USO.md`) | PENDIENTE | 3 | T-041 |
-| 09 | Flujos del sistema (`09_FLUJOS_DEL_SISTEMA.md`) | PENDIENTE | 3 | T-042 |
-| 10 | Arquitectura (`10_ARQUITECTURA.md`) | PENDIENTE | 3 | T-063 |
+| 09 | [Flujos del sistema](09_FLUJOS_DEL_SISTEMA.md) | EN CURSO | 3 | T-042 |
+| 10 | [Arquitectura](10_ARQUITECTURA.md) | EN CURSO | 3 | T-063 |
 | 11 | Diseño técnico (`11_DISENO_TECNICO.md`) | PENDIENTE | 4–6 | T-071 |
 | 12 | [Base de datos](12_BASE_DE_DATOS.md) | EN CURSO | 2–3 | T-007, T-040 |
 | 13 | API e integraciones (`13_API_E_INTEGRACIONES.md`) | PENDIENTE | 5 | T-113 |
