@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * Estructura de las pantallas de acceso (L1–L4): mitad izquierda con el panel
- * oscuro y el mensaje del sistema, mitad derecha con el formulario sobre el
+ * Estructura de las pantallas de acceso (L1–L4): a la izquierda (42%) el panel
+ * oscuro con el mensaje del sistema; a la derecha el formulario sobre el
  * fondo gris cálido. En pantallas pequeñas el panel se reduce a la marca.
  */
 const {
@@ -19,7 +19,7 @@ const {
 <template>
     <div class="flex min-h-screen bg-lienzo text-tinta">
         <aside
-            class="hidden w-1/2 shrink-0 flex-col justify-between bg-menu px-12 py-12 text-menu-texto lg:flex xl:px-20"
+            class="hidden w-[42%] shrink-0 flex-col justify-between bg-menu px-12 py-12 text-menu-texto lg:flex xl:px-20"
         >
             <p class="text-base font-semibold text-white">
                 Diagnóstico <span class="text-menu-marca">Empresarial</span>

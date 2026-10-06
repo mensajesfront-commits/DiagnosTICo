@@ -75,7 +75,7 @@ Niveles del resultado (RN-019). Cada nivel tiene un color fuerte (barras y gráf
 | Pantalla | Diferencia | Motivo |
 |---|---|---|
 | L2, L4 | La lista de requisitos de la contraseña tiene 5 puntos (agrega "Al menos un carácter especial"); el wireframe muestra 4. | RN-001 lo exige. **[INCONSISTENCIA DETECTADA]**, pendiente de decidir. |
-| L1–L4 | El panel oscuro ocupa la mitad de la pantalla y el formulario la otra mitad; en el wireframe el panel es más angosto. | Lo pidió el equipo (6 de octubre). |
+| L1–L4 | El panel oscuro ocupa el 42 % de la pantalla; en el wireframe es más angosto. | Lo pidió el equipo (6 de octubre). |
 | L1 | No tiene la "Nota del prototipo" con atajos de entrada. | El wireframe aclara que no es parte del diseño. |
 | L2 | El país solo ofrece "Colombia". | **[INFORMACIÓN PENDIENTE]** Falta la lista de países. |
 | L2 | Los enlaces de términos y de política apuntan a `#`. | **[INFORMACIÓN PENDIENTE]** Faltan las URL reales. |
