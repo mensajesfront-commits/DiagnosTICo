@@ -29,6 +29,13 @@ Niveles del resultado (RN-019). Cada nivel tiene un color fuerte (barras y gráf
 | Vas en buen camino | 60–79 | `#4a85c7` |
 | Sigue así | 80–100 | `#4e9954` |
 
+## Logo
+
+- Aro azul oscuro (`#14154d`) con una «C» gris claro (`#e6e8ea`) y el punto y la señal en verde (`#6ae45b`).
+- Componente `resources/js/components/marca/Logo.vue`, en SVG; el tamaño se da con la clase (`size-10`).
+- Va en el menú lateral, en el panel de las pantallas de acceso y en la barra superior del celular.
+- El ícono de la pestaña del navegador sale del mismo dibujo: `public/favicon.svg`, `favicon.ico` y `apple-touch-icon.png`.
+
 ## Tipografía
 
 - **IBM Plex Sans** para todo el texto.

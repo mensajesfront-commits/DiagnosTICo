@@ -4,6 +4,8 @@
  * oscuro con el mensaje del sistema; a la derecha el formulario sobre el
  * fondo gris cálido. En pantallas pequeñas el panel se reduce a la marca.
  */
+import Logo from '@/components/marca/Logo.vue';
+
 const {
     title = '',
     description = '',
@@ -21,8 +23,14 @@ const {
         <aside
             class="hidden w-[42%] shrink-0 flex-col justify-between bg-menu px-12 py-12 text-menu-texto lg:flex xl:px-20"
         >
-            <p class="text-base font-semibold text-white">
-                Diagnóstico <span class="text-menu-marca">Empresarial</span>
+            <p
+                class="flex items-center gap-3 text-base font-semibold text-white"
+            >
+                <Logo class="size-10" />
+                <span>
+                    Diagnóstico
+                    <span class="text-menu-marca">Empresarial</span>
+                </span>
             </p>
 
             <div class="max-w-lg">
@@ -53,8 +61,13 @@ const {
 
         <main class="flex flex-1 items-center justify-center px-4 py-10">
             <div :class="['w-full', ancho === 'lg' ? 'max-w-xl' : 'max-w-sm']">
-                <p class="mb-8 text-base font-semibold lg:hidden">
-                    Diagnóstico <span class="text-marca">Empresarial</span>
+                <p
+                    class="mb-8 flex items-center gap-2.5 text-base font-semibold lg:hidden"
+                >
+                    <Logo class="size-8" />
+                    <span>
+                        Diagnóstico <span class="text-marca">Empresarial</span>
+                    </span>
                 </p>
 
                 <header v-if="title" class="mb-5">

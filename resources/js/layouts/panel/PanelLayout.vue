@@ -11,6 +11,7 @@ import { Link, router } from '@inertiajs/vue3';
 import { Menu, X } from '@lucide/vue';
 import { ref } from 'vue';
 import MenuLateral from '@/components/base/MenuLateral.vue';
+import Logo from '@/components/marca/Logo.vue';
 import { Toaster } from '@/components/ui/sonner';
 import type { BreadcrumbItem } from '@/types';
 
@@ -63,9 +64,12 @@ router.on('navigate', () => {
                     <X v-if="menuMovilAbierto" class="size-5" />
                     <Menu v-else class="size-5" />
                 </button>
-                <span class="text-sm font-semibold">
-                    Diagnóstico
-                    <span class="text-marca">Empresarial</span>
+                <span class="flex items-center gap-2 text-sm font-semibold">
+                    <Logo class="size-7" />
+                    <span>
+                        Diagnóstico
+                        <span class="text-marca">Empresarial</span>
+                    </span>
                 </span>
             </div>
 

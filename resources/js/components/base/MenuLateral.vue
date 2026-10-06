@@ -8,6 +8,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { ChevronRight } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
+import Logo from '@/components/marca/Logo.vue';
 import { filtrarMenu, menuAdministrador, menuEmpresa } from '@/lib/menu';
 import type { ItemMenu } from '@/lib/menu';
 import { cn, toUrl } from '@/lib/utils';
@@ -66,12 +67,18 @@ function cerrarSesion(): void {
         class="flex h-full w-60 shrink-0 flex-col bg-menu px-3 py-6"
         aria-label="Menú principal"
     >
-        <Link :href="items[0]?.href ?? '/'" class="mb-8 px-3 leading-tight">
-            <span class="block text-base font-semibold text-white">
-                Diagnóstico
-            </span>
-            <span class="block text-base font-semibold text-menu-marca">
-                Empresarial
+        <Link
+            :href="items[0]?.href ?? '/'"
+            class="mb-8 flex items-center gap-3 px-3 leading-tight"
+        >
+            <Logo class="size-10" />
+            <span>
+                <span class="block text-base font-semibold text-white">
+                    Diagnóstico
+                </span>
+                <span class="block text-base font-semibold text-menu-marca">
+                    Empresarial
+                </span>
             </span>
         </Link>
 
