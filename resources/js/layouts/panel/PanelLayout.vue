@@ -27,8 +27,10 @@ router.on('navigate', () => {
 
 <template>
     <div class="flex min-h-screen bg-lienzo text-tinta">
-        <div class="sticky top-0 hidden h-screen lg:block">
-            <MenuLateral />
+        <div class="hidden shrink-0 bg-menu lg:block">
+            <div class="sticky top-0 h-screen">
+                <MenuLateral />
+            </div>
         </div>
 
         <div

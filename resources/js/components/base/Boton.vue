@@ -43,7 +43,7 @@ const variantes: Record<Variante, string> = {
     secundario:
         'border border-tinta/25 bg-white text-tinta hover:bg-lienzo disabled:text-tinta-suave',
     enlace: 'px-0 text-marca underline underline-offset-2 hover:text-marca-hover',
-    peligro: 'bg-nivel-critico text-white hover:bg-aviso',
+    peligro: 'bg-aviso text-white hover:bg-[#8f2c25]',
 };
 
 const tamanos: Record<Tamano, string> = {

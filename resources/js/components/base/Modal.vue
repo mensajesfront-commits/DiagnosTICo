@@ -16,6 +16,7 @@ import {
     DialogRoot,
     DialogTitle,
 } from 'reka-ui';
+import { ref } from 'vue';
 import { cn } from '@/lib/utils';
 
 type Ancho = 'sm' | 'md' | 'lg' | 'xl';
@@ -30,6 +31,21 @@ withDefaults(
 );
 
 const abierto = defineModel<boolean>('abierto', { default: false });
+
+const cuerpo = ref<HTMLElement | null>(null);
+
+// Al abrir, el foco va al primer campo del formulario en lugar del botón de
+// cerrar. Si no hay campos, Reka UI decide (primer elemento enfocable).
+function enfocarPrimerCampo(evento: Event): void {
+    const campo = cuerpo.value?.querySelector<HTMLElement>(
+        'input:not([type=hidden]):not([disabled]), select:not([disabled]), textarea:not([disabled])',
+    );
+
+    if (campo) {
+        evento.preventDefault();
+        campo.focus();
+    }
+}
 
 const anchos: Record<Ancho, string> = {
     sm: 'max-w-sm',
@@ -52,6 +68,7 @@ const anchos: Record<Ancho, string> = {
                         anchos[ancho],
                     )
                 "
+                @open-auto-focus="enfocarPrimerCampo"
             >
                 <header
                     class="flex items-start justify-between gap-4 px-6 pt-5"
@@ -75,7 +92,7 @@ const anchos: Record<Ancho, string> = {
                     </DialogClose>
                 </header>
 
-                <div class="overflow-y-auto px-6 py-4">
+                <div ref="cuerpo" class="overflow-y-auto px-6 py-4">
                     <slot />
                 </div>
 
