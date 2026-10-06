@@ -18,6 +18,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-010 | Fuentes IBM Plex servidas desde el proyecto | Vigente |
 | DEC-011 | Chromium instalado con Playwright en la imagen de Sail | Vigente |
 | DEC-012 | Del kit solo se deja el registro; sin modo oscuro | Vigente |
+| DEC-013 | La llamada real a OpenAI se prueba cuando se use la IA | Vigente |
 
 ---
 
@@ -128,3 +129,8 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - Del kit se deja solo el **registro**. Se quitan la verificación de correo, el 2FA, las passkeys y la confirmación de contraseña.
   - Se quita también el selector de apariencia (modo oscuro).
 - **Por qué:** el diseño no tiene esas funciones. El registro deja la cuenta "lista al instante" (L2) y el wireframe solo tiene modo claro.
+
+### DEC-013 — Llamada real a OpenAI más adelante
+
+- **Decisión:** la prueba técnica de la IA (T-019) se da por cumplida con el servicio, el comando `prueba:ia` y las pruebas con la API simulada. La llamada real con una clave se hace cuando se construya el análisis de la IA (semana 5).
+- **Por qué:** el equipo todavía no usa la clave de OpenAI; el código ya está listo para recibirla en `.env` (`OPENAI_API_KEY`, `OPENAI_MODEL`).
