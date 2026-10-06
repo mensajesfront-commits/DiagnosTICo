@@ -37,6 +37,7 @@ export const rutas = {
         actualizar: (id: number) => `/categorias/${id}`,
         eliminar: (id: number) => `/categorias/${id}`,
         archivar: (id: number) => `/categorias/${id}/archivar`,
+        restaurar: (id: number) => `/categorias/${id}/restaurar`,
     },
     empresas: {
         lista: (sectorId?: number) =>

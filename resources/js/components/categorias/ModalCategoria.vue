@@ -1,37 +1,33 @@
 <script setup lang="ts">
 /**
- * A2.3b · Crear categoría (HU-018) y editar una categoría del catálogo
- * (HU-017 CA-003 a CA-005).
+ * A2.3b · Crear categoría (HU-018).
  *
  * Envía: nombre (obligatorio, máx. 40, único; RN-009), descripcion (la lee la
- * empresa al iniciar la categoría) y, al crear, diagnosticos[] (borradores
- * donde agregarla; quedan incompletos).
+ * empresa al iniciar la categoría) y diagnosticos[] (borradores donde
+ * agregarla; quedan incompletos hasta escribirle preguntas).
+ * Editar se hace en el panel lateral de A2.3 (PanelEditarCategoria).
  */
 import { useForm } from '@inertiajs/vue3';
-import { computed, watch } from 'vue';
+import { watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
 import { rutas } from '@/lib/rutas';
-import type { Categoria, DiagnosticoBorrador } from '@/types/diagnosticos';
+import type { DiagnosticoBorrador } from '@/types/diagnosticos';
 
 const MAXIMO_NOMBRE = 40;
 
-const props = withDefaults(
+withDefaults(
     defineProps<{
-        /** Sin categoría se crea una nueva. */
-        categoria?: Categoria | null;
         /** Diagnósticos en borrador donde se puede agregar al crearla. */
         borradores?: DiagnosticoBorrador[];
     }>(),
-    { categoria: null, borradores: () => [] },
+    { borradores: () => [] },
 );
 
 const abierto = defineModel<boolean>('abierto', { default: false });
-
-const editando = computed(() => !!props.categoria);
 
 const form = useForm<{
     nombre: string;
@@ -43,11 +39,6 @@ watch(
     abierto,
     (valor) => {
         if (valor) {
-            form.defaults({
-                nombre: props.categoria?.nombre ?? '',
-                descripcion: props.categoria?.descripcion ?? '',
-                diagnosticos: [],
-            });
             form.reset();
             form.clearErrors();
         }
@@ -55,44 +46,33 @@ watch(
     { immediate: true },
 );
 
-function guardar(): void {
-    const opciones = {
+function crear(): void {
+    form.post(rutas.categorias.crear(), {
         preserveScroll: true,
         onSuccess: () => (abierto.value = false),
-    };
-
-    if (props.categoria) {
-        form.put(rutas.categorias.actualizar(props.categoria.id), opciones);
-    } else {
-        form.post(rutas.categorias.crear(), opciones);
-    }
+    });
 }
+
+const textoBorrador = (b: DiagnosticoBorrador) =>
+    `${b.nombre} · ${b.sector_nombre} (borrador${b.version > 1 ? ` v${b.version}` : ''})`;
 </script>
 
 <template>
     <Modal
         v-model:abierto="abierto"
-        :titulo="
-            editando
-                ? `Editar categoría · ${categoria?.nombre}`
-                : 'Crear categoría'
-        "
-        :descripcion="
-            editando
-                ? 'El cambio se ve en todos los diagnósticos que usan esta categoría.'
-                : 'Se agrega al catálogo para que cualquier diagnóstico pueda usarla.'
-        "
+        titulo="Crear categoría"
+        descripcion="Se agrega al catálogo común. Después cada diagnóstico decide si la usa."
         ancho="lg"
     >
         <form
             id="form-categoria"
             class="flex flex-col gap-4"
-            @submit.prevent="guardar"
+            @submit.prevent="crear"
         >
             <Campo
-                etiqueta="Nombre de la categoría"
+                etiqueta="Nombre"
                 para="categoria-nombre"
-                ayuda="Obligatorio y único en el catálogo."
+                ayuda="No puede repetirse en el catálogo."
                 :contador="`${form.nombre.length}/${MAXIMO_NOMBRE}`"
                 :error="form.errors.nombre"
             >
@@ -101,28 +81,26 @@ function guardar(): void {
                     v-model="form.nombre"
                     required
                     :maxlength="MAXIMO_NOMBRE"
-                    placeholder="Ej. Redes sociales"
                     :invalida="!!form.errors.nombre"
                 />
             </Campo>
 
             <Campo
-                etiqueta="Descripción"
+                etiqueta="Descripción para la empresa"
                 para="categoria-descripcion"
-                opcional
-                ayuda="La empresa la lee al iniciar esta categoría del diagnóstico."
+                ayuda="Se muestra al iniciar la categoría en el diagnóstico."
                 :error="form.errors.descripcion"
             >
                 <AreaTexto
                     id="categoria-descripcion"
                     v-model="form.descripcion"
-                    rows="3"
+                    rows="2"
                 />
             </Campo>
 
-            <fieldset v-if="!editando" class="flex flex-col gap-2">
+            <fieldset class="flex flex-col gap-2">
                 <legend class="mb-1 text-xs font-medium">
-                    Agregarla también a diagnósticos en borrador
+                    Agregarla ahora a borradores
                     <span class="font-normal text-tinta-suave">(opcional)</span>
                 </legend>
                 <p
@@ -142,20 +120,21 @@ function guardar(): void {
                         :value="borrador.id"
                         class="size-4 accent-marca"
                     />
-                    {{ borrador.nombre }}
-                    <span class="text-xs text-tinta-suave">
-                        · {{ borrador.sector_nombre }}
-                    </span>
+                    {{ textoBorrador(borrador) }}
                 </label>
-                <p
-                    class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
-                >
-                    Solo se pueden elegir borradores: las versiones publicadas
-                    no cambian. Los diagnósticos elegidos quedan incompletos
-                    hasta que agregues preguntas a la categoría y ajustes la
-                    importancia.
+                <p class="text-xs text-tinta-suave">
+                    Solo se ofrecen borradores: una versión publicada no cambia.
+                    Puedes agregarla más tarde desde el editor.
                 </p>
             </fieldset>
+
+            <p
+                class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
+            >
+                La categoría nueva empieza sin preguntas. Los borradores donde
+                se agregue quedan incompletos hasta escribirle al menos 1
+                pregunta y ajustar la importancia.
+            </p>
         </form>
 
         <template #pie>
@@ -167,7 +146,7 @@ function guardar(): void {
                 form="form-categoria"
                 :cargando="form.processing"
             >
-                {{ editando ? 'Guardar cambios' : 'Crear categoría' }}
+                Crear categoría
             </Boton>
         </template>
     </Modal>

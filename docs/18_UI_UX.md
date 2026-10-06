@@ -2,7 +2,10 @@
 
 **Estado:** EN CURSO (T-066, T-089). Se agregan las pantallas de cada semana.
 
-**[INFORMACIÓN PENDIENTE]** Falta el enlace al prototipo navegable. Los wireframes recibidos son 3 PDF parciales: L1–L4, el inicio y los diagnósticos del Administrador, y la experiencia de la empresa.
+**[INFORMACIÓN PENDIENTE]** Falta el enlace al prototipo navegable. Los wireframes recibidos son 5 PDF parciales:
+
+- L1–L4, el inicio y los diagnósticos del Administrador, y la experiencia de la empresa (los 3 primeros);
+- `selection_3-1` y `selection_3-2` (6 de octubre): catálogo de categorías, Empresas, asignar medición, correo de aviso, registrar empresa, resultado, historial y respuestas vistos por el Administrador, Configuración IA, Usuarios y roles, «Ver como» y Mi perfil.
 
 ## Colores
 
@@ -62,9 +65,9 @@ Niveles del resultado (RN-019). Cada nivel tiene un color fuerte (barras y gráf
 | A2.7 | Duplicar diagnóstico | `…/ModalDuplicarDiagnostico.vue` | Hecha |
 | — | Archivar diagnóstico | `…/ModalArchivarDiagnostico.vue` | Hecha. Sin diseño (PA-005). |
 | — | Eliminar diagnóstico o borrador | `…/ModalEliminarDiagnostico.vue` | Hecha |
-| A2.3 | Catálogo de categorías | `pages/categorias/Index.vue` | Hecha. Sin wireframe, sale de HU-017. |
+| A2.3 | Catálogo de categorías, con el panel para editar | `pages/categorias/Index.vue`, `components/categorias/PanelEditarCategoria.vue` | Hecha (vista previa) |
 | A2.3b | Crear / editar categoría | `components/categorias/ModalCategoria.vue` | Hecha |
-| A2.3c | Eliminar o archivar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Sin wireframe, sale de HU-019. |
+| A2.3c | Archivar o eliminar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Eliminar no tiene wireframe, sale de HU-019. |
 | A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha (vista previa) |
 
 ## Diferencias con el wireframe
@@ -76,3 +79,5 @@ Niveles del resultado (RN-019). Cada nivel tiene un color fuerte (barras y gráf
 | L2 | El país solo ofrece "Colombia". | **[INFORMACIÓN PENDIENTE]** Falta la lista de países. |
 | L2 | Los enlaces de términos y de política apuntan a `#`. | **[INFORMACIÓN PENDIENTE]** Faltan las URL reales. |
 | A2.5 | En blanco, se eligen las categorías con casillas y se muestra cuánto vale cada una al empezar. | HU-020 pide elegir las categorías; el wireframe solo muestra la opción de copiar. |
+| A2.3 | Si la categoría nunca se respondió, la acción es «Eliminar» en vez de «Archivar». | HU-019 y RN-009. El wireframe solo muestra «Archivar». |
+| A2.3 | Al abrir, el panel muestra la primera categoría; con «Cancelar» queda vacío con una indicación. | El wireframe solo muestra el panel con una categoría elegida. |

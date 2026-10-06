@@ -76,8 +76,14 @@ export type Categoria = {
     id: number;
     nombre: string;
     descripcion: string | null;
-    /** Diagnósticos donde se usa. */
+    /** Diagnósticos activos donde se usa ("13 de 13"). */
     diagnosticos: number;
+    /** Preguntas de la categoría, sumando todos los diagnósticos. */
+    preguntas: number;
+    /** Versiones publicadas que la incluyen; no cambian al archivarla. */
+    versiones_publicadas: number;
+    /** Borradores que la usan ("Diagnóstico general · Abogados (borrador v3)"); al archivarla se le quita. */
+    borradores: string[];
     /** true si alguna empresa ya la respondió: se archiva en vez de borrarse (RN-009). */
     tiene_respuestas: boolean;
     archivada: boolean;
@@ -87,6 +93,8 @@ export type DiagnosticoBorrador = {
     id: number;
     nombre: string;
     sector_nombre: string;
+    /** Versión del borrador; mayor que 1 si ya hubo una publicada ("borrador v3"). */
+    version: number;
 };
 
 export type DiagnosticoPublicado = {

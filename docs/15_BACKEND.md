@@ -46,7 +46,8 @@ Todas las rutas del Administrador van con `auth` y con el permiso indicado (matr
 | POST | `/categorias` | `diagnosticos.editar` | A2.3b: crear | `nombre` (máx. 40, único), `descripcion`, `diagnosticos[]` (borradores) |
 | PUT | `/categorias/{id}` | `diagnosticos.editar` | Editar nombre o descripción | `nombre`, `descripcion` |
 | DELETE | `/categorias/{id}` | `diagnosticos.editar` | A2.3c: eliminar (nunca respondida) | — |
-| POST | `/categorias/{id}/archivar` | `diagnosticos.editar` | A2.3c: archivar (con respuestas) | — |
+| POST | `/categorias/{id}/archivar` | `diagnosticos.editar` | A2.3c: archivar (con respuestas). Se quita de los borradores; las versiones publicadas no cambian. | — |
+| POST | `/categorias/{id}/restaurar` | `diagnosticos.editar` | Restaurar una archivada. No se agrega sola a los borradores. | — |
 
 ## Otras secciones del menú (rutas previstas)
 

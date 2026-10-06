@@ -143,8 +143,11 @@ Ruta prevista: `GET /categorias`.
 
 | Prop | Tipo | Nota |
 |---|---|---|
-| `categorias` | `Categoria[]` | Activas y archivadas. `tiene_respuestas` decide entre "Eliminar" y "Archivar" (RN-009). |
-| `borradores` | `DiagnosticoBorrador[]` | Diagnósticos en borrador, para agregarles una categoría nueva (HU-018 CA-004). |
+| `categorias` | `Categoria[]` | Activas y archivadas. Cada una trae `diagnosticos` (activos donde se usa), `preguntas`, `versiones_publicadas`, `borradores` (nombres de los borradores que la usan) y `tiene_respuestas`, que decide entre "Archivar" y "Eliminar" (RN-009). |
+| `totalDiagnosticos` | `number` | Diagnósticos activos en total, para "13 de 13". |
+| `borradores` | `DiagnosticoBorrador[]` | Diagnósticos en borrador (con `version`), para agregarles una categoría nueva (HU-018 CA-004). |
+
+La categoría se edita en el panel de la derecha (`PanelEditarCategoria`) y envía `nombre` y `descripcion`. Crear (A2.3b) y archivar (A2.3c) abren un modal. Las archivadas tienen "Restaurar".
 
 ### A2.5 · Crear diagnóstico (`diagnosticos/Crear`)
 
@@ -164,5 +167,5 @@ Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (
 Se construyeron a partir de las historias y con el mismo estilo. Hay que compararlas con el prototipo cuando esté a mano.
 
 - **A2.2c** · Desactivar sector (HU-015).
-- **A2.3, A2.3c** · Catálogo, y eliminar o archivar una categoría (HU-017 y HU-019). Editar una categoría se hace en un modal.
 - **Archivar diagnóstico** (HU-022): no tiene diseño (PA-005).
+- **Eliminar una categoría nunca respondida** (HU-019): el wireframe A2.3 solo muestra archivar.

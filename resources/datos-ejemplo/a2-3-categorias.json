@@ -6,7 +6,16 @@
                 "id": 1,
                 "nombre": "Análisis del mercado",
                 "descripcion": null,
-                "diagnosticos": 9,
+                "diagnosticos": 13,
+                "preguntas": 52,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
@@ -14,7 +23,16 @@
                 "id": 2,
                 "nombre": "Análisis de la competencia",
                 "descripcion": null,
-                "diagnosticos": 8,
+                "diagnosticos": 13,
+                "preguntas": 40,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
@@ -22,7 +40,16 @@
                 "id": 3,
                 "nombre": "Análisis del cliente",
                 "descripcion": "Qué tan bien conoces a tus clientes y cómo te relacionas con ellos.",
-                "diagnosticos": 10,
+                "diagnosticos": 13,
+                "preguntas": 44,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
@@ -30,15 +57,33 @@
                 "id": 4,
                 "nombre": "Análisis de la marca",
                 "descripcion": null,
-                "diagnosticos": 8,
+                "diagnosticos": 13,
+                "preguntas": 48,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
             {
                 "id": 5,
                 "nombre": "Presencia en línea",
-                "descripcion": null,
-                "diagnosticos": 11,
+                "descripcion": "Dónde te encuentran tus clientes en internet: sitio web, redes y buscadores.",
+                "diagnosticos": 13,
+                "preguntas": 56,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
@@ -46,7 +91,16 @@
                 "id": 6,
                 "nombre": "Contenido y publicaciones",
                 "descripcion": null,
-                "diagnosticos": 10,
+                "diagnosticos": 13,
+                "preguntas": 50,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
@@ -54,7 +108,15 @@
                 "id": 7,
                 "nombre": "Herramientas de automatización",
                 "descripcion": null,
-                "diagnosticos": 7,
+                "diagnosticos": 11,
+                "preguntas": 34,
+                "versiones_publicadas": 7,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
@@ -62,7 +124,16 @@
                 "id": 8,
                 "nombre": "Análisis de la inversión",
                 "descripcion": null,
-                "diagnosticos": 8,
+                "diagnosticos": 13,
+                "preguntas": 36,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
@@ -70,50 +141,73 @@
                 "id": 9,
                 "nombre": "Medición de KPIs",
                 "descripcion": null,
-                "diagnosticos": 9,
+                "diagnosticos": 13,
+                "preguntas": 42,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
             {
                 "id": 10,
                 "nombre": "Recursos humanos",
-                "descripcion": null,
-                "diagnosticos": 7,
+                "descripcion": "Cómo está organizado tu equipo para hacer marketing digital: quién lo hace, con qué formación y con qué apoyo.",
+                "diagnosticos": 13,
+                "preguntas": 38,
+                "versiones_publicadas": 9,
+                "borradores": [
+                    "Diagnóstico general · Abogados (borrador v3)",
+                    "Diagnóstico de redes sociales · Abogados",
+                    "Diagnóstico de reseñas · Comidas",
+                    "Diagnóstico de portales · Inmobiliarias",
+                    "Diagnóstico general · Turismo"
+                ],
                 "tiene_respuestas": true,
                 "archivada": false
             },
             {
                 "id": 11,
-                "nombre": "Correo electrónico",
+                "nombre": "Publicidad offline",
                 "descripcion": null,
                 "diagnosticos": 0,
-                "tiene_respuestas": false,
-                "archivada": false
-            },
-            {
-                "id": 12,
-                "nombre": "Publicidad impresa",
-                "descripcion": null,
-                "diagnosticos": 0,
+                "preguntas": 12,
+                "versiones_publicadas": 0,
+                "borradores": [],
                 "tiene_respuestas": true,
                 "archivada": true
             }
         ],
+        "totalDiagnosticos": 13,
         "borradores": [
             {
-                "id": 3,
+                "id": 1,
+                "nombre": "Diagnóstico general",
+                "sector_nombre": "Abogados",
+                "version": 3
+            },
+            {
+                "id": 2,
                 "nombre": "Diagnóstico de redes sociales",
-                "sector_nombre": "Abogados"
+                "sector_nombre": "Abogados",
+                "version": 1
+            },
+            {
+                "id": 5,
+                "nombre": "Diagnóstico de reseñas",
+                "sector_nombre": "Comidas",
+                "version": 1
             },
             {
                 "id": 8,
-                "nombre": "Diagnóstico de reseñas",
-                "sector_nombre": "Comidas"
-            },
-            {
-                "id": 10,
                 "nombre": "Diagnóstico de portales",
-                "sector_nombre": "Inmobiliarias"
+                "sector_nombre": "Inmobiliarias",
+                "version": 1
             }
         ]
     }
