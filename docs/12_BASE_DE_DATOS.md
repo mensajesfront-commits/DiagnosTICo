@@ -12,7 +12,7 @@ Pasos que siguen:
 
 - **Semana 3:**
   - Cristian revisa que cada dato que se muestra tenga dónde guardarse (T-039).
-  - Luis escribe el diccionario de datos (T-040).
+  - Diccionario de datos de las tablas existentes (T-040): hecho, más abajo.
   - El MER se aprueba antes de crear las migraciones (hito T-044).
 - **Más adelante:** se explica cada tabla con un ejemplo (T-064).
 
@@ -271,6 +271,91 @@ Tablas que ya existen por el kit o por paquetes y que no se dibujan:
 - **Resuelto con A3.1e:** el correo de aviso es una plantilla general (`plantillas_correo`) que se puede editar para una medición (`mediciones.correo_asunto` y `correo_cuerpo`); "Guardar como plantilla" reemplaza la general.
 - **[FUNCIONALIDAD POR DEFINIR]** El bot de WhatsApp está aplazado. Si se retoma, sus tablas van separadas (conversaciones y resultados del bot) y no se relacionan con `empresas` ni con `mediciones` (RN-029).
 - Las respuestas y los análisis apuntan a preguntas y categorías por su identificador dentro del JSON de la versión (`pregunta_ref`, `categoria_ref`), no por llave foránea. Así siguen siendo válidos aunque el borrador cambie. Esto debe confirmarse al revisar el MER (T-039).
+
+## Diccionario de datos de las tablas que ya existen (T-040)
+
+Son las tablas del acceso (L1–L4) y de Mi perfil (A6, E11). Las demás se agregan al diccionario cuando tengan migración.
+
+### `sectores`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `1` | Llave primaria |
+| `nombre` | varchar(40) | Sí, único | `Abogados` | |
+| `descripcion` | varchar(255) | No | `Bufetes, abogados independientes y notarías.` | |
+| `activo` | boolean | Sí (por defecto `true`) | `true` | Solo los activos se ofrecen al registrarse (RN-003) |
+| `created_at`, `updated_at` | timestamp | No | `2026-10-06 17:52:50` | |
+
+### `empresas`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `1` | |
+| `nombre` | varchar(255) | Sí | `Restaurante La Esquina` | |
+| `sector_id` | bigint → `sectores.id` | Sí | `4` | No se puede borrar un sector con empresas |
+| `ciudad` | varchar(255) | Sí | `Cali` | |
+| `pais` | varchar(255) | Sí | `Colombia` | |
+| `telefono` | varchar(255) | No | `+57 602 555 0142` | |
+| `sitio_web` | varchar(255) | No | `https://www.laesquina.co` | |
+| `numero_empleados` | varchar(255) | No | `11 a 50` | Rango (E11) |
+| `logo_ruta` | varchar(255) | No | `logos/abc123.png` | Archivo privado; se sirve por `/imagenes/empresa/{id}` |
+| `activa` | boolean | Sí (por defecto `true`) | `true` | Desactivada: nadie de la empresa entra (RN-025) |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `users`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `7` | |
+| `empresa_id` | bigint → `empresas.id` | No | `1` | `null` para las cuentas internas (Administrador) |
+| `name` | varchar(255) | Sí | `Laura Gómez` | |
+| `email` | varchar(255) | Sí, único | `laura@laesquina.co` | En minúsculas; un correo, una cuenta (RN-002) |
+| `cargo` | varchar(255) | No | `Administradora` | |
+| `telefono` | varchar(255) | No | `+57 311 555 0142` | |
+| `ciudad`, `pais` | varchar(255) | No | `Bogotá`, `Colombia` | Mi perfil (A6) |
+| `zona_horaria` | varchar(255) | Sí (por defecto `America/Bogota`) | `America/Bogota` | |
+| `idioma` | varchar(5) | Sí (por defecto `es`) | `es` | |
+| `avisos` | jsonb | No | `{"ia_falla": true, "resumen_semanal": false}` | Avisos por correo elegidos en Mi perfil |
+| `foto_ruta` | varchar(255) | No | `fotos/abc123.jpg` | Archivo privado; se sirve por `/imagenes/usuario/{id}` |
+| `password` | varchar(255) | Sí | `$2y$12$…` | Cifrada con bcrypt; nunca en texto |
+| `activo` | boolean | Sí (por defecto `true`) | `true` | Desactivada: no entra (RN-004) |
+| `ultimo_acceso_en` | timestamp | No | `2026-10-06 15:24:00` | Se guarda al iniciar sesión |
+| `contrasena_actualizada_en` | timestamp | No | `2026-08-01 10:00:00` | "Última actualización" en Mi perfil |
+| `terminos_aceptados_en` | timestamp | No | `2026-10-06 15:20:11` | Constancia de la aceptación al registrarse |
+| `email_verified_at` | timestamp | No | `null` | Del kit; la verificación de correo no se usa (DEC-012) |
+| `remember_token` | varchar(100) | No | | "Mantener la sesión iniciada" |
+| `created_at`, `updated_at` | timestamp | No | | "Cuenta creada" en Mi perfil |
+
+### Roles y permisos (spatie/laravel-permission)
+
+| Tabla | Para qué | Campos propios |
+|---|---|---|
+| `roles` | Administrador, Empresa, Colaborador y Consultor (y los que se creen en A5.1) | `descripcion` (texto), `activo` (boolean), `del_sistema` (boolean: no se edita ni se elimina) |
+| `permissions` | Los 15 permisos de A5.2 (`diagnosticos.ver`…) | — |
+| `role_has_permissions` | Qué permisos tiene cada rol | — |
+| `model_has_roles` | Qué rol tiene cada cuenta (uno solo, RN-027) | — |
+| `model_has_permissions` | Permisos sueltos por cuenta (no se usan) | — |
+
+### Del kit de Laravel
+
+| Tabla | Para qué |
+|---|---|
+| `password_reset_tokens` | Un enlace de contraseña nueva por correo (cifrado). Pedir otro reemplaza el anterior (RN-006). |
+| `sessions` | Sesiones abiertas (`SESSION_DRIVER=database`). |
+| `cache`, `cache_locks` | Caché, incluidos los contadores del límite de intentos. |
+| `jobs`, `job_batches`, `failed_jobs` | Colas (se usarán para el análisis de la IA). |
+
+### Para entregar la base de datos
+
+```bash
+# Copia completa (estructura y datos) en un archivo .sql
+./vendor/bin/sail exec pgsql pg_dump -U sail -d diagnostico > captter.sql
+
+# Solo la estructura
+./vendor/bin/sail exec pgsql pg_dump -U sail -d diagnostico --schema-only > captter-estructura.sql
+```
+
+El usuario y el nombre de la base salen de `DB_USERNAME` y `DB_DATABASE` en `.env`.
 
 ## Revisión contra los wireframes (T-039, 6 de octubre)
 

@@ -28,6 +28,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $ultimo_acceso_en
  * @property Carbon|null $contrasena_actualizada_en
  * @property bool $activo
+ * @property Carbon|null $terminos_aceptados_en
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $two_factor_secret
@@ -61,7 +62,21 @@ class User extends Authenticatable
             'avisos' => 'array',
             'ultimo_acceso_en' => 'datetime',
             'contrasena_actualizada_en' => 'datetime',
+            'terminos_aceptados_en' => 'datetime',
         ];
+    }
+
+    /**
+     * La cuenta puede iniciar sesión si está activa (RN-004) y, si es de una
+     * empresa, la empresa también lo está (RN-025).
+     */
+    public function puedeEntrar(): bool
+    {
+        if ($this->activo === false) {
+            return false;
+        }
+
+        return $this->empresa_id === null || $this->empresa?->activa !== false;
     }
 
     /**

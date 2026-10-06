@@ -33,10 +33,21 @@ Se hizo desde el frontend para poder probar el registro y el menú de la empresa
 | Registro | `app/Actions/Fortify/CreateNewUser.php` | Valida los campos de L2 y crea empresa + usuario en una transacción |
 | Pruebas | `tests/Feature/Auth/RegistrationTest.php` | Solo sectores activos, registro completo, sector inactivo y términos |
 
-Pendiente para Luis:
+Seguridad del acceso completa (7 de octubre): cuentas y empresas desactivadas, contraseña fuerte, avisos que no revelan correos, enlace sin vencimiento, límite de intentos, mensajes y correo en español y constancia de los términos. Detalle en `17_SEGURIDAD.md`.
 
-- **RN-001:** fuera de producción, la regla de contraseña del kit solo pide 8 caracteres. El frontend exige los 5 requisitos, pero el servidor todavía no.
-- **RN-005:** que "olvidé mi contraseña" responda lo mismo exista o no el correo.
+| Pieza | Archivo |
+|---|---|
+| Inicio de sesión que revisa la cuenta y la empresa | `FortifyServiceProvider::configureLogin`, `User::puedeEntrar()` |
+| Cierre de sesión si desactivan la cuenta | `app/Http/Middleware/CerrarSesionCuentaInactiva.php` |
+| Límite de intentos en registro y recuperación | `app/Http/Middleware/LimitarIntentosAcceso.php` |
+| Mismo aviso en "¿Olvidaste tu contraseña?" | `app/Http/Responses/AvisoRecuperacionResponse.php` |
+| Contraseña fuerte | `AppServiceProvider` + `app/Rules/TieneMayuscula.php` |
+| Correo de recuperación | `FortifyServiceProvider::configureResetEmail` |
+| Textos en español | `lang/es/*.php`, `lang/es.json` |
+| Cuentas de demostración | `database/seeders/DemoSeeder.php` |
+| Pruebas | `tests/Feature/Auth/SeguridadAccesoTest.php` |
+
+Queda fuera del acceso (lo hace el backend de cada módulo): la redirección según el rol (T-048), que depende de las pantallas A1 y E1.
 
 ## Mi perfil (ya existe)
 

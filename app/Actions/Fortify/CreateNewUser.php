@@ -42,7 +42,7 @@ class CreateNewUser implements CreatesNewUsers
             'sector_id' => 'sector',
             'name' => 'nombre del usuario',
             'email' => 'correo',
-            'terminos' => 'términos de uso',
+            'terminos' => 'los términos de uso y la política de tratamiento de datos',
         ])->validate();
 
         return DB::transaction(function () use ($input): User {
@@ -61,6 +61,9 @@ class CreateNewUser implements CreatesNewUsers
                 'telefono' => $input['telefono'] ?? null,
                 'password' => $input['password'],
             ]);
+
+            // Constancia de que aceptó los términos y la política de datos.
+            $usuario->forceFill(['terminos_aceptados_en' => now()])->save();
 
             $usuario->assignRole('Empresa');
 

@@ -28,7 +28,8 @@ Desde la semana 3 también tiene las primeras pantallas del negocio (frontend), 
 | Tarea | Qué quedó | Pendiente |
 |---|---|---|
 | T-051 Pantallas de acceso | L1, L2, L3 y L4 con el diseño del wireframe | — |
-| T-046 / T-047 (mínimo) | Tablas de sectores y empresas, roles y permisos, sectores de ejemplo, Administrador inicial y registro de la empresa | Revisión de Luis; RN-001 y RN-005 en el servidor |
+| T-046 / T-047 | Tablas de sectores y empresas, roles y permisos, sectores de ejemplo, Administrador inicial, registro de la empresa y seguridad del acceso completa | Categorías y niveles iniciales (T-046) |
+| T-040 Diccionario de datos | Tablas existentes en `12_BASE_DE_DATOS.md` | Las demás tablas, cuando tengan migración |
 | T-052 Menú por rol | `MenuLateral` oculta lo que no tiene permiso (con prueba) | — |
 | T-053 Diagnósticos de un sector | A2, A2·T y A2b (`pages/diagnosticos/Index.vue`) | Ruta y controlador (backend) |
 | T-054 Sectores | Modales A2.2, A2.2a, A2.2b, A2.2c, A2.2d y A2.2e | Rutas de sectores (backend) |
