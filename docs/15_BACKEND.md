@@ -133,6 +133,23 @@ Reglas que valida el servidor:
 - **Desactivar la cuenta principal:** también desactiva su empresa, y reactivarla la reactiva (RN-025).
 - **Correos:** se envían al momento, no en cola, para que se vean en Mailpit sin un *worker*. **[FUNCIONALIDAD POR DEFINIR]** Pasarlos a la cola con el resto de correos (RNF-004, semana 5).
 
+## E12 · Colaboradores (hecho)
+
+`ColaboradoresController`, rutas con `role:Empresa`. Pruebas en `tests/Feature/ColaboradoresTest.php`.
+
+| Método | URL | Nombre | Qué hace |
+|---|---|---|---|
+| GET | `/colaboradores` | `colaboradores.index` | Cuenta principal primero y luego los colaboradores de su empresa, por nombre |
+| POST | `/colaboradores` | `colaboradores.store` | Crea la cuenta: rol Colaborador, misma empresa, activa, sin correo (HU-077) |
+| PUT | `/colaboradores/{colaborador}/contrasena` | `colaboradores.contrasena` | Contraseña nueva; cierra sus sesiones y anula "Recordarme" (HU-078) |
+| POST | `/colaboradores/{colaborador}/desactivar` | `colaboradores.desactivar` | `activo = false` y cierra sus sesiones (HU-079) |
+| POST | `/colaboradores/{colaborador}/reactivar` | `colaboradores.reactivar` | `activo = true` |
+
+- Solo la **cuenta principal** con empresa (`User::esPrincipal()`); un colaborador, un Administrador o una cuenta Empresa sin empresa reciben 403.
+- Un colaborador de **otra empresa** da 404; la propia cuenta principal, 403.
+- Correo en minúsculas y único (RN-002); contraseña con `Password::default()` (RN-001), sin confirmación.
+- La contraseña nunca vuelve al navegador: E12.2 muestra lo que la empresa escribió.
+
 ## Otras secciones del menú (rutas previstas)
 
 | URL | Pantalla | Semana |
@@ -140,7 +157,6 @@ Reglas que valida el servidor:
 | `/empresas`, `/empresas?sector={id}`, `/empresas/{id}` | A3, A3.1 | 4–5 |
 | `/configuracion-ia` | A4 | 5 |
 | `/historial` | E8 | 6 |
-| `/colaboradores` | E12 (frontend hecho; contrato en `14_FRONTEND.md`) | 6 |
 
 ## Respuestas después de una acción
 

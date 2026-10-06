@@ -92,7 +92,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | — | Invitar usuario interno | `components/usuarios/ModalInvitarUsuario.vue` | Hecha. El wireframe no le da código. |
 | A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
 | E11 | Mi perfil de la empresa (y del colaborador) | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
-| E12 | Colaboradores de la empresa | `pages/colaboradores/Index.vue` | Hecha, con datos de ejemplo (falta el backend) |
+| E12 | Colaboradores de la empresa | `pages/colaboradores/Index.vue` | Hecha y conectada |
 | E12.1 | Agregar colaborador | `components/colaboradores/ModalAgregarColaborador.vue` | Hecha |
 | E12.2 | Comparte estos datos | `components/colaboradores/ModalDatosDeAcceso.vue` | Hecha |
 | E12.3 | Cambiar contraseña de un colaborador | `components/colaboradores/ModalCambiarContrasena.vue` | Hecha |

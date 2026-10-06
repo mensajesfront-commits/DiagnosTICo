@@ -64,7 +64,7 @@ async function copiar(): Promise<void> {
                     <dd class="font-mono break-all">{{ datos.contrasena }}</dd>
                 </div>
             </dl>
-            <p class="rounded-md bg-aviso-suave px-3 py-2.5 text-aviso">
+            <p class="rounded-md bg-alerta-suave px-3 py-2.5 text-alerta">
                 ⚠ Esta contraseña no se vuelve a mostrar. Cópiala y compártela
                 ahora por un medio seguro. Si se pierde, puedes crear una nueva
                 con "Cambiar contraseña".

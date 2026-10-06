@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ColaboradoresController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UsuariosController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('roles/{rol}', [RolesController::class, 'update'])->name('roles.update');
         Route::delete('roles/{rol}', [RolesController::class, 'destroy'])->name('roles.destroy');
         Route::post('roles/{rol}/asignar', [RolesController::class, 'asignar'])->name('roles.asignar');
+    });
+
+    // E12 · Colaboradores: solo la cuenta principal de la empresa (RN-025).
+    // El controlador revisa además que tenga empresa y que el colaborador
+    // sea de la misma.
+    Route::middleware('role:Empresa')->group(function () {
+        Route::get('colaboradores', [ColaboradoresController::class, 'index'])->name('colaboradores.index');
+        Route::post('colaboradores', [ColaboradoresController::class, 'store'])->name('colaboradores.store');
+        Route::put('colaboradores/{colaborador}/contrasena', [ColaboradoresController::class, 'contrasena'])->name('colaboradores.contrasena');
+        Route::post('colaboradores/{colaborador}/desactivar', [ColaboradoresController::class, 'desactivar'])->name('colaboradores.desactivar');
+        Route::post('colaboradores/{colaborador}/reactivar', [ColaboradoresController::class, 'reactivar'])->name('colaboradores.reactivar');
     });
 });
 

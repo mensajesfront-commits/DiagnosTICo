@@ -98,7 +98,8 @@ Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/
 | 9 | **Constancia de los términos:** se guarda cuándo se aceptaron (`users.terminos_aceptados_en`). | `CreateNewUser` | `SeguridadAccesoTest` |
 | 10 | **El Administrador no restablece contraseñas de otras cuentas** (RN-006). No existe esa ruta; las cuentas internas se invitan y la persona crea su contraseña. | `UsuariosController::invitar` | `UsuariosYRolesTest` |
 | 13 | **Usuarios y roles:** nada sobre la propia cuenta; los roles del sistema no se editan ni se eliminan; un rol con cuentas no se elimina; los inactivos no se asignan (RN-027). | `UsuariosController`, `RolesController` | `UsuariosYRolesTest` |
-| 11 | **Contraseñas cifradas** con bcrypt (`hashed` en el modelo); nunca se guardan ni se muestran en texto. | `User::casts()` | — |
+| 14 | **Colaboradores (E12):** solo la cuenta principal crea, cambia la contraseña, desactiva o reactiva, y solo a colaboradores de su empresa (otra empresa: 404). Cambiar la contraseña o desactivar cierra las sesiones del colaborador. Es la única pantalla donde una cuenta define la contraseña de otra (RN-025, HU-078). | `ColaboradoresController` | `ColaboradoresTest` |
+| 11 | **Contraseñas cifradas** con bcrypt (`hashed` en el modelo); nunca se guardan ni se muestran en texto. La excepción es E12.2: muestra una sola vez la contraseña que la empresa acaba de escribir, desde el navegador; el servidor no la devuelve. | `User::casts()` | — |
 | 12 | **Protección CSRF y sesión nueva al entrar**, de Laravel e Inertia. | Middleware `web` | — |
 
 Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación también (`FortifyServiceProvider::configureResetEmail`).

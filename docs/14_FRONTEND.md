@@ -232,7 +232,7 @@ Envía:
 
 ### E12 · Colaboradores (`colaboradores/Index`)
 
-Ruta: `GET /colaboradores`. **[INFORMACIÓN PENDIENTE]** El backend no existe todavía (semana 6, `15_BACKEND.md`). Solo entra la cuenta principal de la empresa (rol Empresa, HU-076 CA-001); un colaborador recibe 403. Vista previa: `/prueba-tecnica/vistas/e12-colaboradores` y `e12-sin-colaboradores`.
+Ruta: `GET /colaboradores` (ya existe, `ColaboradoresController`; middleware `role:Empresa`). Solo entra la cuenta principal de la empresa (rol Empresa, HU-076 CA-001); un colaborador recibe 403. Vista previa: `/prueba-tecnica/vistas/e12-colaboradores` y `e12-sin-colaboradores`.
 
 | Prop | Tipo | Nota |
 |---|---|---|
