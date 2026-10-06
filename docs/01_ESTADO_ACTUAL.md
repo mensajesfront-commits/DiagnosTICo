@@ -2,7 +2,7 @@
 
 **Estado:** EN CURSO (T-037). Se actualiza al cerrar cada semana.
 
-**Última actualización:** 5 de octubre de 2026, al cierre de la semana 2 (entorno y prueba técnica).
+**Última actualización:** 6 de octubre de 2026, durante la semana 3 (pantallas de acceso y diagnósticos).
 
 ## Resumen
 
@@ -16,7 +16,25 @@ El repositorio tiene:
 - los componentes base;
 - la primera documentación.
 
-Todavía no hay migraciones ni pantallas del negocio. Eso empieza en la semana 3.
+Desde la semana 3 también tiene las primeras pantallas del negocio (frontend), que por ahora se revisan con datos de ejemplo en `/prueba-tecnica/vistas/{vista}` hasta que existan las rutas del backend.
+
+## Reparto del trabajo
+
+- **Cristian:** frontend y documentación.
+- **Luis:** backend (migraciones, modelos, rutas, controladores). Las props y los campos que espera cada pantalla están en `14_FRONTEND.md`, y las rutas propuestas en `15_BACKEND.md`.
+
+## Semana 3: frontend
+
+| Tarea | Qué quedó | Pendiente |
+|---|---|---|
+| T-051 Pantallas de acceso | L1, L2, L3 y L4 con el diseño del wireframe | Campos de empresa en el registro (T-047, backend) |
+| T-052 Menú por rol | `MenuLateral` oculta lo que no tiene permiso (con prueba) | — |
+| T-053 Diagnósticos de un sector | A2, A2·T y A2b (`pages/diagnosticos/Index.vue`) | Ruta y controlador (backend) |
+| T-054 Sectores | Modales A2.2, A2.2a, A2.2b, A2.2c, A2.2d y A2.2e | Rutas de sectores (backend) |
+| T-055 Catálogo de categorías | A2.3, A2.3b y A2.3c | Rutas de categorías (backend) |
+| T-056 Crear diagnóstico | A2.5, en blanco o copiando; también duplicar, archivar y eliminar | `POST /diagnosticos` (backend) |
+| T-043 Rutas del backend | Propuesta en `15_BACKEND.md` | Que Luis la valide |
+| T-066 / T-088 UI/UX y frontend | `18_UI_UX.md` y `14_FRONTEND.md` | Se completan cada semana |
 
 ## Semana 2: tareas "En curso"
 

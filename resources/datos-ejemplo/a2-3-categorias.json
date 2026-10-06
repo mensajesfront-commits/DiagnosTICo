@@ -1,0 +1,120 @@
+{
+    "componente": "categorias/Index",
+    "props": {
+        "categorias": [
+            {
+                "id": 1,
+                "nombre": "Análisis del mercado",
+                "descripcion": null,
+                "diagnosticos": 9,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 2,
+                "nombre": "Análisis de la competencia",
+                "descripcion": null,
+                "diagnosticos": 8,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 3,
+                "nombre": "Análisis del cliente",
+                "descripcion": "Qué tan bien conoces a tus clientes y cómo te relacionas con ellos.",
+                "diagnosticos": 10,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 4,
+                "nombre": "Análisis de la marca",
+                "descripcion": null,
+                "diagnosticos": 8,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 5,
+                "nombre": "Presencia en línea",
+                "descripcion": null,
+                "diagnosticos": 11,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 6,
+                "nombre": "Contenido y publicaciones",
+                "descripcion": null,
+                "diagnosticos": 10,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 7,
+                "nombre": "Herramientas de automatización",
+                "descripcion": null,
+                "diagnosticos": 7,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 8,
+                "nombre": "Análisis de la inversión",
+                "descripcion": null,
+                "diagnosticos": 8,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 9,
+                "nombre": "Medición de KPIs",
+                "descripcion": null,
+                "diagnosticos": 9,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 10,
+                "nombre": "Recursos humanos",
+                "descripcion": null,
+                "diagnosticos": 7,
+                "tiene_respuestas": true,
+                "archivada": false
+            },
+            {
+                "id": 11,
+                "nombre": "Correo electrónico",
+                "descripcion": null,
+                "diagnosticos": 0,
+                "tiene_respuestas": false,
+                "archivada": false
+            },
+            {
+                "id": 12,
+                "nombre": "Publicidad impresa",
+                "descripcion": null,
+                "diagnosticos": 0,
+                "tiene_respuestas": true,
+                "archivada": true
+            }
+        ],
+        "borradores": [
+            {
+                "id": 3,
+                "nombre": "Diagnóstico de redes sociales",
+                "sector_nombre": "Abogados"
+            },
+            {
+                "id": 8,
+                "nombre": "Diagnóstico de reseñas",
+                "sector_nombre": "Comidas"
+            },
+            {
+                "id": 10,
+                "nombre": "Diagnóstico de portales",
+                "sector_nombre": "Inmobiliarias"
+            }
+        ]
+    }
+}

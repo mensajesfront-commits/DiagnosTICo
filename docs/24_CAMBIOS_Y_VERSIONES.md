@@ -4,6 +4,25 @@
 
 La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se agrupan por semana del cronograma.
 
+## Semana 3 · del 5 al 11 de octubre de 2026 (en curso)
+
+### Agregado
+
+- Pantallas de acceso con el diseño del wireframe: L1 (iniciar sesión), L2 (registrar la empresa), L3 (olvidé mi contraseña) y L4 (nueva contraseña).
+- Diagnósticos del Administrador: A2 (un sector), A2·T (todos), A2b (sector vacío), modales de sector (A2.2 a A2.2e), duplicar (A2.7), archivar y eliminar.
+- Catálogo de categorías (A2.3) con sus modales de crear, editar, eliminar o archivar.
+- Crear diagnóstico (A2.5), en blanco o copiando uno publicado.
+- Componentes base de formulario: `Campo`, `Entrada`, `Seleccion`, `AreaTexto`, `CampoContrasena`, `RequisitosContrasena`, `Aviso` y `TarjetaOpcion`.
+- `lib/contrasena.ts` (requisitos de RN-001, con pruebas) y `lib/rutas.ts` (URLs propuestas).
+- Vistas previas con datos de ejemplo: `/prueba-tecnica/vistas/{vista}` lee `resources/datos-ejemplo/{vista}.json`.
+- Documentos `14_FRONTEND.md`, `15_BACKEND.md` y `18_UI_UX.md`.
+
+### Cambiado
+
+- `AuthLayout` reemplaza los layouts de acceso del kit.
+- Los modales enfocan el primer campo al abrirse.
+- El fondo del menú lateral llega hasta abajo en páginas largas.
+
 ## Semana 2 · del 28 de septiembre al 4 de octubre de 2026 (cerrada el 5 de octubre)
 
 ### Agregado
