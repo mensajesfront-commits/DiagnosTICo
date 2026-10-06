@@ -31,6 +31,10 @@ Niveles del resultado (RN-019). Cada nivel tiene un color fuerte (barras y gráf
 | Vas en buen camino | 60–79 | `#4a85c7` |
 | Sigue así | 80–100 | `#4e9954` |
 
+## Nombre
+
+El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el menú y en las pantallas de acceso, y en el título de la pestaña (`APP_NAME`).
+
 ## Logo
 
 - Aro azul oscuro (`#14154d`) con una «C» gris claro (`#e6e8ea`) y el punto y la señal en verde (`#6ae45b`).
@@ -78,6 +82,8 @@ Niveles del resultado (RN-019). Cada nivel tiene un color fuerte (barras y gráf
 | A2.3b | Crear / editar categoría | `components/categorias/ModalCategoria.vue` | Hecha |
 | A2.3c | Archivar o eliminar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Eliminar no tiene wireframe, sale de HU-019. |
 | A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha (vista previa) |
+| A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
+| E11 | Mi perfil de la empresa (y del colaborador) | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
 
 ## Diferencias con el wireframe
 
@@ -91,3 +97,7 @@ Niveles del resultado (RN-019). Cada nivel tiene un color fuerte (barras y gráf
 | A2.5 | En blanco, se eligen las categorías con casillas y se muestra cuánto vale cada una al empezar. | HU-020 pide elegir las categorías; el wireframe solo muestra la opción de copiar. |
 | A2.3 | Si la categoría nunca se respondió, la acción es «Eliminar» en vez de «Archivar». | HU-019 y RN-009. El wireframe solo muestra «Archivar». |
 | A2.3 | Al abrir, el panel muestra la primera categoría; con «Cancelar» queda vacío con una indicación. | El wireframe solo muestra el panel con una categoría elegida. |
+| Todas | Dice «Captter» donde el wireframe dice «Diagnóstico Empresarial». | Nombre del sistema decidido por el equipo (6 de octubre). |
+| A6 | La lista de requisitos de la contraseña tiene 5 puntos; el wireframe muestra 3. | RN-001. **[INCONSISTENCIA DETECTADA]** (también en L2 y L4). |
+| E11 | Al cambiar el correo se guarda directo, sin enlace de verificación. | La verificación de correo está quitada (DEC-012). **[FUNCIONALIDAD POR DEFINIR]** |
+| E11 | El colaborador ve «Información de empresa» bloqueada, con una nota. | RN-025: solo la cuenta principal cambia esos datos. El wireframe solo muestra la cuenta principal. |

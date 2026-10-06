@@ -1,4 +1,4 @@
-# Diagnóstico Empresarial
+# Captter · Diagnóstico de marketing digital
 
 Sistema de Diagnóstico de Marketing Digital para **NuevasTIC**. Las empresas responden un diagnóstico de su sector, la IA analiza cada categoría y el sistema entrega un puntaje, un nivel, recomendaciones y un informe PDF. El Administrador configura sectores, categorías, diagnósticos, empresas, mediciones, la IA y las cuentas.
 

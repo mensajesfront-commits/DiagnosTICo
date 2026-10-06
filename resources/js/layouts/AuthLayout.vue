@@ -27,10 +27,7 @@ const {
                 class="flex items-center gap-3 text-base font-semibold text-white"
             >
                 <Logo class="size-10" />
-                <span>
-                    Diagnóstico
-                    <span class="text-menu-marca">Empresarial</span>
-                </span>
+                <span class="text-xl">Captter</span>
             </p>
 
             <div class="max-w-lg">
@@ -65,9 +62,7 @@ const {
                     class="mb-8 flex items-center gap-2.5 text-base font-semibold lg:hidden"
                 >
                     <Logo class="size-8" />
-                    <span>
-                        Diagnóstico <span class="text-marca">Empresarial</span>
-                    </span>
+                    <span class="text-xl">Captter</span>
                 </p>
 
                 <header v-if="title" class="mb-5">

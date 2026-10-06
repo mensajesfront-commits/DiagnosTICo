@@ -71,8 +71,9 @@ erDiagram
         string ciudad
         string pais
         string telefono "opcional (A3.2)"
+        string logo_ruta "logo de la empresa (E11)"
         string sitio_web "opcional (A3.2)"
-        int numero_empleados "opcional (A3.2)"
+        string numero_empleados "rango, opcional (A3.2, E11): 1 a 10, 11 a 50..."
         bigint registrada_por FK "null si se registró sola (L2)"
         boolean activa "desactivarla desactiva a sus colaboradores (RN-025)"
         timestamp desactivada_en
@@ -89,7 +90,7 @@ erDiagram
         string cargo "opcional"
         string ciudad "opcional (A6)"
         string pais "opcional (A6)"
-        string avatar_ruta "foto de perfil (A6)"
+        string foto_ruta "foto de perfil (A6)"
         string zona_horaria "A6"
         string idioma "A6"
         jsonb avisos "avisos por correo elegidos en A6"
@@ -302,4 +303,4 @@ Pendiente de decidir:
 - **[FUNCIONALIDAD POR DEFINIR]** A3.1 tiene la pestaña "Consultores · Próximamente" y A5.2 el rol "Consultor" inactivo. Si se activa, hace falta una tabla `consultor_empresa` (qué empresas ve cada consultor).
 - **[INCONSISTENCIA DETECTADA]** A6 (Mi perfil) muestra 3 requisitos de contraseña; L2 y L4 muestran 4 y RN-001 pide 4 más la confirmación.
 - **[INFORMACIÓN PENDIENTE]** "Unos 25 minutos" (A3.1b, E1): ¿se calcula por número de preguntas o se escribe en el diagnóstico?
-- Las migraciones ya creadas (`sectores`, `empresas`, columnas de `users`) no tienen todavía los campos nuevos de esta revisión. Se agregan en T-045.
+- Ya tienen migración los campos de Mi perfil (`users`: ciudad, país, zona horaria, idioma, avisos, foto, último acceso, fecha de la contraseña; `empresas`: teléfono, sitio web, número de empleados, logo). Los demás campos nuevos de esta revisión se agregan en T-045.

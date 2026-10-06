@@ -19,6 +19,14 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $email
  * @property string|null $cargo
  * @property string|null $telefono
+ * @property string|null $ciudad
+ * @property string|null $pais
+ * @property string $zona_horaria
+ * @property string $idioma
+ * @property array<string, bool>|null $avisos
+ * @property string|null $foto_ruta
+ * @property Carbon|null $ultimo_acceso_en
+ * @property Carbon|null $contrasena_actualizada_en
  * @property bool $activo
  * @property Carbon|null $email_verified_at
  * @property string $password
@@ -29,8 +37,11 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'empresa_id', 'cargo', 'telefono', 'activo'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+#[Fillable([
+    'name', 'email', 'password', 'empresa_id', 'cargo', 'telefono', 'activo',
+    'ciudad', 'pais', 'zona_horaria', 'idioma', 'avisos',
+])]
+#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'foto_ruta'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -47,6 +58,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'activo' => 'boolean',
+            'avisos' => 'array',
+            'ultimo_acceso_en' => 'datetime',
+            'contrasena_actualizada_en' => 'datetime',
         ];
     }
 

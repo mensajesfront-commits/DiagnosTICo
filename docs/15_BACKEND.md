@@ -15,6 +15,7 @@ Todas las rutas del Administrador van con `auth` y con el permiso indicado (matr
 | GET / POST | `/register` | L2 | Crea la empresa y su usuario con rol Empresa (`CreateNewUser`). |
 | GET / POST | `/forgot-password` | L3 | Ajustar el aviso para cumplir RN-005. |
 | GET | `/reset-password/{token}` | L4 | |
+| GET | `/` | — | Redirige al inicio de sesión, o al inicio de la cuenta si ya entró. |
 | POST | `/reset-password` | L4 | |
 
 ## Lo que ya existe en el backend (versión mínima, 6 de octubre)
@@ -36,6 +37,18 @@ Pendiente para Luis:
 
 - **RN-001:** fuera de producción, la regla de contraseña del kit solo pide 8 caracteres. El frontend exige los 5 requisitos, pero el servidor todavía no.
 - **RN-005:** que "olvidé mi contraseña" responda lo mismo exista o no el correo.
+
+## Mi perfil (ya existe)
+
+| Método | URL | Nombre | Qué hace |
+|---|---|---|---|
+| GET | `/mi-perfil` | `profile.edit` | A6 / E11 |
+| PATCH | `/mi-perfil` | `profile.update` | Guarda datos personales, avisos y, para la cuenta principal, los datos de la empresa (el sector no) |
+| PUT | `/mi-perfil/contrasena` | `user-password.update` | Cambia la contraseña con la actual; guarda `contrasena_actualizada_en` |
+| POST | `/mi-perfil/foto` | `perfil.foto` | Foto de la cuenta o logo de la empresa |
+| GET | `/imagenes/{tipo}/{id}` | `perfil.imagen` | Sirve la foto o el logo a la misma cuenta, su empresa o quien tenga `empresas.ver` / `usuarios.ver` |
+
+Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/security`) y la opción de eliminar la cuenta: las cuentas se desactivan, no se borran (RN-004). `/settings` redirige a `/mi-perfil`. El "último acceso" se guarda al iniciar sesión (`AppServiceProvider`).
 
 ## Diagnósticos y sectores (T-049, T-050)
 

@@ -18,7 +18,9 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Documentos `14_FRONTEND.md`, `15_BACKEND.md` y `18_UI_UX.md`.
 - Backend mínimo para el registro: tablas `sectores` y `empresas`, roles y permisos, 7 sectores de ejemplo, Administrador inicial (`migrate --seed`) y registro que crea la empresa con su usuario de rol Empresa.
 - Inicio provisional en español para revisar el menú de cada rol.
-- Logo del sistema en el menú, el acceso y el ícono del navegador.
+- Logo del sistema en el menú, el acceso y el ícono del navegador. El sistema se llama **Captter**.
+- Mi perfil (A6 y E11) conectado: datos personales, datos de la empresa para la cuenta principal, avisos por correo, foto o logo y cambio de contraseña. Se guarda el último acceso.
+- Al abrir el sistema (`/`) se entra directo al inicio de sesión.
 
 ### Cambiado (roles)
 
@@ -28,6 +30,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - `AuthLayout` reemplaza los layouts de acceso del kit.
 - Los modales enfocan el primer campo al abrirse.
+- Se quitaron las páginas de ajustes del kit y la opción de eliminar la cuenta (RN-004).
 - El fondo del menú lateral llega hasta abajo en páginas largas.
 
 ## Semana 2 · del 28 de septiembre al 4 de octubre de 2026 (cerrada el 5 de octubre)

@@ -82,14 +82,7 @@ function cerrarSesion(): void {
             class="mb-8 flex items-center gap-3 px-3 leading-tight"
         >
             <Logo class="size-10" />
-            <span>
-                <span class="block text-base font-semibold text-white">
-                    Diagnóstico
-                </span>
-                <span class="block text-base font-semibold text-menu-marca">
-                    Empresarial
-                </span>
-            </span>
+            <span class="text-xl font-semibold text-white">Captter</span>
         </Link>
 
         <ul class="flex flex-1 flex-col gap-1">

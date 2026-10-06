@@ -162,6 +162,24 @@ Ruta prevista: `GET /diagnosticos/crear?sector={id}`.
 
 Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1 y redirige al editor (A2.1).
 
+### A6 / E11 · Mi perfil (`perfil/MiPerfil`)
+
+Ruta: `GET /mi-perfil` (ya existe, `PerfilController`). Una sola pantalla para todas las cuentas: con `empresa = null` se ve como A6 (Administrador y roles internos); con empresa, como E11.
+
+| Prop | Tipo | Nota |
+|---|---|---|
+| `usuario` | objeto | `name`, `email`, `cargo`, `telefono`, `ciudad`, `pais`, `zona_horaria`, `idioma`, `avisos` (clave → sí/no), `foto_url`, `ultimo_acceso_en`, `creado_en`, `contrasena_actualizada_en` |
+| `rol` | `string \| null` | Se muestra bloqueado en A6. |
+| `empresa` | objeto o `null` | `nombre`, `sector`, `ciudad`, `pais`, `sitio_web`, `numero_empleados` |
+| `editaEmpresa` | `boolean` | Solo la cuenta principal (rol Empresa) cambia los datos de la empresa (RN-025). |
+| `opciones` | objeto | `paises`, `zonas`, `idiomas`, `empleados` y `avisos` (clave → texto), de `app/Support/OpcionesPerfil.php` |
+
+Envía:
+
+- `PATCH /mi-perfil`: los datos de arriba; `empresa{…}` solo si `editaEmpresa`.
+- `PUT /mi-perfil/contrasena`: `current_password`, `password`, `password_confirmation`. En A6 va en línea; en E11, en un modal.
+- `POST /mi-perfil/foto`: `foto` (imagen de hasta 2 MB). La cuenta principal de una empresa cambia el **logo** de la empresa; las demás cuentas, su **foto**. Las imágenes se sirven por `/imagenes/{usuario|empresa}/{id}`, sin publicar la carpeta de archivos.
+
 ## Pantallas sin wireframe en los PDF recibidos
 
 Se construyeron a partir de las historias y con el mismo estilo. Hay que compararlas con el prototipo cuando esté a mano.

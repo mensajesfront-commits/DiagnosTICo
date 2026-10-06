@@ -14,11 +14,15 @@ use Illuminate\Support\Carbon;
  * @property int $sector_id
  * @property string $ciudad
  * @property string $pais
+ * @property string|null $telefono
+ * @property string|null $sitio_web
+ * @property string|null $numero_empleados
+ * @property string|null $logo_ruta
  * @property bool $activa
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['nombre', 'sector_id', 'ciudad', 'pais', 'activa'])]
+#[Fillable(['nombre', 'sector_id', 'ciudad', 'pais', 'telefono', 'sitio_web', 'numero_empleados', 'activa'])]
 class Empresa extends Model
 {
     protected function casts(): array
