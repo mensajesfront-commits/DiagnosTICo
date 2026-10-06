@@ -167,7 +167,7 @@ Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (
 
 ### A5 · Usuarios y roles: pestaña Usuarios (`usuarios/Index`)
 
-Ruta prevista: `GET /usuarios` (permiso `usuarios.ver`). Admite `?rol=Empresa` para entrar ya filtrado.
+Ruta: `GET /usuarios` (ya existe, `UsuariosController`; permiso `usuarios.ver`). Admite `?rol=Empresa` para entrar ya filtrado.
 
 | Prop | Tipo | Nota |
 |---|---|---|
@@ -187,7 +187,7 @@ No existe "restablecer contraseña" (RN-006).
 
 ### A5.1 · Usuarios y roles: pestaña Roles (`usuarios/Roles`)
 
-Ruta prevista: `GET /usuarios/roles?rol={id}` (permiso `usuarios.ver`).
+Ruta: `GET /usuarios/roles?rol={id}` (ya existe, `RolesController`; permiso `usuarios.ver`).
 
 | Prop | Tipo | Nota |
 |---|---|---|
@@ -209,6 +209,8 @@ Modales (todos en `components/usuarios/`):
 | A5.1d | `ModalEliminarRol` | `DELETE /roles/{id}` |
 
 Sin modal: "Reactivar" (`POST /usuarios/{id}/reactivar`), "Reenviar invitación" (`POST /usuarios/{id}/invitacion`) y "Ver como" (`POST /usuarios/{id}/ver-como`, A5.4).
+
+Todo está conectado al backend. `medicion_pendiente` llega vacío hasta que exista la tabla de mediciones.
 
 ### A6 / E11 · Mi perfil (`perfil/MiPerfil`)
 

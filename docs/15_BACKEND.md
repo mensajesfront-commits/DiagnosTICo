@@ -93,7 +93,7 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | POST | `/categorias/{id}/archivar` | `diagnosticos.editar` | A2.3c: archivar (con respuestas). Se quita de los borradores; las versiones publicadas no cambian. | — |
 | POST | `/categorias/{id}/restaurar` | `diagnosticos.editar` | Restaurar una archivada. No se agrega sola a los borradores. | — |
 
-## Usuarios y roles (A5, rutas previstas)
+## Usuarios y roles (A5, ya existen)
 
 | Método | URL | Permiso | Qué hace | Envía |
 |---|---|---|---|---|
@@ -104,11 +104,34 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | POST | `/usuarios/{id}/desactivar` | `usuarios.gestionar` | A5.3b (RN-004). No sobre la propia cuenta. Si es la cuenta principal, la empresa queda sin acceso | — |
 | POST | `/usuarios/{id}/reactivar` | `usuarios.gestionar` | Reactiva | — |
 | PUT | `/usuarios/{id}/rol` | `usuarios.gestionar` | A5.5: reemplaza el rol (RN-027). No sobre la propia cuenta; el rol debe estar activo | `rol_id`, `avisar` |
-| POST | `/usuarios/{id}/ver-como` | `usuarios.gestionar` | A5.4: solo lectura, con registro (RN-026); no sobre Administradores | — |
+| POST | `/usuarios/{id}/ver-como` | `usuarios.gestionar` | A5.4: por ahora solo avisa que llega con la pantalla A5.4 (semana 6). No sobre Administradores (403) | — |
 | POST | `/roles` | `usuarios.gestionar` | A5.2: crea el rol | `nombre` (único, máx. 40), `descripcion`, `activo`, `permisos[]`, `cuentas[]` |
 | PUT | `/roles/{id}` | `usuarios.gestionar` | A5.1c: edita un rol creado (no los del sistema) | `nombre`, `descripcion`, `activo`, `permisos[]` |
 | DELETE | `/roles/{id}` | `usuarios.gestionar` | A5.1d: solo roles creados y sin cuentas | — |
 | POST | `/roles/{id}/asignar` | `usuarios.gestionar` | A5.5 desde el rol | `cuenta_id`, `avisar` |
+
+Dónde está:
+
+| Pieza | Archivo |
+|---|---|
+| Rutas | `routes/web.php` (grupos `permission:usuarios.ver` y `permission:usuarios.gestionar`) |
+| Controladores | `app/Http/Controllers/UsuariosController.php`, `RolesController.php` |
+| Datos para las pantallas | `app/Support/DatosUsuarios.php` |
+| Correos | `app/Notifications/InvitacionCuenta.php` (enlace para crear la contraseña), `RolCambiado.php` |
+| Invitaciones | `users.password` vacío e `invitacion_enviada_en` (migración `2026_10_07_000003`) |
+| Pruebas | `tests/Feature/UsuariosYRolesTest.php` |
+
+Reglas que valida el servidor:
+
+- Nada sobre la propia cuenta: ni desactivarla ni cambiarle el rol (403).
+- **Invitar:** solo roles internos y activos.
+- **Asignar un rol:**
+  - "Colaborador" nunca;
+  - "Empresa" solo a cuentas de una empresa;
+  - un rol inactivo no se asigna.
+- **Roles del sistema:** no se editan ni se eliminan (403). Un rol con cuentas no se elimina ni se desactiva.
+- **Desactivar la cuenta principal:** también desactiva su empresa, y reactivarla la reactiva (RN-025).
+- **Correos:** se envían al momento, no en cola, para que se vean en Mailpit sin un *worker*. **[FUNCIONALIDAD POR DEFINIR]** Pasarlos a la cola con el resto de correos (RNF-004, semana 5).
 
 ## Otras secciones del menú (rutas previstas)
 

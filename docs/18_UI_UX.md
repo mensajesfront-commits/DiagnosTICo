@@ -82,9 +82,9 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.3b | Crear / editar categoría | `components/categorias/ModalCategoria.vue` | Hecha |
 | A2.3c | Archivar o eliminar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Eliminar no tiene wireframe, sale de HU-019. |
 | A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha (vista previa) |
-| A5 | Usuarios: lista con búsqueda, filtros y acciones | `pages/usuarios/Index.vue` | Hecha (vista previa) |
-| A5.1, A5.1b, A5.1e | Roles del sistema (Administrador, Empresa, Colaborador) | `pages/usuarios/Roles.vue`, `components/usuarios/PanelRol.vue` | Hecha (vista previa) |
-| A5.1c | Editar un rol creado | `components/usuarios/PanelRol.vue` | Hecha (vista previa) |
+| A5 | Usuarios: lista con búsqueda, filtros y acciones | `pages/usuarios/Index.vue` | Hecha y conectada |
+| A5.1, A5.1b, A5.1e | Roles del sistema (Administrador, Empresa, Colaborador) | `pages/usuarios/Roles.vue`, `components/usuarios/PanelRol.vue` | Hecha y conectada |
+| A5.1c | Editar un rol creado | `components/usuarios/PanelRol.vue` | Hecha y conectada |
 | A5.1d | Eliminar rol | `components/usuarios/ModalEliminarRol.vue` | Hecha |
 | A5.2 | Crear rol | `components/usuarios/ModalCrearRol.vue` | Hecha |
 | A5.3b | Desactivar cuenta | `components/usuarios/ModalDesactivarCuenta.vue` | Hecha |
