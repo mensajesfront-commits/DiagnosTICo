@@ -1,6 +1,6 @@
 # Seguridad
 
-**Estado:** EN CURSO. La matriz de roles y permisos ya sigue el wireframe A5.2 (T-006, 6 de octubre).
+**Estado:** EN CURSO. La matriz de roles y permisos sigue el wireframe A5.2 (T-006). La seguridad del acceso (L1–L4) está completa y probada (6 de octubre).
 
 Más adelante se completan:
 
@@ -85,12 +85,31 @@ Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/
 
 ## Reglas que se aplican en el servidor
 
-1. **Cada ruta lleva su middleware** (`role:` o `permission:`). Los alias están registrados en `bootstrap/app.php`. El menú lateral oculta lo que no se puede abrir (T-052), pero eso no reemplaza el bloqueo del servidor.
-2. **La empresa y el colaborador solo ven datos de su propia empresa** (RN-007). Además del permiso, cada consulta se filtra por `empresa_id`. Lo harán las *policies* de Laravel en las semanas 3 a 6.
-3. **Cuenta desactivada:** no puede iniciar sesión y sus datos se conservan (RN-004).
-4. **Los avisos no revelan si un correo existe** en el inicio de sesión ni en la recuperación de la contraseña (RN-005).
-5. **Contraseña fuerte:** mínimo 8 caracteres, una mayúscula, un número y un carácter especial (RN-001). **[INCONSISTENCIA DETECTADA]** Los wireframes L2 y L4 muestran solo 4 requisitos y no incluyen el carácter especial. Hay que decidir si se agrega a la pantalla o si se quita de la regla.
-6. **El Administrador no restablece contraseñas de otras cuentas** (RN-006). El documento "Tecnologías del sistema" todavía menciona "restablecer contraseña (A5.3)". El cronograma ya lo descartó (T-012, T-123).
+| # | Regla | Cómo se cumple | Prueba |
+|---|---|---|---|
+| 1 | **Cada ruta lleva su middleware** (`role:` o `permission:`). El menú oculta lo que no se puede abrir (T-052), pero eso no reemplaza el bloqueo del servidor. | Alias en `bootstrap/app.php` | `PermisosTest` |
+| 2 | **La empresa y el colaborador solo ven datos de su empresa** (RN-007). Además del permiso, cada consulta se filtra por `empresa_id`. | Mi perfil y sus imágenes ya lo hacen; el resto, con *policies* al crear cada módulo | `PerfilTest` |
+| 3 | **Cuenta desactivada no entra** (RN-004), tampoco las cuentas de una empresa desactivada (RN-025). Si las desactivan con la sesión abierta, la sesión se cierra en la siguiente petición. | `User::puedeEntrar()`, `Fortify::authenticateUsing` y el middleware `CerrarSesionCuentaInactiva` | `SeguridadAccesoTest` |
+| 4 | **Los avisos no revelan si un correo existe** (RN-005): el login responde "El correo o la contraseña no son correctos." en todos los casos; "¿Olvidaste tu contraseña?" responde siempre "Si el correo está registrado, te enviamos un enlace…". | `lang/es/auth.php`, `AvisoRecuperacionResponse` | `SeguridadAccesoTest` |
+| 5 | **Contraseña fuerte en todos los entornos** (RN-001): mínimo 8 caracteres, una mayúscula, un número y un carácter especial. Se aplica al registrarse, al crear la contraseña nueva y al cambiarla en Mi perfil. | `Password::defaults` en `AppServiceProvider` + regla `TieneMayuscula` | `SeguridadAccesoTest` |
+| 6 | **Enlace de contraseña nueva sin vencimiento por tiempo** (RN-006): sirve hasta guardar la contraseña; pedir otro invalida el anterior. | `config/auth.php` (`expire` de un año) | `SeguridadAccesoTest` |
+| 7 | **Límite de intentos:** 5 por minuto en iniciar sesión (por correo e IP), registrarse, pedir el enlace y crear la contraseña nueva (por IP). | Limitador `login` de Fortify y middleware `LimitarIntentosAcceso` | `SeguridadAccesoTest`, `AuthenticationTest` |
+| 8 | **Un correo, una cuenta** (RN-002); el correo se guarda y se compara en minúsculas. | Regla `unique` y `lowercase_usernames` de Fortify | `SeguridadAccesoTest` |
+| 9 | **Constancia de los términos:** se guarda cuándo se aceptaron (`users.terminos_aceptados_en`). | `CreateNewUser` | `SeguridadAccesoTest` |
+| 10 | **El Administrador no restablece contraseñas de otras cuentas** (RN-006). No existe esa ruta. | — | — |
+| 11 | **Contraseñas cifradas** con bcrypt (`hashed` en el modelo); nunca se guardan ni se muestran en texto. | `User::casts()` | — |
+| 12 | **Protección CSRF y sesión nueva al entrar**, de Laravel e Inertia. | Middleware `web` | — |
+
+Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación también (`FortifyServiceProvider::configureResetEmail`).
+
+### Antes de una presentación o de producción
+
+- `APP_DEBUG=false`. Con `true`, un error muestra código y datos de la base, como la pantalla de error de Laravel.
+- `APP_ENV=production`. Así no existen las rutas `/prueba-tecnica/*` y el `DemoSeeder` no corre.
+- Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
+- Claves (`APP_KEY`, base de datos, correo, OpenAI) solo en `.env`.
+
+**[INFORMACIÓN PENDIENTE]** Los términos de uso y la política de tratamiento de datos no tienen URL todavía (L2 apunta a `#`).
 
 ## Comprobado en la prueba técnica
 

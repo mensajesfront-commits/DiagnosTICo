@@ -4,14 +4,21 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Http\Responses\AvisoRecuperacionResponse;
 use App\Models\Sector;
+use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
+use Laravel\Fortify\Contracts\FailedPasswordResetLinkRequestResponse;
+use Laravel\Fortify\Contracts\SuccessfulPasswordResetLinkRequestResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 
@@ -22,7 +29,9 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // RN-005: mismo aviso exista o no el correo.
+        $this->app->bind(FailedPasswordResetLinkRequestResponse::class, AvisoRecuperacionResponse::class);
+        $this->app->bind(SuccessfulPasswordResetLinkRequestResponse::class, AvisoRecuperacionResponse::class);
     }
 
     /**
@@ -33,6 +42,50 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+        $this->configureLogin();
+        $this->configureResetEmail();
+    }
+
+    /**
+     * L1 · Solo entran las cuentas activas de empresas activas (RN-004,
+     * RN-025). Si no, el mismo mensaje que una contraseña equivocada, para no
+     * revelar qué cuentas existen (RN-005).
+     */
+    private function configureLogin(): void
+    {
+        Fortify::authenticateUsing(function (Request $request): ?User {
+            $usuario = User::where('email', Str::lower($request->string(Fortify::username())->value()))->first();
+
+            if (! $usuario || ! Hash::check($request->string('password')->value(), $usuario->password ?? '')) {
+                return null;
+            }
+
+            return $usuario->puedeEntrar() ? $usuario : null;
+        });
+    }
+
+    /**
+     * Correo de "¿Olvidaste tu contraseña?" en español y con el nombre del
+     * sistema. El enlace no vence por tiempo (RN-006, config/auth.php).
+     */
+    private function configureResetEmail(): void
+    {
+        ResetPassword::toMailUsing(function (object $usuario, string $token): MailMessage {
+            /** @var User $usuario */
+            $url = url(route('password.reset', [
+                'token' => $token,
+                'email' => $usuario->getEmailForPasswordReset(),
+            ], false));
+
+            return (new MailMessage)
+                ->subject('Crea una contraseña nueva para '.config('app.name'))
+                ->greeting("Hola, {$usuario->name}:")
+                ->line('Recibimos una solicitud para cambiar la contraseña de tu cuenta.')
+                ->action('Crear contraseña nueva', $url)
+                ->line('El enlace sirve hasta que guardes la contraseña nueva. Si pides otro, solo funciona el último.')
+                ->line('Si no pediste el cambio, ignora este correo: tu contraseña sigue igual.')
+                ->salutation('El equipo de NuevasTIC');
+        });
     }
 
     /**

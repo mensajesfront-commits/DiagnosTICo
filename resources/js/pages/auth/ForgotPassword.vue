@@ -4,7 +4,8 @@
  *
  * Fortify recibe `email`. Por seguridad, el aviso es el mismo aunque el correo
  * no exista en el sistema (RN-005); aquí se muestra cuando el servidor
- * devuelve `status`. El enlace sirve hasta que se cambie la contraseña (RN-006).
+ * devuelve `status`. El enlace no vence por tiempo: sirve hasta que se cambie
+ * la contraseña (RN-006). El texto no afirma que el correo exista (RN-005).
  */
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -70,10 +71,11 @@ const correo = ref('');
         </Link>
 
         <Aviso v-if="status" tono="exito" titulo="Revisa tu correo">
-            Enviamos un enlace
-            <template v-if="correo">
-                a <strong>{{ correo }}</strong></template
-            >. El enlace sirve hasta que cambies la contraseña. Si no llega,
+            Si
+            <template v-if="correo"
+                ><strong>{{ correo }}</strong> tiene una cuenta</template
+            ><template v-else>el correo tiene una cuenta</template>, te enviamos
+            un enlace. Sirve hasta que cambies la contraseña. Si no llega,
             revisa spam o
             <button
                 type="button"

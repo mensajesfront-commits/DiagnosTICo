@@ -28,13 +28,15 @@ Desde la semana 3 también tiene las primeras pantallas del negocio (frontend), 
 | Tarea | Qué quedó | Pendiente |
 |---|---|---|
 | T-051 Pantallas de acceso | L1, L2, L3 y L4 con el diseño del wireframe | — |
-| T-046 / T-047 (mínimo) | Tablas de sectores y empresas, roles y permisos, sectores de ejemplo, Administrador inicial y registro de la empresa | Revisión de Luis; RN-001 y RN-005 en el servidor |
+| T-046 / T-047 | Tablas de sectores y empresas, roles y permisos, sectores de ejemplo, Administrador inicial, registro de la empresa y seguridad del acceso completa | Categorías y niveles iniciales (T-046) |
+| T-040 Diccionario de datos | Tablas existentes en `12_BASE_DE_DATOS.md` | Las demás tablas, cuando tengan migración |
 | T-052 Menú por rol | `MenuLateral` oculta lo que no tiene permiso (con prueba) | — |
 | T-053 Diagnósticos de un sector | A2, A2·T y A2b (`pages/diagnosticos/Index.vue`) | Ruta y controlador (backend) |
 | T-054 Sectores | Modales A2.2, A2.2a, A2.2b, A2.2c, A2.2d y A2.2e | Rutas de sectores (backend) |
 | T-055 Catálogo de categorías | A2.3, A2.3b y A2.3c | Rutas de categorías (backend) |
 | T-056 Crear diagnóstico | A2.5, en blanco o copiando; también duplicar, archivar y eliminar | `POST /diagnosticos` (backend) |
 | T-043 Rutas del backend | Propuesta en `15_BACKEND.md` | Que Luis la valide |
+| T-042, T-059, T-060, T-062, T-063 Documentos | `09_FLUJOS_DEL_SISTEMA.md`, `02_VISION_Y_OBJETIVOS.md`, `04_STAKEHOLDERS.md`, `06_REQUISITOS_NO_FUNCIONALES.md`, `10_ARQUITECTURA.md` | Validar metas y datos de NuevasTIC marcados como pendientes |
 | T-066 / T-088 UI/UX y frontend | `18_UI_UX.md` y `14_FRONTEND.md` | Se completan cada semana |
 
 ## Semana 2: tareas "En curso"

@@ -19,6 +19,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-011 | Chromium instalado con Playwright en la imagen de Sail | Vigente |
 | DEC-012 | Del kit solo se deja el registro; sin modo oscuro | Vigente |
 | DEC-013 | La llamada real a OpenAI se prueba cuando se use la IA | Vigente |
+| DEC-014 | Reglas de acceso propias sobre Fortify | Vigente |
 
 ---
 
@@ -134,3 +135,12 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 
 - **Decisión:** la prueba técnica de la IA (T-019) se da por cumplida con el servicio, el comando `prueba:ia` y las pruebas con la API simulada. La llamada real con una clave se hace cuando se construya el análisis de la IA (semana 5).
 - **Por qué:** el equipo todavía no usa la clave de OpenAI; el código ya está listo para recibirla en `.env` (`OPENAI_API_KEY`, `OPENAI_MODEL`).
+
+### DEC-014 — Reglas de acceso propias sobre Fortify
+
+- **Decisión:**
+  - La contraseña fuerte (RN-001) es la misma en todos los entornos. Se quitó la regla del kit para producción (12 caracteres y revisión de filtraciones), que RN-001 no pide.
+  - El enlace de contraseña nueva no vence por tiempo (RN-006): `expire` de un año en `config/auth.php`.
+  - El inicio de sesión revisa que la cuenta y su empresa estén activas, y "¿Olvidaste tu contraseña?" responde siempre lo mismo (RN-005).
+  - Se agregaron las traducciones al español en `lang/es` en lugar de instalar un paquete de traducciones.
+- **Por qué:** las reglas de negocio piden algo distinto a lo que trae Fortify por defecto, y los evaluadores van a probar el acceso.

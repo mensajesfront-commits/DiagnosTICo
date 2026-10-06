@@ -9685,7 +9685,7 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 
 # 7. Requisitos no funcionales relacionados
 
-**[INFORMACIÓN PENDIENTE]** `docs/06_REQUISITOS_NO_FUNCIONALES.md` está vacío. Estos RNF se desprenden solo de las historias y deben validarse. No hay metas medibles de rendimiento, disponibilidad ni accesibilidad.
+Estos RNF se desprenden de las historias. El detalle, con los RNF que se agregaron desde RNF-007 y las metas propuestas, está en `06_REQUISITOS_NO_FUNCIONALES.md` (REQUIERE VALIDACIÓN, PA-008).
 
 | ID | Categoría | Requisito | Historias |
 |---|---|---|---|

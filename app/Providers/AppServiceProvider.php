@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Rules\TieneMayuscula;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Date;
@@ -47,14 +48,12 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
-        );
+        // RN-001, igual en todos los entornos: mínimo 8 caracteres, una
+        // mayúscula, un número y un carácter especial. La pantalla muestra
+        // los mismos requisitos (resources/js/lib/contrasena.ts).
+        Password::defaults(fn (): Password => Password::min(8)
+            ->numbers()
+            ->symbols()
+            ->rules([new TieneMayuscula]));
     }
 }

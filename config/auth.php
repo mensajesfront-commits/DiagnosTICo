@@ -96,7 +96,10 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
+            // RN-006: el enlace no vence por tiempo; sirve hasta guardar la
+            // contraseña. Se usa un año como "sin vencimiento". Pedir otro
+            // enlace invalida el anterior.
+            'expire' => (int) env('AUTH_PASSWORD_RESET_EXPIRE', 525600),
             'throttle' => 60,
         ],
     ],

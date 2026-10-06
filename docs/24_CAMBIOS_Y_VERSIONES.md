@@ -21,6 +21,9 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Logo del sistema en el menú, el acceso y el ícono del navegador. El sistema se llama **Captter**.
 - Mi perfil (A6 y E11) conectado: datos personales, datos de la empresa para la cuenta principal, avisos por correo, foto o logo y cambio de contraseña. Se guarda el último acceso.
 - Al abrir el sistema (`/`) se entra directo al inicio de sesión.
+- Seguridad del acceso completa: cuentas y empresas desactivadas no entran, contraseña fuerte en todos los entornos, mismo aviso en la recuperación, enlace sin vencimiento, límite de intentos, mensajes y correo en español, constancia de los términos (DEC-014).
+- Cuentas de demostración (`DemoSeeder`) y diccionario de datos de las tablas existentes.
+- Documentos 02 (visión y objetivos), 04 (stakeholders), 06 (requisitos no funcionales), 09 (flujos, con el diagrama de secuencia de la medición) y 10 (arquitectura).
 
 ### Cambiado (roles)
 

@@ -103,6 +103,33 @@ El envío de correos y el análisis de la IA corren en segundo plano. Para que f
 - **Cuenta de empresa:** regístrate en `/register`. Queda con el rol Empresa y su menú.
 - **Cuenta de Administrador:** entra con la del seeder. Las pantallas de la prueba técnica y las vistas previas (`/prueba-tecnica/*`) solo existen con `APP_ENV=local`.
 
+## Cuentas de demostración
+
+Para probar el acceso (o presentarlo) sin registrar cuentas a mano:
+
+```bash
+./vendor/bin/sail artisan db:seed --class=DemoSeeder
+```
+
+Crea, con la contraseña de `DEMO_PASSWORD` (o una que muestra en la terminal):
+
+| Correo | Rol | Puede entrar |
+|---|---|---|
+| `laura@laesquina.co` | Empresa (Restaurante La Esquina) | Sí |
+| `andres@laesquina.co` | Colaborador | Sí |
+| `diego@laesquina.co` | Colaborador desactivado | No (RN-004) |
+| `info@casaverde.co` | Empresa desactivada (Hostal Casa Verde) | No (RN-025) |
+
+No corre con `APP_ENV=production`.
+
+## Copia de la base de datos
+
+```bash
+./vendor/bin/sail exec pgsql pg_dump -U sail -d diagnostico > captter.sql
+```
+
+El diccionario de datos y el MER están en `docs/12_BASE_DE_DATOS.md`.
+
 ## Revisiones de código
 
 Lo mismo que corre GitHub Actions en cada pull request:
