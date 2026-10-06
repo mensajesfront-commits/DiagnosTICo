@@ -140,7 +140,7 @@ Reglas que valida el servidor:
 | `/empresas`, `/empresas?sector={id}`, `/empresas/{id}` | A3, A3.1 | 4–5 |
 | `/configuracion-ia` | A4 | 5 |
 | `/historial` | E8 | 6 |
-| `/colaboradores` | E12 | 6 |
+| `/colaboradores` | E12 (frontend hecho; contrato en `14_FRONTEND.md`) | 6 |
 
 ## Respuestas después de una acción
 

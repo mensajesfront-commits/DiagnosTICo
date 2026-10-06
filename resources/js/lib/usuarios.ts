@@ -61,3 +61,13 @@ export function coincide(
         normalizar(cuenta.correo).includes(buscado)
     );
 }
+
+/** Iniciales para el círculo de la persona ("Laura Gómez" → "LG"). */
+export function iniciales(nombre: string): string {
+    return nombre
+        .split(/\s+/)
+        .filter((palabra) => /^\p{L}/u.test(palabra))
+        .slice(0, 2)
+        .map((palabra) => palabra[0]?.toUpperCase())
+        .join('');
+}

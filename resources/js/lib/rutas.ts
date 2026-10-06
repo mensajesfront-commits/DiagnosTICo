@@ -57,6 +57,13 @@ export const rutas = {
         eliminar: (id: number) => `/roles/${id}`,
         asignar: (id: number) => `/roles/${id}/asignar`,
     },
+    colaboradores: {
+        lista: () => '/colaboradores',
+        crear: () => '/colaboradores',
+        contrasena: (id: number) => `/colaboradores/${id}/contrasena`,
+        desactivar: (id: number) => `/colaboradores/${id}/desactivar`,
+        reactivar: (id: number) => `/colaboradores/${id}/reactivar`,
+    },
     empresas: {
         lista: (sectorId?: number) =>
             sectorId ? `/empresas?sector=${sectorId}` : '/empresas',

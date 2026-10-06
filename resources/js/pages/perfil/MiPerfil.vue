@@ -25,6 +25,7 @@ import Modal from '@/components/base/Modal.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import FormularioContrasena from '@/components/perfil/FormularioContrasena.vue';
 import { haceCuanto, mesYAnio, momento } from '@/lib/fechas';
+import { iniciales } from '@/lib/usuarios';
 import { logout } from '@/routes';
 import { foto as subirFoto } from '@/routes/perfil';
 import { edit as perfil, update as guardarPerfil } from '@/routes/profile';
@@ -114,19 +115,11 @@ function guardar(): void {
     })).patch(guardarPerfil().url, { preserveScroll: true });
 }
 
-const iniciales = computed(() => {
-    const base =
-        esEmpresa.value && props.editaEmpresa
-            ? (props.empresa?.nombre ?? '')
-            : props.usuario.name;
-
-    return base
-        .split(/\s+/)
-        .filter((palabra) => /^\p{L}/u.test(palabra))
-        .slice(0, 2)
-        .map((palabra) => palabra[0]?.toUpperCase())
-        .join('');
-});
+const nombreDelCirculo = computed(() =>
+    esEmpresa.value && props.editaEmpresa
+        ? (props.empresa?.nombre ?? '')
+        : props.usuario.name,
+);
 
 // Foto (A6) o logo de la empresa (E11).
 const archivo = ref<HTMLInputElement | null>(null);
@@ -206,7 +199,7 @@ function cerrarSesion(): void {
                         class="flex size-20 items-center justify-center rounded-full bg-marca-suave text-2xl font-semibold text-marca"
                         aria-hidden="true"
                     >
-                        {{ iniciales }}
+                        {{ iniciales(nombreDelCirculo) }}
                     </span>
 
                     <template v-if="esEmpresa">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { avisoCuentaPrincipal, coincide } from '@/lib/usuarios';
+import { avisoCuentaPrincipal, coincide, iniciales } from '@/lib/usuarios';
 
 const laura = {
     nombre: 'Laura Gómez',
@@ -45,5 +45,13 @@ describe('coincide', () => {
         expect(coincide(laura, 'LAESQUINA')).toBe(true);
         expect(coincide(laura, 'rojas')).toBe(false);
         expect(coincide(laura, '  ')).toBe(true);
+    });
+});
+
+describe('iniciales', () => {
+    it('toma la primera letra de las dos primeras palabras', () => {
+        expect(iniciales('Laura Gómez')).toBe('LG');
+        expect(iniciales('ángela de la Torre')).toBe('ÁD');
+        expect(iniciales('Diego')).toBe('D');
     });
 });

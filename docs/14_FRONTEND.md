@@ -230,6 +230,25 @@ Envía:
 - `PUT /mi-perfil/contrasena`: `current_password`, `password`, `password_confirmation`. En A6 va en línea; en E11, en un modal.
 - `POST /mi-perfil/foto`: `foto` (imagen de hasta 2 MB). La cuenta principal de una empresa cambia el **logo** de la empresa; las demás cuentas, su **foto**. Las imágenes se sirven por `/imagenes/{usuario|empresa}/{id}`, sin publicar la carpeta de archivos.
 
+### E12 · Colaboradores (`colaboradores/Index`)
+
+Ruta: `GET /colaboradores`. **[INFORMACIÓN PENDIENTE]** El backend no existe todavía (semana 6, `15_BACKEND.md`). Solo entra la cuenta principal de la empresa (rol Empresa, HU-076 CA-001); un colaborador recibe 403. Vista previa: `/prueba-tecnica/vistas/e12-colaboradores` y `e12-sin-colaboradores`.
+
+| Prop | Tipo | Nota |
+|---|---|---|
+| `empresa` | `string` | Nombre de la empresa, para el texto de arriba |
+| `colaboradores` | `Colaborador[]` | Las cuentas de la empresa: la principal primero, luego los colaboradores por nombre. Cada una con `id`, `nombre`, `correo`, `es_principal`, `activo` y `ultimo_acceso` (fecha ISO o `null`) |
+
+Tipos exactos en `resources/js/types/colaboradores.ts`. Si solo llega la cuenta principal, la pantalla muestra la lista vacía con el botón para crear (HU-076 CA-004).
+
+Envía (todo con `colaborador` de la misma empresa; si no, 404):
+
+- `POST /colaboradores` (E12.1): `name`, `email` y `password`. Correo único (RN-002) y contraseña fuerte (RN-001); no se pide confirmación porque la empresa la escribe y la comparte. Crea la cuenta con `empresa_id` de la empresa y rol **Colaborador**, activa, sin enviar correo. Redirige con `back()`; la pantalla abre E12.2 con lo que se escribió. **El servidor no devuelve la contraseña.**
+- `PUT /colaboradores/{id}/contrasena` (E12.3): `password` (RN-001). Cambia la contraseña, guarda `contrasena_actualizada_en` y **cierra las sesiones abiertas** del colaborador. La pantalla abre E12.2 con la contraseña nueva.
+- `POST /colaboradores/{id}/desactivar` y `/reactivar` (HU-079): cambian `activo`. Nunca sobre la cuenta principal (403).
+
+Modales (en `components/colaboradores/`): `ModalAgregarColaborador` (E12.1), `ModalDatosDeAcceso` (E12.2), `ModalCambiarContrasena` (E12.3) y `ModalDesactivarColaborador` (confirmación; el wireframe no la tiene).
+
 ## Pantallas sin wireframe en los PDF recibidos
 
 Se construyeron a partir de las historias y con el mismo estilo. Hay que compararlas con el prototipo cuando esté a mano.

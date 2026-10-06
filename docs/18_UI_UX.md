@@ -92,6 +92,10 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | — | Invitar usuario interno | `components/usuarios/ModalInvitarUsuario.vue` | Hecha. El wireframe no le da código. |
 | A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
 | E11 | Mi perfil de la empresa (y del colaborador) | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
+| E12 | Colaboradores de la empresa | `pages/colaboradores/Index.vue` | Hecha, con datos de ejemplo (falta el backend) |
+| E12.1 | Agregar colaborador | `components/colaboradores/ModalAgregarColaborador.vue` | Hecha |
+| E12.2 | Comparte estos datos | `components/colaboradores/ModalDatosDeAcceso.vue` | Hecha |
+| E12.3 | Cambiar contraseña de un colaborador | `components/colaboradores/ModalCambiarContrasena.vue` | Hecha |
 
 ## Diferencias con el wireframe
 
@@ -112,4 +116,8 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A5 | "Ver como" no aparece en las cuentas de Administrador. | Respuesta del equipo (6 oct): "Ver como" es para revisar lo que ven los otros roles. |
 | A5.5 | "Cambiar rol" no ofrece "Colaborador", y a las cuentas internas tampoco "Empresa". | Un colaborador lo crea su empresa (RN-025); una cuenta sin empresa no puede ser Empresa. |
 | A5.1c | Con un rol creado que tiene cuentas, "Eliminar rol" queda desactivado con una nota. | HU-051: solo se elimina un rol sin cuentas. |
+| E12.1, E12.3 | La contraseña muestra los 4 requisitos de RN-001; el wireframe dice solo "Mínimo 8 caracteres". | RN-001 y HU-077/HU-078 piden contraseña fuerte. |
+| E12 | "Desactivar" pide confirmación en un modal. | HU-079 CA-001 ("elijo Desactivar y confirmo"); el wireframe no lo dibuja. |
+| E12 | Sin colaboradores, la tabla muestra un mensaje y el botón para crear. | HU-076 CA-004. |
+| E12.2 | También se abre después de cambiar una contraseña (E12.3), con "Contraseña cambiada para…". | HU-078: "guardo y comparto la nueva contraseña". |
 | A5 | "Quitar rol" (HU-052) no está. | Cada cuenta tiene un solo rol (RN-027); se cambia con "Cambiar rol". **[FUNCIONALIDAD POR DEFINIR]** qué rol queda al "quitar". |

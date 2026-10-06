@@ -32,4 +32,12 @@ describe('revisarContrasena (RN-001)', () => {
         expect(cumplidos).toBe(3);
         expect(completa).toBe(false);
     });
+
+    it('sin confirmación no pide que coincidan (E12.1, E12.3)', () => {
+        const estado = revisarContrasena('Mesa-47-Sol', '', {
+            conConfirmacion: false,
+        });
+        expect(estado.requisitos.map((r) => r.id)).not.toContain('coinciden');
+        expect(estado.completa).toBe(true);
+    });
 });
