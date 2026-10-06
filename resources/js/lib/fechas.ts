@@ -69,6 +69,45 @@ export function haceCuanto(iso: string, ahora: Date = new Date()): string {
     return anios === 1 ? 'hace 1 año' : `hace ${anios} años`;
 }
 
+/**
+ * "Último acceso" de A5: "Hoy, 9:12", "Ayer", "Hace 5 días", "30 sep" o
+ * "Nunca".
+ */
+export function ultimoAcceso(
+    iso: string | null,
+    ahora: Date = new Date(),
+): string {
+    if (!iso) {
+        return 'Nunca';
+    }
+
+    const fecha = new Date(iso);
+    const dias = diasEntre(fecha, ahora);
+
+    if (dias <= 0) {
+        return `Hoy, ${hora(fecha)}`;
+    }
+
+    if (dias === 1) {
+        return 'Ayer';
+    }
+
+    if (dias < 7) {
+        return `Hace ${dias} días`;
+    }
+
+    return diaYMes(fecha, ahora);
+}
+
+/** "29 sep", con el año si no es el actual ("2 ago 2025"). */
+export function diaYMes(fecha: Date, ahora: Date = new Date()): string {
+    const texto = `${fecha.getDate()} ${MESES[fecha.getMonth()]}`;
+
+    return fecha.getFullYear() === ahora.getFullYear()
+        ? texto
+        : `${texto} ${fecha.getFullYear()}`;
+}
+
 function diasEntre(desde: Date, hasta: Date): number {
     const inicio = new Date(
         desde.getFullYear(),

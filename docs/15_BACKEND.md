@@ -93,13 +93,29 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | POST | `/categorias/{id}/archivar` | `diagnosticos.editar` | A2.3c: archivar (con respuestas). Se quita de los borradores; las versiones publicadas no cambian. | — |
 | POST | `/categorias/{id}/restaurar` | `diagnosticos.editar` | Restaurar una archivada. No se agrega sola a los borradores. | — |
 
+## Usuarios y roles (A5, rutas previstas)
+
+| Método | URL | Permiso | Qué hace | Envía |
+|---|---|---|---|---|
+| GET | `/usuarios` | `usuarios.ver` | A5: lista de cuentas | Props de `usuarios/Index` |
+| GET | `/usuarios/roles?rol={id}` | `usuarios.ver` | A5.1: roles | Props de `usuarios/Roles` |
+| POST | `/usuarios/invitar` | `usuarios.gestionar` | Crea la cuenta interna sin contraseña y envía el enlace (RN-006) | `name`, `email` (único), `rol_id` (activo, interno), `mensaje` |
+| POST | `/usuarios/{id}/invitacion` | `usuarios.gestionar` | Reenvía la invitación | — |
+| POST | `/usuarios/{id}/desactivar` | `usuarios.gestionar` | A5.3b (RN-004). No sobre la propia cuenta. Si es la cuenta principal, la empresa queda sin acceso | — |
+| POST | `/usuarios/{id}/reactivar` | `usuarios.gestionar` | Reactiva | — |
+| PUT | `/usuarios/{id}/rol` | `usuarios.gestionar` | A5.5: reemplaza el rol (RN-027). No sobre la propia cuenta; el rol debe estar activo | `rol_id`, `avisar` |
+| POST | `/usuarios/{id}/ver-como` | `usuarios.gestionar` | A5.4: solo lectura, con registro (RN-026); no sobre Administradores | — |
+| POST | `/roles` | `usuarios.gestionar` | A5.2: crea el rol | `nombre` (único, máx. 40), `descripcion`, `activo`, `permisos[]`, `cuentas[]` |
+| PUT | `/roles/{id}` | `usuarios.gestionar` | A5.1c: edita un rol creado (no los del sistema) | `nombre`, `descripcion`, `activo`, `permisos[]` |
+| DELETE | `/roles/{id}` | `usuarios.gestionar` | A5.1d: solo roles creados y sin cuentas | — |
+| POST | `/roles/{id}/asignar` | `usuarios.gestionar` | A5.5 desde el rol | `cuenta_id`, `avisar` |
+
 ## Otras secciones del menú (rutas previstas)
 
 | URL | Pantalla | Semana |
 |---|---|---|
 | `/empresas`, `/empresas?sector={id}`, `/empresas/{id}` | A3, A3.1 | 4–5 |
 | `/configuracion-ia` | A4 | 5 |
-| `/usuarios` | A5 | 6 |
 | `/historial` | E8 | 6 |
 | `/colaboradores` | E12 | 6 |
 

@@ -1,5 +1,5 @@
 /**
- * URLs del módulo de Diagnósticos que usa el frontend.
+ * URLs de los módulos que usa el frontend (Diagnósticos, Usuarios y roles…).
  *
  * [INFORMACIÓN PENDIENTE] Las rutas del backend todavía no existen (T-049,
  * T-050, T-074…). Estas son las URLs propuestas en docs/15_BACKEND.md. Cuando
@@ -38,6 +38,24 @@ export const rutas = {
         eliminar: (id: number) => `/categorias/${id}`,
         archivar: (id: number) => `/categorias/${id}/archivar`,
         restaurar: (id: number) => `/categorias/${id}/restaurar`,
+    },
+    usuarios: {
+        lista: (rol?: string) =>
+            rol ? `/usuarios?rol=${encodeURIComponent(rol)}` : '/usuarios',
+        roles: (rolId?: number) =>
+            rolId ? `/usuarios/roles?rol=${rolId}` : '/usuarios/roles',
+        invitar: () => '/usuarios/invitar',
+        reenviarInvitacion: (id: number) => `/usuarios/${id}/invitacion`,
+        desactivar: (id: number) => `/usuarios/${id}/desactivar`,
+        reactivar: (id: number) => `/usuarios/${id}/reactivar`,
+        cambiarRol: (id: number) => `/usuarios/${id}/rol`,
+        verComo: (id: number) => `/usuarios/${id}/ver-como`,
+    },
+    roles: {
+        crear: () => '/roles',
+        actualizar: (id: number) => `/roles/${id}`,
+        eliminar: (id: number) => `/roles/${id}`,
+        asignar: (id: number) => `/roles/${id}/asignar`,
     },
     empresas: {
         lista: (sectorId?: number) =>

@@ -18,6 +18,9 @@ Mientras una ruta no exista, la pantalla se revisa en `/prueba-tecnica/vistas/{v
 | `/prueba-tecnica/vistas/a2-talleres` | A2b · Sector sin diagnósticos | `a2-talleres.json` |
 | `/prueba-tecnica/vistas/a2-3-categorias` | A2.3 · Catálogo de categorías | `a2-3-categorias.json` |
 | `/prueba-tecnica/vistas/a2-5-crear` | A2.5 · Crear diagnóstico | `a2-5-crear.json` |
+| `/prueba-tecnica/vistas/a5-usuarios` | A5 · Usuarios (y sus modales) | `a5-usuarios.json` |
+| `/prueba-tecnica/vistas/a5-1-roles` | A5.1 · Roles del sistema | `a5-1-roles.json` |
+| `/prueba-tecnica/vistas/a5-1c-consultor` | A5.1c · Rol creado e inactivo (Consultor) | `a5-1c-consultor.json` |
 
 Las pantallas de acceso (L1–L4) usan las rutas reales de Fortify y no necesitan vista previa.
 
@@ -161,6 +164,51 @@ Ruta prevista: `GET /diagnosticos/crear?sector={id}`.
 | `publicados` | `DiagnosticoPublicado[]` | Última versión publicada de cada diagnóstico, de todos los sectores, con los nombres de sus categorías. |
 
 Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1 y redirige al editor (A2.1).
+
+### A5 · Usuarios y roles: pestaña Usuarios (`usuarios/Index`)
+
+Ruta prevista: `GET /usuarios` (permiso `usuarios.ver`). Admite `?rol=Empresa` para entrar ya filtrado.
+
+| Prop | Tipo | Nota |
+|---|---|---|
+| `cuentas` | `Cuenta[]` | **Todas** las cuentas. La búsqueda, los filtros y las páginas de 12 se hacen en la pantalla. Cada una trae `rol`, `empresa`, `es_principal`, `colaboradores_activos`, `medicion_pendiente` (texto), `estado` (`activa`, `desactivada`, `invitacion`), `ultimo_acceso`, `invitacion_enviada_en` y `es_tuya` |
+| `roles` | `{ id, nombre, descripcion, activo, del_sistema, aviso }[]` | Para el filtro, "Invitar usuario" y "Cambiar rol" |
+
+Tipos exactos en `resources/js/types/usuarios.ts`.
+
+Acciones por fila:
+- **La propia cuenta:** "Tu cuenta · Mi perfil".
+- **Invitación pendiente:** "Reenviar invitación".
+- **"Ver como":** no aparece en cuentas de Administrador.
+- **"Cambiar rol":** no aparece en colaboradores.
+- **"Desactivar" o "Reactivar".**
+
+No existe "restablecer contraseña" (RN-006).
+
+### A5.1 · Usuarios y roles: pestaña Roles (`usuarios/Roles`)
+
+Ruta prevista: `GET /usuarios/roles?rol={id}` (permiso `usuarios.ver`).
+
+| Prop | Tipo | Nota |
+|---|---|---|
+| `roles` | `Rol[]` | Cada uno con `descripcion`, `resumen` (texto corto de la lista), `activo`, `del_sistema`, `permisos` (nombres técnicos), `notas_permisos` ("solo su empresa"), `cuentas_total`, `cuentas` (las primeras, con `detalle` y `es_tuya`) y `aviso` (texto si está inactivo) |
+| `bloques` | `BloquePermisos[]` | Los 15 permisos de A5.2 en 6 bloques. Salen de `RolesYPermisosSeeder::PERMISOS` |
+| `cuentas` | `Cuenta[]` | Todas, para "+ Asignar a una cuenta", "Cambiar rol…" y "Crear rol" |
+| `rolId` | `number \| null` | Rol abierto al entrar; sin él, el primero |
+
+Modales (todos en `components/usuarios/`):
+
+| Pantalla | Componente | Envía |
+|---|---|---|
+| Invitar usuario | `ModalInvitarUsuario` | `POST /usuarios/invitar`: `name`, `email`, `rol_id`, `mensaje` |
+| A5.3b | `ModalDesactivarCuenta` | `POST /usuarios/{id}/desactivar` |
+| A5.5 (desde una cuenta) | `ModalCambiarRol` | `PUT /usuarios/{id}/rol`: `rol_id`, `avisar` |
+| A5.5 (desde un rol) | `ModalAsignarRol` | `POST /roles/{id}/asignar`: `cuenta_id`, `avisar` |
+| A5.2 | `ModalCrearRol` | `POST /roles`: `nombre`, `descripcion`, `activo`, `permisos[]`, `cuentas[]` |
+| A5.1c | `PanelRol` | `PUT /roles/{id}`: `nombre`, `descripcion`, `activo`, `permisos[]` |
+| A5.1d | `ModalEliminarRol` | `DELETE /roles/{id}` |
+
+Sin modal: "Reactivar" (`POST /usuarios/{id}/reactivar`), "Reenviar invitación" (`POST /usuarios/{id}/invitacion`) y "Ver como" (`POST /usuarios/{id}/ver-como`, A5.4).
 
 ### A6 / E11 · Mi perfil (`perfil/MiPerfil`)
 
