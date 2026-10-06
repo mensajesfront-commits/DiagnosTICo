@@ -7,6 +7,8 @@
 - L1–L4, el inicio y los diagnósticos del Administrador, y la experiencia de la empresa (los 3 primeros);
 - `selection_3-1` y `selection_3-2` (6 de octubre): catálogo de categorías, Empresas, asignar medición, correo de aviso, registrar empresa, resultado, historial y respuestas vistos por el Administrador, Configuración IA, Usuarios y roles, «Ver como» y Mi perfil.
 
+> Los wireframes van a cambiar: con las pruebas se ve qué se puede mejorar (aviso del equipo, 6 de octubre). Cuando llegue una versión nueva, se compara con las pantallas construidas y las diferencias se anotan en la tabla del final.
+
 ## Colores
 
 Los colores están en `resources/css/app.css` y salieron de los wireframes. En las clases de Tailwind se usan por nombre (`bg-marca`, `text-tinta-suave`).

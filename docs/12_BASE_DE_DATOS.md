@@ -258,7 +258,7 @@ erDiagram
 
 Tablas que ya existen por el kit o por paquetes y que no se dibujan:
 
-- `roles` (spatie) necesita tres columnas más para A5.1 y A5.2: `descripcion`, `activo` y `del_sistema` (Administrador, Empresa y Colaborador no se editan ni se eliminan, RN-027).
+- `roles` (spatie) tiene tres columnas más para A5.1 y A5.2: `descripcion`, `activo` y `del_sistema` (Administrador, Empresa y Colaborador no se editan ni se eliminan, RN-027). Ya tienen migración.
 
 
 - `password_reset_tokens`, `sessions`, `cache` y `jobs`, de Laravel.
@@ -293,7 +293,7 @@ Se revisó que cada dato que muestran los wireframes tenga dónde guardarse o de
 | A4 | "Restaurar texto original" | El texto original vive en el código (no en la base) |
 | A4 | "Probar con un ejemplo" | No se guarda ("probar no afecta resultados reales") |
 | A5 | Invitación pendiente y "Reenviar invitación" | **Nuevo:** `users.invitacion_enviada_en`; `password` vacío hasta crearla |
-| A5.1, A5.2 | Rol con descripción, activo, "Del sistema" | **Nuevo:** columnas en `roles` (ver arriba) |
+| A5.1, A5.2 | Rol con descripción, activo, "Del sistema" | **Nuevo:** columnas en `roles` (ya migradas) |
 | A5.4 | "Ver como" con registro | `registros_ver_como` |
 | A6 | Foto, ciudad, país, zona horaria, idioma, avisos por correo, "última actualización" de la contraseña | **Nuevo:** columnas en `users` |
 

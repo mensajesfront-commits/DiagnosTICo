@@ -51,11 +51,18 @@ class RolesYPermisosSeeder extends Seeder
     ];
 
     /**
-     * Roles del sistema (RN-027) con sus permisos fijos, como en A5.2.
-     * El Administrador tiene los 15.
+     * Roles del sistema (RN-027) con su descripción y sus permisos fijos,
+     * como en A5.2. El Administrador tiene los 15.
      *
-     * @var array<string, list<string>>
+     * @var array<string, string>
      */
+    public const array DESCRIPCIONES = [
+        'Administrador' => 'Acceso total al sistema',
+        'Empresa' => 'Responde y ve los resultados de su empresa',
+        'Colaborador' => 'Trabaja con la empresa, sin gestionar el equipo',
+    ];
+
+    /** @var array<string, list<string>> */
     public const array ROLES = [
         'Empresa' => [
             'diagnostico.responder',
@@ -64,14 +71,32 @@ class RolesYPermisosSeeder extends Seeder
             'perfil.editar',
             'contrasena.cambiar',
         ],
-        // RN-025: igual que la empresa, pero no edita el perfil de la empresa
-        // ni gestiona colaboradores.
+        // RN-025: igual que la empresa, pero no cambia los datos de la empresa
+        // ni gestiona colaboradores (eso lo decide el rol, no un permiso).
+        // Sí edita su propio perfil (respuesta del equipo, 6 de octubre).
         'Colaborador' => [
             'diagnostico.responder',
             'resultados.ver',
             'resultados.pdf',
+            'perfil.editar',
             'contrasena.cambiar',
         ],
+    ];
+
+    /**
+     * Consultor: rol creado de ejemplo, inactivo hasta que exista la
+     * vinculación de empresas (A5.2, PA-006). No es del sistema, así que el
+     * Administrador lo puede editar; el seeder solo lo crea si no existe.
+     *
+     * @var list<string>
+     */
+    public const array CONSULTOR = [
+        'empresas.ver',
+        'diagnostico.responder',
+        'resultados.ver',
+        'resultados.pdf',
+        'perfil.editar',
+        'contrasena.cambiar',
     ];
 
     public function run(): void
@@ -90,10 +115,26 @@ class RolesYPermisosSeeder extends Seeder
         // Se limpia otra vez para que syncPermissions vea los permisos nuevos.
         $registro->forgetCachedPermissions();
 
-        Role::findOrCreate('Administrador')->syncPermissions($todos);
+        $permisosPorRol = ['Administrador' => $todos, ...self::ROLES];
 
-        foreach (self::ROLES as $rol => $permisos) {
-            Role::findOrCreate($rol)->syncPermissions($permisos);
+        foreach ($permisosPorRol as $nombre => $permisos) {
+            $rol = Role::findOrCreate($nombre);
+            $rol->forceFill([
+                'descripcion' => self::DESCRIPCIONES[$nombre],
+                'activo' => true,
+                'del_sistema' => true,
+            ])->save();
+            $rol->syncPermissions($permisos);
+        }
+
+        if (! Role::where('name', 'Consultor')->exists()) {
+            $consultor = Role::findOrCreate('Consultor');
+            $consultor->forceFill([
+                'descripcion' => 'Acompaña a sus empresas vinculadas.',
+                'activo' => false,
+                'del_sistema' => false,
+            ])->save();
+            $consultor->syncPermissions(self::CONSULTOR);
         }
     }
 }

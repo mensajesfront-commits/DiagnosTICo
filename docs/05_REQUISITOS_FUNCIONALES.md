@@ -10078,6 +10078,7 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 - **PA-004:** ¿El recordatorio enviado se registra y se muestra en la ficha de la empresa? (HU-008)
 - **PA-005:** ¿Cómo es el modal de confirmación al archivar o eliminar un diagnóstico? (HU-022)
 - **PA-006:** ¿El rol “Consultor” de ejemplo del prototipo (A5.1c) se mantiene o se cambia? (HU-049, HU-050)
+  - **Respondida (6 de octubre):** se mantiene como rol **inactivo** hasta que se le asigne a alguien; se probará más adelante. Ver `17_SEGURIDAD.md`.
 - **PA-007:** ¿Cuál es la capacidad del equipo por Sprint? (propuesta de Sprints)
 - **PA-008:** ¿Cuáles son las metas medibles de rendimiento, disponibilidad y accesibilidad? (RNF)
 - **PA-009:** ¿Cómo se ve la solicitud de nueva medición en el inicio de la empresa y cómo es el correo al Administrador? (HU-082, HU-083)
@@ -10089,7 +10090,8 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 - **[INFORMACIÓN PENDIENTE]** Requisitos no funcionales con metas medibles (PA-008).
 - **[INFORMACIÓN PENDIENTE]** Capacidad del equipo para organizar Sprints (PA-007).
 - **[INFORMACIÓN PENDIENTE]** Diseño y textos del bot de WhatsApp (PA-001, PA-002).
-- **[FUNCIONALIDAD POR DEFINIR]** Roles Consultor y Usuario; “Ver como” un colaborador; historial de solicitudes de nueva medición.
+- **[FUNCIONALIDAD POR DEFINIR]** Rol Usuario; historial de solicitudes de nueva medición.
+- **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. El Colaborador puede editar su propio perfil.
 
 **Supuestos**
 

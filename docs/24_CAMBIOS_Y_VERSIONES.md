@@ -22,7 +22,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ### Cambiado (roles)
 
-- La matriz de roles y permisos sigue el wireframe A5.2: 15 permisos en 6 bloques; Administrador 15, Empresa 5, Colaborador 4. «Colaboradores» del menú se decide por el rol Empresa.
+- La matriz de roles y permisos sigue el wireframe A5.2: 15 permisos en 6 bloques; Administrador 15, Empresa 5, Colaborador 5 (también edita su perfil). Rol Consultor creado inactivo; los roles guardan descripción, si están activos y si son del sistema. «Colaboradores» del menú se decide por el rol Empresa.
 
 ### Cambiado
 

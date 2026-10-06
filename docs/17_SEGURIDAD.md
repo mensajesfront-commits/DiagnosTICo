@@ -19,7 +19,9 @@ Hay tres roles del sistema. Son fijos: no se editan ni se eliminan, y cada cuent
 
 El Administrador puede crear roles nuevos con los permisos que elija (HU-049); cada uno tiene nombre, descripción opcional y si está activo. Un rol con cuentas no se elimina (RN-027).
 
-**[INCONSISTENCIA DETECTADA]** El wireframe A5.2 muestra un rol "Consultor" **inactivo**, marcado "Disponible en la próxima fase: vincular empresas", con 6 permisos (ver empresas solo vinculadas, responder, ver resultados, PDF, editar su perfil y cambiar su contraseña). Los requisitos dicen que Consultor es un rol a futuro sin historias. No se crea en el seeder; falta decidir si se muestra como rol inactivo (PA-006).
+**Rol Consultor (PA-006, respondida el 6 de octubre):** existe pero está **inactivo** hasta que se le asigne a alguien; eso se probará más adelante. El seeder lo crea inactivo, con los 6 permisos de A5.2 (ver empresas, solo las vinculadas; responder; ver resultados; PDF; editar su perfil; cambiar su contraseña). No es del sistema: el Administrador lo puede editar o eliminar, y el seeder no pisa esos cambios.
+
+Cada rol guarda `descripcion`, `activo` y `del_sistema` (columnas agregadas a la tabla `roles` de spatie). Un rol inactivo no se puede asignar.
 
 ## Permisos
 
@@ -40,7 +42,7 @@ Son los **15 permisos en 6 bloques** del wireframe A5.2 (A5.1 "Crear rol" usa la
 | | `ia.editar` | Editar prompts | Editar prompts y ajustes por sector o empresa; probarlos | A4–A4.9 |
 | Usuarios y roles | `usuarios.ver` | Ver usuarios | Ver cuentas y roles | A5 |
 | | `usuarios.gestionar` | Gestionar usuarios y roles | Invitar, desactivar, reactivar, cambiar rol, crear y editar roles, "Ver como" | A5.1–A5.5 |
-| Su cuenta | `perfil.editar` | Editar su perfil | Cambiar sus datos (y los de la empresa, en el rol Empresa) | A6, E11 |
+| Su cuenta | `perfil.editar` | Editar su perfil | Cambiar sus datos personales. En el rol Empresa, también los de la empresa | A6, E11 |
 | | `contrasena.cambiar` | Cambiar su contraseña | Cambiar su contraseña | A6, E11 |
 
 En la Empresa y el Colaborador, los permisos de "Mediciones y resultados" valen **solo para su empresa** (RN-007).
@@ -49,7 +51,7 @@ Lo que no tiene casilla en A5.2 se decide por el rol:
 
 - **Inicio del Administrador (A1):** cualquier rol interno (que no sea Empresa ni Colaborador). Lo que muestra depende de sus permisos.
 - **Colaboradores (E12):** solo el rol Empresa (RN-025, HU-076).
-- **"Ver como" (A5.4):** **[REQUIERE VALIDACIÓN]** se propone ligarlo a `usuarios.gestionar`, con registro (RN-026).
+- **"Ver como" (A5.4):** lo usa quien tiene `usuarios.gestionar`, en solo lectura y con registro (RN-026). Sirve para **comprobar que cada rol ve solo las pantallas que se le asignaron**, así que se usa sobre cuentas de Empresa, Colaborador, Consultor y cualquier rol creado, **no sobre cuentas de Administrador** (respuesta del equipo, 6 de octubre). **[INCONSISTENCIA DETECTADA]** El wireframe A5.4b muestra "Ver como" sobre un Administrador; queda fuera según esta respuesta.
 
 Para todas las cuentas, sin permiso: iniciar y cerrar sesión y recuperar la contraseña.
 
@@ -72,12 +74,12 @@ Los roles del sistema tienen permisos fijos (RN-027). Así los muestra A5.2:
 | `ia.editar` | ✓ | | |
 | `usuarios.ver` | ✓ | | |
 | `usuarios.gestionar` | ✓ | | |
-| `perfil.editar` | ✓ | ✓ | |
+| `perfil.editar` | ✓ | ✓ | ✓ |
 | `contrasena.cambiar` | ✓ | ✓ | ✓ |
-| **Total** | **15** | **5** | **4** |
+| **Total** | **15** | **5** | **5** |
 
 - El Administrador tiene los 15, también "Responder el diagnóstico", aunque no responde por ninguna empresa (no tiene `empresa_id`).
-- El colaborador no tiene "Editar su perfil" porque no cambia los datos de la empresa (RN-025). **[REQUIERE VALIDACIÓN]** Así queda también sin poder editar su propio nombre; confirmar con NuevasTIC.
+- El colaborador **sí edita su propio perfil** (su nombre, su teléfono…), respuesta del equipo del 6 de octubre. Lo que no puede es cambiar los datos de la empresa (RN-025): eso lo decide el rol Empresa, no el permiso. **[INCONSISTENCIA DETECTADA]** A5.2 muestra al Colaborador con 4 permisos, sin "Editar su perfil"; manda la respuesta del equipo.
 
 Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/Feature/RolesYPermisosTest.php`) y el menú en `resources/js/lib/menu.ts`.
 
