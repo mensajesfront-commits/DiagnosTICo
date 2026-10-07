@@ -146,6 +146,7 @@ Reglas que valida el servidor:
 | PUT | `/colaboradores/{colaborador}` | `colaboradores.actualizar` | Edita nombre, cargo, correo y, si se envía, la contraseña; si cambia el correo o la contraseña, cierra sus sesiones y anula "Recordarme" (HU-078) |
 | POST | `/colaboradores/{colaborador}/desactivar` | `colaboradores.desactivar` | `activo = false` y cierra sus sesiones (HU-079) |
 | POST | `/colaboradores/{colaborador}/reactivar` | `colaboradores.reactivar` | `activo = true` |
+| DELETE | `/colaboradores/{colaborador}` | `colaboradores.eliminar` | Elimina (soft delete, DEC-017): cierra sus sesiones; el Administrador lo recupera en 90 días desde A5 |
 
 - Solo la **cuenta principal** con empresa (`User::esPrincipal()`); un colaborador, un Administrador o una cuenta Empresa sin empresa reciben 403.
 - Un colaborador de **otra empresa** da 404; la propia cuenta principal, 403.

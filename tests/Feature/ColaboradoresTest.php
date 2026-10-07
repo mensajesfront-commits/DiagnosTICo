@@ -209,3 +209,29 @@ it('pide el cargo del colaborador', function () {
 
     expect(User::where('email', 'sin@cargo.co')->exists())->toBeFalse();
 });
+
+it('elimina un colaborador y deja de verse en la lista', function () {
+    $laura = empresaConPrincipal();
+    $andres = colaboradorDe($laura);
+
+    $this->actingAs($laura)
+        ->delete(route('colaboradores.eliminar', $andres))
+        ->assertSessionHasNoErrors();
+    $this->assertSoftDeleted($andres);
+
+    $this->actingAs($laura)->get(route('colaboradores.index'))
+        ->assertInertia(fn (Assert $page) => $page->has('colaboradores', 1));
+
+    // El Administrador lo puede recuperar desde Usuarios y roles.
+    $admin = User::factory()->create()->assignRole('Administrador');
+    $this->actingAs($admin)->post(route('usuarios.recuperar', $andres))->assertSessionHasNoErrors();
+    $this->assertNotSoftDeleted($andres);
+});
+
+it('no elimina la cuenta principal ni colaboradores de otra empresa', function () {
+    $laura = empresaConPrincipal();
+    $ajeno = colaboradorDe(empresaConPrincipal('Otra empresa'));
+
+    $this->actingAs($laura)->delete(route('colaboradores.eliminar', $laura))->assertForbidden();
+    $this->actingAs($laura)->delete(route('colaboradores.eliminar', $ajeno))->assertNotFound();
+});

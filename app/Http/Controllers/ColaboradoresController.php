@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -133,6 +134,33 @@ class ColaboradoresController extends Controller
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Datos de {$colaborador->name} guardados."]);
+
+        return back();
+    }
+
+    /**
+     * Eliminar un colaborador (DEC-017). La doble confirmación es con dos
+     * botones en la pantalla (el correo y el nombre se pueden cambiar). Sale
+     * de la lista y no puede entrar; el Administrador puede recuperarlo
+     * durante 90 días desde Usuarios y roles y después se borra para siempre.
+     */
+    public function eliminar(Request $request, User $colaborador): RedirectResponse
+    {
+        $this->deMiEmpresa($request, $colaborador);
+
+        DB::transaction(function () use ($colaborador): void {
+            DB::table('password_reset_tokens')->where('email', $colaborador->email)->delete();
+            $this->cerrarSesiones($colaborador);
+            $colaborador->delete();
+        });
+
+        Log::info('Colaborador eliminado (recuperable)', [
+            'cuenta_id' => $colaborador->id,
+            'empresa_id' => $colaborador->empresa_id,
+            'por' => $request->user()?->id,
+        ]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => "{$colaborador->name} ya no está en tu equipo."]);
 
         return back();
     }

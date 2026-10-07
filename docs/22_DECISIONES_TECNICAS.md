@@ -175,5 +175,6 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - No se puede eliminar la propia cuenta ni el **último Administrador**.
   - En el log queda una constancia con los id (cuenta, empresa y quién la eliminó), sin datos personales.
 - **Por qué:** lo pidió el equipo (8 de octubre de 2026): limpiar cuentas y atender solicitudes de borrado de datos (Ley 1581 de 2012), dando 90 días por si la empresa se arrepiente.
+- **Colaboradores (E12):** la cuenta principal de la empresa también elimina a sus colaboradores, con la misma espera de 90 días. Ahí la doble confirmación es con **dos botones** ("Eliminar" → "Sí, eliminar a…") en lugar de escribir el correo, porque el correo y el nombre del colaborador se pueden cambiar.
 - **Ojo:** mientras dure la espera, el correo sigue ocupado: no se puede registrar ni invitar otra cuenta con él.
 - **Pendiente:** cuando existan mediciones y resultados, decidir si se borran con la empresa o se conservan anonimizados para las estadísticas. La cantidad de días se cambia con `DIAS_PARA_RECUPERAR_CUENTA`.

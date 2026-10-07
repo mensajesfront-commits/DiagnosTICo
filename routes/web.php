@@ -53,6 +53,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('colaboradores/{colaborador}', [ColaboradoresController::class, 'actualizar'])->name('colaboradores.actualizar');
         Route::post('colaboradores/{colaborador}/desactivar', [ColaboradoresController::class, 'desactivar'])->name('colaboradores.desactivar');
         Route::post('colaboradores/{colaborador}/reactivar', [ColaboradoresController::class, 'reactivar'])->name('colaboradores.reactivar');
+        Route::delete('colaboradores/{colaborador}', [ColaboradoresController::class, 'eliminar'])->name('colaboradores.eliminar');
     });
 });
 

@@ -41,6 +41,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ### Cambiado (colaboradores)
 
+- La empresa puede eliminar colaboradores ("Desactivar / Eliminar", doble confirmación con botones); el Administrador los recupera en 90 días.
 - "Cambiar contraseña" de un colaborador pasa a ser "Editar": nombre, cargo, correo y, si se quiere, contraseña nueva.
 - Al agregar un colaborador se pide su cargo (Marketing, Producción…, o escrito). La tabla de Colaboradores muestra el cargo y ya no el último acceso.
 

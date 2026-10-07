@@ -65,6 +65,7 @@ export const rutas = {
         actualizar: (id: number) => `/colaboradores/${id}`,
         desactivar: (id: number) => `/colaboradores/${id}/desactivar`,
         reactivar: (id: number) => `/colaboradores/${id}/reactivar`,
+        eliminar: (id: number) => `/colaboradores/${id}`,
     },
     empresas: {
         lista: (sectorId?: number) =>

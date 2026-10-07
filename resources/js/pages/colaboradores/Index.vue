@@ -5,7 +5,7 @@
  * Solo la cuenta principal de la empresa entra aquí (rol Empresa). Ve a las
  * personas de su empresa: ella misma primero ("Cuenta principal · Tú") y
  * luego los colaboradores, con "Editar" (datos y contraseña, E12.3) y
- * "Desactivar" o
+ * "Desactivar / Eliminar" (doble confirmación con botones) o
  * "Reactivar". "+ Agregar colaborador" abre E12.1; al crear o cambiar una
  * contraseña se abre E12.2 con los datos para compartir.
  *
@@ -19,7 +19,7 @@ import Etiqueta from '@/components/base/Etiqueta.vue';
 import ModalAgregarColaborador from '@/components/colaboradores/ModalAgregarColaborador.vue';
 import ModalEditarColaborador from '@/components/colaboradores/ModalEditarColaborador.vue';
 import ModalDatosDeAcceso from '@/components/colaboradores/ModalDatosDeAcceso.vue';
-import ModalDesactivarColaborador from '@/components/colaboradores/ModalDesactivarColaborador.vue';
+import ModalDesactivarEliminarColaborador from '@/components/colaboradores/ModalDesactivarEliminarColaborador.vue';
 import { rutas } from '@/lib/rutas';
 import { iniciales } from '@/lib/usuarios';
 import { cn } from '@/lib/utils';
@@ -74,8 +74,14 @@ function alGuardar(nuevos: DatosDeAcceso | null): void {
     }
 }
 
-function desactivar(colaborador: Colaborador): void {
+const inicioModal = ref<'elegir' | 'eliminar'>('elegir');
+
+function desactivarOEliminar(
+    colaborador: Colaborador,
+    inicio: 'elegir' | 'eliminar' = 'elegir',
+): void {
     elegido.value = colaborador;
+    inicioModal.value = inicio;
     modalDesactivar.value = true;
 }
 
@@ -95,6 +101,8 @@ function reactivar(colaborador: Colaborador): void {
 
 const enlace =
     'text-sm text-marca underline underline-offset-2 hover:text-marca-hover disabled:opacity-50';
+const enlaceEliminar =
+    'text-sm text-aviso underline underline-offset-2 hover:opacity-80';
 </script>
 
 <template>
@@ -234,20 +242,41 @@ const enlace =
                                     <button
                                         type="button"
                                         :class="enlace"
-                                        @click="desactivar(colaborador)"
+                                        @click="
+                                            desactivarOEliminar(colaborador)
+                                        "
                                     >
-                                        Desactivar
+                                        Desactivar / Eliminar
                                     </button>
                                 </span>
-                                <button
+                                <span
                                     v-else
-                                    type="button"
-                                    :class="enlace"
-                                    :disabled="reactivando === colaborador.id"
-                                    @click="reactivar(colaborador)"
+                                    class="inline-flex items-center gap-x-1.5"
                                 >
-                                    Reactivar
-                                </button>
+                                    <button
+                                        type="button"
+                                        :class="enlace"
+                                        :disabled="
+                                            reactivando === colaborador.id
+                                        "
+                                        @click="reactivar(colaborador)"
+                                    >
+                                        Reactivar
+                                    </button>
+                                    <span class="text-tinta-suave">·</span>
+                                    <button
+                                        type="button"
+                                        :class="enlaceEliminar"
+                                        @click="
+                                            desactivarOEliminar(
+                                                colaborador,
+                                                'eliminar',
+                                            )
+                                        "
+                                    >
+                                        Eliminar
+                                    </button>
+                                </span>
                             </td>
                         </tr>
                     </tbody>
@@ -287,9 +316,10 @@ const enlace =
             :colaborador="elegido"
             @guardado="alGuardar"
         />
-        <ModalDesactivarColaborador
+        <ModalDesactivarEliminarColaborador
             v-model:abierto="modalDesactivar"
             :colaborador="elegido"
+            :inicio="inicioModal"
         />
     </template>
     <ModalDatosDeAcceso

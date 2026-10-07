@@ -104,6 +104,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2, L4 | La lista de requisitos de la contraseña tiene 5 puntos (agrega "Al menos un carácter especial"); el wireframe muestra 4. | RN-001 lo exige. **[INCONSISTENCIA DETECTADA]**, pendiente de decidir. |
 | L1–L4 | El panel oscuro ocupa el 42 % de la pantalla; en el wireframe es más angosto. | Lo pidió el equipo (6 de octubre). |
 | L1 | No tiene la "Nota del prototipo" con atajos de entrada. | El wireframe aclara que no es parte del diseño. |
+| E12 | "Desactivar" pasa a "Desactivar / Eliminar"; eliminar se confirma con dos botones ("Eliminar" → "Sí, eliminar a…"). Los desactivados tienen "Reactivar · Eliminar". | Pedido por el equipo (8 de octubre, DEC-017): sin escribir el correo, porque se puede cambiar. |
 | E12.3 | "Cambiar contraseña" pasa a ser "Editar": nombre, cargo, correo y, opcional, contraseña nueva. | Pedido por el equipo (8 de octubre). El wireframe solo cambia la contraseña. |
 | E12, E12.1 | Columna "Cargo" en lugar de "Último acceso"; al agregar un colaborador el cargo es obligatorio (lista con búsqueda: Marketing, Producción… o escrito). | Pedido por el equipo (8 de octubre). |
 | A5 | Sin la columna "Último acceso": se guarda en la base (`users.ultimo_acceso_en`) pero no se muestra. "Enviada el…" (invitación) y "Se borra el…" (eliminada) van bajo el Estado. | Pedido por el equipo (8 de octubre). |
