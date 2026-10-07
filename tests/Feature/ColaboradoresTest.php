@@ -71,6 +71,7 @@ it('crea un colaborador que puede iniciar sesión', function () {
     $this->actingAs($laura)
         ->post(route('colaboradores.store'), [
             'name' => 'Mariana Díaz',
+            'cargo' => 'Marketing',
             'email' => ' Mariana@LaEsquina.co ',
             'password' => 'Mesa-47-Sol',
         ])
@@ -81,6 +82,7 @@ it('crea un colaborador que puede iniciar sesión', function () {
     expect($mariana->hasRole('Colaborador'))->toBeTrue()
         ->and($mariana->empresa_id)->toBe($laura->empresa_id)
         ->and($mariana->activo)->toBeTrue()
+        ->and($mariana->cargo)->toBe('Marketing')
         ->and(Hash::check('Mesa-47-Sol', (string) $mariana->password))->toBeTrue();
 
     auth()->logout();
@@ -92,11 +94,11 @@ it('no crea con un correo registrado ni con una contraseña débil', function ()
     $laura = empresaConPrincipal();
 
     $this->actingAs($laura)
-        ->post(route('colaboradores.store'), ['name' => 'Otra', 'email' => $laura->email, 'password' => 'Mesa-47-Sol'])
+        ->post(route('colaboradores.store'), ['name' => 'Otra', 'cargo' => 'Ventas', 'email' => $laura->email, 'password' => 'Mesa-47-Sol'])
         ->assertSessionHasErrors(['email' => 'Ya hay una cuenta con este correo.']);
 
     $this->actingAs($laura)
-        ->post(route('colaboradores.store'), ['name' => 'Otra', 'email' => 'otra@laesquina.co', 'password' => 'mesa1234'])
+        ->post(route('colaboradores.store'), ['name' => 'Otra', 'cargo' => 'Ventas', 'email' => 'otra@laesquina.co', 'password' => 'mesa1234'])
         ->assertSessionHasErrors('password');
 
     expect(User::where('email', 'otra@laesquina.co')->exists())->toBeFalse();
@@ -164,4 +166,12 @@ it('no toca colaboradores de otra empresa ni la cuenta principal', function () {
 
     expect($ajeno->refresh()->activo)->toBeTrue()
         ->and($laura->refresh()->activo)->toBeTrue();
+});
+
+it('pide el cargo del colaborador', function () {
+    $this->actingAs(empresaConPrincipal())
+        ->post(route('colaboradores.store'), ['name' => 'Sin cargo', 'email' => 'sin@cargo.co', 'password' => 'Mesa-47-Sol'])
+        ->assertSessionHasErrors('cargo');
+
+    expect(User::where('email', 'sin@cargo.co')->exists())->toBeFalse();
 });

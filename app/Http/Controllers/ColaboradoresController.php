@@ -42,7 +42,7 @@ class ColaboradoresController extends Controller
                     'correo' => $u->email,
                     'es_principal' => $u->is($yo),
                     'activo' => $u->activo,
-                    'ultimo_acceso' => $u->ultimo_acceso_en?->toIso8601String(),
+                    'cargo' => $u->cargo,
                 ])
                 ->values()
                 ->all(),
@@ -58,6 +58,8 @@ class ColaboradoresController extends Controller
 
         $datos = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            // Área o cargo dentro de la empresa ("Marketing", "Producción").
+            'cargo' => ['required', 'string', 'min:2', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)],
             'password' => ['required', 'string', Password::default()],
         ], [
@@ -68,6 +70,7 @@ class ColaboradoresController extends Controller
             $colaborador = User::create([
                 'name' => $datos['name'],
                 'email' => $datos['email'],
+                'cargo' => trim($datos['cargo']),
                 'password' => $datos['password'],
                 'empresa_id' => $yo->empresa_id,
                 'activo' => true,

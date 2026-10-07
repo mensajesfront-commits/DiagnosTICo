@@ -9,7 +9,7 @@
                 "correo": "laura@laesquina.co",
                 "es_principal": true,
                 "activo": true,
-                "ultimo_acceso": "2026-10-06T09:12:00-05:00"
+                "cargo": "Gerencia general"
             },
             {
                 "id": 2,
@@ -17,7 +17,7 @@
                 "correo": "andres@laesquina.co",
                 "es_principal": false,
                 "activo": true,
-                "ultimo_acceso": "2026-10-05T16:40:00-05:00"
+                "cargo": "Marketing"
             },
             {
                 "id": 3,
@@ -25,7 +25,7 @@
                 "correo": "camila@laesquina.co",
                 "es_principal": false,
                 "activo": true,
-                "ultimo_acceso": "2026-10-01T10:00:00-05:00"
+                "cargo": "Ventas"
             },
             {
                 "id": 4,
@@ -33,7 +33,7 @@
                 "correo": "diego@laesquina.co",
                 "es_principal": false,
                 "activo": false,
-                "ultimo_acceso": "2026-08-02T11:30:00-05:00"
+                "cargo": "Producción"
             }
         ]
     }

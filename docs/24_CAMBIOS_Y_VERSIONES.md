@@ -39,6 +39,10 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - El Administrador puede eliminar cuentas desde Usuarios y roles: "Desactivar / Eliminar" con segunda confirmación escribiendo el correo exacto. La cuenta sale de la vista pero se puede recuperar durante 90 días (filtro «Eliminadas» → "Recuperar"); después la tarea diaria `cuentas:purgar` la borra para siempre. La cuenta principal se elimina y se recupera con su empresa y sus colaboradores; nunca la propia ni el último Administrador (DEC-017).
 
+### Cambiado (colaboradores)
+
+- Al agregar un colaborador se pide su cargo (Marketing, Producción…, o escrito). La tabla de Colaboradores muestra el cargo y ya no el último acceso.
+
 ### Quitado
 
 - La columna "Último acceso" de Usuarios y roles (A5). El dato se sigue guardando en `users.ultimo_acceso_en`.

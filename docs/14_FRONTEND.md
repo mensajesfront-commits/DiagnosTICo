@@ -242,13 +242,13 @@ Ruta: `GET /colaboradores` (ya existe, `ColaboradoresController`; middleware `ro
 | Prop | Tipo | Nota |
 |---|---|---|
 | `empresa` | `string` | Nombre de la empresa, para el texto de arriba |
-| `colaboradores` | `Colaborador[]` | Las cuentas de la empresa: la principal primero, luego los colaboradores por nombre. Cada una con `id`, `nombre`, `correo`, `es_principal`, `activo` y `ultimo_acceso` (fecha ISO o `null`) |
+| `colaboradores` | `Colaborador[]` | Las cuentas de la empresa: la principal primero, luego los colaboradores por nombre. Cada una con `id`, `nombre`, `correo`, `cargo`, `es_principal` y `activo` |
 
 Tipos exactos en `resources/js/types/colaboradores.ts`. Si solo llega la cuenta principal, la pantalla muestra la lista vacía con el botón para crear (HU-076 CA-004).
 
 Envía (todo con `colaborador` de la misma empresa; si no, 404):
 
-- `POST /colaboradores` (E12.1): `name`, `email` y `password`. Correo único (RN-002) y contraseña fuerte (RN-001); no se pide confirmación porque la empresa la escribe y la comparte. Crea la cuenta con `empresa_id` de la empresa y rol **Colaborador**, activa, sin enviar correo. Redirige con `back()`; la pantalla abre E12.2 con lo que se escribió. **El servidor no devuelve la contraseña.**
+- `POST /colaboradores` (E12.1): `name`, `cargo` (obligatorio; lista de sugerencias en `lib/cargos.ts` o escrito), `email` y `password`. Correo único (RN-002) y contraseña fuerte (RN-001); no se pide confirmación porque la empresa la escribe y la comparte. Crea la cuenta con `empresa_id` de la empresa y rol **Colaborador**, activa, sin enviar correo. Redirige con `back()`; la pantalla abre E12.2 con lo que se escribió. **El servidor no devuelve la contraseña.**
 - `PUT /colaboradores/{id}/contrasena` (E12.3): `password` (RN-001). Cambia la contraseña, guarda `contrasena_actualizada_en` y **cierra las sesiones abiertas** del colaborador. La pantalla abre E12.2 con la contraseña nueva.
 - `POST /colaboradores/{id}/desactivar` y `/reactivar` (HU-079): cambian `activo`. Nunca sobre la cuenta principal (403).
 

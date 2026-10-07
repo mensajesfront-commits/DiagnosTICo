@@ -19,7 +19,6 @@ import ModalAgregarColaborador from '@/components/colaboradores/ModalAgregarCola
 import ModalCambiarContrasena from '@/components/colaboradores/ModalCambiarContrasena.vue';
 import ModalDatosDeAcceso from '@/components/colaboradores/ModalDatosDeAcceso.vue';
 import ModalDesactivarColaborador from '@/components/colaboradores/ModalDesactivarColaborador.vue';
-import { ultimoAcceso } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { iniciales } from '@/lib/usuarios';
 import { cn } from '@/lib/utils';
@@ -134,9 +133,9 @@ const enlace =
                             <th
                                 v-for="columna in [
                                     'Persona',
+                                    'Cargo',
                                     'Rol',
                                     'Estado',
-                                    'Último acceso',
                                 ]"
                                 :key="columna"
                                 scope="col"
@@ -186,6 +185,9 @@ const enlace =
                                     </div>
                                 </div>
                             </td>
+                            <td class="px-5 py-3">
+                                {{ colaborador.cargo ?? '—' }}
+                            </td>
                             <td class="px-5 py-3 whitespace-nowrap">
                                 {{
                                     colaborador.es_principal
@@ -201,9 +203,6 @@ const enlace =
                                     ✓ Activo
                                 </Etiqueta>
                                 <Etiqueta v-else>○ Desactivado</Etiqueta>
-                            </td>
-                            <td class="px-5 py-3 whitespace-nowrap">
-                                {{ ultimoAcceso(colaborador.ultimo_acceso) }}
                             </td>
                             <td class="px-5 py-3 text-right whitespace-nowrap">
                                 <span

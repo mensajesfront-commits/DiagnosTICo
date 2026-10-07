@@ -2,21 +2,23 @@
 /**
  * E12.1 · Agregar colaborador (HU-077, RN-025).
  *
- * La empresa escribe el nombre, el correo (será su usuario) y la contraseña,
+ * La empresa escribe el nombre, el cargo (área: Marketing, Producción…), el correo (será su usuario) y la contraseña,
  * y después se los comparte. No se envía correo. Al guardar se abre E12.2
  * con los datos para compartir; la contraseña sale de lo que se escribió
  * aquí, el servidor no la devuelve.
  *
- * Envía: POST /colaboradores con name, email y password.
+ * Envía: POST /colaboradores con name, cargo, email y password.
  */
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
+import Combobox from '@/components/base/Combobox.vue';
 import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
+import { cargosSugeridos } from '@/lib/cargos';
 import { revisarContrasena } from '@/lib/contrasena';
 import { rutas } from '@/lib/rutas';
 import type { DatosDeAcceso } from '@/types/colaboradores';
@@ -25,7 +27,7 @@ const abierto = defineModel<boolean>('abierto', { default: false });
 
 const emit = defineEmits<{ creado: [datos: DatosDeAcceso] }>();
 
-const form = useForm({ name: '', email: '', password: '' });
+const form = useForm({ name: '', cargo: '', email: '', password: '' });
 
 watch(abierto, (valor) => {
     if (valor) {
@@ -37,6 +39,7 @@ watch(abierto, (valor) => {
 const listo = computed(
     () =>
         form.name.trim() !== '' &&
+        form.cargo.trim() !== '' &&
         form.email.trim() !== '' &&
         revisarContrasena(form.password, '', { conConfirmacion: false })
             .completa,
@@ -88,6 +91,23 @@ function crear(): void {
                     autocomplete="off"
                     maxlength="255"
                     :invalida="!!form.errors.name"
+                />
+            </Campo>
+            <Campo
+                obligatorio
+                etiqueta="Cargo"
+                para="colaborador-cargo"
+                ayuda="Su área en la empresa. Si no aparece, escríbelo y elige «Usar…»."
+                :error="form.errors.cargo"
+            >
+                <Combobox
+                    id="colaborador-cargo"
+                    v-model="form.cargo"
+                    :opciones="cargosSugeridos"
+                    permitir-otro
+                    required
+                    placeholder="Ej. Marketing, Producción"
+                    :invalida="!!form.errors.cargo"
                 />
             </Campo>
             <Campo

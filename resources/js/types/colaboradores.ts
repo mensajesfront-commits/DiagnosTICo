@@ -10,8 +10,8 @@ export type Colaborador = {
     /** La cuenta principal (rol Empresa): va primero y no tiene acciones. */
     es_principal: boolean;
     activo: boolean;
-    /** Fecha ISO del último inicio de sesión; null si nunca entró. */
-    ultimo_acceso: string | null;
+    /** Área o cargo en la empresa ("Marketing"); null en cuentas antiguas. */
+    cargo: string | null;
 };
 
 /** Lo que se muestra en E12.2 para compartir; no viene del servidor. */
