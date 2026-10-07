@@ -46,6 +46,9 @@ const abierto = ref(false);
 const activo = ref(0);
 const escribiendo = ref(false);
 const lista = ref<HTMLUListElement | null>(null);
+const entrada = ref<HTMLInputElement | null>(null);
+/** La lista se abre hacia arriba si abajo no cabe (final de la página). */
+const haciaArriba = ref(false);
 const idLista = `${useId()}-lista`;
 
 watch(modelo, (valor) => {
@@ -81,6 +84,13 @@ const items = computed(() => [
 function abrir(): void {
     if (props.disabled) {
         return;
+    }
+
+    const caja = entrada.value?.getBoundingClientRect();
+
+    if (caja) {
+        const abajo = window.innerHeight - caja.bottom;
+        haciaArriba.value = abajo < 272 && caja.top > abajo;
     }
 
     abierto.value = true;
@@ -182,6 +192,7 @@ const idActivo = computed(() =>
     <div class="relative">
         <input
             :id="id"
+            ref="entrada"
             :value="texto"
             type="text"
             role="combobox"
@@ -219,7 +230,12 @@ const idActivo = computed(() =>
             :id="idLista"
             ref="lista"
             role="listbox"
-            class="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-md border border-linea bg-white py-1 text-sm shadow-lg"
+            :class="
+                cn(
+                    'absolute z-30 max-h-64 w-full overflow-y-auto rounded-md border border-linea bg-white py-1 text-sm shadow-lg',
+                    haciaArriba ? 'bottom-full mb-1' : 'top-full mt-1',
+                )
+            "
         >
             <li
                 v-for="(item, indice) in items"
