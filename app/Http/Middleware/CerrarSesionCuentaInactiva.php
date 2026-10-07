@@ -23,7 +23,8 @@ class CerrarSesionCuentaInactiva
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->with('status', 'Tu cuenta está desactivada. Escribe al equipo de NuevasTIC si crees que es un error.');
+            // L1 lo muestra en el mismo modal que al intentar entrar.
+            return redirect()->route('login')->withErrors(['cuenta_desactivada' => trans('auth.desactivada')]);
         }
 
         return $next($request);

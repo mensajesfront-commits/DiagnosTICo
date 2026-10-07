@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Fortify\Contracts\FailedPasswordResetLinkRequestResponse;
 use Laravel\Fortify\Contracts\SuccessfulPasswordResetLinkRequestResponse;
@@ -48,8 +49,12 @@ class FortifyServiceProvider extends ServiceProvider
 
     /**
      * L1 · Solo entran las cuentas activas de empresas activas (RN-004,
-     * RN-025). Si no, el mismo mensaje que una contraseña equivocada, para no
-     * revelar qué cuentas existen (RN-005).
+     * RN-025).
+     *
+     * Correo inexistente o contraseña equivocada: el mismo mensaje, para no
+     * revelar qué cuentas existen (RN-005). Solo quien escribe la contraseña
+     * correcta de una cuenta desactivada recibe el error
+     * `cuenta_desactivada`, que la pantalla muestra en un modal.
      */
     private function configureLogin(): void
     {
@@ -60,7 +65,11 @@ class FortifyServiceProvider extends ServiceProvider
                 return null;
             }
 
-            return $usuario->puedeEntrar() ? $usuario : null;
+            if (! $usuario->puedeEntrar()) {
+                throw ValidationException::withMessages(['cuenta_desactivada' => trans('auth.desactivada')]);
+            }
+
+            return $usuario;
         });
     }
 
@@ -159,10 +168,17 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureRateLimiting(): void
     {
 
+        // 5 intentos por minuto por correo e IP. Al pasarse, vuelve a L1 con
+        // el error `bloqueo` (segundos que faltan), que la pantalla muestra en
+        // un modal con la cuenta regresiva.
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
-            return Limit::perMinute(5)->by($throttleKey);
+            return Limit::perMinute(5)->by($throttleKey)->response(
+                fn (Request $request, array $headers) => redirect()->route('login')
+                    ->withInput($request->only(Fortify::username()))
+                    ->withErrors(['bloqueo' => (string) ($headers['Retry-After'] ?? 60)]),
+            );
         });
 
     }

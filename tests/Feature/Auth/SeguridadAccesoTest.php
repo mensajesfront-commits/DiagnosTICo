@@ -35,10 +35,12 @@ function intentarEntrar(User $usuario, string $contrasena = 'password'): TestRes
 
 // --- L1 · Iniciar sesión -------------------------------------------------
 
-it('no deja entrar a una cuenta desactivada (RN-004)', function () {
+it('no deja entrar a una cuenta desactivada y lo avisa en el modal (RN-004)', function () {
     $usuario = User::factory()->create(['activo' => false]);
 
-    intentarEntrar($usuario)->assertSessionHasErrors('email');
+    intentarEntrar($usuario)->assertSessionHasErrors([
+        'cuenta_desactivada' => 'Su cuenta ha sido desactivada. Diríjase a Captter para saber más detalles.',
+    ]);
 
     $this->assertGuest();
 });
@@ -48,18 +50,19 @@ it('no deja entrar a las cuentas de una empresa desactivada (RN-025)', function 
     $principal = User::factory()->create(['empresa_id' => $empresa->id])->assignRole('Empresa');
     $colaborador = User::factory()->create(['empresa_id' => $empresa->id])->assignRole('Colaborador');
 
-    intentarEntrar($principal)->assertSessionHasErrors('email');
-    intentarEntrar($colaborador)->assertSessionHasErrors('email');
+    intentarEntrar($principal)->assertSessionHasErrors('cuenta_desactivada');
+    intentarEntrar($colaborador)->assertSessionHasErrors('cuenta_desactivada');
 
     $this->assertGuest();
 });
 
-it('responde lo mismo a un correo inexistente y a una cuenta desactivada (RN-005)', function () {
+it('sin la contraseña correcta, una cuenta desactivada responde como un correo inexistente (RN-005)', function () {
     $desactivada = User::factory()->create(['activo' => false]);
 
     $mensaje = ['email' => 'El correo o la contraseña no son correctos.'];
 
-    intentarEntrar($desactivada)->assertSessionHasErrors($mensaje);
+    intentarEntrar($desactivada, 'equivocada')->assertSessionHasErrors($mensaje)
+        ->assertSessionDoesntHaveErrors('cuenta_desactivada');
 
     $this->flushSession();
     $this->post(route('login.store'), ['email' => 'nadie@ejemplo.co', 'password' => 'password'])
@@ -80,7 +83,9 @@ it('cierra la sesión si desactivan la cuenta mientras está adentro', function 
 
     $usuario->forceFill(['activo' => false])->save();
 
-    $this->get(route('dashboard'))->assertRedirect(route('login'));
+    $this->get(route('dashboard'))
+        ->assertRedirect(route('login'))
+        ->assertSessionHasErrors('cuenta_desactivada');
     $this->assertGuest();
 });
 
@@ -235,7 +240,15 @@ it('limita los intentos de inicio de sesión', function () {
         intentarEntrar($usuario, 'equivocada');
     }
 
-    intentarEntrar($usuario, 'equivocada')->assertTooManyRequests();
+    intentarEntrar($usuario, 'equivocada')
+        ->assertRedirect(route('login'))
+        ->assertSessionHasErrors('bloqueo');
+
+    expect((int) session('errors')->first('bloqueo'))->toBeGreaterThan(0)->toBeLessThanOrEqual(60);
+
+    // Bloqueado, ni la contraseña correcta deja entrar.
+    intentarEntrar($usuario)->assertSessionHasErrors('bloqueo');
+    $this->assertGuest();
 });
 
 // --- Español ---------------------------------------------------------------
