@@ -153,3 +153,13 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - La **descripción corta** (máximo 300 caracteres) y el **cargo** son obligatorios.
 - **Por qué:** lo pidió el equipo (7 de octubre de 2026). El CIIU es la clasificación oficial en Colombia, así que la empresa la reconoce de su RUT. La descripción le da contexto a la IA, y el cargo dice quién pide el acceso.
 - **Pendiente:** **[INFORMACIÓN PENDIENTE]** NuevasTIC debe confirmar qué códigos van en cada sector. Un sector sin actividades no pide la actividad.
+
+### DEC-016 — País, departamento y ciudad en cascada
+
+- **Decisión:**
+  - Se elige primero el **país** (los 18 de Hispanoamérica), luego su **departamento** (se llama Estado, Provincia o Región según el país) y por último la **ciudad**. En las tres listas se puede escribir para buscar, sin importar tildes ni mayúsculas.
+  - El país y el departamento deben ser de la lista (el servidor lo revisa). La **ciudad** se puede escribir aunque no esté en la lista ("Usar «…»").
+  - Se usa en el registro (L2) y en Mi perfil (A6 y E11). Nueva columna `departamento` en `empresas` y `users`.
+  - Los datos vienen de countries-states-cities-database (licencia ODbL), en `resources/ubicaciones/`. Se cargan por país desde `GET /ubicaciones/{pais}`, sin guardarlos en la base de datos.
+- **Por qué:** lo pidió el equipo (8 de octubre de 2026). Escribir evita buscar en listas largas (México tiene más de 9.000 localidades). Las listas públicas no traen todos los municipios, y por eso la ciudad queda libre.
+- **Pendiente:** España y Guinea Ecuatorial quedan por fuera (respuesta del equipo: solo Hispanoamérica).

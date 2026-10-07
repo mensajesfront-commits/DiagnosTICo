@@ -9,9 +9,6 @@ use App\Models\User;
  */
 class OpcionesPerfil
 {
-    /** [INFORMACIÓN PENDIENTE] Lista de países; por ahora solo Colombia. */
-    public const array PAISES = ['Colombia'];
-
     /** @var array<string, string> */
     public const array ZONAS_HORARIAS = [
         'America/Bogota' => 'América/Bogotá (UTC−5)',

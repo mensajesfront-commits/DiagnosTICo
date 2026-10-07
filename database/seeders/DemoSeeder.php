@@ -41,6 +41,7 @@ class DemoSeeder extends Seeder
             'actividad_economica_id' => $comidas->actividades()->where('codigo', '5611')->value('id'),
             'descripcion' => 'Restaurante de comida casera con almuerzos del día y domicilios en el barrio.',
             'ciudad' => 'Cali',
+            'departamento' => 'Valle del Cauca',
             'pais' => 'Colombia',
             'activa' => true,
         ]);
@@ -50,6 +51,7 @@ class DemoSeeder extends Seeder
             'actividad_economica_id' => $alojamientos->actividades()->where('codigo', '5514')->value('id'),
             'descripcion' => 'Hostal campestre con seis habitaciones cerca del Valle de Cocora.',
             'ciudad' => 'Salento',
+            'departamento' => 'Quindío',
             'pais' => 'Colombia',
             'activa' => false,
         ]);

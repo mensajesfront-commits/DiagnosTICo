@@ -7,6 +7,8 @@ use App\Concerns\ProfileValidationRules;
 use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
+use App\Rules\DepartamentoDelPais;
+use App\Support\Ubicaciones;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -21,7 +23,8 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
  *
  * Paso «Mi empresa»: la actividad económica debe ser del sector elegido
  * (obligatoria si el sector tiene actividades) y la descripción corta es
- * obligatoria, de máximo 300 caracteres. Paso «Tu usuario»: el cargo es
+ * obligatoria, de máximo 300 caracteres. País → departamento → ciudad: el
+ * departamento debe ser del país; la ciudad puede escribirse (DEC-016). Paso «Tu usuario»: el cargo es
  * obligatorio para saber quién registra la empresa.
  */
 class CreateNewUser implements CreatesNewUsers
@@ -47,8 +50,10 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::exists('actividades_economicas', 'id')->where('sector_id', $sectorId)->where('activo', true),
             ],
             'descripcion' => ['required', 'string', 'max:300'],
+            'pais' => ['required', 'string', Rule::in(Ubicaciones::nombresDePaises())],
+            'departamento' => ['required', 'string', new DepartamentoDelPais($input['pais'] ?? null)],
+            // La ciudad puede no estar en la lista: se acepta escrita (DEC-016).
             'ciudad' => ['required', 'string', 'max:255'],
-            'pais' => ['required', 'string', 'max:255'],
             ...$this->profileRules(),
             'cargo' => ['required', 'string', 'max:255'],
             'telefono' => ['nullable', 'string', 'max:30'],
@@ -59,6 +64,7 @@ class CreateNewUser implements CreatesNewUsers
             'sector_id' => 'sector',
             'actividad_economica_id' => 'actividad económica',
             'descripcion' => 'descripción corta',
+            'pais' => 'país',
             'name' => 'nombre del usuario',
             'email' => 'correo',
             'terminos' => 'los términos de uso y la política de tratamiento de datos',
@@ -72,7 +78,8 @@ class CreateNewUser implements CreatesNewUsers
                 'actividad_economica_id' => isset($input['actividad_economica_id']) && $input['actividad_economica_id'] !== ''
                     ? (int) $input['actividad_economica_id']
                     : null,
-                'ciudad' => $input['ciudad'],
+                'departamento' => $input['departamento'],
+                'ciudad' => trim($input['ciudad']),
                 'pais' => $input['pais'],
             ]);
 

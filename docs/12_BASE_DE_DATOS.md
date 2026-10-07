@@ -320,8 +320,9 @@ Las carga `ActividadesEconomicasSeeder` (lo llama `SectoresSeeder`). **[INFORMAC
 | `descripcion` | varchar(300) | Sí en L2 (columna nullable) | `Restaurante de comida casera con almuerzos del día…` | Descripción corta del registro |
 | `sector_id` | bigint → `sectores.id` | Sí | `4` | No se puede borrar un sector con empresas |
 | `actividad_economica_id` | bigint → `actividades_economicas.id` | Sí en L2 si el sector tiene actividades | `12` | Debe ser del mismo sector; queda en `null` si se borra la actividad |
-| `ciudad` | varchar(255) | Sí | `Cali` | |
-| `pais` | varchar(255) | Sí | `Colombia` | |
+| `ciudad` | varchar(255) | Sí | `Cali` | De la lista o escrita (DEC-016) |
+| `departamento` | varchar(255) | Sí en L2 y E11 (columna nullable) | `Valle del Cauca` | Estado, provincia o región según el país; debe ser de ese país |
+| `pais` | varchar(255) | Sí | `Colombia` | Uno de los 18 de Hispanoamérica |
 | `telefono` | varchar(255) | No | `+57 602 555 0142` | |
 | `sitio_web` | varchar(255) | No | `https://www.laesquina.co` | |
 | `numero_empleados` | varchar(255) | No | `11 a 50` | Rango (E11) |
@@ -339,7 +340,7 @@ Las carga `ActividadesEconomicasSeeder` (lo llama `SectoresSeeder`). **[INFORMAC
 | `email` | varchar(255) | Sí, único | `laura@laesquina.co` | En minúsculas; un correo, una cuenta (RN-002) |
 | `cargo` | varchar(255) | Sí en L2 (cuenta principal); no en las demás | `Administradora` | Quién registró la empresa |
 | `telefono` | varchar(255) | No | `+57 311 555 0142` | |
-| `ciudad`, `pais` | varchar(255) | No | `Bogotá`, `Colombia` | Mi perfil (A6) |
+| `ciudad`, `departamento`, `pais` | varchar(255) | No | `Bogotá`, `Bogotá D.C.`, `Colombia` | Mi perfil (A6); mismas reglas que en la empresa |
 | `zona_horaria` | varchar(255) | Sí (por defecto `America/Bogota`) | `America/Bogota` | |
 | `idioma` | varchar(5) | Sí (por defecto `es`) | `es` | |
 | `avisos` | jsonb | No | `{"ia_falla": true, "resumen_semanal": false}` | Avisos por correo elegidos en Mi perfil |

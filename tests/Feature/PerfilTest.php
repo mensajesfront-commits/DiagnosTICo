@@ -62,6 +62,7 @@ it('guarda los datos personales y los avisos', function () {
             'name' => 'Cristian Andrés',
             'cargo' => 'Administrador del sistema',
             'ciudad' => 'Bogotá',
+            'departamento' => 'Bogotá D.C.',
             'pais' => 'Colombia',
             'avisos' => ['resumen_semanal' => true, 'otro' => true],
         ]))
@@ -82,6 +83,7 @@ it('deja a la cuenta principal cambiar los datos de la empresa, salvo el sector'
             'empresa' => [
                 'nombre' => 'La Esquina Gourmet',
                 'ciudad' => 'Cali',
+                'departamento' => 'Valle del Cauca',
                 'pais' => 'Colombia',
                 'sitio_web' => 'https://laesquina.co',
                 'numero_empleados' => '11 a 50',
@@ -177,4 +179,25 @@ it('guarda el último acceso al iniciar sesión', function () {
     $this->post(route('login.store'), ['email' => $usuario->email, 'password' => 'password']);
 
     expect($usuario->fresh()->ultimo_acceso_en)->not->toBeNull();
+});
+
+it('pide que el departamento sea del país elegido', function () {
+    $admin = User::factory()->create()->assignRole('Administrador');
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, [
+            'pais' => 'México',
+            'departamento' => 'Antioquia',
+        ]))
+        ->assertSessionHasErrors('departamento');
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, [
+            'pais' => 'México',
+            'departamento' => 'Jalisco',
+            'ciudad' => 'Un pueblo que no está en la lista',
+        ]))
+        ->assertSessionHasNoErrors();
+
+    expect($admin->refresh()->departamento)->toBe('Jalisco');
 });

@@ -1,0 +1,159 @@
+[
+    {
+        "nombre": "Ahuachapán",
+        "ciudades": [
+            "Ahuachapán",
+            "Atiquizaya",
+            "Concepción de Ataco",
+            "Guaymango",
+            "Jujutla",
+            "San Francisco Menéndez",
+            "Tacuba"
+        ]
+    },
+    { "nombre": "Cabañas", "ciudades": ["Sensuntepeque", "Victoria"] },
+    {
+        "nombre": "Chalatenango",
+        "ciudades": ["Chalatenango", "Nueva Concepción"]
+    },
+    {
+        "nombre": "Cuscatlán",
+        "ciudades": [
+            "Cojutepeque",
+            "San Martín",
+            "Suchitoto",
+            "Tecoluca",
+            "Tenancingo"
+        ]
+    },
+    {
+        "nombre": "La Libertad",
+        "ciudades": [
+            "Antiguo Cuscatlán",
+            "Ciudad Arce",
+            "La Libertad",
+            "Nuevo Cuscatlán",
+            "Quezaltepeque",
+            "San Juan Opico",
+            "San Pablo Tacachico",
+            "Santa Tecla",
+            "Zaragoza"
+        ]
+    },
+    {
+        "nombre": "La Paz",
+        "ciudades": [
+            "El Rosario",
+            "Olocuilta",
+            "San Pedro Masahuat",
+            "Santiago Nonualco",
+            "Zacatecoluca"
+        ]
+    },
+    {
+        "nombre": "La Unión",
+        "ciudades": [
+            "Anamorós",
+            "Conchagua",
+            "Intipucá",
+            "La Unión",
+            "Nueva Esparta",
+            "Pasaquina",
+            "San Alejo",
+            "Santa Rosa de Lima"
+        ]
+    },
+    {
+        "nombre": "Morazán",
+        "ciudades": [
+            "Cacaopera",
+            "Corinto",
+            "Guatajiagua",
+            "Jocoro",
+            "San Francisco",
+            "Sociedad"
+        ]
+    },
+    {
+        "nombre": "San Miguel",
+        "ciudades": [
+            "Chapeltique",
+            "Chinameca",
+            "Chirilagua",
+            "Ciudad Barrios",
+            "El Tránsito",
+            "Lolotique",
+            "Moncagua",
+            "Nueva Guadalupe",
+            "San Miguel",
+            "San Rafael Oriente",
+            "Sesori"
+        ]
+    },
+    {
+        "nombre": "San Salvador",
+        "ciudades": [
+            "Aguilares",
+            "Apopa",
+            "Ayutuxtepeque",
+            "Cuscatancingo",
+            "Delgado",
+            "El Paisnal",
+            "Guazapa",
+            "Ilopango",
+            "Mejicanos",
+            "Panchimalco",
+            "Rosario de Mora",
+            "San Marcos",
+            "San Salvador",
+            "Santo Tomás",
+            "Soyapango",
+            "Tonacatepeque"
+        ]
+    },
+    {
+        "nombre": "San Vicente",
+        "ciudades": ["Apastepeque", "San Sebastián", "San Vicente"]
+    },
+    {
+        "nombre": "Santa Ana",
+        "ciudades": [
+            "Candelaria de La Frontera",
+            "Chalchuapa",
+            "Coatepeque",
+            "El Congo",
+            "Metapán",
+            "Santa Ana",
+            "Texistepeque"
+        ]
+    },
+    {
+        "nombre": "Sonsonate",
+        "ciudades": [
+            "Acajutla",
+            "Armenia",
+            "Izalco",
+            "Juayúa",
+            "Nahuizalco",
+            "San Antonio del Monte",
+            "Sonsonate",
+            "Sonzacate"
+        ]
+    },
+    {
+        "nombre": "Usulután",
+        "ciudades": [
+            "Berlín",
+            "Concepción Batres",
+            "Jiquilisco",
+            "Jucuapa",
+            "Jucuarán",
+            "Ozatlán",
+            "Puerto El Triunfo",
+            "San Agustín",
+            "Santa Elena",
+            "Santiago de María",
+            "Usulután"
+        ]
+    }
+]

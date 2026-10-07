@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $sector_id
  * @property int|null $actividad_economica_id
  * @property string $ciudad
+ * @property string|null $departamento
  * @property string $pais
  * @property string|null $telefono
  * @property string|null $sitio_web
@@ -24,7 +25,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['nombre', 'descripcion', 'sector_id', 'actividad_economica_id', 'ciudad', 'pais', 'telefono', 'sitio_web', 'numero_empleados', 'activa'])]
+#[Fillable(['nombre', 'descripcion', 'sector_id', 'actividad_economica_id', 'ciudad', 'departamento', 'pais', 'telefono', 'sitio_web', 'numero_empleados', 'activa'])]
 class Empresa extends Model
 {
     protected function casts(): array

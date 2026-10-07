@@ -20,6 +20,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $cargo
  * @property string|null $telefono
  * @property string|null $ciudad
+ * @property string|null $departamento
  * @property string|null $pais
  * @property string $zona_horaria
  * @property string $idioma
@@ -41,7 +42,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 #[Fillable([
     'name', 'email', 'password', 'empresa_id', 'cargo', 'telefono', 'activo',
-    'ciudad', 'pais', 'zona_horaria', 'idioma', 'avisos',
+    'ciudad', 'departamento', 'pais', 'zona_horaria', 'idioma', 'avisos',
 ])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'foto_ruta'])]
 class User extends Authenticatable

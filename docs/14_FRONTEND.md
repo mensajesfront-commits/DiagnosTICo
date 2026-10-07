@@ -90,7 +90,7 @@ En dos pasos: **1 · Mi empresa** (con "Siguiente") y **2 · Tu usuario** (con "
 | Prop | Tipo | Nota |
 |---|---|---|
 | `sectores` | `{ id, nombre, actividades: { id, codigo, nombre }[] }[]` | Solo sectores activos (RN-003), en orden alfabético, cada uno con sus actividades CIIU activas. Sin sector elegido, la actividad no se puede elegir. |
-| `paises` | `string[]` | Por ahora `['Colombia']`. **[INFORMACIÓN PENDIENTE]** lista de países. |
+| `paises` | `{ codigo, nombre, division }[]` | Los 18 países de Hispanoamérica (`App\Support\Ubicaciones`). `division` es el nombre de su departamento: Departamento, Estado, Provincia o Región. Los departamentos y ciudades los pide `SelectorUbicacion` a `GET /ubicaciones/{codigo}` (DEC-016). |
 | `passwordRules` | `string` | Del kit (atributo `passwordrules`). |
 
 Envía a `POST /register`:
@@ -101,8 +101,9 @@ Envía a `POST /register`:
 | `sector_id` | Obligatorio; debe ser un sector activo |
 | `actividad_economica_id` | Obligatorio si el sector tiene actividades; debe ser una actividad activa **de ese sector** |
 | `descripcion` | Obligatorio, máximo 300 caracteres |
-| `ciudad` | Obligatorio |
-| `pais` | Obligatorio |
+| `pais` | Obligatorio; uno de los 18 países (por nombre: `Colombia`) |
+| `departamento` | Obligatorio; debe ser de ese país |
+| `ciudad` | Obligatorio; de la lista o escrita (máx. 255) |
 | `name` | Obligatorio |
 | `cargo` | Obligatorio |
 | `email` | Obligatorio, único (RN-002) |
@@ -222,11 +223,11 @@ Ruta: `GET /mi-perfil` (ya existe, `PerfilController`). Una sola pantalla para t
 
 | Prop | Tipo | Nota |
 |---|---|---|
-| `usuario` | objeto | `name`, `email`, `cargo`, `telefono`, `ciudad`, `pais`, `zona_horaria`, `idioma`, `avisos` (clave → sí/no), `foto_url`, `ultimo_acceso_en`, `creado_en`, `contrasena_actualizada_en` |
+| `usuario` | objeto | `name`, `email`, `cargo`, `telefono`, `pais`, `departamento`, `ciudad`, `zona_horaria`, `idioma`, `avisos` (clave → sí/no), `foto_url`, `ultimo_acceso_en`, `creado_en`, `contrasena_actualizada_en` |
 | `rol` | `string \| null` | Se muestra bloqueado en A6. |
-| `empresa` | objeto o `null` | `nombre`, `sector`, `ciudad`, `pais`, `sitio_web`, `numero_empleados` |
+| `empresa` | objeto o `null` | `nombre`, `sector`, `pais`, `departamento`, `ciudad`, `sitio_web`, `numero_empleados` |
 | `editaEmpresa` | `boolean` | Solo la cuenta principal (rol Empresa) cambia los datos de la empresa (RN-025). |
-| `opciones` | objeto | `paises`, `zonas`, `idiomas`, `empleados` y `avisos` (clave → texto), de `app/Support/OpcionesPerfil.php` |
+| `opciones` | objeto | `paises` (como en L2), `zonas`, `idiomas`, `empleados` y `avisos` (clave → texto), de `app/Support/OpcionesPerfil.php` |
 
 Envía:
 

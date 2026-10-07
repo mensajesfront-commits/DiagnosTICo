@@ -3,7 +3,8 @@
  * L2 · Registra tu empresa (HU-002), en dos pasos:
  *
  * 1. Mi empresa: nombre, sector, actividad económica (CIIU, ligada al
- *    sector), descripción corta (máx. 300), ciudad y país.
+ *    sector), descripción corta (máx. 300) y país → departamento → ciudad
+ *    (SelectorUbicacion).
  * 2. Tu usuario: nombre, cargo (obligatorio, para saber quién registra la
  *    empresa), correo, teléfono (opcional), contraseña y términos.
  *
@@ -28,9 +29,11 @@ import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
+import SelectorUbicacion from '@/components/ubicacion/SelectorUbicacion.vue';
 import { cn } from '@/lib/utils';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
+import type { Pais } from '@/types/ubicaciones';
 
 defineOptions({
     layout: {
@@ -49,16 +52,13 @@ const props = withDefaults(
         passwordRules?: string;
         /** Sectores activos (RN-003), cada uno con sus actividades CIIU. */
         sectores?: SectorRegistro[];
-        /**
-         * [INFORMACIÓN PENDIENTE] Lista de países. El wireframe solo muestra
-         * "Colombia"; mientras no se defina la lista, es la única opción.
-         */
-        paises?: string[];
+        /** Los 18 países de Hispanoamérica (DEC-016). */
+        paises?: Pais[];
     }>(),
     {
         passwordRules: undefined,
         sectores: () => [],
-        paises: () => ['Colombia'],
+        paises: () => [],
     },
 );
 
@@ -69,8 +69,9 @@ const CAMPOS_PASO_1 = [
     'sector_id',
     'actividad_economica_id',
     'descripcion',
-    'ciudad',
     'pais',
+    'departamento',
+    'ciudad',
 ] as const;
 
 const form = useForm({
@@ -78,8 +79,9 @@ const form = useForm({
     sector_id: '' as number | '',
     actividad_economica_id: '' as number | '',
     descripcion: '',
+    pais: '',
+    departamento: '',
     ciudad: '',
-    pais: props.paises[0] ?? '',
     name: '',
     cargo: '',
     email: '',
@@ -313,29 +315,18 @@ const pasos = [
                 />
             </Campo>
 
-            <Campo etiqueta="Ciudad" para="ciudad" :error="form.errors.ciudad">
-                <Entrada
-                    id="ciudad"
-                    v-model="form.ciudad"
-                    required
-                    maxlength="255"
-                    autocomplete="address-level2"
-                    :invalida="!!form.errors.ciudad"
-                />
-            </Campo>
-
-            <Campo etiqueta="País" para="pais" :error="form.errors.pais">
-                <Seleccion
-                    id="pais"
-                    v-model="form.pais"
-                    required
-                    :invalida="!!form.errors.pais"
-                >
-                    <option v-for="pais in paises" :key="pais" :value="pais">
-                        {{ pais }}
-                    </option>
-                </Seleccion>
-            </Campo>
+            <SelectorUbicacion
+                v-model:pais="form.pais"
+                v-model:departamento="form.departamento"
+                v-model:ciudad="form.ciudad"
+                prefijo="registro"
+                :paises="paises"
+                :errores="{
+                    pais: form.errors.pais,
+                    departamento: form.errors.departamento,
+                    ciudad: form.errors.ciudad,
+                }"
+            />
 
             <Boton type="submit" class="w-full sm:col-span-2">
                 Siguiente

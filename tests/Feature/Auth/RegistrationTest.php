@@ -35,6 +35,7 @@ class RegistrationTest extends TestCase
             'sector_id' => $sector->id,
             'actividad_economica_id' => $sector->actividades()->value('id'),
             'ciudad' => 'Bogotá',
+            'departamento' => 'Bogotá D.C.',
             'pais' => 'Colombia',
             'name' => 'Laura Gómez',
             'cargo' => 'Gerente',
@@ -150,5 +151,35 @@ class RegistrationTest extends TestCase
             ->assertSessionHasErrors('terminos');
 
         $this->assertGuest();
+    }
+
+    public function test_department_must_belong_to_the_country_and_city_can_be_typed()
+    {
+        $sector = $this->sectorConActividad();
+
+        $this->post(route('register.store'), $this->datos($sector, ['pais' => 'Perú', 'departamento' => 'Antioquia']))
+            ->assertSessionHasErrors('departamento');
+
+        $this->post(route('register.store'), $this->datos($sector, ['pais' => 'España']))
+            ->assertSessionHasErrors('pais');
+
+        $this->post(route('register.store'), $this->datos($sector, [
+            'departamento' => 'Antioquia',
+            'ciudad' => 'Corregimiento de prueba',
+        ]))->assertSessionHasNoErrors();
+
+        $empresa = Empresa::firstOrFail();
+        $this->assertSame('Antioquia', $empresa->departamento);
+        $this->assertSame('Corregimiento de prueba', $empresa->ciudad);
+    }
+
+    public function test_locations_endpoint_returns_departments_and_cities()
+    {
+        $this->getJson(route('ubicaciones.pais', 'co'))
+            ->assertOk()
+            ->assertJsonFragment(['nombre' => 'Antioquia'])
+            ->assertJsonFragment(['Medellín']);
+
+        $this->getJson(route('ubicaciones.pais', 'es'))->assertNotFound();
     }
 }

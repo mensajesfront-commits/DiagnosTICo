@@ -7,6 +7,7 @@ use App\Actions\Fortify\ResetUserPassword;
 use App\Http\Responses\AvisoRecuperacionResponse;
 use App\Models\Sector;
 use App\Models\User;
+use App\Support\Ubicaciones;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -131,8 +132,9 @@ class FortifyServiceProvider extends ServiceProvider
             // Solo los sectores activos se ofrecen al registrarse (RN-003),
             // cada uno con sus actividades económicas (CIIU) activas.
             'sectores' => $this->sectoresParaRegistro(),
-            // [INFORMACIÓN PENDIENTE] Lista de países.
-            'paises' => ['Colombia'],
+            // Los 18 países de Hispanoamérica; departamentos y ciudades se
+            // piden a /ubicaciones/{pais} al elegir el país (DEC-016).
+            'paises' => Ubicaciones::paises(),
         ]));
 
     }

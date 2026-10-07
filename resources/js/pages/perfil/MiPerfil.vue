@@ -10,9 +10,10 @@
  *   la cuenta principal la cambia; el sector, solo NuevasTIC), preferencias
  *   y "Cambiar contraseña" en un modal (E11).
  *
- * Envía a PATCH /mi-perfil: name, email, cargo, telefono, ciudad, pais,
+ * Envía a PATCH /mi-perfil: name, email, cargo, telefono, pais,
+ * departamento, ciudad,
  * zona_horaria, idioma, avisos{} y, si edita la empresa, empresa{nombre,
- * ciudad, pais, sitio_web, numero_empleados}.
+ * pais, departamento, ciudad, sitio_web, numero_empleados}.
  */
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { Lock, LogOut } from '@lucide/vue';
@@ -24,11 +25,13 @@ import Interruptor from '@/components/base/Interruptor.vue';
 import Modal from '@/components/base/Modal.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import FormularioContrasena from '@/components/perfil/FormularioContrasena.vue';
+import SelectorUbicacion from '@/components/ubicacion/SelectorUbicacion.vue';
 import { haceCuanto, mesYAnio, momento } from '@/lib/fechas';
 import { iniciales } from '@/lib/usuarios';
 import { logout } from '@/routes';
 import { foto as subirFoto } from '@/routes/perfil';
 import { edit as perfil, update as guardarPerfil } from '@/routes/profile';
+import type { Pais } from '@/types/ubicaciones';
 
 type Usuario = {
     name: string;
@@ -36,6 +39,7 @@ type Usuario = {
     cargo: string | null;
     telefono: string | null;
     ciudad: string | null;
+    departamento: string | null;
     pais: string | null;
     zona_horaria: string;
     idioma: string;
@@ -50,6 +54,7 @@ type Empresa = {
     nombre: string;
     sector: string | null;
     ciudad: string;
+    departamento: string | null;
     pais: string;
     sitio_web: string | null;
     numero_empleados: string | null;
@@ -62,7 +67,8 @@ const props = defineProps<{
     /** Solo la cuenta principal de la empresa cambia sus datos (RN-025). */
     editaEmpresa: boolean;
     opciones: {
-        paises: string[];
+        /** Los 18 países de Hispanoamérica (DEC-016). */
+        paises: Pais[];
         zonas: Record<string, string>;
         idiomas: Record<string, string>;
         empleados: string[];
@@ -82,15 +88,17 @@ const datosIniciales = () => ({
     email: props.usuario.email,
     cargo: props.usuario.cargo ?? '',
     telefono: props.usuario.telefono ?? '',
-    ciudad: props.usuario.ciudad ?? '',
     pais: props.usuario.pais ?? '',
+    departamento: props.usuario.departamento ?? '',
+    ciudad: props.usuario.ciudad ?? '',
     zona_horaria: props.usuario.zona_horaria,
     idioma: props.usuario.idioma,
     avisos: { ...props.usuario.avisos },
     empresa: {
         nombre: props.empresa?.nombre ?? '',
-        ciudad: props.empresa?.ciudad ?? '',
         pais: props.empresa?.pais ?? '',
+        departamento: props.empresa?.departamento ?? '',
+        ciudad: props.empresa?.ciudad ?? '',
         sitio_web: props.empresa?.sitio_web ?? '',
         numero_empleados: props.empresa?.numero_empleados ?? '',
     },
@@ -387,36 +395,19 @@ function cerrarSesion(): void {
                             </Campo>
 
                             <template v-if="!esEmpresa">
-                                <Campo
-                                    etiqueta="Ciudad"
-                                    para="perfil-ciudad"
-                                    :error="form.errors.ciudad"
-                                >
-                                    <Entrada
-                                        id="perfil-ciudad"
-                                        v-model="form.ciudad"
-                                        autocomplete="address-level2"
-                                    />
-                                </Campo>
-                                <Campo
-                                    etiqueta="País"
-                                    para="perfil-pais"
-                                    :error="form.errors.pais"
-                                >
-                                    <Seleccion
-                                        id="perfil-pais"
-                                        v-model="form.pais"
-                                    >
-                                        <option value="">Sin elegir</option>
-                                        <option
-                                            v-for="pais in opciones.paises"
-                                            :key="pais"
-                                            :value="pais"
-                                        >
-                                            {{ pais }}
-                                        </option>
-                                    </Seleccion>
-                                </Campo>
+                                <SelectorUbicacion
+                                    v-model:pais="form.pais"
+                                    v-model:departamento="form.departamento"
+                                    v-model:ciudad="form.ciudad"
+                                    prefijo="perfil"
+                                    :paises="opciones.paises"
+                                    :requerido="false"
+                                    :errores="{
+                                        pais: form.errors.pais,
+                                        departamento: form.errors.departamento,
+                                        ciudad: form.errors.ciudad,
+                                    }"
+                                />
                                 <Campo
                                     etiqueta="Zona horaria"
                                     para="perfil-zona"
@@ -525,37 +516,20 @@ function cerrarSesion(): void {
                                     />
                                 </div>
                             </Campo>
-                            <Campo
-                                etiqueta="Ciudad"
-                                para="empresa-ciudad"
-                                :error="form.errors['empresa.ciudad']"
-                            >
-                                <Entrada
-                                    id="empresa-ciudad"
-                                    v-model="form.empresa.ciudad"
-                                    required
-                                    :disabled="!editaEmpresa"
-                                />
-                            </Campo>
-                            <Campo
-                                etiqueta="País"
-                                para="empresa-pais"
-                                :error="form.errors['empresa.pais']"
-                            >
-                                <Seleccion
-                                    id="empresa-pais"
-                                    v-model="form.empresa.pais"
-                                    :disabled="!editaEmpresa"
-                                >
-                                    <option
-                                        v-for="pais in opciones.paises"
-                                        :key="pais"
-                                        :value="pais"
-                                    >
-                                        {{ pais }}
-                                    </option>
-                                </Seleccion>
-                            </Campo>
+                            <SelectorUbicacion
+                                v-model:pais="form.empresa.pais"
+                                v-model:departamento="form.empresa.departamento"
+                                v-model:ciudad="form.empresa.ciudad"
+                                prefijo="empresa"
+                                :paises="opciones.paises"
+                                :bloqueado="!editaEmpresa"
+                                :errores="{
+                                    pais: form.errors['empresa.pais'],
+                                    departamento:
+                                        form.errors['empresa.departamento'],
+                                    ciudad: form.errors['empresa.ciudad'],
+                                }"
+                            />
                             <Campo
                                 etiqueta="Sitio web o red social"
                                 para="empresa-web"

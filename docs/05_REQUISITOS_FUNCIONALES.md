@@ -451,6 +451,7 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 - Campos del formulario: nombre de la empresa, sector, actividad económica, descripción corta, ciudad, país, nombre del usuario, cargo, correo, teléfono (opcional), contraseña y confirmación.
 - La actividad económica debe ser del sector elegido; es obligatoria si el sector tiene actividades.
 - La descripción corta es obligatoria, de máximo 300 caracteres.
+- País → departamento (estado, provincia o región) → ciudad, en ese orden. El país es uno de los 18 de Hispanoamérica y el departamento debe ser de ese país; la ciudad se elige o se escribe (DEC-016).
 - El cargo es obligatorio, para saber quién registra la empresa.
 - Cambio pedido por el equipo el 7 de octubre de 2026 (dos pasos, actividad económica, descripción y cargo obligatorio; DEC-015).
 - Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.

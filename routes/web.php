@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ColaboradoresController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\UbicacionesController;
 use App\Http\Controllers\UsuariosController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => auth()->check()
     ? to_route('dashboard')
     : to_route('login'))->name('home');
+
+// País → departamento → ciudad (L2, A6, E11). Pública: el registro no tiene sesión.
+Route::get('ubicaciones/{pais}', [UbicacionesController::class, 'show'])
+    ->where('pais', '[A-Za-z]{2}')
+    ->middleware('throttle:60,1')
+    ->name('ubicaciones.pais');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

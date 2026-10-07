@@ -7,6 +7,7 @@ use App\Http\Requests\Perfil\CambiarContrasenaRequest;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Support\OpcionesPerfil;
+use App\Support\Ubicaciones;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +34,7 @@ class PerfilController extends Controller
                 'cargo' => $usuario->cargo,
                 'telefono' => $usuario->telefono,
                 'ciudad' => $usuario->ciudad,
+                'departamento' => $usuario->departamento,
                 'pais' => $usuario->pais,
                 'zona_horaria' => $usuario->zona_horaria,
                 'idioma' => $usuario->idioma,
@@ -47,13 +49,14 @@ class PerfilController extends Controller
                 'nombre' => $empresa->nombre,
                 'sector' => $empresa->sector?->nombre,
                 'ciudad' => $empresa->ciudad,
+                'departamento' => $empresa->departamento,
                 'pais' => $empresa->pais,
                 'sitio_web' => $empresa->sitio_web,
                 'numero_empleados' => $empresa->numero_empleados,
             ] : null,
             'editaEmpresa' => $empresa !== null && $rol === 'Empresa',
             'opciones' => [
-                'paises' => OpcionesPerfil::PAISES,
+                'paises' => Ubicaciones::paises(),
                 'zonas' => OpcionesPerfil::ZONAS_HORARIAS,
                 'idiomas' => OpcionesPerfil::IDIOMAS,
                 'empleados' => OpcionesPerfil::RANGOS_EMPLEADOS,
@@ -74,6 +77,7 @@ class PerfilController extends Controller
             'cargo' => $datos['cargo'] ?? null,
             'telefono' => $datos['telefono'] ?? null,
             'ciudad' => $datos['ciudad'] ?? null,
+            'departamento' => $datos['departamento'] ?? null,
             'pais' => $datos['pais'] ?? null,
             'zona_horaria' => $datos['zona_horaria'],
             'idioma' => $datos['idioma'],
@@ -92,6 +96,7 @@ class PerfilController extends Controller
             $usuario->empresa->update([
                 'nombre' => $datos['empresa']['nombre'],
                 'ciudad' => $datos['empresa']['ciudad'],
+                'departamento' => $datos['empresa']['departamento'],
                 'pais' => $datos['empresa']['pais'],
                 'sitio_web' => $datos['empresa']['sitio_web'] ?? null,
                 'numero_empleados' => $datos['empresa']['numero_empleados'] ?? null,
