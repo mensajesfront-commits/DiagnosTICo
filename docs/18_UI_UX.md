@@ -104,6 +104,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2, L4 | La lista de requisitos de la contraseña tiene 5 puntos (agrega "Al menos un carácter especial"); el wireframe muestra 4. | RN-001 lo exige. **[INCONSISTENCIA DETECTADA]**, pendiente de decidir. |
 | L1–L4 | El panel oscuro ocupa el 42 % de la pantalla; en el wireframe es más angosto. | Lo pidió el equipo (6 de octubre). |
 | L1 | No tiene la "Nota del prototipo" con atajos de entrada. | El wireframe aclara que no es parte del diseño. |
+| L2 | El registro va en dos pasos (Mi empresa → Tu usuario), con actividad económica CIIU, descripción corta (máx. 300) y cargo obligatorio. | Cambio pedido por el equipo (7 de octubre, DEC-015). El wireframe muestra un solo formulario. |
 | L2 | El país solo ofrece "Colombia". | **[INFORMACIÓN PENDIENTE]** Falta la lista de países. |
 | L2 | Los enlaces de términos y de política apuntan a `#`. | **[INFORMACIÓN PENDIENTE]** Faltan las URL reales. |
 | A2.5 | En blanco, se eligen las categorías con casillas y se muestra cuánto vale cada una al empezar. | HU-020 pide elegir las categorías; el wireframe solo muestra la opción de copiar. |

@@ -144,3 +144,12 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - El inicio de sesión revisa que la cuenta y su empresa estén activas, y "¿Olvidaste tu contraseña?" responde siempre lo mismo (RN-005).
   - Se agregaron las traducciones al español en `lang/es` en lugar de instalar un paquete de traducciones.
 - **Por qué:** las reglas de negocio piden algo distinto a lo que trae Fortify por defecto, y los evaluadores van a probar el acceso.
+
+### DEC-015 — Registro en dos pasos y actividad económica CIIU
+
+- **Decisión:**
+  - El registro (L2) tiene dos pasos: «Mi empresa» y «Tu usuario».
+  - La empresa elige su **actividad económica** de la clasificación **CIIU Rev. 4 A.C.** (la que usa la DIAN en el RUT), filtrada por el sector elegido. Tabla `actividades_economicas`; cada sector tiene sus códigos.
+  - La **descripción corta** (máximo 300 caracteres) y el **cargo** son obligatorios.
+- **Por qué:** lo pidió el equipo (7 de octubre de 2026). El CIIU es la clasificación oficial en Colombia, así que la empresa la reconoce de su RUT. La descripción le da contexto a la IA, y el cargo dice quién pide el acceso.
+- **Pendiente:** **[INFORMACIÓN PENDIENTE]** NuevasTIC debe confirmar qué códigos van en cada sector. Un sector sin actividades no pide la actividad.

@@ -38,6 +38,8 @@ class DemoSeeder extends Seeder
 
         $esquina = Empresa::updateOrCreate(['nombre' => 'Restaurante La Esquina'], [
             'sector_id' => $comidas->id,
+            'actividad_economica_id' => $comidas->actividades()->where('codigo', '5611')->value('id'),
+            'descripcion' => 'Restaurante de comida casera con almuerzos del día y domicilios en el barrio.',
             'ciudad' => 'Cali',
             'pais' => 'Colombia',
             'activa' => true,
@@ -45,6 +47,8 @@ class DemoSeeder extends Seeder
 
         $casaVerde = Empresa::updateOrCreate(['nombre' => 'Hostal Casa Verde'], [
             'sector_id' => $alojamientos->id,
+            'actividad_economica_id' => $alojamientos->actividades()->where('codigo', '5514')->value('id'),
+            'descripcion' => 'Hostal campestre con seis habitaciones cerca del Valle de Cocora.',
             'ciudad' => 'Salento',
             'pais' => 'Colombia',
             'activa' => false,

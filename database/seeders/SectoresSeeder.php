@@ -26,5 +26,7 @@ class SectoresSeeder extends Seeder
         foreach ($sectores as $nombre => $descripcion) {
             Sector::firstOrCreate(['nombre' => $nombre], ['descripcion' => $descripcion]);
         }
+
+        $this->call(ActividadesEconomicasSeeder::class);
     }
 }

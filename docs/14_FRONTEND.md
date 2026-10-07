@@ -85,9 +85,11 @@ Envía `email`, `password` y `remember` a Fortify (`POST /login`). Los errores n
 
 ### L2 · Registra tu empresa (`auth/Register`)
 
+En dos pasos: **1 · Mi empresa** (con "Siguiente") y **2 · Tu usuario** (con "Atrás" y "Registrar empresa"). "Siguiente" revisa los campos del paso 1 en el navegador; si el servidor devuelve un error de un campo del paso 1, la pantalla vuelve a ese paso.
+
 | Prop | Tipo | Nota |
 |---|---|---|
-| `sectores` | `{ id, nombre }[]` | Solo sectores activos (RN-003), en orden alfabético. |
+| `sectores` | `{ id, nombre, actividades: { id, codigo, nombre }[] }[]` | Solo sectores activos (RN-003), en orden alfabético, cada uno con sus actividades CIIU activas. Sin sector elegido, la actividad no se puede elegir. |
 | `paises` | `string[]` | Por ahora `['Colombia']`. **[INFORMACIÓN PENDIENTE]** lista de países. |
 | `passwordRules` | `string` | Del kit (atributo `passwordrules`). |
 
@@ -97,10 +99,12 @@ Envía a `POST /register`:
 |---|---|
 | `empresa_nombre` | Obligatorio |
 | `sector_id` | Obligatorio; debe ser un sector activo |
+| `actividad_economica_id` | Obligatorio si el sector tiene actividades; debe ser una actividad activa **de ese sector** |
+| `descripcion` | Obligatorio, máximo 300 caracteres |
 | `ciudad` | Obligatorio |
 | `pais` | Obligatorio |
 | `name` | Obligatorio |
-| `cargo` | Opcional |
+| `cargo` | Obligatorio |
 | `email` | Obligatorio, único (RN-002) |
 | `telefono` | Opcional |
 | `password`, `password_confirmation` | Contraseña fuerte (RN-001) y confirmada |

@@ -35,6 +35,8 @@ Pasos que siguen:
 ```mermaid
 erDiagram
     sectores ||--o{ empresas : "agrupa"
+    sectores ||--o{ actividades_economicas : "ofrece"
+    actividades_economicas ||--o{ empresas : "clasifica"
     sectores ||--o{ diagnosticos : "tiene"
     empresas ||--o{ users : "cuentas (empresa y colaboradores)"
     users ||--o{ empresas : "registra (A3.2)"
@@ -64,10 +66,20 @@ erDiagram
         timestamps timestamps
     }
 
+    actividades_economicas {
+        bigint id PK
+        bigint sector_id FK
+        string codigo "CIIU Rev. 4 A.C., 4 dígitos"
+        string nombre
+        boolean activo
+    }
+
     empresas {
         bigint id PK
         string nombre
+        string descripcion "máx. 300 (L2)"
         bigint sector_id FK
+        bigint actividad_economica_id FK "CIIU del sector (L2)"
         string ciudad
         string pais
         string telefono "opcional (A3.2)"
@@ -286,13 +298,28 @@ Son las tablas del acceso (L1–L4) y de Mi perfil (A6, E11). Las demás se agre
 | `activo` | boolean | Sí (por defecto `true`) | `true` | Solo los activos se ofrecen al registrarse (RN-003) |
 | `created_at`, `updated_at` | timestamp | No | `2026-10-06 17:52:50` | |
 
+### `actividades_economicas`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `12` | |
+| `sector_id` | bigint → `sectores.id` | Sí | `4` | Se borran con su sector |
+| `codigo` | varchar(4) | Sí, único por sector | `5611` | Código CIIU Rev. 4 A.C. (DIAN) |
+| `nombre` | varchar(255) | Sí | `Expendio a la mesa de comidas preparadas` | |
+| `activo` | boolean | Sí (por defecto `true`) | `true` | Solo las activas se ofrecen en L2 |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+Las carga `ActividadesEconomicasSeeder` (lo llama `SectoresSeeder`). **[INFORMACIÓN PENDIENTE]** NuevasTIC debe confirmar qué códigos van en cada sector. **[FUNCIONALIDAD POR DEFINIR]** Pantalla para que el Administrador las edite; por ahora solo el seeder.
+
 ### `empresas`
 
 | Campo | Tipo | Obligatorio | Ejemplo | Nota |
 |---|---|---|---|---|
 | `id` | bigint | Sí | `1` | |
 | `nombre` | varchar(255) | Sí | `Restaurante La Esquina` | |
+| `descripcion` | varchar(300) | Sí en L2 (columna nullable) | `Restaurante de comida casera con almuerzos del día…` | Descripción corta del registro |
 | `sector_id` | bigint → `sectores.id` | Sí | `4` | No se puede borrar un sector con empresas |
+| `actividad_economica_id` | bigint → `actividades_economicas.id` | Sí en L2 si el sector tiene actividades | `12` | Debe ser del mismo sector; queda en `null` si se borra la actividad |
 | `ciudad` | varchar(255) | Sí | `Cali` | |
 | `pais` | varchar(255) | Sí | `Colombia` | |
 | `telefono` | varchar(255) | No | `+57 602 555 0142` | |
@@ -310,7 +337,7 @@ Son las tablas del acceso (L1–L4) y de Mi perfil (A6, E11). Las demás se agre
 | `empresa_id` | bigint → `empresas.id` | No | `1` | `null` para las cuentas internas (Administrador) |
 | `name` | varchar(255) | Sí | `Laura Gómez` | |
 | `email` | varchar(255) | Sí, único | `laura@laesquina.co` | En minúsculas; un correo, una cuenta (RN-002) |
-| `cargo` | varchar(255) | No | `Administradora` | |
+| `cargo` | varchar(255) | Sí en L2 (cuenta principal); no en las demás | `Administradora` | Quién registró la empresa |
 | `telefono` | varchar(255) | No | `+57 311 555 0142` | |
 | `ciudad`, `pais` | varchar(255) | No | `Bogotá`, `Colombia` | Mi perfil (A6) |
 | `zona_horaria` | varchar(255) | Sí (por defecto `America/Bogota`) | `America/Bogota` | |

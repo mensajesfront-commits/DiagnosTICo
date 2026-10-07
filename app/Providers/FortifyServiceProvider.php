@@ -119,12 +119,38 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::registerView(fn () => Inertia::render('auth/Register', [
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
-            // Solo los sectores activos se ofrecen al registrarse (RN-003).
-            'sectores' => Sector::activos()->orderBy('nombre')->get(['id', 'nombre']),
+            // Solo los sectores activos se ofrecen al registrarse (RN-003),
+            // cada uno con sus actividades económicas (CIIU) activas.
+            'sectores' => $this->sectoresParaRegistro(),
             // [INFORMACIÓN PENDIENTE] Lista de países.
             'paises' => ['Colombia'],
         ]));
 
+    }
+
+    /**
+     * @return list<array{id: int, nombre: string, actividades: list<array{id: int, codigo: string, nombre: string}>}>
+     */
+    private function sectoresParaRegistro(): array
+    {
+        $sectores = Sector::activos()
+            ->with(['actividades' => fn ($q) => $q->where('activo', true)->orderBy('codigo')])
+            ->orderBy('nombre')
+            ->get();
+
+        $lista = [];
+
+        foreach ($sectores as $sector) {
+            $actividades = [];
+
+            foreach ($sector->actividades as $actividad) {
+                $actividades[] = ['id' => $actividad->id, 'codigo' => $actividad->codigo, 'nombre' => $actividad->nombre];
+            }
+
+            $lista[] = ['id' => $sector->id, 'nombre' => $sector->nombre, 'actividades' => $actividades];
+        }
+
+        return $lista;
     }
 
     /**

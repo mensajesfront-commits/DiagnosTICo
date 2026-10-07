@@ -376,10 +376,11 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 ### Caso de éxito
 
-1. Completo nombre de la empresa, sector, ciudad, país, nombre del usuario, cargo, correo, teléfono, contraseña y confirmación.
-2. Acepto los términos de uso y el tratamiento de datos.
-3. Pulso “Crear cuenta”.
-4. Se guardan la empresa y su usuario principal en una sola operación y entro a E1.
+1. Paso 1 · Mi empresa: completo nombre de la empresa, sector, actividad económica (del sector elegido), descripción corta, ciudad y país, y pulso "Siguiente".
+2. Paso 2 · Tu usuario: completo nombre del usuario, cargo, correo, teléfono (opcional), contraseña y confirmación.
+3. Acepto los términos de uso y el tratamiento de datos.
+4. Pulso “Registrar empresa”.
+5. Se guardan la empresa y su usuario principal en una sola operación y entro a E1.
 
 ### Criterios de aceptación
 
@@ -387,7 +388,7 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 **Dado** que no tengo sesión iniciada y completo todos los campos con datos válidos y acepto los términos,
 
-**Cuando** pulso "Crear cuenta",
+**Cuando** pulso "Registrar empresa",
 
 **Entonces** se guardan la empresa y su usuario principal y entro al inicio de la empresa.
 
@@ -403,7 +404,7 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 **Dado** que el correo ya pertenece a una cuenta,
 
-**Cuando** pulso "Crear cuenta",
+**Cuando** pulso "Registrar empresa",
 
 **Entonces** veo un aviso bajo el campo y no se crea nada.
 
@@ -423,6 +424,22 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 **Entonces** no se puede crear la cuenta.
 
+#### CA-006 — Actividad económica ligada al sector
+
+**Dado** que no elegí un sector,
+
+**Cuando** reviso la actividad económica,
+
+**Entonces** no la puedo elegir; al elegir el sector aparecen solo sus actividades (código CIIU), y si cambio de sector debo elegirla de nuevo.
+
+#### CA-007 — Dos pasos
+
+**Dado** que falta un dato obligatorio de "Mi empresa",
+
+**Cuando** pulso "Siguiente",
+
+**Entonces** no paso a "Tu usuario" y se me indica el campo que falta.
+
 ### Reglas de negocio
 
 - RN-001 — Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
@@ -431,7 +448,11 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 ### Validaciones
 
-- Campos del formulario: nombre de la empresa, sector, ciudad, país, nombre del usuario, cargo, correo, teléfono, contraseña y confirmación.
+- Campos del formulario: nombre de la empresa, sector, actividad económica, descripción corta, ciudad, país, nombre del usuario, cargo, correo, teléfono (opcional), contraseña y confirmación.
+- La actividad económica debe ser del sector elegido; es obligatoria si el sector tiene actividades.
+- La descripción corta es obligatoria, de máximo 300 caracteres.
+- El cargo es obligatorio, para saber quién registra la empresa.
+- Cambio pedido por el equipo el 7 de octubre de 2026 (dos pasos, actividad económica, descripción y cargo obligatorio; DEC-015).
 - Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
 - La contraseña debe coincidir con su confirmación.
 - El correo no puede estar ya registrado.

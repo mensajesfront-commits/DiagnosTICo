@@ -31,6 +31,12 @@ class Sector extends Model
         return ['activo' => 'boolean'];
     }
 
+    /** @return HasMany<ActividadEconomica, $this> */
+    public function actividades(): HasMany
+    {
+        return $this->hasMany(ActividadEconomica::class);
+    }
+
     /** @return HasMany<Empresa, $this> */
     public function empresas(): HasMany
     {

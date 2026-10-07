@@ -11,7 +11,9 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $nombre
+ * @property string|null $descripcion
  * @property int $sector_id
+ * @property int|null $actividad_economica_id
  * @property string $ciudad
  * @property string $pais
  * @property string|null $telefono
@@ -22,7 +24,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['nombre', 'sector_id', 'ciudad', 'pais', 'telefono', 'sitio_web', 'numero_empleados', 'activa'])]
+#[Fillable(['nombre', 'descripcion', 'sector_id', 'actividad_economica_id', 'ciudad', 'pais', 'telefono', 'sitio_web', 'numero_empleados', 'activa'])]
 class Empresa extends Model
 {
     protected function casts(): array
@@ -34,6 +36,12 @@ class Empresa extends Model
     public function sector(): BelongsTo
     {
         return $this->belongsTo(Sector::class);
+    }
+
+    /** @return BelongsTo<ActividadEconomica, $this> */
+    public function actividadEconomica(): BelongsTo
+    {
+        return $this->belongsTo(ActividadEconomica::class);
     }
 
     /** @return HasMany<User, $this> */
