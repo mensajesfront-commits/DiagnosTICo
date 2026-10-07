@@ -107,7 +107,7 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 ### Antes de una presentación o de producción
 
 - `APP_DEBUG=false`. Con `true`, un error muestra código y datos de la base, como la pantalla de error de Laravel.
-- `APP_ENV=production`. Así no existen las rutas `/prueba-tecnica/*` y el `DemoSeeder` no corre.
+- `APP_ENV=production`. Así no existen las rutas `/prueba-tecnica/*`.
 - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
 - Claves (`APP_KEY`, base de datos, correo, OpenAI) solo en `.env`.
 

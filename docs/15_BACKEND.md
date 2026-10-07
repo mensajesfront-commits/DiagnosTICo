@@ -44,7 +44,6 @@ Seguridad del acceso completa (7 de octubre): cuentas y empresas desactivadas, c
 | Contraseña fuerte | `AppServiceProvider` + `app/Rules/TieneMayuscula.php` |
 | Correo de recuperación | `FortifyServiceProvider::configureResetEmail` |
 | Textos en español | `lang/es/*.php`, `lang/es.json` |
-| Cuentas de demostración | `database/seeders/DemoSeeder.php` |
 | Pruebas | `tests/Feature/Auth/SeguridadAccesoTest.php` |
 
 Queda fuera del acceso (lo hace el backend de cada módulo): la redirección según el rol (T-048), que depende de las pantallas A1 y E1.

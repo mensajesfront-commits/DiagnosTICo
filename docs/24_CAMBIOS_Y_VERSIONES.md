@@ -35,6 +35,10 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - País → departamento → ciudad en el registro y en Mi perfil, con búsqueda al escribir. Los 18 países de Hispanoamérica; la ciudad se puede escribir si no está en la lista. Nueva columna `departamento`, ruta `GET /ubicaciones/{pais}`, componentes `Combobox` y `SelectorUbicacion`, comando `ubicaciones:generar` (DEC-016).
 
+### Quitado
+
+- Las cuentas de demostración (`DemoSeeder`, `DEMO_PASSWORD`). El equipo trabaja con cuentas creadas por ellos mismos.
+
 ### Cambiado (Mi perfil de la empresa)
 
 - E11 muestra y deja cambiar a la cuenta principal la actividad económica (subsector) y la descripción corta; el colaborador las ve bloqueadas.
