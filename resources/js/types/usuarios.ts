@@ -25,7 +25,6 @@ export type Cuenta = {
     /** Medición pendiente de su empresa ("Medición 4 no iniciada (vence el 20 oct)"). */
     medicion_pendiente: string | null;
     estado: EstadoCuenta;
-    ultimo_acceso: string | null;
     invitacion_enviada_en: string | null;
     /** La cuenta con la que se entró: no se desactiva ni cambia su rol. */
     es_tuya: boolean;

@@ -12,7 +12,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "activa",
-                "ultimo_acceso": "2026-10-06T15:24:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": true
             },
@@ -26,7 +25,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "activa",
-                "ultimo_acceso": "2026-10-06T08:10:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -40,7 +38,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "invitacion",
-                "ultimo_acceso": null,
                 "invitacion_enviada_en": "2026-09-29T10:00:00-05:00",
                 "es_tuya": false
             },
@@ -54,7 +51,6 @@
                 "colaboradores_activos": 2,
                 "medicion_pendiente": "Medición 4 no iniciada (vence el 20 oct)",
                 "estado": "activa",
-                "ultimo_acceso": "2026-10-06T09:12:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -68,7 +64,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "activa",
-                "ultimo_acceso": "2026-10-05T17:30:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -82,7 +77,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "activa",
-                "ultimo_acceso": "2026-10-01T11:00:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -96,7 +90,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "desactivada",
-                "ultimo_acceso": "2026-08-02T09:00:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -110,7 +103,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": "Medición 5 en curso (8/10)",
                 "estado": "activa",
-                "ultimo_acceso": "2026-09-30T16:00:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -124,7 +116,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "activa",
-                "ultimo_acceso": "2026-09-25T10:00:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -138,7 +129,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "desactivada",
-                "ultimo_acceso": "2026-08-02T12:00:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -152,7 +142,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": "Medición 1 no iniciada",
                 "estado": "activa",
-                "ultimo_acceso": null,
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -166,7 +155,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": "Medición 1 no iniciada",
                 "estado": "activa",
-                "ultimo_acceso": null,
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -180,7 +168,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "activa",
-                "ultimo_acceso": "2026-09-24T09:00:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -194,7 +181,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": null,
                 "estado": "activa",
-                "ultimo_acceso": "2026-09-20T15:00:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             },
@@ -208,7 +194,6 @@
                 "colaboradores_activos": 0,
                 "medicion_pendiente": "Medición 3 en curso (2/10)",
                 "estado": "activa",
-                "ultimo_acceso": "2026-09-18T08:00:00-05:00",
                 "invitacion_enviada_en": null,
                 "es_tuya": false
             }

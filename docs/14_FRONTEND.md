@@ -176,7 +176,7 @@ Ruta: `GET /usuarios` (ya existe, `UsuariosController`; permiso `usuarios.ver`).
 
 | Prop | Tipo | Nota |
 |---|---|---|
-| `cuentas` | `Cuenta[]` | **Todas** las cuentas. La búsqueda, los filtros y las páginas de 12 se hacen en la pantalla. Cada una trae `rol`, `empresa`, `es_principal`, `colaboradores_activos`, `medicion_pendiente` (texto), `estado` (`activa`, `desactivada`, `invitacion`, `eliminada`), `eliminada_en`, `se_borra_el`, `ultimo_acceso`, `invitacion_enviada_en` y `es_tuya` |
+| `cuentas` | `Cuenta[]` | **Todas** las cuentas. La búsqueda, los filtros y las páginas de 12 se hacen en la pantalla. Cada una trae `rol`, `empresa`, `es_principal`, `colaboradores_activos`, `medicion_pendiente` (texto), `estado` (`activa`, `desactivada`, `invitacion`, `eliminada`), `eliminada_en`, `se_borra_el`, `invitacion_enviada_en` y `es_tuya` |
 | `roles` | `{ id, nombre, descripcion, activo, del_sistema, aviso }[]` | Para el filtro, "Invitar usuario" y "Cambiar rol" |
 
 Tipos exactos en `resources/js/types/usuarios.ts`.

@@ -104,6 +104,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2, L4 | La lista de requisitos de la contraseña tiene 5 puntos (agrega "Al menos un carácter especial"); el wireframe muestra 4. | RN-001 lo exige. **[INCONSISTENCIA DETECTADA]**, pendiente de decidir. |
 | L1–L4 | El panel oscuro ocupa el 42 % de la pantalla; en el wireframe es más angosto. | Lo pidió el equipo (6 de octubre). |
 | L1 | No tiene la "Nota del prototipo" con atajos de entrada. | El wireframe aclara que no es parte del diseño. |
+| A5 | Sin la columna "Último acceso": se guarda en la base (`users.ultimo_acceso_en`) pero no se muestra. "Enviada el…" (invitación) y "Se borra el…" (eliminada) van bajo el Estado. | Pedido por el equipo (8 de octubre). |
 | A5, A5.3b | "Desactivar / Eliminar" abre un modal para elegir; eliminar pide escribir el correo exacto. Las desactivadas tienen "Reactivar · Eliminar" y las invitaciones "Reenviar invitación · Eliminar". | Pedido por el equipo (8 de octubre, DEC-017). El wireframe solo tiene "Desactivar". |
 | Todas | Los campos obligatorios llevan un asterisco rojo (`Campo obligatorio`); los opcionales siguen con "(opcional)". | Pedido por el equipo (8 de octubre). |
 | L1 | Cuenta desactivada y demasiados intentos se avisan en un modal, no bajo el campo. | Pedido por el equipo (7 de octubre). El wireframe no los dibuja. |

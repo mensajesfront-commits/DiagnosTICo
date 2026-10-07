@@ -101,7 +101,8 @@ class DatosUsuarios
                 ! $u->activo => 'desactivada',
                 default => 'activa',
             },
-            'ultimo_acceso' => $u->ultimo_acceso_en?->toIso8601String(),
+            // El último acceso se guarda (users.ultimo_acceso_en) pero A5 ya
+            // no lo muestra: se consulta en la base de datos.
             'invitacion_enviada_en' => $u->invitacion_enviada_en?->toIso8601String(),
             'es_tuya' => $u->id === $yo->id,
             'eliminada_en' => $u->deleted_at?->toIso8601String(),

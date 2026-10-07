@@ -28,7 +28,7 @@ import EncabezadoUsuarios from '@/components/usuarios/EncabezadoUsuarios.vue';
 import ModalCambiarRol from '@/components/usuarios/ModalCambiarRol.vue';
 import ModalDesactivarEliminar from '@/components/usuarios/ModalDesactivarEliminar.vue';
 import ModalInvitarUsuario from '@/components/usuarios/ModalInvitarUsuario.vue';
-import { diaYMes, ultimoAcceso } from '@/lib/fechas';
+import { diaYMes } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { coincide } from '@/lib/usuarios';
 import { edit as perfil } from '@/routes/profile';
@@ -233,7 +233,6 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                     'Rol',
                                     'Empresa asociada',
                                     'Estado',
-                                    'Último acceso',
                                     'Acciones',
                                 ]"
                                 :key="columna"
@@ -290,23 +289,22 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                     ✕ Eliminada
                                 </Etiqueta>
                                 <Etiqueta v-else>○ Desactivada</Etiqueta>
-                            </td>
-                            <td class="px-5 py-3 whitespace-nowrap">
-                                <span
+                                <p
                                     v-if="
                                         cuenta.estado === 'eliminada' &&
                                         cuenta.se_borra_el
                                     "
-                                    class="text-aviso"
+                                    class="mt-1 text-xs whitespace-nowrap text-aviso"
                                 >
                                     Se borra el
                                     {{ diaYMes(new Date(cuenta.se_borra_el)) }}
-                                </span>
-                                <template
+                                </p>
+                                <p
                                     v-else-if="
                                         cuenta.estado === 'invitacion' &&
                                         cuenta.invitacion_enviada_en
                                     "
+                                    class="mt-1 text-xs whitespace-nowrap text-tinta-suave"
                                 >
                                     Enviada el
                                     {{
@@ -316,10 +314,7 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                             ),
                                         )
                                     }}
-                                </template>
-                                <template v-else>
-                                    {{ ultimoAcceso(cuenta.ultimo_acceso) }}
-                                </template>
+                                </p>
                             </td>
                             <td class="px-5 py-3 whitespace-nowrap">
                                 <template v-if="cuenta.es_tuya">
@@ -424,7 +419,7 @@ const enlaceEliminar = 'text-aviso hover:underline';
                         </tr>
                         <tr v-if="visibles.length === 0">
                             <td
-                                colspan="6"
+                                colspan="5"
                                 class="px-5 py-10 text-center text-sm text-tinta-suave"
                             >
                                 Ninguna cuenta coincide con la búsqueda o los
