@@ -110,7 +110,41 @@ it('no deja a un colaborador crear colaboradores', function () {
         ->assertForbidden();
 });
 
-// --- HU-078 · Cambiar contraseña ---------------------------------------------
+// --- HU-078 · Editar (datos y contraseña) ----------------------------------------
+
+function datosDe(User $u, array $cambios = []): array
+{
+    return ['name' => $u->name, 'cargo' => $u->cargo ?? 'Ventas', 'email' => $u->email, 'password' => '', ...$cambios];
+}
+
+it('edita nombre, cargo y correo sin tocar la contraseña', function () {
+    $laura = empresaConPrincipal();
+    $andres = colaboradorDe($laura, ['cargo' => 'Ventas']);
+    $clave = $andres->password;
+
+    $this->actingAs($laura)
+        ->put(route('colaboradores.actualizar', $andres), datosDe($andres, [
+            'name' => 'Andrés Felipe Pérez',
+            'cargo' => 'Marketing',
+            'email' => 'Andres.Felipe@LaEsquina.co',
+        ]))
+        ->assertSessionHasNoErrors();
+
+    $andres->refresh();
+    expect($andres->name)->toBe('Andrés Felipe Pérez')
+        ->and($andres->cargo)->toBe('Marketing')
+        ->and($andres->email)->toBe('andres.felipe@laesquina.co')
+        ->and($andres->password)->toBe($clave);
+});
+
+it('no deja poner el correo de otra cuenta', function () {
+    $laura = empresaConPrincipal();
+    $andres = colaboradorDe($laura);
+
+    $this->actingAs($laura)
+        ->put(route('colaboradores.actualizar', $andres), datosDe($andres, ['email' => $laura->email]))
+        ->assertSessionHasErrors(['email' => 'Ya hay una cuenta con este correo.']);
+});
 
 it('cambia la contraseña y cierra las sesiones del colaborador', function () {
     $laura = empresaConPrincipal();
@@ -122,7 +156,7 @@ it('cambia la contraseña y cierra las sesiones del colaborador', function () {
     ]);
 
     $this->actingAs($laura)
-        ->put(route('colaboradores.contrasena', $andres), ['password' => 'Nueva-12-Clave'])
+        ->put(route('colaboradores.actualizar', $andres), datosDe($andres, ['password' => 'Nueva-12-Clave']))
         ->assertRedirect()
         ->assertSessionHasNoErrors();
 
@@ -136,7 +170,7 @@ it('pide una contraseña fuerte al cambiarla', function () {
     $laura = empresaConPrincipal();
 
     $this->actingAs($laura)
-        ->put(route('colaboradores.contrasena', colaboradorDe($laura)), ['password' => 'corta'])
+        ->put(route('colaboradores.actualizar', $c = colaboradorDe($laura)), datosDe($c, ['password' => 'corta']))
         ->assertSessionHasErrors('password');
 });
 
@@ -161,7 +195,7 @@ it('no toca colaboradores de otra empresa ni la cuenta principal', function () {
     $ajeno = colaboradorDe(empresaConPrincipal('Otra empresa'));
 
     $this->actingAs($laura)->post(route('colaboradores.desactivar', $ajeno))->assertNotFound();
-    $this->actingAs($laura)->put(route('colaboradores.contrasena', $ajeno), ['password' => 'Nueva-12-Clave'])->assertNotFound();
+    $this->actingAs($laura)->put(route('colaboradores.actualizar', $ajeno), datosDe($ajeno, ['password' => 'Nueva-12-Clave']))->assertNotFound();
     $this->actingAs($laura)->post(route('colaboradores.desactivar', $laura))->assertForbidden();
 
     expect($ajeno->refresh()->activo)->toBeTrue()

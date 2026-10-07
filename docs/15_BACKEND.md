@@ -143,7 +143,7 @@ Reglas que valida el servidor:
 |---|---|---|---|
 | GET | `/colaboradores` | `colaboradores.index` | Cuenta principal primero y luego los colaboradores de su empresa, por nombre |
 | POST | `/colaboradores` | `colaboradores.store` | Crea la cuenta: rol Colaborador, misma empresa, activa, sin correo (HU-077) |
-| PUT | `/colaboradores/{colaborador}/contrasena` | `colaboradores.contrasena` | Contraseña nueva; cierra sus sesiones y anula "Recordarme" (HU-078) |
+| PUT | `/colaboradores/{colaborador}` | `colaboradores.actualizar` | Edita nombre, cargo, correo y, si se envía, la contraseña; si cambia el correo o la contraseña, cierra sus sesiones y anula "Recordarme" (HU-078) |
 | POST | `/colaboradores/{colaborador}/desactivar` | `colaboradores.desactivar` | `activo = false` y cierra sus sesiones (HU-079) |
 | POST | `/colaboradores/{colaborador}/reactivar` | `colaboradores.reactivar` | `activo = true` |
 

@@ -50,7 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:Empresa')->group(function () {
         Route::get('colaboradores', [ColaboradoresController::class, 'index'])->name('colaboradores.index');
         Route::post('colaboradores', [ColaboradoresController::class, 'store'])->name('colaboradores.store');
-        Route::put('colaboradores/{colaborador}/contrasena', [ColaboradoresController::class, 'contrasena'])->name('colaboradores.contrasena');
+        Route::put('colaboradores/{colaborador}', [ColaboradoresController::class, 'actualizar'])->name('colaboradores.actualizar');
         Route::post('colaboradores/{colaborador}/desactivar', [ColaboradoresController::class, 'desactivar'])->name('colaboradores.desactivar');
         Route::post('colaboradores/{colaborador}/reactivar', [ColaboradoresController::class, 'reactivar'])->name('colaboradores.reactivar');
     });

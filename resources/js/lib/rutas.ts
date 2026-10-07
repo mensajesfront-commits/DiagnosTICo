@@ -62,7 +62,7 @@ export const rutas = {
     colaboradores: {
         lista: () => '/colaboradores',
         crear: () => '/colaboradores',
-        contrasena: (id: number) => `/colaboradores/${id}/contrasena`,
+        actualizar: (id: number) => `/colaboradores/${id}`,
         desactivar: (id: number) => `/colaboradores/${id}/desactivar`,
         reactivar: (id: number) => `/colaboradores/${id}/reactivar`,
     },

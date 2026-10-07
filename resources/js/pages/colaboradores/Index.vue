@@ -4,7 +4,8 @@
  *
  * Solo la cuenta principal de la empresa entra aquí (rol Empresa). Ve a las
  * personas de su empresa: ella misma primero ("Cuenta principal · Tú") y
- * luego los colaboradores, con "Cambiar contraseña" y "Desactivar" o
+ * luego los colaboradores, con "Editar" (datos y contraseña, E12.3) y
+ * "Desactivar" o
  * "Reactivar". "+ Agregar colaborador" abre E12.1; al crear o cambiar una
  * contraseña se abre E12.2 con los datos para compartir.
  *
@@ -16,7 +17,7 @@ import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
 import ModalAgregarColaborador from '@/components/colaboradores/ModalAgregarColaborador.vue';
-import ModalCambiarContrasena from '@/components/colaboradores/ModalCambiarContrasena.vue';
+import ModalEditarColaborador from '@/components/colaboradores/ModalEditarColaborador.vue';
 import ModalDatosDeAcceso from '@/components/colaboradores/ModalDatosDeAcceso.vue';
 import ModalDesactivarColaborador from '@/components/colaboradores/ModalDesactivarColaborador.vue';
 import { rutas } from '@/lib/rutas';
@@ -40,7 +41,7 @@ const sinColaboradores = computed(() =>
 );
 
 const modalAgregar = ref(false);
-const modalContrasena = ref(false);
+const modalEditar = ref(false);
 const modalDesactivar = ref(false);
 const modalDatos = ref(false);
 
@@ -61,9 +62,16 @@ function alCerrarDatos(abierto: boolean): void {
     }
 }
 
-function cambiarContrasena(colaborador: Colaborador): void {
+function editar(colaborador: Colaborador): void {
     elegido.value = colaborador;
-    modalContrasena.value = true;
+    modalEditar.value = true;
+}
+
+// E12.2 solo si se cambió la contraseña; si no, basta el aviso.
+function alGuardar(nuevos: DatosDeAcceso | null): void {
+    if (nuevos) {
+        mostrarDatos(nuevos, true);
+    }
 }
 
 function desactivar(colaborador: Colaborador): void {
@@ -218,9 +226,9 @@ const enlace =
                                     <button
                                         type="button"
                                         :class="enlace"
-                                        @click="cambiarContrasena(colaborador)"
+                                        @click="editar(colaborador)"
                                     >
-                                        Cambiar contraseña
+                                        Editar
                                     </button>
                                     <span class="text-tinta-suave">·</span>
                                     <button
@@ -274,10 +282,10 @@ const enlace =
         @creado="mostrarDatos($event, false)"
     />
     <template v-if="elegido">
-        <ModalCambiarContrasena
-            v-model:abierto="modalContrasena"
+        <ModalEditarColaborador
+            v-model:abierto="modalEditar"
             :colaborador="elegido"
-            @cambiada="mostrarDatos($event, true)"
+            @guardado="alGuardar"
         />
         <ModalDesactivarColaborador
             v-model:abierto="modalDesactivar"

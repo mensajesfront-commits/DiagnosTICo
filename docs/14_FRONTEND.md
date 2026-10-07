@@ -249,10 +249,10 @@ Tipos exactos en `resources/js/types/colaboradores.ts`. Si solo llega la cuenta 
 Envía (todo con `colaborador` de la misma empresa; si no, 404):
 
 - `POST /colaboradores` (E12.1): `name`, `cargo` (obligatorio; lista de sugerencias en `lib/cargos.ts` o escrito), `email` y `password`. Correo único (RN-002) y contraseña fuerte (RN-001); no se pide confirmación porque la empresa la escribe y la comparte. Crea la cuenta con `empresa_id` de la empresa y rol **Colaborador**, activa, sin enviar correo. Redirige con `back()`; la pantalla abre E12.2 con lo que se escribió. **El servidor no devuelve la contraseña.**
-- `PUT /colaboradores/{id}/contrasena` (E12.3): `password` (RN-001). Cambia la contraseña, guarda `contrasena_actualizada_en` y **cierra las sesiones abiertas** del colaborador. La pantalla abre E12.2 con la contraseña nueva.
+- `PUT /colaboradores/{id}` (E12.3, "Editar"): `name`, `cargo`, `email` (único) y `password` (vacía si no se cambia; si va, RN-001). Si cambia el correo o la contraseña, **cierra las sesiones abiertas** del colaborador. Con contraseña nueva, la pantalla abre E12.2 para compartirla.
 - `POST /colaboradores/{id}/desactivar` y `/reactivar` (HU-079): cambian `activo`. Nunca sobre la cuenta principal (403).
 
-Modales (en `components/colaboradores/`): `ModalAgregarColaborador` (E12.1), `ModalDatosDeAcceso` (E12.2), `ModalCambiarContrasena` (E12.3) y `ModalDesactivarColaborador` (confirmación; el wireframe no la tiene).
+Modales (en `components/colaboradores/`): `ModalAgregarColaborador` (E12.1), `ModalDatosDeAcceso` (E12.2), `ModalEditarColaborador` (E12.3: datos y contraseña) y `ModalDesactivarColaborador` (confirmación; el wireframe no la tiene).
 
 ## Pantallas sin wireframe en los PDF recibidos
 

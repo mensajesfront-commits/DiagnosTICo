@@ -87,26 +87,52 @@ class ColaboradoresController extends Controller
     }
 
     /**
-     * E12.3 · La contraseña anterior deja de funcionar y se cierran sus
-     * sesiones abiertas, también las de "Recordarme" (HU-078).
+     * E12.3 · Editar un colaborador: nombre, cargo, correo y, si se envía,
+     * una contraseña nueva (HU-078). Si cambia el correo o la contraseña, se
+     * cierran sus sesiones abiertas, también las de "Recordarme".
      */
-    public function contrasena(Request $request, User $colaborador): RedirectResponse
+    public function actualizar(Request $request, User $colaborador): RedirectResponse
     {
         $this->deMiEmpresa($request, $colaborador);
 
+        $request->merge(['email' => Str::lower(trim((string) $request->input('email')))]);
+
         $datos = $request->validate([
-            'password' => ['required', 'string', Password::default()],
+            'name' => ['required', 'string', 'max:255'],
+            'cargo' => ['required', 'string', 'min:2', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($colaborador->id)],
+            'password' => ['nullable', 'string', Password::default()],
+        ], [
+            'email.unique' => 'Ya hay una cuenta con este correo.',
         ]);
 
-        $colaborador->forceFill([
-            'password' => $datos['password'],
-            'contrasena_actualizada_en' => now(),
-            'remember_token' => Str::random(60),
-        ])->save();
+        $cambiaCorreo = $datos['email'] !== $colaborador->email;
+        $cambiaContrasena = filled($datos['password'] ?? null);
 
-        $this->cerrarSesiones($colaborador);
+        $colaborador->fill([
+            'name' => $datos['name'],
+            'cargo' => trim($datos['cargo']),
+            'email' => $datos['email'],
+        ]);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => "Contraseña cambiada para {$colaborador->name}."]);
+        if ($cambiaContrasena) {
+            $colaborador->forceFill([
+                'password' => $datos['password'],
+                'contrasena_actualizada_en' => now(),
+            ]);
+        }
+
+        if ($cambiaCorreo || $cambiaContrasena) {
+            $colaborador->forceFill(['remember_token' => Str::random(60)]);
+        }
+
+        $colaborador->save();
+
+        if ($cambiaCorreo || $cambiaContrasena) {
+            $this->cerrarSesiones($colaborador);
+        }
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Datos de {$colaborador->name} guardados."]);
 
         return back();
     }
