@@ -41,6 +41,7 @@ const page = usePage();
 
 const modalDesactivada = ref(false);
 const mensajeDesactivada = ref('');
+const tituloDesactivada = ref('Cuenta desactivada');
 
 const modalBloqueo = ref(false);
 const segundos = ref(0);
@@ -63,7 +64,14 @@ watch(
     () => page.props.errors as Record<string, string> | undefined,
     (errores) => {
         if (errores?.cuenta_desactivada) {
+            tituloDesactivada.value = 'Cuenta desactivada';
             mensajeDesactivada.value = errores.cuenta_desactivada;
+            modalDesactivada.value = true;
+        }
+
+        if (errores?.cuenta_eliminada) {
+            tituloDesactivada.value = 'Cuenta eliminada';
+            mensajeDesactivada.value = errores.cuenta_eliminada;
             modalDesactivada.value = true;
         }
 
@@ -163,6 +171,7 @@ onBeforeUnmount(() => clearInterval(reloj));
     <ModalCuentaDesactivada
         v-model:abierto="modalDesactivada"
         :mensaje="mensajeDesactivada"
+        :titulo="tituloDesactivada"
     />
     <ModalAccesoBloqueado v-model:abierto="modalBloqueo" :segundos="segundos" />
 </template>

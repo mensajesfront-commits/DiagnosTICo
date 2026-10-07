@@ -58,6 +58,7 @@ const cuentasSinEsteRol = computed(() =>
         (c) =>
             !c.es_tuya &&
             c.estado !== 'invitacion' &&
+            c.estado !== 'eliminada' &&
             c.rol !== elegido.value?.nombre,
     ),
 );
@@ -163,7 +164,12 @@ const rolesInternos = computed(() =>
         v-model:abierto="modalCrear"
         :bloques="bloques"
         :cuentas="
-            cuentas.filter((c) => !c.es_tuya && c.estado !== 'invitacion')
+            cuentas.filter(
+                (c) =>
+                    !c.es_tuya &&
+                    c.estado !== 'invitacion' &&
+                    c.estado !== 'eliminada',
+            )
         "
     />
     <template v-if="elegido">

@@ -51,7 +51,10 @@ class DatosUsuarios
      */
     public static function cuentas(User $yo): array
     {
-        $usuarios = User::with(['roles:id,name', 'empresa:id,nombre'])
+        // Incluye las eliminadas: la pantalla las muestra solo con el filtro
+        // "Eliminadas", para recuperarlas (DEC-017).
+        $usuarios = User::withTrashed()
+            ->with(['roles:id,name', 'empresa' => fn ($q) => $q->withTrashed()->select('id', 'nombre')])
             ->orderByRaw('id = ? desc', [$yo->id])
             ->orderBy('name')
             ->get();
@@ -93,6 +96,7 @@ class DatosUsuarios
             // mediciones (semana 4).
             'medicion_pendiente' => null,
             'estado' => match (true) {
+                $u->trashed() => 'eliminada',
                 $u->invitacionPendiente() => 'invitacion',
                 ! $u->activo => 'desactivada',
                 default => 'activa',
@@ -100,6 +104,9 @@ class DatosUsuarios
             'ultimo_acceso' => $u->ultimo_acceso_en?->toIso8601String(),
             'invitacion_enviada_en' => $u->invitacion_enviada_en?->toIso8601String(),
             'es_tuya' => $u->id === $yo->id,
+            'eliminada_en' => $u->deleted_at?->toIso8601String(),
+            // Último día para recuperarla; después se borra para siempre.
+            'se_borra_el' => $u->deleted_at?->copy()->addDays((int) config('diagnostico.eliminacion.dias'))->toIso8601String(),
         ];
     }
 

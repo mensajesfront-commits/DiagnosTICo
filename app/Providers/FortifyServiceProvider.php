@@ -7,6 +7,7 @@ use App\Actions\Fortify\ResetUserPassword;
 use App\Http\Responses\AvisoRecuperacionResponse;
 use App\Models\Sector;
 use App\Models\User;
+use App\Support\Fechas;
 use App\Support\Ubicaciones;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -60,10 +61,17 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureLogin(): void
     {
         Fortify::authenticateUsing(function (Request $request): ?User {
-            $usuario = User::where('email', Str::lower($request->string(Fortify::username())->value()))->first();
+            $usuario = User::withTrashed()->where('email', Str::lower($request->string(Fortify::username())->value()))->first();
 
             if (! $usuario || ! Hash::check($request->string('password')->value(), $usuario->password ?? '')) {
                 return null;
+            }
+
+            // Eliminada hace menos de 90 días: todavía se puede recuperar (DEC-017).
+            if ($usuario->trashed()) {
+                throw ValidationException::withMessages(['cuenta_eliminada' => trans('auth.eliminada', [
+                    'fecha' => Fechas::larga(($usuario->deleted_at ?? now())->copy()->addDays((int) config('diagnostico.eliminacion.dias'))),
+                ])]);
             }
 
             if (! $usuario->puedeEntrar()) {

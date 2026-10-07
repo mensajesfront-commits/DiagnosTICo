@@ -258,33 +258,85 @@ it('elimina un rol creado solo si no tiene cuentas', function () {
 
 // --- Eliminar (DEC-017) ---------------------------------------------------------
 
-it('elimina una cuenta solo con el correo exacto', function () {
+it('elimina una cuenta solo con el correo exacto y la deja recuperable', function () {
     $diego = User::factory()->create(['email' => 'diego@ejemplo.co']);
 
     $this->actingAs($this->admin)
         ->delete(route('usuarios.eliminar', $diego), ['confirmacion' => 'Diego@ejemplo.co'])
         ->assertSessionHasErrors(['confirmacion' => 'El correo no coincide. Escríbelo exactamente como aparece.']);
-    expect(User::find($diego->id))->not->toBeNull();
+    $this->assertNotSoftDeleted($diego);
 
     $this->actingAs($this->admin)
         ->delete(route('usuarios.eliminar', $diego), ['confirmacion' => ' diego@ejemplo.co '])
         ->assertSessionHasNoErrors();
+
+    // Sale de la vista pero sigue en la base para recuperarla.
+    $this->assertSoftDeleted($diego);
     expect(User::find($diego->id))->toBeNull();
+
+    $cuenta = collect($this->get(route('usuarios.index'))->viewData('page')['props']['cuentas'])->firstWhere('id', $diego->id);
+    expect($cuenta['estado'])->toBe('eliminada')
+        ->and($cuenta['se_borra_el'])->not->toBeNull();
+
+    $this->actingAs($this->admin)->post(route('usuarios.recuperar', $diego))->assertSessionHasNoErrors();
+    $this->assertNotSoftDeleted($diego);
 });
 
-it('al eliminar la cuenta principal elimina la empresa y sus colaboradores', function () {
+it('al eliminar la cuenta principal elimina la empresa y sus colaboradores, y los recupera juntos', function () {
     $laura = cuentaPrincipal();
     $andres = User::factory()->create(['empresa_id' => $laura->empresa_id])->assignRole('Colaborador');
-    $empresaId = $laura->empresa_id;
+    $empresa = $laura->empresa;
 
     $this->actingAs($this->admin)
         ->delete(route('usuarios.eliminar', $laura), ['confirmacion' => $laura->email])
         ->assertSessionHasNoErrors();
 
-    expect(User::find($laura->id))->toBeNull()
-        ->and(User::find($andres->id))->toBeNull()
-        ->and(Empresa::find($empresaId))->toBeNull()
-        ->and(DB::table('model_has_roles')->where('model_id', $andres->id)->exists())->toBeFalse();
+    $this->assertSoftDeleted($laura);
+    $this->assertSoftDeleted($andres);
+    $this->assertSoftDeleted($empresa);
+
+    // El colaborador no se recupera solo: va con su empresa.
+    $this->actingAs($this->admin)->post(route('usuarios.recuperar', $andres))
+        ->assertSessionHasErrors('recuperar');
+
+    $this->actingAs($this->admin)->post(route('usuarios.recuperar', $laura))->assertSessionHasNoErrors();
+    $this->assertNotSoftDeleted($laura);
+    $this->assertNotSoftDeleted($andres);
+    $this->assertNotSoftDeleted($empresa);
+    expect($laura->refresh()->hasRole('Empresa'))->toBeTrue();
+});
+
+it('a los 90 días la tarea diaria la borra para siempre', function () {
+    $laura = cuentaPrincipal();
+    $empresa = $laura->empresa;
+    $reciente = User::factory()->create();
+
+    $this->actingAs($this->admin)->delete(route('usuarios.eliminar', $laura), ['confirmacion' => $laura->email]);
+    $this->actingAs($this->admin)->delete(route('usuarios.eliminar', $reciente), ['confirmacion' => $reciente->email]);
+
+    $this->travel(89)->days();
+    $this->artisan('cuentas:purgar')->assertSuccessful();
+    expect(User::withTrashed()->find($laura->id))->not->toBeNull();
+
+    $this->travel(2)->days();
+    $this->artisan('cuentas:purgar')->assertSuccessful();
+    expect(User::withTrashed()->find($laura->id))->toBeNull()
+        ->and(User::withTrashed()->find($reciente->id))->toBeNull()
+        ->and(Empresa::withTrashed()->find($empresa->id))->toBeNull()
+        ->and(DB::table('model_has_roles')->where('model_id', $laura->id)->exists())->toBeFalse();
+});
+
+it('una cuenta eliminada no entra y, con la contraseña correcta, se le dice hasta cuándo puede recuperarla', function () {
+    $diego = User::factory()->create(['email' => 'diego@ejemplo.co']);
+    $this->actingAs($this->admin)->delete(route('usuarios.eliminar', $diego), ['confirmacion' => 'diego@ejemplo.co']);
+    auth()->logout();
+
+    $this->post(route('login.store'), ['email' => 'diego@ejemplo.co', 'password' => 'equivocada'])
+        ->assertSessionHasErrors(['email' => 'El correo o la contraseña no son correctos.']);
+
+    $this->post(route('login.store'), ['email' => 'diego@ejemplo.co', 'password' => 'password'])
+        ->assertSessionHasErrors('cuenta_eliminada');
+    $this->assertGuest();
 });
 
 it('no elimina la propia cuenta ni el último Administrador', function () {

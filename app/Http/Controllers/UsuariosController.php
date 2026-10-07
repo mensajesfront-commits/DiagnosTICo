@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Empresa;
 use App\Models\User;
 use App\Notifications\InvitacionCuenta;
 use App\Notifications\RolCambiado;
 use App\Support\DatosUsuarios;
+use App\Support\Fechas;
+use Carbon\CarbonInterface;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -107,10 +109,12 @@ class UsuariosController extends Controller
     }
 
     /**
-     * Eliminar una cuenta para siempre (DEC-017). Pide escribir el correo
-     * exacto de la cuenta. Si es la cuenta principal de una empresa, se
-     * eliminan también la empresa y sus colaboradores. No se elimina la
-     * propia cuenta ni el último Administrador.
+     * Eliminar una cuenta (DEC-017). Pide escribir el correo exacto de la
+     * cuenta. Sale de la vista y nadie puede entrar, pero se puede recuperar
+     * durante 90 días; después `cuentas:purgar` la borra para siempre.
+     * Si es la cuenta principal de una empresa, se eliminan también la
+     * empresa y sus colaboradores. No se elimina la propia cuenta ni el
+     * último Administrador.
      */
     public function eliminar(User $usuario, Request $request): RedirectResponse
     {
@@ -133,39 +137,73 @@ class UsuariosController extends Controller
         }
 
         $empresa = $usuario->esPrincipal() ? $usuario->empresa : null;
-        /** @var list<User> $cuentas */
-        $cuentas = $empresa !== null ? $empresa->usuarios()->get()->all() : [$usuario];
-        $archivos = array_values(array_filter([
-            ...array_map(fn (User $u) => $u->foto_ruta, $cuentas),
-            $empresa?->logo_ruta,
-        ]));
+        $ids = $empresa !== null ? $empresa->usuarios()->pluck('id')->all() : [$usuario->id];
+        $correos = User::whereKey($ids)->pluck('email')->all();
+        // La misma marca para todas, para recuperarlas juntas.
+        $ahora = now();
 
-        DB::transaction(function () use ($cuentas, $empresa): void {
-            foreach ($cuentas as $cuenta) {
-                DB::table('sessions')->where('user_id', $cuenta->id)->delete();
-                DB::table('password_reset_tokens')->where('email', $cuenta->email)->delete();
-                $cuenta->delete();
-            }
-
-            $empresa?->delete();
+        DB::transaction(function () use ($ids, $correos, $empresa, $ahora): void {
+            DB::table('sessions')->whereIn('user_id', $ids)->delete();
+            DB::table('password_reset_tokens')->whereIn('email', $correos)->delete();
+            User::whereKey($ids)->update(['deleted_at' => $ahora]);
+            $empresa?->forceFill(['deleted_at' => $ahora])->save();
         });
 
-        Storage::disk('local')->delete($archivos);
-
-        // Constancia sin datos personales: quién eliminó qué (id).
-        Log::info('Cuenta eliminada', [
+        Log::info('Cuenta eliminada (recuperable)', [
             'cuenta_id' => $usuario->id,
             'empresa_id' => $empresa?->id,
-            'cuentas_eliminadas' => count($cuentas),
+            'cuentas' => count($ids),
             'por' => $request->user()?->id,
         ]);
 
+        $hasta = $this->fechaLimite($ahora);
         $mensaje = $empresa !== null
-            ? "Se eliminaron la cuenta de {$usuario->name}, la empresa {$empresa->nombre} y sus colaboradores."
-            : "Cuenta de {$usuario->name} eliminada.";
+            ? "Se eliminaron la cuenta de {$usuario->name}, la empresa {$empresa->nombre} y sus colaboradores. Se pueden recuperar hasta el {$hasta}."
+            : "Cuenta de {$usuario->name} eliminada. Se puede recuperar hasta el {$hasta}.";
         Inertia::flash('toast', ['type' => 'success', 'message' => $mensaje]);
 
         return back();
+    }
+
+    /**
+     * Recuperar una cuenta eliminada dentro de los 90 días. La cuenta
+     * principal vuelve con su empresa y los colaboradores que se eliminaron
+     * con ella.
+     */
+    public function recuperar(User $usuario, Request $request): RedirectResponse
+    {
+        abort_unless($usuario->trashed(), 404);
+
+        $empresa = $usuario->empresa_id !== null
+            ? Empresa::withTrashed()->find($usuario->empresa_id)
+            : null;
+
+        if ($empresa?->trashed() && ! $usuario->hasRole('Empresa')) {
+            throw ValidationException::withMessages([
+                'recuperar' => 'Esta cuenta se eliminó junto con su empresa: recupera la cuenta principal de la empresa.',
+            ]);
+        }
+
+        DB::transaction(function () use ($usuario, $empresa): void {
+            if ($empresa?->trashed() && $usuario->hasRole('Empresa')) {
+                User::onlyTrashed()
+                    ->where('empresa_id', $empresa->id)
+                    ->where('deleted_at', $usuario->deleted_at)
+                    ->update(['deleted_at' => null]);
+                $empresa->restore();
+            }
+
+            $usuario->restore();
+        });
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Cuenta de {$usuario->name} recuperada."]);
+
+        return back();
+    }
+
+    private function fechaLimite(CarbonInterface $eliminada): string
+    {
+        return Fechas::larga($eliminada->copy()->addDays((int) config('diagnostico.eliminacion.dias')));
     }
 
     public function reactivar(User $usuario, Request $request): RedirectResponse

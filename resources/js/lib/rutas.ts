@@ -49,6 +49,7 @@ export const rutas = {
         desactivar: (id: number) => `/usuarios/${id}/desactivar`,
         reactivar: (id: number) => `/usuarios/${id}/reactivar`,
         eliminar: (id: number) => `/usuarios/${id}`,
+        recuperar: (id: number) => `/usuarios/${id}/recuperar`,
         cambiarRol: (id: number) => `/usuarios/${id}/rol`,
         verComo: (id: number) => `/usuarios/${id}/ver-como`,
     },

@@ -176,7 +176,7 @@ Ruta: `GET /usuarios` (ya existe, `UsuariosController`; permiso `usuarios.ver`).
 
 | Prop | Tipo | Nota |
 |---|---|---|
-| `cuentas` | `Cuenta[]` | **Todas** las cuentas. La búsqueda, los filtros y las páginas de 12 se hacen en la pantalla. Cada una trae `rol`, `empresa`, `es_principal`, `colaboradores_activos`, `medicion_pendiente` (texto), `estado` (`activa`, `desactivada`, `invitacion`), `ultimo_acceso`, `invitacion_enviada_en` y `es_tuya` |
+| `cuentas` | `Cuenta[]` | **Todas** las cuentas. La búsqueda, los filtros y las páginas de 12 se hacen en la pantalla. Cada una trae `rol`, `empresa`, `es_principal`, `colaboradores_activos`, `medicion_pendiente` (texto), `estado` (`activa`, `desactivada`, `invitacion`, `eliminada`), `eliminada_en`, `se_borra_el`, `ultimo_acceso`, `invitacion_enviada_en` y `es_tuya` |
 | `roles` | `{ id, nombre, descripcion, activo, del_sistema, aviso }[]` | Para el filtro, "Invitar usuario" y "Cambiar rol" |
 
 Tipos exactos en `resources/js/types/usuarios.ts`.
@@ -206,7 +206,7 @@ Modales (todos en `components/usuarios/`):
 | Pantalla | Componente | Envía |
 |---|---|---|
 | Invitar usuario | `ModalInvitarUsuario` | `POST /usuarios/invitar`: `name`, `email`, `rol_id`, `mensaje` |
-| A5.3b | `ModalDesactivarEliminar` | Paso 1: elegir. Desactivar: `POST /usuarios/{id}/desactivar`. Eliminar: `DELETE /usuarios/{id}` con `confirmacion` (el correo exacto; no se puede pegar) |
+| A5.3b | `ModalDesactivarEliminar` | Paso 1: elegir. Desactivar: `POST /usuarios/{id}/desactivar`. Eliminar: `DELETE /usuarios/{id}` con `confirmacion` (el correo exacto; no se puede pegar). Las eliminadas solo se ven con el filtro «Eliminadas», con "Se borra el…" y "Recuperar" (`POST /usuarios/{id}/recuperar`) |
 | A5.5 (desde una cuenta) | `ModalCambiarRol` | `PUT /usuarios/{id}/rol`: `rol_id`, `avisar` |
 | A5.5 (desde un rol) | `ModalAsignarRol` | `POST /roles/{id}/asignar`: `cuenta_id`, `avisar` |
 | A5.2 | `ModalCrearRol` | `POST /roles`: `nombre`, `descripcion`, `activo`, `permisos[]`, `cuentas[]` |

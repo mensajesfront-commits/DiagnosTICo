@@ -37,7 +37,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ### Agregado (eliminar cuentas)
 
-- El Administrador puede eliminar cuentas desde Usuarios y roles: "Desactivar / Eliminar" con segunda confirmación escribiendo el correo exacto. La cuenta principal se elimina con su empresa y sus colaboradores; nunca la propia ni el último Administrador (DEC-017).
+- El Administrador puede eliminar cuentas desde Usuarios y roles: "Desactivar / Eliminar" con segunda confirmación escribiendo el correo exacto. La cuenta sale de la vista pero se puede recuperar durante 90 días (filtro «Eliminadas» → "Recuperar"); después la tarea diaria `cuentas:purgar` la borra para siempre. La cuenta principal se elimina y se recupera con su empresa y sus colaboradores; nunca la propia ni el último Administrador (DEC-017).
 
 ### Quitado
 

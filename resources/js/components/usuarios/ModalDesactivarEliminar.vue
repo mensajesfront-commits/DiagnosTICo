@@ -6,8 +6,10 @@
  * siempre). Las cuentas desactivadas o con invitación pendiente abren
  * directo en "eliminar".
  * Paso 2 · eliminar: hay que escribir el correo exacto de la cuenta; el
- * servidor lo vuelve a revisar. Si es la cuenta principal de una empresa,
- * se eliminan también la empresa y sus colaboradores.
+ * servidor lo vuelve a revisar. La cuenta sale de la vista y nadie entra,
+ * pero se puede recuperar durante 90 días (filtro "Eliminadas"); después se
+ * borra para siempre. Si es la cuenta principal de una empresa, se eliminan
+ * también la empresa y sus colaboradores.
  *
  * Envía: POST /usuarios/{id}/desactivar (sin campos) o
  * DELETE /usuarios/{id} con confirmacion (el correo).
@@ -103,7 +105,8 @@ function eliminar(): void {
                 class="hover:border-aviso hover:bg-aviso-suave/40"
                 @elegir="paso = 'eliminar'"
             >
-                Se borra para siempre con sus datos. No se puede deshacer.
+                Sale de la lista y nadie puede entrar. Se puede recuperar
+                durante 90 días; después se borra para siempre.
             </TarjetaOpcion>
         </div>
 
@@ -132,17 +135,23 @@ function eliminar(): void {
             @submit.prevent="coincide && eliminar()"
         >
             <div class="rounded-md bg-aviso-suave px-3 py-2.5 text-aviso">
-                <p class="font-medium">Esta acción no se puede deshacer.</p>
+                <p class="font-medium">
+                    Tienes 90 días para recuperarla; después se borra para
+                    siempre.
+                </p>
                 <p class="mt-1">
                     <template v-if="cuenta.es_principal && cuenta.empresa">
                         Es la cuenta principal de {{ cuenta.empresa }}: también
-                        se eliminan <strong>la empresa</strong>,
-                        <strong>todos sus colaboradores</strong> y sus datos.
+                        se eliminan <strong>la empresa</strong> y
+                        <strong>todos sus colaboradores</strong>, y se recuperan
+                        juntos.
                     </template>
                     <template v-else>
-                        Se borran la cuenta, su foto y sus sesiones abiertas.
+                        La cuenta sale de la lista y se cierran sus sesiones
+                        abiertas.
                     </template>
-                    Si solo quieres quitarle el acceso, desactívala.
+                    Para recuperarla, filtra por Estado «Eliminadas». Si solo
+                    quieres quitarle el acceso, desactívala.
                 </p>
             </div>
             <Campo

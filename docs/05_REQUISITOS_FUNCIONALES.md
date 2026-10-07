@@ -9678,7 +9678,7 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 | RN-001 | Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial. | HU-002, HU-004, HU-055, HU-056, HU-077, HU-078 |
 | RN-002 | Un correo no puede pertenecer a más de una cuenta. | HU-002, HU-032, HU-034, HU-077 |
 | RN-003 | Solo se ofrecen sectores activos al registrar empresas; no existe la opción “Otro”. | HU-002, HU-012, HU-013, HU-014, HU-015, HU-032 |
-| RN-004 | Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar. Además, el Administrador puede **eliminar** una cuenta para siempre, escribiendo su correo exacto para confirmar (decisión del equipo, 8 de octubre de 2026, DEC-017). | HU-001, HU-003, HU-035, HU-047, HU-079 |
+| RN-004 | Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar. Además, el Administrador puede **eliminar** una cuenta escribiendo su correo exacto para confirmar; se puede recuperar durante 90 días y después se borra para siempre (decisión del equipo, 8 de octubre de 2026, DEC-017). | HU-001, HU-003, HU-035, HU-047, HU-079 |
 | RN-005 | Los avisos de inicio de sesión y recuperación no revelan si un correo está registrado. | HU-001, HU-003 |
 | RN-006 | El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas. | HU-003, HU-004, HU-032, HU-034 |
 | RN-007 | Cada rol ve solo las secciones que le corresponden; empresa y colaborador ven solo la información de su propia empresa. | HU-001, HU-046, HU-048, HU-053, HU-056, HU-057, HU-065, HU-076 |

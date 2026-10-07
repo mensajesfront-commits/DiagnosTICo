@@ -7,5 +7,6 @@ return [
     'password' => 'La contraseña no es correcta.',
     'throttle' => 'Demasiados intentos. Vuelve a intentarlo en :seconds segundos.',
     // Solo se muestra si el correo y la contraseña son correctos (L1, modal).
+    'eliminada' => 'Su cuenta fue eliminada. Puede recuperarla hasta el :fecha escribiendo a Captter; después se borra para siempre.',
     'desactivada' => 'Su cuenta ha sido desactivada. Diríjase a Captter para saber más detalles.',
 ];

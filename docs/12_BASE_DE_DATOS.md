@@ -328,6 +328,7 @@ Las carga `ActividadesEconomicasSeeder` (lo llama `SectoresSeeder`). **[INFORMAC
 | `numero_empleados` | varchar(255) | No | `11 a 50` | Rango (E11) |
 | `logo_ruta` | varchar(255) | No | `logos/abc123.png` | Archivo privado; se sirve por `/imagenes/empresa/{id}` |
 | `activa` | boolean | Sí (por defecto `true`) | `true` | Desactivada: nadie de la empresa entra (RN-025) |
+| `deleted_at` | timestamp | No | `2026-10-08 10:00:00` | Eliminada: se puede recuperar 90 días y luego se borra para siempre (DEC-017) |
 | `created_at`, `updated_at` | timestamp | No | | |
 
 ### `users`
@@ -347,6 +348,7 @@ Las carga `ActividadesEconomicasSeeder` (lo llama `SectoresSeeder`). **[INFORMAC
 | `foto_ruta` | varchar(255) | No | `fotos/abc123.jpg` | Archivo privado; se sirve por `/imagenes/usuario/{id}` |
 | `password` | varchar(255) | Sí | `$2y$12$…` | Cifrada con bcrypt; nunca en texto |
 | `activo` | boolean | Sí (por defecto `true`) | `true` | Desactivada: no entra (RN-004) |
+| `deleted_at` | timestamp | No | `2026-10-08 10:00:00` | Eliminada: no entra; se recupera en 90 días o se borra para siempre (DEC-017) |
 | `ultimo_acceso_en` | timestamp | No | `2026-10-06 15:24:00` | Se guarda al iniciar sesión |
 | `contrasena_actualizada_en` | timestamp | No | `2026-08-01 10:00:00` | "Última actualización" en Mi perfil |
 | `terminos_aceptados_en` | timestamp | No | `2026-10-06 15:20:11` | Constancia de la aceptación al registrarse |

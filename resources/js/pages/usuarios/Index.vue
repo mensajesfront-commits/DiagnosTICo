@@ -19,6 +19,7 @@
  */
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 import Boton from '@/components/base/Boton.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
@@ -65,6 +66,7 @@ const estados: Record<EstadoCuenta, string> = {
     activa: 'Activa',
     desactivada: 'Desactivada',
     invitacion: 'Invitación pendiente',
+    eliminada: 'Eliminadas (se pueden recuperar)',
 };
 
 const filtradas = computed(() =>
@@ -72,7 +74,10 @@ const filtradas = computed(() =>
         (c) =>
             coincide(c, busqueda.value) &&
             (filtroRol.value === '' || c.rol === filtroRol.value) &&
-            (filtroEstado.value === '' || c.estado === filtroEstado.value),
+            // Las eliminadas solo se ven con su filtro (DEC-017).
+            (filtroEstado.value === ''
+                ? c.estado !== 'eliminada'
+                : c.estado === filtroEstado.value),
     ),
 );
 
@@ -117,6 +122,21 @@ function reactivar(cuenta: Cuenta): void {
         rutas.usuarios.reactivar(cuenta.id),
         {},
         { preserveScroll: true },
+    );
+}
+
+function recuperar(cuenta: Cuenta): void {
+    router.post(
+        rutas.usuarios.recuperar(cuenta.id),
+        {},
+        {
+            preserveScroll: true,
+            onError: (errores) => {
+                if (errores.recuperar) {
+                    toast.error(errores.recuperar);
+                }
+            },
+        },
     );
 }
 
@@ -263,11 +283,27 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                 >
                                     ✉ Invitación pendiente
                                 </Etiqueta>
+                                <Etiqueta
+                                    v-else-if="cuenta.estado === 'eliminada'"
+                                    tono="aviso"
+                                >
+                                    ✕ Eliminada
+                                </Etiqueta>
                                 <Etiqueta v-else>○ Desactivada</Etiqueta>
                             </td>
                             <td class="px-5 py-3 whitespace-nowrap">
-                                <template
+                                <span
                                     v-if="
+                                        cuenta.estado === 'eliminada' &&
+                                        cuenta.se_borra_el
+                                    "
+                                    class="text-aviso"
+                                >
+                                    Se borra el
+                                    {{ diaYMes(new Date(cuenta.se_borra_el)) }}
+                                </span>
+                                <template
+                                    v-else-if="
                                         cuenta.estado === 'invitacion' &&
                                         cuenta.invitacion_enviada_en
                                     "
@@ -292,6 +328,14 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                         Mi perfil
                                     </Link>
                                 </template>
+                                <button
+                                    v-else-if="cuenta.estado === 'eliminada'"
+                                    type="button"
+                                    :class="enlace"
+                                    @click="recuperar(cuenta)"
+                                >
+                                    Recuperar
+                                </button>
                                 <span
                                     v-else-if="cuenta.estado === 'invitacion'"
                                     class="inline-flex flex-wrap items-center gap-x-2"

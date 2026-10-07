@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
- * L1 · Aviso de cuenta desactivada (RN-004, RN-025).
+ * L1 · Aviso de cuenta desactivada (RN-004, RN-025) o eliminada hace menos
+ * de 90 días (DEC-017; título "Cuenta eliminada").
  *
  * Se abre cuando el servidor devuelve el error `cuenta_desactivada`: al
  * entrar con el correo y la contraseña correctos de una cuenta (o empresa)
@@ -14,13 +15,15 @@ import { CircleSlash } from '@lucide/vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
 
-defineProps<{ mensaje: string }>();
+withDefaults(defineProps<{ mensaje: string; titulo?: string }>(), {
+    titulo: 'Cuenta desactivada',
+});
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 </script>
 
 <template>
-    <Modal v-model:abierto="abierto" titulo="Cuenta desactivada" ancho="sm">
+    <Modal v-model:abierto="abierto" :titulo="titulo" ancho="sm">
         <div class="flex flex-col items-center gap-4 text-center">
             <span
                 class="grid size-12 place-items-center rounded-full bg-aviso-suave text-aviso"

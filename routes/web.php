@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('usuarios/{usuario}/desactivar', [UsuariosController::class, 'desactivar'])->name('usuarios.desactivar');
         Route::post('usuarios/{usuario}/reactivar', [UsuariosController::class, 'reactivar'])->name('usuarios.reactivar');
         Route::delete('usuarios/{usuario}', [UsuariosController::class, 'eliminar'])->name('usuarios.eliminar');
+        Route::post('usuarios/{usuario}/recuperar', [UsuariosController::class, 'recuperar'])->withTrashed()->name('usuarios.recuperar');
         Route::put('usuarios/{usuario}/rol', [UsuariosController::class, 'cambiarRol'])->name('usuarios.cambiar-rol');
         Route::post('usuarios/{usuario}/ver-como', [UsuariosController::class, 'verComo'])->name('usuarios.ver-como');
 

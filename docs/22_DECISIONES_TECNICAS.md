@@ -164,13 +164,16 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 - **Por qué:** lo pidió el equipo (8 de octubre de 2026). Escribir evita buscar en listas largas (México tiene más de 9.000 localidades). Las listas públicas no traen todos los municipios, y por eso la ciudad queda libre.
 - **Pendiente:** España y Guinea Ecuatorial quedan por fuera (respuesta del equipo: solo Hispanoamérica).
 
-### DEC-017 — El Administrador puede eliminar cuentas
+### DEC-017 — Eliminar cuentas con 90 días para recuperarlas
 
 - **Decisión:**
   - En Usuarios y roles (A5), "Desactivar / Eliminar" abre un modal con las dos opciones. Desactivar sigue igual (RN-004).
-  - **Eliminar** borra la cuenta para siempre: sus sesiones, sus enlaces de contraseña, su rol y su foto. Para confirmar hay que **escribir a mano el correo exacto** de la cuenta; el servidor lo vuelve a comparar.
-  - Si es la **cuenta principal** de una empresa, se eliminan también la empresa (con su logo) y todos sus colaboradores.
+  - **Eliminar** pide **escribir a mano el correo exacto** de la cuenta; el servidor lo vuelve a comparar.
+  - La cuenta eliminada **sale de la vista** y nadie puede entrar con ella, pero **sigue en la base de datos 90 días** (`deleted_at`). En ese tiempo el Administrador la recupera desde el filtro Estado «Eliminadas» → "Recuperar". Si la persona intenta entrar con la contraseña correcta, ve hasta qué fecha puede pedir que la recuperen.
+  - Pasados los 90 días, la tarea diaria `cuentas:purgar` (03:10) la **borra para siempre**: la fila, su rol, sus sesiones, su foto y el logo de la empresa.
+  - Si es la **cuenta principal** de una empresa, se eliminan también la empresa y sus colaboradores, y se recuperan juntos. Un colaborador eliminado con su empresa no se recupera solo.
   - No se puede eliminar la propia cuenta ni el **último Administrador**.
   - En el log queda una constancia con los id (cuenta, empresa y quién la eliminó), sin datos personales.
-- **Por qué:** lo pidió el equipo (8 de octubre de 2026), para limpiar cuentas y para atender solicitudes de borrado de datos (Ley 1581 de 2012). Escribir el correo evita eliminar por error.
-- **Pendiente:** cuando existan mediciones y resultados, decidir si se eliminan con la empresa o se conservan anonimizados para las estadísticas.
+- **Por qué:** lo pidió el equipo (8 de octubre de 2026): limpiar cuentas y atender solicitudes de borrado de datos (Ley 1581 de 2012), dando 90 días por si la empresa se arrepiente.
+- **Ojo:** mientras dure la espera, el correo sigue ocupado: no se puede registrar ni invitar otra cuenta con él.
+- **Pendiente:** cuando existan mediciones y resultados, decidir si se borran con la empresa o se conservan anonimizados para las estadísticas. La cantidad de días se cambia con `DIAS_PARA_RECUPERAR_CUENTA`.

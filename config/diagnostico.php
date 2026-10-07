@@ -11,4 +11,12 @@ return [
         'password' => env('ADMIN_PASSWORD'),
     ],
 
+    /*
+    | Días que una cuenta eliminada se puede recuperar antes de que la tarea
+    | diaria `cuentas:purgar` la borre para siempre (DEC-017).
+    */
+    'eliminacion' => [
+        'dias' => (int) env('DIAS_PARA_RECUPERAR_CUENTA', 90),
+    ],
+
 ];

@@ -3,7 +3,12 @@
  * Contrato documentado en docs/14_FRONTEND.md.
  */
 
-export type EstadoCuenta = 'activa' | 'desactivada' | 'invitacion';
+/** `eliminada`: se puede recuperar durante 90 días (DEC-017). */
+export type EstadoCuenta =
+    | 'activa'
+    | 'desactivada'
+    | 'invitacion'
+    | 'eliminada';
 
 export type Cuenta = {
     id: number;
@@ -24,6 +29,10 @@ export type Cuenta = {
     invitacion_enviada_en: string | null;
     /** La cuenta con la que se entró: no se desactiva ni cambia su rol. */
     es_tuya: boolean;
+    /** Cuándo se eliminó; null si no está eliminada. */
+    eliminada_en: string | null;
+    /** Último día para recuperarla; después se borra para siempre. */
+    se_borra_el: string | null;
 };
 
 export type PermisoTexto = { nombre: string; texto: string };

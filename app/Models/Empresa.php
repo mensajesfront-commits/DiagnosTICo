@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
@@ -22,12 +23,15 @@ use Illuminate\Support\Carbon;
  * @property string|null $numero_empleados
  * @property string|null $logo_ruta
  * @property bool $activa
+ * @property Carbon|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
 #[Fillable(['nombre', 'descripcion', 'sector_id', 'actividad_economica_id', 'ciudad', 'departamento', 'pais', 'telefono', 'sitio_web', 'numero_empleados', 'activa'])]
 class Empresa extends Model
 {
+    use SoftDeletes;
+
     protected function casts(): array
     {
         return ['activa' => 'boolean'];
