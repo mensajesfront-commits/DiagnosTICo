@@ -225,13 +225,13 @@ Ruta: `GET /mi-perfil` (ya existe, `PerfilController`). Una sola pantalla para t
 |---|---|---|
 | `usuario` | objeto | `name`, `email`, `cargo`, `telefono`, `pais`, `departamento`, `ciudad`, `zona_horaria`, `idioma`, `avisos` (clave → sí/no), `foto_url`, `ultimo_acceso_en`, `creado_en`, `contrasena_actualizada_en` |
 | `rol` | `string \| null` | Se muestra bloqueado en A6. |
-| `empresa` | objeto o `null` | `nombre`, `sector`, `pais`, `departamento`, `ciudad`, `sitio_web`, `numero_empleados` |
+| `empresa` | objeto o `null` | `nombre`, `sector`, `actividad_economica_id` (subsector), `descripcion`, `pais`, `departamento`, `ciudad`, `sitio_web`, `numero_empleados` |
 | `editaEmpresa` | `boolean` | Solo la cuenta principal (rol Empresa) cambia los datos de la empresa (RN-025). |
-| `opciones` | objeto | `paises` (como en L2), `zonas`, `idiomas`, `empleados` y `avisos` (clave → texto), de `app/Support/OpcionesPerfil.php` |
+| `opciones` | objeto | `actividades` (las CIIU del sector de la empresa: `{ id, codigo, nombre }[]`, vacío en A6), `paises` (como en L2), `zonas`, `idiomas`, `empleados` y `avisos` (clave → texto), de `app/Support/OpcionesPerfil.php` |
 
 Envía:
 
-- `PATCH /mi-perfil`: los datos de arriba; `empresa{…}` solo si `editaEmpresa`.
+- `PATCH /mi-perfil`: los datos de arriba; `empresa{…}` solo si `editaEmpresa`. La actividad debe ser del sector de la empresa (obligatoria si el sector tiene actividades) y la descripción es obligatoria, de máximo 300 caracteres (DEC-015).
 - `PUT /mi-perfil/contrasena`: `current_password`, `password`, `password_confirmation`. En A6 va en línea; en E11, en un modal.
 - `POST /mi-perfil/foto`: `foto` (imagen de hasta 2 MB). La cuenta principal de una empresa cambia el **logo** de la empresa; las demás cuentas, su **foto**. Las imágenes se sirven por `/imagenes/{usuario|empresa}/{id}`, sin publicar la carpeta de archivos.
 

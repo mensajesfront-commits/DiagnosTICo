@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Perfil\ActualizarPerfilRequest;
 use App\Http\Requests\Perfil\CambiarContrasenaRequest;
+use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Support\OpcionesPerfil;
@@ -48,6 +49,8 @@ class PerfilController extends Controller
             'empresa' => $empresa ? [
                 'nombre' => $empresa->nombre,
                 'sector' => $empresa->sector?->nombre,
+                'actividad_economica_id' => $empresa->actividad_economica_id,
+                'descripcion' => $empresa->descripcion,
                 'ciudad' => $empresa->ciudad,
                 'departamento' => $empresa->departamento,
                 'pais' => $empresa->pais,
@@ -60,6 +63,14 @@ class PerfilController extends Controller
                 'zonas' => OpcionesPerfil::ZONAS_HORARIAS,
                 'idiomas' => OpcionesPerfil::IDIOMAS,
                 'empleados' => OpcionesPerfil::RANGOS_EMPLEADOS,
+                // Actividades (CIIU) del sector de la empresa; la actual va
+                // aunque esté inactiva, para que se siga viendo (DEC-015).
+                'actividades' => $empresa === null ? [] : ActividadEconomica::query()
+                    ->where('sector_id', $empresa->sector_id)
+                    ->where(fn ($q) => $q->where('activo', true)->orWhere('id', $empresa->actividad_economica_id))
+                    ->orderBy('codigo')
+                    ->get(['id', 'codigo', 'nombre'])
+                    ->toArray(),
                 'avisos' => array_map(fn (array $aviso) => $aviso[0], OpcionesPerfil::avisosPara($usuario)),
             ],
         ]);
@@ -95,6 +106,8 @@ class PerfilController extends Controller
         if ($request->editaEmpresa() && $usuario->empresa) {
             $usuario->empresa->update([
                 'nombre' => $datos['empresa']['nombre'],
+                'actividad_economica_id' => $datos['empresa']['actividad_economica_id'] ?? null,
+                'descripcion' => $datos['empresa']['descripcion'],
                 'ciudad' => $datos['empresa']['ciudad'],
                 'departamento' => $datos['empresa']['departamento'],
                 'pais' => $datos['empresa']['pais'],

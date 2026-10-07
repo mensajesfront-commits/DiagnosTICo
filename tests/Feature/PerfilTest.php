@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
@@ -82,6 +83,7 @@ it('deja a la cuenta principal cambiar los datos de la empresa, salvo el sector'
         ->patch(route('profile.update'), datosPerfil($usuario, [
             'empresa' => [
                 'nombre' => 'La Esquina Gourmet',
+                'descripcion' => 'Comida casera y domicilios.',
                 'ciudad' => 'Cali',
                 'departamento' => 'Valle del Cauca',
                 'pais' => 'Colombia',
@@ -200,4 +202,29 @@ it('pide que el departamento sea del país elegido', function () {
         ->assertSessionHasNoErrors();
 
     expect($admin->refresh()->departamento)->toBe('Jalisco');
+});
+
+it('la cuenta principal cambia el subsector y la descripción de la empresa', function () {
+    $principal = cuentaDeEmpresa();
+    $empresa = $principal->empresa;
+    $propia = ActividadEconomica::create(['sector_id' => $empresa->sector_id, 'codigo' => '5612', 'nombre' => 'Autoservicio']);
+    $ajena = ActividadEconomica::create(['sector_id' => Sector::factory()->create()->id, 'codigo' => '6910', 'nombre' => 'Jurídicas']);
+
+    $datos = fn (int $actividad) => datosPerfil($principal, ['empresa' => [
+        'nombre' => $empresa->nombre,
+        'actividad_economica_id' => $actividad,
+        'descripcion' => 'Almuerzos del día.',
+        'pais' => 'Colombia',
+        'departamento' => 'Valle del Cauca',
+        'ciudad' => 'Cali',
+    ]]);
+
+    $this->actingAs($principal)->patch(route('profile.update'), $datos($ajena->id))
+        ->assertSessionHasErrors('empresa.actividad_economica_id');
+
+    $this->actingAs($principal)->patch(route('profile.update'), $datos($propia->id))
+        ->assertSessionHasNoErrors();
+
+    expect($empresa->refresh()->actividad_economica_id)->toBe($propia->id)
+        ->and($empresa->descripcion)->toBe('Almuerzos del día.');
 });

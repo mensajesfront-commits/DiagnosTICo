@@ -13,11 +13,13 @@
  * Envía a PATCH /mi-perfil: name, email, cargo, telefono, pais,
  * departamento, ciudad,
  * zona_horaria, idioma, avisos{} y, si edita la empresa, empresa{nombre,
- * pais, departamento, ciudad, sitio_web, numero_empleados}.
+ * actividad_economica_id, descripcion, pais, departamento, ciudad,
+ * sitio_web, numero_empleados}.
  */
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { Lock, LogOut } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
+import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
@@ -53,6 +55,9 @@ type Usuario = {
 type Empresa = {
     nombre: string;
     sector: string | null;
+    /** Subsector: actividad económica CIIU del sector (DEC-015). */
+    actividad_economica_id: number | null;
+    descripcion: string | null;
     ciudad: string;
     departamento: string | null;
     pais: string;
@@ -72,6 +77,8 @@ const props = defineProps<{
         zonas: Record<string, string>;
         idiomas: Record<string, string>;
         empleados: string[];
+        /** Actividades CIIU del sector de la empresa (vacío en A6). */
+        actividades: { id: number; codigo: string; nombre: string }[];
         /** Clave del aviso → texto. */
         avisos: Record<string, string>;
     };
@@ -96,6 +103,9 @@ const datosIniciales = () => ({
     avisos: { ...props.usuario.avisos },
     empresa: {
         nombre: props.empresa?.nombre ?? '',
+        actividad_economica_id: (props.empresa?.actividad_economica_id ??
+            '') as number | '',
+        descripcion: props.empresa?.descripcion ?? '',
         pais: props.empresa?.pais ?? '',
         departamento: props.empresa?.departamento ?? '',
         ciudad: props.empresa?.ciudad ?? '',
@@ -119,7 +129,13 @@ watch(
 function guardar(): void {
     form.transform((datos) => ({
         ...datos,
-        empresa: props.editaEmpresa ? datos.empresa : undefined,
+        empresa: props.editaEmpresa
+            ? {
+                  ...datos.empresa,
+                  actividad_economica_id:
+                      datos.empresa.actividad_economica_id || null,
+              }
+            : undefined,
     })).patch(guardarPerfil().url, { preserveScroll: true });
 }
 
@@ -518,6 +534,75 @@ function cerrarSesion(): void {
                                         aria-hidden="true"
                                     />
                                 </div>
+                            </Campo>
+                            <Campo
+                                :obligatorio="
+                                    editaEmpresa &&
+                                    opciones.actividades.length > 0
+                                "
+                                etiqueta="Actividad económica (subsector)"
+                                para="empresa-actividad"
+                                ayuda="Código CIIU con el que aparece tu empresa en el RUT."
+                                :error="
+                                    form.errors[
+                                        'empresa.actividad_economica_id'
+                                    ]
+                                "
+                                class="sm:col-span-2"
+                            >
+                                <Seleccion
+                                    id="empresa-actividad"
+                                    v-model="
+                                        form.empresa.actividad_economica_id
+                                    "
+                                    :required="opciones.actividades.length > 0"
+                                    :disabled="
+                                        !editaEmpresa ||
+                                        opciones.actividades.length === 0
+                                    "
+                                    :invalida="
+                                        !!form.errors[
+                                            'empresa.actividad_economica_id'
+                                        ]
+                                    "
+                                >
+                                    <option value="" disabled>
+                                        {{
+                                            opciones.actividades.length === 0
+                                                ? 'Tu sector no tiene actividades para elegir'
+                                                : 'Selecciona la actividad'
+                                        }}
+                                    </option>
+                                    <option
+                                        v-for="actividad in opciones.actividades"
+                                        :key="actividad.id"
+                                        :value="actividad.id"
+                                    >
+                                        {{ actividad.codigo }} ·
+                                        {{ actividad.nombre }}
+                                    </option>
+                                </Seleccion>
+                            </Campo>
+                            <Campo
+                                :obligatorio="editaEmpresa"
+                                etiqueta="Descripción corta"
+                                para="empresa-descripcion"
+                                ayuda="Qué hace tu empresa y a quién le vende."
+                                :contador="`${form.empresa.descripcion.length}/300`"
+                                :error="form.errors['empresa.descripcion']"
+                                class="sm:col-span-2"
+                            >
+                                <AreaTexto
+                                    id="empresa-descripcion"
+                                    v-model="form.empresa.descripcion"
+                                    required
+                                    rows="3"
+                                    maxlength="300"
+                                    :disabled="!editaEmpresa"
+                                    :invalida="
+                                        !!form.errors['empresa.descripcion']
+                                    "
+                                />
                             </Campo>
                             <SelectorUbicacion
                                 v-model:pais="form.empresa.pais"
