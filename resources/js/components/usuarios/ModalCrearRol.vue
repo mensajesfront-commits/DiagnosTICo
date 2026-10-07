@@ -99,6 +99,7 @@ function crear(): void {
         >
             <div class="grid items-start gap-4 sm:grid-cols-[1fr_1.4fr_auto]">
                 <Campo
+                    obligatorio
                     etiqueta="Nombre del rol"
                     para="rol-nombre"
                     :error="form.errors.nombre"

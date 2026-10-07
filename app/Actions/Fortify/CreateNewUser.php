@@ -53,7 +53,7 @@ class CreateNewUser implements CreatesNewUsers
             'pais' => ['required', 'string', Rule::in(Ubicaciones::nombresDePaises())],
             'departamento' => ['required', 'string', new DepartamentoDelPais($input['pais'] ?? null)],
             // La ciudad puede no estar en la lista: se acepta escrita (DEC-016).
-            'ciudad' => ['required', 'string', 'max:255'],
+            'ciudad' => ['required', 'string', 'min:2', 'max:255'],
             ...$this->profileRules(),
             'cargo' => ['required', 'string', 'max:255'],
             'telefono' => ['nullable', 'string', 'max:30'],

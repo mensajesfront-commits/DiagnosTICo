@@ -339,6 +339,7 @@ function cerrarSesion(): void {
                         </h2>
                         <div class="grid gap-4 sm:grid-cols-2">
                             <Campo
+                                obligatorio
                                 :etiqueta="
                                     esEmpresa
                                         ? 'Nombre de usuario'
@@ -367,6 +368,7 @@ function cerrarSesion(): void {
                                 />
                             </Campo>
                             <Campo
+                                obligatorio
                                 etiqueta="Correo"
                                 para="perfil-correo"
                                 :error="form.errors.email"
@@ -486,6 +488,7 @@ function cerrarSesion(): void {
                         </p>
                         <div class="grid gap-4 sm:grid-cols-2">
                             <Campo
+                                obligatorio
                                 etiqueta="Nombre de la empresa"
                                 para="empresa-nombre"
                                 :error="form.errors['empresa.nombre']"

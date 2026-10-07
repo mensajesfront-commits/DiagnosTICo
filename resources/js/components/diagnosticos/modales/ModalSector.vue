@@ -105,6 +105,7 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
             @submit.prevent="guardar"
         >
             <Campo
+                obligatorio
                 etiqueta="Nombre del sector"
                 para="sector-nombre"
                 :error="form.errors.nombre"

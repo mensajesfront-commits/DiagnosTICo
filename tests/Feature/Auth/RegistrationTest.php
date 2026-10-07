@@ -163,6 +163,9 @@ class RegistrationTest extends TestCase
         $this->post(route('register.store'), $this->datos($sector, ['pais' => 'España']))
             ->assertSessionHasErrors('pais');
 
+        $this->post(route('register.store'), $this->datos($sector, ['ciudad' => 'c']))
+            ->assertSessionHasErrors('ciudad');
+
         $this->post(route('register.store'), $this->datos($sector, [
             'departamento' => 'Antioquia',
             'ciudad' => 'Corregimiento de prueba',

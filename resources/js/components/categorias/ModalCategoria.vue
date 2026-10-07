@@ -70,6 +70,7 @@ const textoBorrador = (b: DiagnosticoBorrador) =>
             @submit.prevent="crear"
         >
             <Campo
+                obligatorio
                 etiqueta="Nombre"
                 para="categoria-nombre"
                 ayuda="No puede repetirse en el catálogo."

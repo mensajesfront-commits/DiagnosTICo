@@ -133,7 +133,7 @@ const ayudaDepartamento = computed(() => {
 
 const ayudaCiudad = computed(() => {
     if (departamento.value !== '') {
-        return 'Escribe para buscarla. Si no aparece, escríbela completa.';
+        return 'Escribe para buscarla. Si no aparece, escríbela completa y elige «Usar…».';
     }
 
     const articulo = ['Provincia', 'Región'].includes(division.value)
@@ -147,6 +147,7 @@ const ayudaCiudad = computed(() => {
 <template>
     <div class="grid gap-4 sm:col-span-2 sm:grid-cols-3">
         <Campo
+            :obligatorio="requerido"
             etiqueta="País"
             :para="`${prefijo}-pais`"
             :opcional="!requerido"
@@ -165,6 +166,7 @@ const ayudaCiudad = computed(() => {
         </Campo>
 
         <Campo
+            :obligatorio="requerido"
             :etiqueta="division"
             :para="`${prefijo}-departamento`"
             :opcional="!requerido"
@@ -184,6 +186,7 @@ const ayudaCiudad = computed(() => {
         </Campo>
 
         <Campo
+            :obligatorio="requerido"
             etiqueta="Ciudad"
             :para="`${prefijo}-ciudad`"
             :opcional="!requerido"

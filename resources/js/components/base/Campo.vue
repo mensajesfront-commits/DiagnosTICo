@@ -4,6 +4,7 @@
  * error, con el estilo del wireframe (etiqueta pequeña encima del control).
  *
  * `opcional` agrega "(opcional)" a la etiqueta, como en L2.
+ * `obligatorio` agrega un asterisco rojo (el control lleva `required`).
  * El slot `accion` va a la derecha de la etiqueta ("¿Olvidaste tu contraseña?").
  */
 defineProps<{
@@ -12,6 +13,7 @@ defineProps<{
     ayuda?: string;
     error?: string;
     opcional?: boolean;
+    obligatorio?: boolean;
     /** Contador a la derecha de la ayuda, por ejemplo "11/40". */
     contador?: string;
 }>();
@@ -22,6 +24,13 @@ defineProps<{
         <div class="flex items-baseline justify-between gap-2">
             <label :for="para" class="text-xs font-medium text-tinta">
                 {{ etiqueta }}
+                <span
+                    v-if="obligatorio"
+                    class="text-aviso"
+                    aria-hidden="true"
+                    title="Obligatorio"
+                    >*</span
+                >
                 <span v-if="opcional" class="font-normal text-tinta-suave">
                     (opcional)
                 </span>

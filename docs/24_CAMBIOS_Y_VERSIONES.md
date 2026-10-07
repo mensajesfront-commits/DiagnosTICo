@@ -35,6 +35,11 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - País → departamento → ciudad en el registro y en Mi perfil, con búsqueda al escribir. Los 18 países de Hispanoamérica; la ciudad se puede escribir si no está en la lista. Nueva columna `departamento`, ruta `GET /ubicaciones/{pais}`, componentes `Combobox` y `SelectorUbicacion`, comando `ubicaciones:generar` (DEC-016).
 
+### Cambiado (formularios)
+
+- Asterisco rojo en los campos obligatorios de todos los formularios.
+- La ciudad escrita a mano solo se guarda eligiendo "Usar «…»"; un texto a medias ya no se acepta.
+
 ### Cambiado (inicio de sesión)
 
 - Cuenta o empresa desactivada: con la contraseña correcta, L1 muestra el modal "Su cuenta ha sido desactivada. Diríjase a Captter para saber más detalles."; con la contraseña equivocada sigue el mensaje genérico (RN-005). También se muestra si la desactivan con la sesión abierta.

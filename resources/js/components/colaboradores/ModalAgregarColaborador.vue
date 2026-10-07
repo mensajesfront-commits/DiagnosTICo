@@ -76,6 +76,7 @@ function crear(): void {
                 Todos los campos son obligatorios.
             </p>
             <Campo
+                obligatorio
                 etiqueta="Nombre"
                 para="colaborador-nombre"
                 :error="form.errors.name"
@@ -90,6 +91,7 @@ function crear(): void {
                 />
             </Campo>
             <Campo
+                obligatorio
                 etiqueta="Correo (será su usuario)"
                 para="colaborador-correo"
                 ayuda="Con este correo iniciará sesión."
@@ -105,6 +107,7 @@ function crear(): void {
                 />
             </Campo>
             <Campo
+                obligatorio
                 etiqueta="Contraseña"
                 para="colaborador-contrasena"
                 ayuda="Te la mostraremos una sola vez al crear la cuenta."

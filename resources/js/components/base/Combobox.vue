@@ -5,8 +5,9 @@
  *
  * - Sin `permitirOtro`, solo vale una opción de la lista: si lo escrito no
  *   coincide, al salir vuelve a la opción anterior.
- * - Con `permitirOtro` (ciudad), lo escrito se acepta tal cual y la lista
- *   ofrece "Usar «…»".
+ * - Con `permitirOtro` (ciudad), la lista ofrece además "Usar «…»" (desde 3
+ *   letras). Lo escrito solo se acepta si se elige esa opción: al salir del
+ *   campo con un texto a medias ("c"), vuelve a lo que estaba elegido.
  *
  * Muestra hasta 50 opciones; con más, pide seguir escribiendo.
  */
@@ -16,6 +17,8 @@ import { filtrarOpciones, opcionExacta } from '@/lib/texto';
 import { cn } from '@/lib/utils';
 
 const MAXIMO = 50;
+/** Letras mínimas para ofrecer "Usar «…»". */
+const MINIMO_OTRO = 3;
 
 const props = withDefaults(
     defineProps<{
@@ -69,7 +72,7 @@ const otro = computed(() => {
 
     return props.permitirOtro &&
         escribiendo.value &&
-        valor !== '' &&
+        valor.length >= MINIMO_OTRO &&
         !opcionExacta(props.opciones, valor)
         ? valor
         : null;
@@ -111,10 +114,9 @@ function confirmar(): void {
 
     if (exacta) {
         elegir(exacta);
-    } else if (props.permitirOtro) {
-        elegir(valor);
     } else {
-        // Lo escrito no es una opción: vuelve a lo que estaba elegido.
+        // Lo escrito no es una opción ni se eligió "Usar «…»": vuelve a lo
+        // que estaba elegido.
         texto.value = modelo.value;
         escribiendo.value = false;
         abierto.value = false;

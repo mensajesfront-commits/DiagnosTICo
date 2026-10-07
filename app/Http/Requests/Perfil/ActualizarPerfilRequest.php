@@ -35,7 +35,7 @@ class ActualizarPerfilRequest extends FormRequest
             'telefono' => ['nullable', 'string', 'max:30'],
             'pais' => ['nullable', 'string', Rule::in(Ubicaciones::nombresDePaises())],
             'departamento' => ['nullable', 'string', new DepartamentoDelPais($this->string('pais')->value())],
-            'ciudad' => ['nullable', 'string', 'max:255'],
+            'ciudad' => ['nullable', 'string', 'min:2', 'max:255'],
             'zona_horaria' => ['required', 'string', Rule::in(array_keys(OpcionesPerfil::ZONAS_HORARIAS))],
             'idioma' => ['required', 'string', Rule::in(array_keys(OpcionesPerfil::IDIOMAS))],
             'avisos' => ['array'],
@@ -50,7 +50,7 @@ class ActualizarPerfilRequest extends FormRequest
                 'empresa.nombre' => ['required', 'string', 'max:255'],
                 'empresa.pais' => ['required', 'string', Rule::in(Ubicaciones::nombresDePaises())],
                 'empresa.departamento' => ['required', 'string', new DepartamentoDelPais($this->string('empresa.pais')->value())],
-                'empresa.ciudad' => ['required', 'string', 'max:255'],
+                'empresa.ciudad' => ['required', 'string', 'min:2', 'max:255'],
                 'empresa.sitio_web' => ['nullable', 'string', 'max:255'],
                 'empresa.numero_empleados' => ['nullable', 'string', Rule::in(OpcionesPerfil::RANGOS_EMPLEADOS)],
             ];

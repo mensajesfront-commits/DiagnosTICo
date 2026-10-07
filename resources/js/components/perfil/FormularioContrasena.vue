@@ -52,12 +52,14 @@ defineExpose({ listo, form, enviar });
     >
         <div class="grid gap-4 sm:grid-cols-2">
             <Campo
+                obligatorio
                 etiqueta="Contraseña actual"
                 para="contrasena-actual"
                 :error="form.errors.current_password"
             >
                 <CampoContrasena
                     id="contrasena-actual"
+                    required
                     v-model="form.current_password"
                     autocomplete="current-password"
                     :invalida="!!form.errors.current_password"
@@ -66,23 +68,27 @@ defineExpose({ listo, form, enviar });
         </div>
         <div class="grid gap-4 sm:grid-cols-2">
             <Campo
+                obligatorio
                 etiqueta="Contraseña nueva"
                 para="contrasena-nueva"
                 :error="form.errors.password"
             >
                 <CampoContrasena
                     id="contrasena-nueva"
+                    required
                     v-model="form.password"
                     autocomplete="new-password"
                     :invalida="!!form.errors.password"
                 />
             </Campo>
             <Campo
+                obligatorio
                 etiqueta="Confirmar contraseña nueva"
                 para="contrasena-confirmacion"
             >
                 <CampoContrasena
                     id="contrasena-confirmacion"
+                    required
                     v-model="form.password_confirmation"
                     autocomplete="new-password"
                 />

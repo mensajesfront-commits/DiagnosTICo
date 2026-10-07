@@ -91,7 +91,7 @@ onBeforeUnmount(() => clearInterval(reloj));
         v-slot="{ errors, processing }"
         class="flex flex-col gap-4"
     >
-        <Campo etiqueta="Correo" para="email" :error="errors.email">
+        <Campo obligatorio etiqueta="Correo" para="email" :error="errors.email">
             <Entrada
                 id="email"
                 type="email"
@@ -104,7 +104,12 @@ onBeforeUnmount(() => clearInterval(reloj));
             />
         </Campo>
 
-        <Campo etiqueta="Contraseña" para="password" :error="errors.password">
+        <Campo
+            obligatorio
+            etiqueta="Contraseña"
+            para="password"
+            :error="errors.password"
+        >
             <template v-if="canResetPassword" #accion>
                 <Link
                     :href="request()"

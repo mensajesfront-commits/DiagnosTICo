@@ -39,7 +39,7 @@ defineOptions({
     layout: {
         title: 'Registra tu empresa',
         description:
-            'Crea tu cuenta para responder el diagnóstico de marketing digital. Todos los campos son obligatorios salvo los marcados como (opcional).',
+            'Crea tu cuenta para responder el diagnóstico de marketing digital. Los campos con * son obligatorios.',
         ancho: 'lg',
     },
 });
@@ -221,6 +221,7 @@ const pasos = [
             <h2 class="text-base font-semibold sm:col-span-2">Mi empresa</h2>
 
             <Campo
+                obligatorio
                 etiqueta="Nombre de la empresa"
                 para="empresa_nombre"
                 :error="form.errors.empresa_nombre"
@@ -238,6 +239,7 @@ const pasos = [
             </Campo>
 
             <Campo
+                obligatorio
                 etiqueta="Sector"
                 para="sector_id"
                 :error="form.errors.sector_id"
@@ -266,6 +268,7 @@ const pasos = [
             </Campo>
 
             <Campo
+                :obligatorio="form.sector_id === '' || actividades.length > 0"
                 etiqueta="Actividad económica"
                 para="actividad_economica_id"
                 :ayuda="ayudaActividad"
@@ -297,6 +300,7 @@ const pasos = [
             </Campo>
 
             <Campo
+                obligatorio
                 etiqueta="Descripción corta"
                 para="descripcion"
                 ayuda="Qué hace tu empresa y a quién le vende."
@@ -341,6 +345,7 @@ const pasos = [
                 </h2>
 
                 <Campo
+                    obligatorio
                     etiqueta="Nombre del usuario"
                     para="name"
                     :error="form.errors.name"
@@ -356,6 +361,7 @@ const pasos = [
                 </Campo>
 
                 <Campo
+                    obligatorio
                     etiqueta="Cargo"
                     para="cargo"
                     ayuda="Así sabemos quién registra la empresa."
@@ -373,6 +379,7 @@ const pasos = [
                 </Campo>
 
                 <Campo
+                    obligatorio
                     etiqueta="Correo"
                     para="email"
                     :error="form.errors.email"
@@ -404,6 +411,7 @@ const pasos = [
                 </Campo>
 
                 <Campo
+                    obligatorio
                     etiqueta="Contraseña"
                     para="password"
                     :error="form.errors.password"
@@ -419,6 +427,7 @@ const pasos = [
                 </Campo>
 
                 <Campo
+                    obligatorio
                     etiqueta="Confirmar contraseña"
                     para="password_confirmation"
                     :error="form.errors.password_confirmation"

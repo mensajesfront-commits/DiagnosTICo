@@ -132,6 +132,7 @@ function crear(): void {
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <Campo
+                        obligatorio
                         etiqueta="Nombre del diagnóstico"
                         para="nombre"
                         ayuda="Máximo 60 caracteres. Puedes cambiarlo después."
@@ -148,6 +149,7 @@ function crear(): void {
                     </Campo>
 
                     <Campo
+                        obligatorio
                         etiqueta="Sector"
                         para="sector"
                         :error="form.errors.sector_id"
@@ -261,6 +263,7 @@ function crear(): void {
                         class="ml-6 flex flex-col gap-3"
                     >
                         <Campo
+                            obligatorio
                             etiqueta="Copiar de"
                             para="copiar-de"
                             ayuda="Agrupados por sector. Solo aparecen diagnósticos publicados."

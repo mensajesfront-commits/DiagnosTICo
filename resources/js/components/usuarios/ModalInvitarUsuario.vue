@@ -71,6 +71,7 @@ function invitar(): void {
             </p>
             <div class="grid gap-4 sm:grid-cols-2">
                 <Campo
+                    obligatorio
                     etiqueta="Nombre"
                     para="invitar-nombre"
                     :error="form.errors.name"
@@ -83,6 +84,7 @@ function invitar(): void {
                     />
                 </Campo>
                 <Campo
+                    obligatorio
                     etiqueta="Correo"
                     para="invitar-correo"
                     :error="form.errors.email"

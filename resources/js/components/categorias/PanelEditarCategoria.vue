@@ -57,6 +57,7 @@ function guardar(): void {
         </h2>
 
         <Campo
+            obligatorio
             etiqueta="Nombre"
             para="editar-nombre"
             ayuda="No puede repetirse en el catálogo."

@@ -74,6 +74,7 @@ function guardar(): void {
             @submit.prevent="guardar"
         >
             <Campo
+                obligatorio
                 etiqueta="Contraseña nueva"
                 para="colaborador-contrasena-nueva"
                 ayuda="La contraseña anterior deja de funcionar."
