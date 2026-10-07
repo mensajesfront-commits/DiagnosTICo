@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\InvitacionCuenta;
 use App\Notifications\RolCambiado;
 use Database\Seeders\RolesYPermisosSeeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Role;
@@ -253,4 +254,59 @@ it('elimina un rol creado solo si no tiene cuentas', function () {
     expect(Role::where('name', 'Temporal')->exists())->toBeFalse();
 
     $this->delete(route('roles.destroy', Role::findByName('Administrador')))->assertForbidden();
+});
+
+// --- Eliminar (DEC-017) ---------------------------------------------------------
+
+it('elimina una cuenta solo con el correo exacto', function () {
+    $diego = User::factory()->create(['email' => 'diego@ejemplo.co']);
+
+    $this->actingAs($this->admin)
+        ->delete(route('usuarios.eliminar', $diego), ['confirmacion' => 'Diego@ejemplo.co'])
+        ->assertSessionHasErrors(['confirmacion' => 'El correo no coincide. Escríbelo exactamente como aparece.']);
+    expect(User::find($diego->id))->not->toBeNull();
+
+    $this->actingAs($this->admin)
+        ->delete(route('usuarios.eliminar', $diego), ['confirmacion' => ' diego@ejemplo.co '])
+        ->assertSessionHasNoErrors();
+    expect(User::find($diego->id))->toBeNull();
+});
+
+it('al eliminar la cuenta principal elimina la empresa y sus colaboradores', function () {
+    $laura = cuentaPrincipal();
+    $andres = User::factory()->create(['empresa_id' => $laura->empresa_id])->assignRole('Colaborador');
+    $empresaId = $laura->empresa_id;
+
+    $this->actingAs($this->admin)
+        ->delete(route('usuarios.eliminar', $laura), ['confirmacion' => $laura->email])
+        ->assertSessionHasNoErrors();
+
+    expect(User::find($laura->id))->toBeNull()
+        ->and(User::find($andres->id))->toBeNull()
+        ->and(Empresa::find($empresaId))->toBeNull()
+        ->and(DB::table('model_has_roles')->where('model_id', $andres->id)->exists())->toBeFalse();
+});
+
+it('no elimina la propia cuenta ni el último Administrador', function () {
+    $this->actingAs($this->admin)
+        ->delete(route('usuarios.eliminar', $this->admin), ['confirmacion' => $this->admin->email])
+        ->assertForbidden();
+
+    // Otra cuenta con usuarios.gestionar (rol creado) intenta eliminar al único Administrador.
+    $rol = Role::create(['name' => 'Coordinador', 'activo' => true, 'del_sistema' => false]);
+    $rol->givePermissionTo(['usuarios.ver', 'usuarios.gestionar']);
+    $coordinador = User::factory()->create()->assignRole($rol);
+
+    $this->actingAs($coordinador)
+        ->delete(route('usuarios.eliminar', $this->admin), ['confirmacion' => $this->admin->email])
+        ->assertSessionHasErrors('confirmacion');
+    expect(User::find($this->admin->id))->not->toBeNull();
+});
+
+it('una cuenta de empresa no puede eliminar cuentas', function () {
+    $otra = User::factory()->create();
+
+    $this->actingAs(cuentaPrincipal())
+        ->delete(route('usuarios.eliminar', $otra), ['confirmacion' => $otra->email])
+        ->assertForbidden();
 });

@@ -93,10 +93,10 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 
 - Al registrarse, la empresa acepta los términos y la política de tratamiento de datos, y se guarda cuándo (`users.terminos_aceptados_en`).
 - La foto y el logo se guardan en una carpeta privada y solo los ve la misma cuenta, su empresa o el Administrador.
-- Las cuentas se desactivan, no se borran (RN-004).
+- Las cuentas se desactivan (RN-004) y, si hace falta, el Administrador las elimina con sus datos, confirmando con el correo exacto (DEC-017). Sirve para atender una solicitud de borrado (Ley 1581 de 2012, de protección de datos personales).
 - **[INFORMACIÓN PENDIENTE]**:
   - el texto y la URL de los términos y de la política de datos;
-  - cómo se atiende una solicitud de borrado de datos. En Colombia aplica la Ley 1581 de 2012, de protección de datos personales.
+  - el procedimiento formal de NuevasTIC para recibir y responder una solicitud de borrado (plazos, quién la aprueba, si hay datos que deban conservarse por ley).
 
 ### RNF-012 · Accesibilidad
 

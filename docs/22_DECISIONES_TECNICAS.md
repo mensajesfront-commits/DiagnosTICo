@@ -163,3 +163,14 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - Los datos vienen de countries-states-cities-database (licencia ODbL), en `resources/ubicaciones/`. Se cargan por país desde `GET /ubicaciones/{pais}`, sin guardarlos en la base de datos.
 - **Por qué:** lo pidió el equipo (8 de octubre de 2026). Escribir evita buscar en listas largas (México tiene más de 9.000 localidades). Las listas públicas no traen todos los municipios, y por eso la ciudad queda libre.
 - **Pendiente:** España y Guinea Ecuatorial quedan por fuera (respuesta del equipo: solo Hispanoamérica).
+
+### DEC-017 — El Administrador puede eliminar cuentas
+
+- **Decisión:**
+  - En Usuarios y roles (A5), "Desactivar / Eliminar" abre un modal con las dos opciones. Desactivar sigue igual (RN-004).
+  - **Eliminar** borra la cuenta para siempre: sus sesiones, sus enlaces de contraseña, su rol y su foto. Para confirmar hay que **escribir a mano el correo exacto** de la cuenta; el servidor lo vuelve a comparar.
+  - Si es la **cuenta principal** de una empresa, se eliminan también la empresa (con su logo) y todos sus colaboradores.
+  - No se puede eliminar la propia cuenta ni el **último Administrador**.
+  - En el log queda una constancia con los id (cuenta, empresa y quién la eliminó), sin datos personales.
+- **Por qué:** lo pidió el equipo (8 de octubre de 2026), para limpiar cuentas y para atender solicitudes de borrado de datos (Ley 1581 de 2012). Escribir el correo evita eliminar por error.
+- **Pendiente:** cuando existan mediciones y resultados, decidir si se eliminan con la empresa o se conservan anonimizados para las estadísticas.

@@ -206,7 +206,7 @@ Modales (todos en `components/usuarios/`):
 | Pantalla | Componente | Envía |
 |---|---|---|
 | Invitar usuario | `ModalInvitarUsuario` | `POST /usuarios/invitar`: `name`, `email`, `rol_id`, `mensaje` |
-| A5.3b | `ModalDesactivarCuenta` | `POST /usuarios/{id}/desactivar` |
+| A5.3b | `ModalDesactivarEliminar` | Paso 1: elegir. Desactivar: `POST /usuarios/{id}/desactivar`. Eliminar: `DELETE /usuarios/{id}` con `confirmacion` (el correo exacto; no se puede pegar) |
 | A5.5 (desde una cuenta) | `ModalCambiarRol` | `PUT /usuarios/{id}/rol`: `rol_id`, `avisar` |
 | A5.5 (desde un rol) | `ModalAsignarRol` | `POST /roles/{id}/asignar`: `cuenta_id`, `avisar` |
 | A5.2 | `ModalCrearRol` | `POST /roles`: `nombre`, `descripcion`, `activo`, `permisos[]`, `cuentas[]` |

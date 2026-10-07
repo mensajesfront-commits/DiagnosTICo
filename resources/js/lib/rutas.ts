@@ -48,6 +48,7 @@ export const rutas = {
         reenviarInvitacion: (id: number) => `/usuarios/${id}/invitacion`,
         desactivar: (id: number) => `/usuarios/${id}/desactivar`,
         reactivar: (id: number) => `/usuarios/${id}/reactivar`,
+        eliminar: (id: number) => `/usuarios/${id}`,
         cambiarRol: (id: number) => `/usuarios/${id}/rol`,
         verComo: (id: number) => `/usuarios/${id}/ver-como`,
     },

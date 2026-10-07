@@ -10,7 +10,9 @@ use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -100,6 +102,68 @@ class UsuariosController extends Controller
         });
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Cuenta de {$usuario->name} desactivada."]);
+
+        return back();
+    }
+
+    /**
+     * Eliminar una cuenta para siempre (DEC-017). Pide escribir el correo
+     * exacto de la cuenta. Si es la cuenta principal de una empresa, se
+     * eliminan también la empresa y sus colaboradores. No se elimina la
+     * propia cuenta ni el último Administrador.
+     */
+    public function eliminar(User $usuario, Request $request): RedirectResponse
+    {
+        $this->noSobreLaPropia($usuario, $request);
+
+        $request->validate(['confirmacion' => ['required', 'string']], [
+            'confirmacion.required' => 'Escribe el correo de la cuenta para confirmar.',
+        ]);
+
+        if (trim($request->string('confirmacion')->value()) !== $usuario->email) {
+            throw ValidationException::withMessages([
+                'confirmacion' => 'El correo no coincide. Escríbelo exactamente como aparece.',
+            ]);
+        }
+
+        if ($usuario->hasRole('Administrador') && User::role('Administrador')->count() <= 1) {
+            throw ValidationException::withMessages([
+                'confirmacion' => 'Es el único Administrador: asigna ese rol a otra cuenta antes de eliminarla.',
+            ]);
+        }
+
+        $empresa = $usuario->esPrincipal() ? $usuario->empresa : null;
+        /** @var list<User> $cuentas */
+        $cuentas = $empresa !== null ? $empresa->usuarios()->get()->all() : [$usuario];
+        $archivos = array_values(array_filter([
+            ...array_map(fn (User $u) => $u->foto_ruta, $cuentas),
+            $empresa?->logo_ruta,
+        ]));
+
+        DB::transaction(function () use ($cuentas, $empresa): void {
+            foreach ($cuentas as $cuenta) {
+                DB::table('sessions')->where('user_id', $cuenta->id)->delete();
+                DB::table('password_reset_tokens')->where('email', $cuenta->email)->delete();
+                $cuenta->delete();
+            }
+
+            $empresa?->delete();
+        });
+
+        Storage::disk('local')->delete($archivos);
+
+        // Constancia sin datos personales: quién eliminó qué (id).
+        Log::info('Cuenta eliminada', [
+            'cuenta_id' => $usuario->id,
+            'empresa_id' => $empresa?->id,
+            'cuentas_eliminadas' => count($cuentas),
+            'por' => $request->user()?->id,
+        ]);
+
+        $mensaje = $empresa !== null
+            ? "Se eliminaron la cuenta de {$usuario->name}, la empresa {$empresa->nombre} y sus colaboradores."
+            : "Cuenta de {$usuario->name} eliminada.";
+        Inertia::flash('toast', ['type' => 'success', 'message' => $mensaje]);
 
         return back();
     }

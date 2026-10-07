@@ -102,6 +102,7 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | POST | `/usuarios/{id}/invitacion` | `usuarios.gestionar` | Reenvía la invitación | — |
 | POST | `/usuarios/{id}/desactivar` | `usuarios.gestionar` | A5.3b (RN-004). No sobre la propia cuenta. Si es la cuenta principal, la empresa queda sin acceso | — |
 | POST | `/usuarios/{id}/reactivar` | `usuarios.gestionar` | Reactiva | — |
+| DELETE | `/usuarios/{id}` | `usuarios.gestionar` | Elimina para siempre (DEC-017). Pide `confirmacion` = correo exacto; con la cuenta principal elimina la empresa y sus colaboradores; nunca la propia (403) ni el último Administrador (error en `confirmacion`). Deja en el log solo los id. | — |
 | PUT | `/usuarios/{id}/rol` | `usuarios.gestionar` | A5.5: reemplaza el rol (RN-027). No sobre la propia cuenta; el rol debe estar activo | `rol_id`, `avisar` |
 | POST | `/usuarios/{id}/ver-como` | `usuarios.gestionar` | A5.4: por ahora solo avisa que llega con la pantalla A5.4 (semana 6). No sobre Administradores (403) | — |
 | POST | `/roles` | `usuarios.gestionar` | A5.2: crea el rol | `nombre` (único, máx. 40), `descripcion`, `activo`, `permisos[]`, `cuentas[]` |

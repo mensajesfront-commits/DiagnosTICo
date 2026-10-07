@@ -8,11 +8,13 @@
  *
  * Acciones por fila:
  * - La propia: "Tu cuenta · Mi perfil" (no se desactiva ni cambia de rol).
- * - Invitación pendiente: "Reenviar invitación".
+ * - Invitación pendiente: "Reenviar invitación · Eliminar".
  * - "Ver como": solo en cuentas que no son de Administrador (respuesta del
  *   equipo, 6 oct; A5.4).
  * - "Cambiar rol": no en colaboradores (los maneja su empresa, RN-025).
- * - "Desactivar" / "Reactivar" (A5.3b, RN-004).
+ * - "Desactivar / Eliminar" (A5.3b, DEC-017): un modal para elegir;
+ *   eliminar pide escribir el correo exacto. Las desactivadas tienen
+ *   "Reactivar · Eliminar" y las invitaciones "Reenviar · Eliminar".
  * - No existe "restablecer contraseña" (RN-006).
  */
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
@@ -23,7 +25,7 @@ import Etiqueta from '@/components/base/Etiqueta.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import EncabezadoUsuarios from '@/components/usuarios/EncabezadoUsuarios.vue';
 import ModalCambiarRol from '@/components/usuarios/ModalCambiarRol.vue';
-import ModalDesactivarCuenta from '@/components/usuarios/ModalDesactivarCuenta.vue';
+import ModalDesactivarEliminar from '@/components/usuarios/ModalDesactivarEliminar.vue';
 import ModalInvitarUsuario from '@/components/usuarios/ModalInvitarUsuario.vue';
 import { diaYMes, ultimoAcceso } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
@@ -94,8 +96,14 @@ const modalDesactivar = ref(false);
 const modalCambiarRol = ref(false);
 const elegida = ref<Cuenta | null>(null);
 
-function desactivar(cuenta: Cuenta): void {
+const inicioModal = ref<'elegir' | 'eliminar'>('elegir');
+
+function desactivarOEliminar(
+    cuenta: Cuenta,
+    inicio: 'elegir' | 'eliminar' = 'elegir',
+): void {
     elegida.value = cuenta;
+    inicioModal.value = inicio;
     modalDesactivar.value = true;
 }
 
@@ -125,6 +133,7 @@ function verComo(cuenta: Cuenta): void {
 }
 
 const enlace = 'text-marca hover:underline';
+const enlaceEliminar = 'text-aviso hover:underline';
 </script>
 
 <template>
@@ -283,14 +292,31 @@ const enlace = 'text-marca hover:underline';
                                         Mi perfil
                                     </Link>
                                 </template>
-                                <button
+                                <span
                                     v-else-if="cuenta.estado === 'invitacion'"
-                                    type="button"
-                                    :class="enlace"
-                                    @click="reenviar(cuenta)"
+                                    class="inline-flex flex-wrap items-center gap-x-2"
                                 >
-                                    Reenviar invitación
-                                </button>
+                                    <button
+                                        type="button"
+                                        :class="enlace"
+                                        @click="reenviar(cuenta)"
+                                    >
+                                        Reenviar invitación
+                                    </button>
+                                    <span class="text-tinta-suave">·</span>
+                                    <button
+                                        type="button"
+                                        :class="enlaceEliminar"
+                                        @click="
+                                            desactivarOEliminar(
+                                                cuenta,
+                                                'eliminar',
+                                            )
+                                        "
+                                    >
+                                        Eliminar
+                                    </button>
+                                </span>
                                 <span
                                     v-else
                                     class="inline-flex flex-wrap items-center gap-x-2"
@@ -323,18 +349,32 @@ const enlace = 'text-marca hover:underline';
                                         v-if="cuenta.estado === 'activa'"
                                         type="button"
                                         :class="enlace"
-                                        @click="desactivar(cuenta)"
+                                        @click="desactivarOEliminar(cuenta)"
                                     >
-                                        Desactivar
+                                        Desactivar / Eliminar
                                     </button>
-                                    <button
-                                        v-else
-                                        type="button"
-                                        :class="enlace"
-                                        @click="reactivar(cuenta)"
-                                    >
-                                        Reactivar
-                                    </button>
+                                    <template v-else>
+                                        <button
+                                            type="button"
+                                            :class="enlace"
+                                            @click="reactivar(cuenta)"
+                                        >
+                                            Reactivar
+                                        </button>
+                                        <span class="text-tinta-suave">·</span>
+                                        <button
+                                            type="button"
+                                            :class="enlaceEliminar"
+                                            @click="
+                                                desactivarOEliminar(
+                                                    cuenta,
+                                                    'eliminar',
+                                                )
+                                            "
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </template>
                                 </span>
                             </td>
                         </tr>
@@ -389,10 +429,11 @@ const enlace = 'text-marca hover:underline';
         v-model:abierto="modalInvitar"
         :roles="rolesInternos"
     />
-    <ModalDesactivarCuenta
+    <ModalDesactivarEliminar
         v-if="elegida"
         v-model:abierto="modalDesactivar"
         :cuenta="elegida"
+        :inicio="inicioModal"
     />
     <ModalCambiarRol
         v-if="elegida"
