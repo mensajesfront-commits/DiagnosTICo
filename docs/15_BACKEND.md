@@ -105,6 +105,7 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | GET | `/diagnosticos/{id}/vista-previa` | `diagnosticos.ver` | A2.4 (semana 4) | |
 | POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 (por ahora vuelve a A2 con un aviso) | `nombre` (máx. 60, único en el sector), `sector_id` |
 | POST | `/diagnosticos/{id}/archivar` | `diagnosticos.editar` | Archiva un diagnóstico publicado | — |
+| DELETE | `/diagnosticos` | `diagnosticos.editar` | Elimina varios a la vez (selección en la tabla). Solo los que nunca se publicaron; si alguno tiene versiones no se elimina ninguno y el error en `ids` dice cuáles archivar | `ids[]` |
 | DELETE | `/diagnosticos/{id}` | `diagnosticos.editar` | Elimina un borrador que nunca se publicó | — |
 | DELETE | `/diagnosticos/{id}/borrador` | `diagnosticos.editar` | Elimina el borrador pendiente (vN) sin tocar la versión publicada | — |
 | POST | `/sectores` | `diagnosticos.editar` | A2.2a: crear | `nombre` (máx. 40, único), `descripcion`, `activo` |

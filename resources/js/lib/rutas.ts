@@ -21,6 +21,7 @@ export const rutas = {
         duplicar: (id: number) => `/diagnosticos/${id}/duplicar`,
         archivar: (id: number) => `/diagnosticos/${id}/archivar`,
         eliminar: (id: number) => `/diagnosticos/${id}`,
+        eliminarVarios: () => '/diagnosticos',
         eliminarBorrador: (id: number) => `/diagnosticos/${id}/borrador`,
     },
     sectores: {

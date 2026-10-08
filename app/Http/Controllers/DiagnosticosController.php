@@ -140,6 +140,35 @@ class DiagnosticosController extends Controller
         return back();
     }
 
+    /**
+     * Elimina varios diagnósticos a la vez (A2, selección en la tabla). Solo
+     * los que nunca se publicaron; si alguno tiene versiones, no se elimina
+     * ninguno y se dice cuáles hay que archivar.
+     */
+    public function eliminarVarios(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:200'],
+            'ids.*' => ['integer', 'distinct', Rule::exists('diagnosticos', 'id')],
+        ], ['ids.required' => 'Elige al menos un diagnóstico.']);
+
+        $diagnosticos = Diagnostico::whereIn('id', $datos['ids'])->withExists('versiones')->get();
+        $publicados = $diagnosticos->where('versiones_exists', true)->pluck('nombre');
+
+        if ($publicados->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'ids' => 'Tienen versiones publicadas y no se eliminan (archívalos): '.$publicados->join(', ', ' y ').'.',
+            ]);
+        }
+
+        DB::transaction(fn () => Diagnostico::whereKey($diagnosticos->modelKeys())->delete());
+
+        $n = $diagnosticos->count();
+        Inertia::flash('toast', ['type' => 'success', 'message' => $n === 1 ? 'Se eliminó 1 diagnóstico.' : "Se eliminaron {$n} diagnósticos."]);
+
+        return back();
+    }
+
     /** Elimina un borrador que nunca se publicó (HU-022). */
     public function eliminar(Diagnostico $diagnostico): RedirectResponse
     {

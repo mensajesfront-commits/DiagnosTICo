@@ -14,7 +14,7 @@
  * tildes ni mayúsculas.
  */
 import { Head } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
 import Entrada from '@/components/base/Entrada.vue';
@@ -23,6 +23,7 @@ import ListaSectores from '@/components/diagnosticos/ListaSectores.vue';
 import ModalArchivarDiagnostico from '@/components/diagnosticos/modales/ModalArchivarDiagnostico.vue';
 import ModalDuplicarDiagnostico from '@/components/diagnosticos/modales/ModalDuplicarDiagnostico.vue';
 import ModalEliminarDiagnostico from '@/components/diagnosticos/modales/ModalEliminarDiagnostico.vue';
+import ModalEliminarVarios from '@/components/diagnosticos/modales/ModalEliminarVarios.vue';
 import ModalEliminarSector from '@/components/diagnosticos/modales/ModalEliminarSector.vue';
 import ModalEstadoSector from '@/components/diagnosticos/modales/ModalEstadoSector.vue';
 import ModalReasignarSector from '@/components/diagnosticos/modales/ModalReasignarSector.vue';
@@ -100,6 +101,24 @@ const filas = computed(() => {
                 Number(b.version_publicada === null),
     );
 });
+
+// --- Eliminar varios a la vez ------------------------------------------------
+const seleccion = ref<number[]>([]);
+const modalEliminarVarios = ref(false);
+const elegidos = computed(() =>
+    props.diagnosticos.filter((d) => seleccion.value.includes(d.id)),
+);
+
+// Después de eliminar o de cambiar de sector, se quitan los que ya no están.
+watch(
+    () => props.diagnosticos,
+    (lista) => {
+        const ids = new Set(
+            lista.filter((d) => d.version_publicada === null).map((d) => d.id),
+        );
+        seleccion.value = seleccion.value.filter((id) => ids.has(id));
+    },
+);
 
 // --- Modales ------------------------------------------------------------------
 const modalSector = ref(false);
@@ -317,6 +336,7 @@ function elegir(
 
                     <TablaDiagnosticos
                         v-else
+                        v-model:seleccion="seleccion"
                         class="min-h-0 flex-1"
                         :filas="filas"
                         :mostrar-sector="!sector"
@@ -324,6 +344,7 @@ function elegir(
                         @archivar="elegir($event, 'archivar')"
                         @eliminar="elegir($event, 'eliminar')"
                         @eliminar-borrador="elegir($event, 'borrador')"
+                        @eliminar-seleccion="modalEliminarVarios = true"
                     />
                 </section>
             </div>
@@ -359,6 +380,12 @@ function elegir(
             @desactivar="modalEstado = true"
         />
     </template>
+
+    <ModalEliminarVarios
+        v-model:abierto="modalEliminarVarios"
+        :diagnosticos="elegidos"
+        @eliminados="seleccion = []"
+    />
 
     <template v-if="diagnosticoElegido">
         <ModalDuplicarDiagnostico

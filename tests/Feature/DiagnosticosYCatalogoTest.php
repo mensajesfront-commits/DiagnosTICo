@@ -151,6 +151,26 @@ it('archiva un publicado, elimina un borrador y no elimina uno con versiones', f
         ->and(Diagnostico::find($borrador->id))->toBeNull();
 });
 
+it('elimina varios borradores a la vez, pero ninguno si alguno está publicado', function () {
+    $sector = Sector::factory()->create();
+    [$a, $b, $c] = Diagnostico::factory()->count(3)->conCategorias(2)->create(['sector_id' => $sector->id])->all();
+    $publicado = Diagnostico::factory()->publicado()->create(['sector_id' => $sector->id, 'nombre' => 'Diagnóstico general']);
+
+    // Con uno publicado en la selección no se elimina nada.
+    $this->actingAs($this->admin)->delete(route('diagnosticos.eliminar-varios'), ['ids' => [$a->id, $publicado->id]])
+        ->assertSessionHasErrors(['ids' => 'Tienen versiones publicadas y no se eliminan (archívalos): Diagnóstico general.']);
+    expect(Diagnostico::count())->toBe(4);
+
+    $this->actingAs($this->admin)->delete(route('diagnosticos.eliminar-varios'), ['ids' => [$a->id, $b->id]])
+        ->assertSessionHasNoErrors();
+    expect(Diagnostico::pluck('id')->sort()->values()->all())->toBe(collect([$c->id, $publicado->id])->sort()->values()->all());
+
+    // Sin selección, o sin permiso.
+    $this->actingAs($this->admin)->delete(route('diagnosticos.eliminar-varios'), ['ids' => []])->assertSessionHasErrors('ids');
+    $empresa = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole('Empresa');
+    $this->actingAs($empresa)->delete(route('diagnosticos.eliminar-varios'), ['ids' => [$c->id]])->assertForbidden();
+});
+
 it('descarta el borrador pendiente y vuelve a la versión publicada', function () {
     $diagnostico = Diagnostico::factory()->publicado()->create();
     $diagnostico->forceFill(['version_borrador' => 2])->save();

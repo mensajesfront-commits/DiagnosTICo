@@ -11,6 +11,13 @@
  * publicó) y "Eliminar borrador" (si hay un borrador pendiente sobre la
  * versión publicada). Al lado queda "Vista previa".
  *
+ * Selección: la casilla de cada fila elige los diagnósticos que nunca se
+ * publicaron, para eliminar varios a la vez (los publicados se archivan, no
+ * se eliminan, y su casilla queda desactivada). La casilla del encabezado
+ * elige o quita los de la página. Con algo elegido, el pie muestra "N
+ * seleccionados · Quitar selección · Eliminar seleccionados" (en el pie, para
+ * no cambiar el alto de la tabla ni las filas por página).
+ *
  * Paginada: en pantallas grandes muestra las filas que caben en su espacio
  * (la página no se desplaza); en pantallas pequeñas, 10 por página. Vuelve a
  * la página 1 al buscar, filtrar u ordenar.
@@ -48,11 +55,15 @@ const props = withDefaults(
     { mostrarSector: false },
 );
 
+/** Ids elegidos para eliminar varios a la vez. */
+const seleccion = defineModel<number[]>('seleccion', { default: () => [] });
+
 defineEmits<{
     duplicar: [fila: FilaDiagnostico];
     archivar: [fila: FilaDiagnostico];
     eliminar: [fila: FilaDiagnostico];
     eliminarBorrador: [fila: FilaDiagnostico];
+    eliminarSeleccion: [];
 }>();
 
 // --- Paginado según el alto disponible --------------------------------------
@@ -121,6 +132,31 @@ watch(
     () => nextTick(medir),
 );
 
+const seElimina = (fila: FilaDiagnostico) => fila.version_publicada === null;
+
+const eliminablesDeLaPagina = computed(() =>
+    visibles.value.filter(seElimina).map((f) => f.id),
+);
+const paginaElegida = computed(
+    () =>
+        eliminablesDeLaPagina.value.length > 0 &&
+        eliminablesDeLaPagina.value.every((id) => seleccion.value.includes(id)),
+);
+
+function alternarPagina(): void {
+    const ids = eliminablesDeLaPagina.value;
+
+    seleccion.value = paginaElegida.value
+        ? seleccion.value.filter((id) => !ids.includes(id))
+        : [...new Set([...seleccion.value, ...ids])];
+}
+
+function alternar(id: number): void {
+    seleccion.value = seleccion.value.includes(id)
+        ? seleccion.value.filter((x) => x !== id)
+        : [...seleccion.value, id];
+}
+
 function detalle(fila: FilaDiagnostico): string {
     const partes = [
         `${fila.categorias} ${fila.categorias === 1 ? 'categoría' : 'categorías'}`,
@@ -153,6 +189,16 @@ const columnas = computed(() => [
             <table class="w-full border-collapse text-sm">
                 <thead>
                     <tr class="border-y border-linea bg-[#f9f8f4] text-left">
+                        <th scope="col" class="w-10 py-2.5 pr-0 pl-4">
+                            <input
+                                type="checkbox"
+                                class="size-4 accent-marca disabled:opacity-40"
+                                aria-label="Elegir los borradores de esta página"
+                                :checked="paginaElegida"
+                                :disabled="eliminablesDeLaPagina.length === 0"
+                                @change="alternarPagina"
+                            />
+                        </th>
                         <th
                             v-for="columna in columnas"
                             :key="columna"
@@ -167,8 +213,26 @@ const columnas = computed(() => [
                     <tr
                         v-for="fila in visibles"
                         :key="fila.id"
-                        class="border-b border-linea last:border-b-0"
+                        :class="[
+                            'border-b border-linea last:border-b-0',
+                            seleccion.includes(fila.id) && 'bg-marca-suave',
+                        ]"
                     >
+                        <td class="w-10 py-3 pr-0 pl-4 align-top">
+                            <input
+                                type="checkbox"
+                                class="mt-0.5 size-4 accent-marca disabled:opacity-40"
+                                :aria-label="`Elegir ${fila.nombre}`"
+                                :title="
+                                    seElimina(fila)
+                                        ? undefined
+                                        : 'Está publicado: se archiva, no se elimina'
+                                "
+                                :checked="seleccion.includes(fila.id)"
+                                :disabled="!seElimina(fila)"
+                                @change="alternar(fila.id)"
+                            />
+                        </td>
                         <td class="px-4 py-3 align-top">
                             <p class="min-w-44 font-medium">
                                 {{ fila.nombre }}
@@ -294,6 +358,30 @@ const columnas = computed(() => [
             :cantidad="visibles.length"
             :total="total"
             :paginas="paginas"
-        />
+        >
+            <template v-if="seleccion.length > 0">
+                <span class="text-sm font-medium text-marca" role="status">
+                    {{
+                        seleccion.length === 1
+                            ? '1 seleccionado'
+                            : `${seleccion.length} seleccionados`
+                    }}
+                </span>
+                <Boton
+                    variante="secundario"
+                    tamano="sm"
+                    @click="seleccion = []"
+                >
+                    Quitar selección
+                </Boton>
+                <Boton
+                    variante="peligro"
+                    tamano="sm"
+                    @click="$emit('eliminarSeleccion')"
+                >
+                    Eliminar seleccionados
+                </Boton>
+            </template>
+        </Paginacion>
     </div>
 </template>

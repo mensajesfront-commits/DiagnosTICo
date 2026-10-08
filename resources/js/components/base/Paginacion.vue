@@ -2,6 +2,9 @@
 /**
  * Pie de una tabla paginada: "Mostrando 1–10 de 34 · Página 1 de 4" con
  * "Anterior" y "Siguiente". Se usa con `usePaginacion` (`lib/paginacion.ts`).
+ *
+ * El slot por defecto va en el medio (por ejemplo, las acciones de una
+ * selección), sin cambiar el alto del pie.
  */
 import Boton from '@/components/base/Boton.vue';
 
@@ -31,6 +34,12 @@ const pagina = defineModel<number>('pagina', { required: true });
             </template>
             <template v-else>Sin resultados</template>
         </p>
+        <div
+            v-if="$slots.default"
+            class="flex flex-1 flex-wrap items-center justify-end gap-2"
+        >
+            <slot />
+        </div>
         <div class="flex gap-2">
             <Boton
                 variante="secundario"
