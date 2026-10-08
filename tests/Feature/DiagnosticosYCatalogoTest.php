@@ -81,6 +81,46 @@ it('crea un borrador en blanco con importancias que suman 100', function () {
         ->and(round((float) $diagnostico->partes->sum('importancia'), 2))->toBe(100.0);
 });
 
+it('no deja repetir el nombre de un diagnóstico, sin mirar mayúsculas ni espacios', function () {
+    $otroSector = Sector::factory()->create();
+    $existente = Diagnostico::factory()->create(['nombre' => 'Diagnóstico general']);
+    $categoria = Categoria::factory()->create();
+
+    // Crear, aunque sea en otro sector y escrito distinto.
+    $this->actingAs($this->admin)->post(route('diagnosticos.guardar'), [
+        'nombre' => '  diagnóstico   GENERAL ',
+        'sector_id' => $otroSector->id,
+        'punto_partida' => 'blanco',
+        'categorias' => [$categoria->id],
+    ])->assertSessionHasErrors(['nombre' => 'Ya existe un diagnóstico con ese nombre. Elige otro.']);
+
+    // Duplicar con el mismo nombre.
+    $this->actingAs($this->admin)->post(route('diagnosticos.duplicar', $existente), [
+        'nombre' => 'Diagnóstico General',
+        'sector_id' => $otroSector->id,
+    ])->assertSessionHasErrors('nombre');
+
+    // Un archivado también cuenta.
+    $existente->update(['estado' => Diagnostico::ARCHIVADO, 'archivado_en' => now()]);
+    $this->actingAs($this->admin)->post(route('diagnosticos.guardar'), [
+        'nombre' => 'Diagnóstico general',
+        'sector_id' => $otroSector->id,
+        'punto_partida' => 'blanco',
+        'categorias' => [$categoria->id],
+    ])->assertSessionHasErrors('nombre');
+
+    // Un nombre nuevo se guarda sin espacios de más.
+    $this->actingAs($this->admin)->post(route('diagnosticos.guardar'), [
+        'nombre' => '  Diagnóstico   rápido ',
+        'sector_id' => $otroSector->id,
+        'punto_partida' => 'blanco',
+        'categorias' => [$categoria->id],
+    ])->assertSessionHasNoErrors();
+
+    expect(Diagnostico::where('nombre', 'Diagnóstico rápido')->exists())->toBeTrue()
+        ->and(Diagnostico::count())->toBe(2);
+});
+
 it('crea copiando la última versión publicada y duplica un diagnóstico', function () {
     $origen = Diagnostico::factory()->publicado()->create();
     $sector = Sector::factory()->create();

@@ -100,10 +100,10 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | GET | `/diagnosticos` | `diagnosticos.ver` | A2·T: todos los diagnósticos | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos?sector={id}` | `diagnosticos.ver` | A2 / A2b: un sector | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos/crear?sector={id}` | `diagnosticos.editar` | A2.5 | Props de `diagnosticos/Crear` |
-| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1. Mientras no exista el editor A2.1 vuelve a A2 con un aviso | `nombre`, `sector_id`, `descripcion`, `punto_partida`, `categorias[]`, `copiar_de` |
+| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1. Mientras no exista el editor A2.1 vuelve a A2 con un aviso | `nombre` (máx. 60, único), `sector_id`, `descripcion`, `punto_partida`, `categorias[]`, `copiar_de` |
 | GET | `/diagnosticos/{id}/editar` | `diagnosticos.editar` | A2.1 (semana 4) | |
 | GET | `/diagnosticos/{id}/vista-previa` | `diagnosticos.ver` | A2.4 (semana 4) | |
-| POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 (por ahora vuelve a A2 con un aviso) | `nombre` (máx. 60), `sector_id` |
+| POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 (por ahora vuelve a A2 con un aviso) | `nombre` (máx. 60, único), `sector_id` |
 | POST | `/diagnosticos/{id}/archivar` | `diagnosticos.editar` | Archiva un diagnóstico publicado | — |
 | DELETE | `/diagnosticos/{id}` | `diagnosticos.editar` | Elimina un borrador que nunca se publicó | — |
 | DELETE | `/diagnosticos/{id}/borrador` | `diagnosticos.editar` | Elimina el borrador pendiente (vN) sin tocar la versión publicada | — |
@@ -113,6 +113,8 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | POST | `/sectores/{id}/desactivar` | `diagnosticos.editar` | A2.2c | — |
 | POST | `/sectores/{id}/reactivar` | `diagnosticos.editar` | Reactivar desde A2.2 | — |
 | DELETE | `/sectores/{id}` | `diagnosticos.editar` | A2.2e. Solo si no tiene empresas ni mediciones (RN-008). | — |
+
+**Nombre único:** dos diagnósticos no pueden llamarse igual, en ningún sector ni estado (un archivado también cuenta). No se miran mayúsculas ni espacios de más, y el nombre se guarda sin espacios de más (`app/Rules/NombreDiagnosticoUnico.php`). Error: "Ya existe un diagnóstico con ese nombre. Elige otro."
 
 ## Catálogo de categorías (T-049)
 

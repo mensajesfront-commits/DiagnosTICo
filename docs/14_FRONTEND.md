@@ -145,6 +145,15 @@ Ruta prevista: `GET /diagnosticos` (Todos) y `GET /diagnosticos?sector={id}`.
 | `diagnosticos` | `FilaDiagnostico[]` | Del sector, o de todos. Sin archivados. |
 | `empresas` | `EmpresaDelSector[]` | Solo con sector. Las primeras N; el total sale de `resumen.empresas`. |
 
+Comportamiento:
+
+- **Página fija** en pantallas grandes (`lg`): ocupa el alto de la ventana y no se desplaza. Solo bajan y suben, cada una en su espacio:
+  - la lista de sectores (el título y "+ Crear sector" quedan fijos);
+  - la tabla de diagnósticos (el encabezado de la tabla queda fijo);
+  - la tabla de empresas del sector.
+- En pantallas pequeñas la página se desplaza normal.
+- **Búsqueda:** filtra los diagnósticos por nombre en el navegador, sin mirar tildes ni mayúsculas (`lib/texto.ts`). Funciona en un sector y en "Todos", junto con el orden y el filtro de estado.
+
 ### A2.3 · Catálogo de categorías (`categorias/Index`)
 
 Ruta prevista: `GET /categorias`.

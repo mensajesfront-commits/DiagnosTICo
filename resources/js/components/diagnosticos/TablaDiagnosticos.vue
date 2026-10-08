@@ -94,9 +94,10 @@ const columnas = [
 </script>
 
 <template>
-    <div class="overflow-x-auto">
+    <!-- Baja y sube dentro de su espacio; el encabezado queda fijo arriba. -->
+    <div class="overflow-auto">
         <table class="w-full border-collapse text-sm">
-            <thead>
+            <thead class="sticky top-0 z-10">
                 <tr class="border-y border-linea bg-[#f9f8f4] text-left">
                     <th
                         v-for="columna in columnas"

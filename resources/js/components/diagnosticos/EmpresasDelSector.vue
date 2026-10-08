@@ -66,9 +66,9 @@ function textoMedicion(empresa: EmpresaDelSector): string {
             </Link>
         </header>
 
-        <div v-if="empresas.length > 0" class="overflow-x-auto">
+        <div v-if="empresas.length > 0" class="max-h-52 overflow-auto">
             <table class="w-full border-collapse text-sm">
-                <thead>
+                <thead class="sticky top-0 bg-white">
                     <tr class="border-y border-linea text-left">
                         <th
                             v-for="columna in [

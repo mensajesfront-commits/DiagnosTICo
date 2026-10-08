@@ -6,11 +6,17 @@
  * Una sola pantalla: con `sector` muestra ese sector; sin `sector` muestra
  * "Todos", agrupados por sector, con orden y filtro por estado.
  * Props completas en docs/14_FRONTEND.md.
+ *
+ * En pantallas grandes la página no se desplaza: ocupa el alto de la ventana
+ * y solo bajan y suben la lista de sectores, la tabla de diagnósticos y la de
+ * empresas, cada una en su espacio. La búsqueda filtra por nombre, sin mirar
+ * tildes ni mayúsculas.
  */
 import { Head } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
+import Entrada from '@/components/base/Entrada.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import EmpresasDelSector from '@/components/diagnosticos/EmpresasDelSector.vue';
 import ListaSectores from '@/components/diagnosticos/ListaSectores.vue';
@@ -24,6 +30,7 @@ import ModalSector from '@/components/diagnosticos/modales/ModalSector.vue';
 import ResumenDiagnosticos from '@/components/diagnosticos/ResumenDiagnosticos.vue';
 import TablaDiagnosticos from '@/components/diagnosticos/TablaDiagnosticos.vue';
 import { rutas } from '@/lib/rutas';
+import { normalizar } from '@/lib/texto';
 import type {
     EmpresaDelSector,
     FilaDiagnostico,
@@ -55,9 +62,16 @@ type FiltroEstado = 'todos' | 'publicado' | 'borrador';
 
 const orden = ref<Orden>('sector');
 const filtro = ref<FiltroEstado>('todos');
+const busqueda = ref('');
+const buscando = computed(() => normalizar(busqueda.value) !== '');
 
 const filas = computed(() => {
     let lista = [...props.diagnosticos];
+    const buscado = normalizar(busqueda.value);
+
+    if (buscado !== '') {
+        lista = lista.filter((d) => normalizar(d.nombre).includes(buscado));
+    }
 
     if (filtro.value === 'publicado') {
         lista = lista.filter((d) => d.version_publicada !== null);
@@ -139,7 +153,7 @@ function elegir(
         :title="sector ? `Diagnósticos de ${sector.nombre}` : 'Diagnósticos'"
     />
 
-    <div class="flex flex-col gap-5 p-6">
+    <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
         <EncabezadoPagina
             titulo="Diagnósticos"
             descripcion="Cada sector puede tener varios diagnósticos. Aquí también se administran los sectores y el catálogo de categorías."
@@ -152,19 +166,28 @@ function elegir(
             </Boton>
         </EncabezadoPagina>
 
-        <div class="grid items-start gap-5 lg:grid-cols-[240px_1fr]">
-            <div class="flex flex-col gap-4">
+        <div
+            class="grid items-start gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[240px_1fr] lg:grid-rows-[minmax(0,1fr)] lg:items-stretch"
+        >
+            <div class="flex flex-col gap-4 lg:min-h-0">
                 <ListaSectores
+                    class="lg:min-h-0"
                     :sectores="sectores"
                     :sector-actual-id="sector?.id ?? null"
                     :total-diagnosticos="totalDiagnosticos"
                     @crear="crearSector"
                 />
-                <ResumenDiagnosticos :resumen="resumen" :sector="sector" />
+                <ResumenDiagnosticos
+                    class="shrink-0"
+                    :resumen="resumen"
+                    :sector="sector"
+                />
             </div>
 
-            <div class="flex min-w-0 flex-col gap-5">
-                <section class="rounded-xl border border-linea bg-white">
+            <div class="flex min-w-0 flex-col gap-5 lg:min-h-0">
+                <section
+                    class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0"
+                >
                     <header
                         class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3"
                     >
@@ -239,6 +262,23 @@ function elegir(
                         </div>
                     </header>
 
+                    <div
+                        v-if="diagnosticos.length > 0"
+                        class="shrink-0 px-5 pb-3"
+                    >
+                        <label for="buscar-diagnostico" class="sr-only">
+                            Buscar diagnóstico
+                        </label>
+                        <Entrada
+                            id="buscar-diagnostico"
+                            v-model="busqueda"
+                            type="search"
+                            placeholder="Buscar diagnóstico por nombre"
+                            autocomplete="off"
+                            class="h-9"
+                        />
+                    </div>
+
                     <!-- A2b · sector sin diagnósticos -->
                     <div
                         v-if="sector && diagnosticos.length === 0"
@@ -271,7 +311,12 @@ function elegir(
                         v-else-if="filas.length === 0"
                         class="border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
                     >
-                        No hay diagnósticos con ese estado.
+                        <template v-if="buscando">
+                            Ningún diagnóstico se llama «{{ busqueda.trim() }}».
+                        </template>
+                        <template v-else>
+                            No hay diagnósticos con ese estado.
+                        </template>
                     </p>
 
                     <TablaDiagnosticos
@@ -279,7 +324,10 @@ function elegir(
                         :filas="filas"
                         :agrupar="!sector && orden === 'sector'"
                         :mostrar-sector="!sector && orden !== 'sector'"
-                        :sectores="filtro === 'todos' ? sectores : []"
+                        class="min-h-0"
+                        :sectores="
+                            filtro === 'todos' && !buscando ? sectores : []
+                        "
                         @duplicar="elegir($event, 'duplicar')"
                         @archivar="elegir($event, 'archivar')"
                         @eliminar="elegir($event, 'eliminar')"
@@ -289,6 +337,7 @@ function elegir(
 
                 <EmpresasDelSector
                     v-if="sector"
+                    class="shrink-0"
                     :sector="sector"
                     :empresas="empresas"
                     :total="resumen.empresas"

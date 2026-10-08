@@ -35,6 +35,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Redirección después del login según el rol (T-048): `/dashboard` lleva a A1 (`/inicio`) o a E1 (`/mi-inicio`). A1 y E1 son pantallas de bienvenida hasta las semanas 5 y 6.
 - Documentos: `08_CASOS_DE_USO.md` (T-041) y `30_RIESGOS.md` (T-067). Diccionario de datos de todas las tablas, cada tabla con un ejemplo y los campos JSONB (T-040, T-064). Rutas por módulo en `15_BACKEND.md` (T-043). Tabla historia → requisito en `05_REQUISITOS_FUNCIONALES.md` (T-061). Términos técnicos nuevos en el glosario (T-068).
 
+### Cambiado (Diagnósticos, A2)
+
+- La página queda fija; solo bajan y suben la lista de sectores, la tabla de diagnósticos y la de empresas, cada una en su espacio.
+- Barra de búsqueda de diagnósticos por nombre.
+- Dos diagnósticos no pueden tener el mismo nombre (sin mirar mayúsculas ni espacios de más).
+
 ### Cambiado (registro)
 
 - El registro (L2) va en dos pasos: Mi empresa y Tu usuario. Se agregan la actividad económica (códigos CIIU por sector, tabla `actividades_economicas`) y la descripción corta de máximo 300 caracteres; el cargo pasa a ser obligatorio (DEC-015).

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Diagnostico;
 use App\Models\DiagnosticoCategoria;
 use App\Models\Sector;
+use App\Rules\NombreDiagnosticoUnico;
 use App\Services\Diagnosticos\ContenidoDiagnostico;
 use App\Support\DatosDiagnosticos;
 use Illuminate\Http\RedirectResponse;
@@ -54,7 +55,7 @@ class DiagnosticosController extends Controller
     public function guardar(Request $request): RedirectResponse
     {
         $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:60'],
+            'nombre' => ['required', 'string', 'max:60', new NombreDiagnosticoUnico],
             'sector_id' => ['required', 'integer', Rule::exists('sectores', 'id')->where('activo', true)],
             'descripcion' => ['nullable', 'string', 'max:500'],
             'punto_partida' => ['required', Rule::in(['blanco', 'copia'])],
@@ -69,7 +70,7 @@ class DiagnosticosController extends Controller
         $diagnostico = DB::transaction(function () use ($datos, $request): Diagnostico {
             $diagnostico = Diagnostico::create([
                 'sector_id' => $datos['sector_id'],
-                'nombre' => $datos['nombre'],
+                'nombre' => NombreDiagnosticoUnico::limpiar($datos['nombre']),
                 'descripcion' => $datos['descripcion'] ?? null,
                 'estado' => Diagnostico::BORRADOR,
                 'version_borrador' => 1,
@@ -105,14 +106,14 @@ class DiagnosticosController extends Controller
     public function duplicar(Request $request, Diagnostico $diagnostico): RedirectResponse
     {
         $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:60'],
+            'nombre' => ['required', 'string', 'max:60', new NombreDiagnosticoUnico],
             'sector_id' => ['required', 'integer', Rule::exists('sectores', 'id')->where('activo', true)],
         ], [], ['sector_id' => 'sector']);
 
         $copia = DB::transaction(function () use ($datos, $diagnostico, $request): Diagnostico {
             $copia = Diagnostico::create([
                 'sector_id' => $datos['sector_id'],
-                'nombre' => $datos['nombre'],
+                'nombre' => NombreDiagnosticoUnico::limpiar($datos['nombre']),
                 'descripcion' => $diagnostico->descripcion,
                 'estado' => Diagnostico::BORRADOR,
                 'version_borrador' => 1,
