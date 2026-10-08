@@ -18,6 +18,11 @@
  * seleccionados · Quitar selección · Eliminar seleccionados" (en el pie, para
  * no cambiar el alto de la tabla ni las filas por página).
  *
+ * Compacta para que quepa sin moverse a izquierda y derecha: preguntas,
+ * empresas y mediciones van juntas en la columna "Uso", y "Editar ▾" y
+ * "Vista previa" van uno debajo del otro. En pantallas medianas (menos de
+ * 1280 px) el sector va debajo del nombre en lugar de su columna.
+ *
  * Paginada: en pantallas grandes muestra las filas que caben en su espacio
  * (la página no se desplaza); en pantallas pequeñas, 10 por página. Vuelve a
  * la página 1 al buscar, filtrar u ordenar.
@@ -173,19 +178,14 @@ const columnas = computed(() => [
     'Diagnóstico',
     ...(props.mostrarSector ? ['Sector'] : []),
     'Estado',
-    'Preguntas',
-    'Empresas',
-    'Mediciones',
+    'Uso',
     'Acciones',
 ]);
 </script>
 
 <template>
     <div class="flex flex-col">
-        <div
-            ref="contenedor"
-            class="min-h-0 flex-1 overflow-x-auto overflow-y-hidden"
-        >
+        <div ref="contenedor" class="min-h-0 flex-1 overflow-hidden">
             <table class="w-full border-collapse text-sm">
                 <thead>
                     <tr class="border-y border-linea bg-[#f9f8f4] text-left">
@@ -203,7 +203,10 @@ const columnas = computed(() => [
                             v-for="columna in columnas"
                             :key="columna"
                             scope="col"
-                            class="px-4 py-2.5 text-xs font-normal text-tinta-suave"
+                            :class="[
+                                'px-3 py-2.5 text-xs font-normal text-tinta-suave',
+                                columna === 'Sector' && 'hidden xl:table-cell',
+                            ]"
                         >
                             {{ columna }}
                         </th>
@@ -233,15 +236,27 @@ const columnas = computed(() => [
                                 @change="alternar(fila.id)"
                             />
                         </td>
-                        <td class="px-4 py-3 align-top">
-                            <p class="min-w-44 font-medium">
+                        <td class="px-3 py-3 align-top">
+                            <p class="min-w-32 font-medium break-words">
                                 {{ fila.nombre }}
                             </p>
                             <p class="text-xs text-tinta-suave">
                                 {{ detalle(fila) }}
                             </p>
+                            <Link
+                                v-if="mostrarSector"
+                                :href="
+                                    rutas.diagnosticos.sector(fila.sector_id)
+                                "
+                                class="text-xs text-tinta hover:text-marca hover:underline xl:hidden"
+                            >
+                                {{ fila.sector_nombre }}
+                            </Link>
                         </td>
-                        <td v-if="mostrarSector" class="px-4 py-3 align-top">
+                        <td
+                            v-if="mostrarSector"
+                            class="hidden px-3 py-3 align-top xl:table-cell"
+                        >
                             <Link
                                 :href="
                                     rutas.diagnosticos.sector(fila.sector_id)
@@ -251,7 +266,7 @@ const columnas = computed(() => [
                                 {{ fila.sector_nombre }}
                             </Link>
                         </td>
-                        <td class="px-4 py-3 align-top">
+                        <td class="px-3 py-3 align-top">
                             <div class="flex flex-col items-start gap-1">
                                 <Etiqueta
                                     v-if="fila.version_publicada"
@@ -259,26 +274,46 @@ const columnas = computed(() => [
                                 >
                                     Publicado · v{{ fila.version_publicada }}
                                 </Etiqueta>
-                                <Etiqueta v-else tono="alerta">
+                                <Etiqueta
+                                    v-else
+                                    tono="alerta"
+                                    class="whitespace-normal"
+                                >
                                     Borrador · sin publicar
                                 </Etiqueta>
-                                <Etiqueta v-if="fila.borrador_pendiente">
+                                <Etiqueta
+                                    v-if="fila.borrador_pendiente"
+                                    class="whitespace-normal"
+                                >
                                     ✎ Borrador v{{ fila.borrador_pendiente }}
                                     pendiente
                                 </Etiqueta>
                             </div>
                         </td>
-                        <td class="px-4 py-3 align-top font-mono">
-                            {{ fila.preguntas }}
+                        <td
+                            class="px-3 py-3 align-top text-xs whitespace-nowrap text-tinta-suave"
+                        >
+                            <p>
+                                <span class="font-mono text-tinta">{{
+                                    fila.preguntas
+                                }}</span>
+                                preguntas
+                            </p>
+                            <p>
+                                <span class="font-mono text-tinta">{{
+                                    fila.empresas
+                                }}</span>
+                                empresas
+                            </p>
+                            <p>
+                                <span class="font-mono text-tinta">{{
+                                    fila.mediciones
+                                }}</span>
+                                mediciones
+                            </p>
                         </td>
-                        <td class="px-4 py-3 align-top font-mono">
-                            {{ fila.empresas }}
-                        </td>
-                        <td class="px-4 py-3 align-top font-mono">
-                            {{ fila.mediciones }}
-                        </td>
-                        <td class="px-4 py-3 align-top">
-                            <div class="flex gap-2">
+                        <td class="w-32 px-3 py-3 align-top">
+                            <div class="flex flex-col items-stretch gap-1.5">
                                 <DropdownMenu :modal="false">
                                     <DropdownMenuTrigger as-child>
                                         <Boton
