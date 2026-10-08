@@ -294,7 +294,7 @@ function elegir(
                     <!-- A2b · sector sin diagnósticos -->
                     <div
                         v-if="sector && diagnosticos.length === 0"
-                        class="border-t border-linea px-5 py-8 text-center"
+                        class="flex flex-1 flex-col items-center justify-center border-t border-linea px-5 py-8 text-center"
                     >
                         <p class="font-semibold">
                             Este sector todavía no tiene diagnósticos
@@ -321,7 +321,7 @@ function elegir(
 
                     <p
                         v-else-if="filas.length === 0"
-                        class="border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
+                        class="flex flex-1 items-center justify-center border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
                     >
                         <template v-if="diagnosticos.length === 0">
                             Todavía no hay diagnósticos.
