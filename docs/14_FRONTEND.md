@@ -152,6 +152,7 @@ Comportamiento:
   - la tabla de diagnósticos (el encabezado de la tabla queda fijo);
   - la tabla de empresas del sector.
 - En pantallas pequeñas la página se desplaza normal.
+- **"Todos":** no agrupa por sector; la columna "Sector", al lado de "Estado", dice de qué sector es cada diagnóstico (enlace al sector).
 - **Búsqueda:** filtra los diagnósticos por nombre en el navegador, sin mirar tildes ni mayúsculas (`lib/texto.ts`). Funciona en un sector y en "Todos", junto con el orden y el filtro de estado.
 
 ### A2.3 · Catálogo de categorías (`categorias/Index`)

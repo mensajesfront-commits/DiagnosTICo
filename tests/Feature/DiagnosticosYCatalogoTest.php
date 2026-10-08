@@ -81,43 +81,36 @@ it('crea un borrador en blanco con importancias que suman 100', function () {
         ->and(round((float) $diagnostico->partes->sum('importancia'), 2))->toBe(100.0);
 });
 
-it('no deja repetir el nombre de un diagnóstico, sin mirar mayúsculas ni espacios', function () {
+it('no deja repetir el nombre de un diagnóstico en el mismo sector, sin mirar mayúsculas ni espacios', function () {
+    $sector = Sector::factory()->create();
     $otroSector = Sector::factory()->create();
-    $existente = Diagnostico::factory()->create(['nombre' => 'Diagnóstico general']);
+    $existente = Diagnostico::factory()->create(['nombre' => 'Diagnóstico general', 'sector_id' => $sector->id]);
     $categoria = Categoria::factory()->create();
-
-    // Crear, aunque sea en otro sector y escrito distinto.
-    $this->actingAs($this->admin)->post(route('diagnosticos.guardar'), [
-        'nombre' => '  diagnóstico   GENERAL ',
-        'sector_id' => $otroSector->id,
+    $crear = fn (string $nombre, int $sectorId) => $this->actingAs($this->admin)->post(route('diagnosticos.guardar'), [
+        'nombre' => $nombre,
+        'sector_id' => $sectorId,
         'punto_partida' => 'blanco',
         'categorias' => [$categoria->id],
-    ])->assertSessionHasErrors(['nombre' => 'Ya existe un diagnóstico con ese nombre. Elige otro.']);
+    ]);
 
-    // Duplicar con el mismo nombre.
+    // Mismo sector, escrito distinto: no.
+    $crear('  diagnóstico   GENERAL ', $sector->id)
+        ->assertSessionHasErrors(['nombre' => 'Este sector ya tiene un diagnóstico con ese nombre. Elige otro.']);
+
+    // Duplicar al mismo sector con el mismo nombre: no.
     $this->actingAs($this->admin)->post(route('diagnosticos.duplicar', $existente), [
         'nombre' => 'Diagnóstico General',
-        'sector_id' => $otroSector->id,
+        'sector_id' => $sector->id,
     ])->assertSessionHasErrors('nombre');
 
-    // Un archivado también cuenta.
+    // Un archivado del sector también cuenta.
     $existente->update(['estado' => Diagnostico::ARCHIVADO, 'archivado_en' => now()]);
-    $this->actingAs($this->admin)->post(route('diagnosticos.guardar'), [
-        'nombre' => 'Diagnóstico general',
-        'sector_id' => $otroSector->id,
-        'punto_partida' => 'blanco',
-        'categorias' => [$categoria->id],
-    ])->assertSessionHasErrors('nombre');
+    $crear('Diagnóstico general', $sector->id)->assertSessionHasErrors('nombre');
 
-    // Un nombre nuevo se guarda sin espacios de más.
-    $this->actingAs($this->admin)->post(route('diagnosticos.guardar'), [
-        'nombre' => '  Diagnóstico   rápido ',
-        'sector_id' => $otroSector->id,
-        'punto_partida' => 'blanco',
-        'categorias' => [$categoria->id],
-    ])->assertSessionHasNoErrors();
+    // En otro sector sí se puede, y se guarda sin espacios de más.
+    $crear('  Diagnóstico   general ', $otroSector->id)->assertSessionHasNoErrors();
 
-    expect(Diagnostico::where('nombre', 'Diagnóstico rápido')->exists())->toBeTrue()
+    expect(Diagnostico::where('sector_id', $otroSector->id)->where('nombre', 'Diagnóstico general')->exists())->toBeTrue()
         ->and(Diagnostico::count())->toBe(2);
 });
 

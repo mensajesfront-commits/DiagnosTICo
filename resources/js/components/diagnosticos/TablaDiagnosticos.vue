@@ -1,7 +1,10 @@
 <script setup lang="ts">
 /**
- * Tabla de diagnósticos de A2 (un sector) y A2·T (todos, agrupados por
- * sector). HU-010 CA-004 y HU-011.
+ * Tabla de diagnósticos de A2 (un sector) y A2·T (todos). HU-010 CA-004 y
+ * HU-011.
+ *
+ * En "Todos" no se agrupa por sector: la columna "Sector", al lado de
+ * "Estado", dice a qué sector pertenece cada diagnóstico (`mostrarSector`).
  *
  * Acciones por fila: Editar y Vista previa; Duplicar; Archivar si tiene una
  * versión publicada o Eliminar si nunca se publicó; y "Eliminar borrador" si
@@ -12,19 +15,15 @@ import { computed } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
 import { rutas } from '@/lib/rutas';
-import type { FilaDiagnostico, Sector } from '@/types/diagnosticos';
+import type { FilaDiagnostico } from '@/types/diagnosticos';
 
 const props = withDefaults(
     defineProps<{
         filas: FilaDiagnostico[];
-        /** Agrupa por sector (vista "Todos"). */
-        agrupar?: boolean;
-        /** Muestra el sector bajo el nombre (en "Todos" sin agrupar). */
+        /** En "Todos": la columna "Sector", al lado de "Estado". */
         mostrarSector?: boolean;
-        /** En "Todos", los sectores para mostrar también los que no tienen diagnósticos. */
-        sectores?: Sector[];
     }>(),
-    { agrupar: false, mostrarSector: false, sectores: () => [] },
+    { mostrarSector: false },
 );
 
 defineEmits<{
@@ -34,63 +33,27 @@ defineEmits<{
     eliminarBorrador: [fila: FilaDiagnostico];
 }>();
 
-type Grupo = { id: number; nombre: string; filas: FilaDiagnostico[] };
-
-const grupos = computed<Grupo[]>(() => {
-    if (!props.agrupar) {
-        return [{ id: 0, nombre: '', filas: props.filas }];
-    }
-
-    const porSector = new Map<number, Grupo>();
-
-    for (const fila of props.filas) {
-        const grupo = porSector.get(fila.sector_id) ?? {
-            id: fila.sector_id,
-            nombre: fila.sector_nombre,
-            filas: [],
-        };
-        grupo.filas.push(fila);
-        porSector.set(fila.sector_id, grupo);
-    }
-
-    // Los sectores sin diagnósticos también aparecen, con "Ver sector".
-    for (const sector of props.sectores) {
-        if (!porSector.has(sector.id) && sector.diagnosticos === 0) {
-            porSector.set(sector.id, {
-                id: sector.id,
-                nombre: sector.nombre,
-                filas: [],
-            });
-        }
-    }
-
-    return [...porSector.values()];
-});
-
 function detalle(fila: FilaDiagnostico): string {
-    const categorias = `${fila.categorias} ${fila.categorias === 1 ? 'categoría' : 'categorías'}`;
-
-    const partes = [categorias];
+    const partes = [
+        `${fila.categorias} ${fila.categorias === 1 ? 'categoría' : 'categorías'}`,
+    ];
 
     if (fila.borrador_pendiente && fila.version_publicada) {
         partes.push(`v${fila.version_publicada} publicada`);
     }
 
-    if (props.mostrarSector) {
-        partes.unshift(fila.sector_nombre);
-    }
-
     return partes.join(' · ');
 }
 
-const columnas = [
+const columnas = computed(() => [
     'Diagnóstico',
     'Estado',
+    ...(props.mostrarSector ? ['Sector'] : []),
     'Preguntas',
     'Empresas',
     'Mediciones',
     'Acciones',
-];
+]);
 </script>
 
 <template>
@@ -109,37 +72,9 @@ const columnas = [
                     </th>
                 </tr>
             </thead>
-            <tbody v-for="grupo in grupos" :key="grupo.id">
-                <tr v-if="agrupar" class="border-b border-linea bg-lienzo/70">
-                    <th
-                        scope="rowgroup"
-                        :colspan="columnas.length"
-                        class="px-4 py-2 text-left text-xs font-semibold"
-                    >
-                        <span class="flex items-center justify-between">
-                            <span>
-                                {{ grupo.nombre }}
-                                <span class="ml-1 font-normal text-tinta-suave">
-                                    {{ grupo.filas.length }}
-                                    {{
-                                        grupo.filas.length === 1
-                                            ? 'diagnóstico'
-                                            : 'diagnósticos'
-                                    }}
-                                </span>
-                            </span>
-                            <Link
-                                v-if="grupo.filas.length === 0"
-                                :href="rutas.diagnosticos.sector(grupo.id)"
-                                class="font-normal text-marca underline"
-                            >
-                                Ver sector
-                            </Link>
-                        </span>
-                    </th>
-                </tr>
+            <tbody>
                 <tr
-                    v-for="fila in grupo.filas"
+                    v-for="fila in filas"
                     :key="fila.id"
                     class="border-b border-linea last:border-b-0"
                 >
@@ -165,6 +100,14 @@ const columnas = [
                                 pendiente
                             </Etiqueta>
                         </div>
+                    </td>
+                    <td v-if="mostrarSector" class="px-4 py-3 align-top">
+                        <Link
+                            :href="rutas.diagnosticos.sector(fila.sector_id)"
+                            class="text-tinta hover:text-marca hover:underline"
+                        >
+                            {{ fila.sector_nombre }}
+                        </Link>
                     </td>
                     <td class="px-4 py-3 align-top font-mono">
                         {{ fila.preguntas }}

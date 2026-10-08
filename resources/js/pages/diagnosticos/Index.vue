@@ -311,7 +311,10 @@ function elegir(
                         v-else-if="filas.length === 0"
                         class="border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
                     >
-                        <template v-if="buscando">
+                        <template v-if="diagnosticos.length === 0">
+                            Todavía no hay diagnósticos.
+                        </template>
+                        <template v-else-if="buscando">
                             Ningún diagnóstico se llama «{{ busqueda.trim() }}».
                         </template>
                         <template v-else>
@@ -321,13 +324,9 @@ function elegir(
 
                     <TablaDiagnosticos
                         v-else
-                        :filas="filas"
-                        :agrupar="!sector && orden === 'sector'"
-                        :mostrar-sector="!sector && orden !== 'sector'"
                         class="min-h-0"
-                        :sectores="
-                            filtro === 'todos' && !buscando ? sectores : []
-                        "
+                        :filas="filas"
+                        :mostrar-sector="!sector"
                         @duplicar="elegir($event, 'duplicar')"
                         @archivar="elegir($event, 'archivar')"
                         @eliminar="elegir($event, 'eliminar')"

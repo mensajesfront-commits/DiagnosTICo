@@ -55,7 +55,7 @@ class DiagnosticosController extends Controller
     public function guardar(Request $request): RedirectResponse
     {
         $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:60', new NombreDiagnosticoUnico],
+            'nombre' => ['required', 'string', 'max:60', new NombreDiagnosticoUnico($request->input('sector_id'))],
             'sector_id' => ['required', 'integer', Rule::exists('sectores', 'id')->where('activo', true)],
             'descripcion' => ['nullable', 'string', 'max:500'],
             'punto_partida' => ['required', Rule::in(['blanco', 'copia'])],
@@ -106,7 +106,7 @@ class DiagnosticosController extends Controller
     public function duplicar(Request $request, Diagnostico $diagnostico): RedirectResponse
     {
         $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:60', new NombreDiagnosticoUnico],
+            'nombre' => ['required', 'string', 'max:60', new NombreDiagnosticoUnico($request->input('sector_id'))],
             'sector_id' => ['required', 'integer', Rule::exists('sectores', 'id')->where('activo', true)],
         ], [], ['sector_id' => 'sector']);
 

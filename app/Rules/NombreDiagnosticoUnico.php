@@ -7,28 +7,33 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
- * Dos diagnósticos no pueden llamarse igual, en ningún sector ni estado
- * (también cuenta un archivado). Sin mirar mayúsculas ni espacios de más:
+ * Dentro de un mismo sector, dos diagnósticos no pueden llamarse igual, en
+ * ningún estado (también cuenta un archivado). En sectores distintos sí se
+ * puede. Sin mirar mayúsculas ni espacios de más:
  * "Diagnóstico general" = " diagnóstico  GENERAL ".
  */
 class NombreDiagnosticoUnico implements ValidationRule
 {
-    /** @param int|null $ignorar Al renombrar, el propio diagnóstico. */
-    public function __construct(private readonly ?int $ignorar = null) {}
+    /**
+     * @param  mixed  $sectorId  El sector elegido en el formulario.
+     * @param  int|null  $ignorar  Al renombrar, el propio diagnóstico.
+     */
+    public function __construct(private readonly mixed $sectorId, private readonly ?int $ignorar = null) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! is_string($value)) {
+        if (! is_string($value) || ! is_numeric($this->sectorId)) {
             return;
         }
 
         $existe = Diagnostico::query()
+            ->where('sector_id', (int) $this->sectorId)
             ->whereRaw("lower(regexp_replace(trim(nombre), '\\s+', ' ', 'g')) = ?", [self::normalizar($value)])
             ->when($this->ignorar, fn ($q) => $q->whereKeyNot($this->ignorar))
             ->exists();
 
         if ($existe) {
-            $fail('Ya existe un diagnóstico con ese nombre. Elige otro.');
+            $fail('Este sector ya tiene un diagnóstico con ese nombre. Elige otro.');
         }
     }
 
