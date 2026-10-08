@@ -147,10 +147,9 @@ Ruta prevista: `GET /diagnosticos` (Todos) y `GET /diagnosticos?sector={id}`.
 
 Comportamiento:
 
-- **Página fija** en pantallas grandes (`lg`): ocupa el alto de la ventana y no se desplaza. Solo bajan y suben, cada una en su espacio:
-  - la lista de sectores (el título y "+ Crear sector" quedan fijos);
-  - la tabla de diagnósticos (el encabezado de la tabla queda fijo);
-  - la tabla de empresas del sector.
+- **Página fija** en pantallas grandes (`lg`): ocupa el alto de la ventana y no se desplaza.
+  - **La tabla de diagnósticos va paginada** (Todos y cada sector): muestra las filas que caben en su espacio, con "Mostrando 1–9 de 31 · Página 1 de 4", "Anterior" y "Siguiente" (`components/base/Paginacion.vue`, `lib/paginacion.ts`). En pantallas pequeñas, 10 por página. Al buscar, filtrar u ordenar vuelve a la página 1.
+  - La lista de sectores y la tabla de empresas del sector bajan y suben en su espacio.
 - En pantallas pequeñas la página se desplaza normal.
 - **"Todos":** no agrupa por sector; la columna "Sector", antes de "Estado", dice de qué sector es cada diagnóstico (enlace al sector).
 - **Acciones por fila:** "Editar ▾" abre un menú con Editar diagnóstico, Duplicar, Archivar o Eliminar, y Eliminar borrador cuando corresponde. Al lado queda "Vista previa".
@@ -168,7 +167,7 @@ Ruta prevista: `GET /categorias`.
 | `totalDiagnosticos` | `number` | Diagnósticos activos en total, para "13 de 13". |
 | `borradores` | `DiagnosticoBorrador[]` | Diagnósticos en borrador (con `version`), para agregarles una categoría nueva (HU-018 CA-004). |
 
-La tabla usa todo el ancho. La categoría se edita en un modal en el centro (`ModalEditarCategoria`) que envía `nombre` y `descripcion`; "Archivar…" o "Eliminar…" desde ese modal abre el de A2.3c. Crear (A2.3b) y archivar (A2.3c) abren un modal. Las archivadas tienen "Restaurar".
+La tabla usa todo el ancho y va paginada, 10 categorías por página (vuelve a la 1 al cambiar el filtro). La categoría se edita en un modal en el centro (`ModalEditarCategoria`) que envía `nombre` y `descripcion`; "Archivar…" o "Eliminar…" desde ese modal abre el de A2.3c. Crear (A2.3b) y archivar (A2.3c) abren un modal. Las archivadas tienen "Restaurar".
 
 ### A2.5 · Crear diagnóstico (`diagnosticos/Crear`)
 

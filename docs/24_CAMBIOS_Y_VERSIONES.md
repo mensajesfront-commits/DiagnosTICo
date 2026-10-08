@@ -41,6 +41,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Barra de búsqueda de diagnósticos por nombre.
 - Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (sin mirar mayúsculas ni espacios de más).
 - "Todos los diagnósticos" ya no agrupa por sector: tiene la columna "Sector" antes de "Estado".
+- Listas paginadas en lugar de bajar y subir: todos los diagnósticos y los de cada sector (las filas que caben en la pantalla) y el catálogo de categorías (10 por página). Componente `Paginacion` y `lib/paginacion.ts`, con pruebas.
 - Catálogo de categorías (A2.3) y Crear diagnóstico (A2.5): flecha "← Diagnósticos" arriba del título para volver, en lugar de la ruta pequeña "Diagnósticos › …". En Crear vuelve al sector del que se vino.
 - Catálogo de categorías (A2.3): "Editar" abre un modal en el centro en lugar del panel de la derecha; la tabla usa todo el ancho.
 - Duplicar, Archivar y Eliminar pasan a un menú dentro de "Editar ▾" para ahorrar espacio.

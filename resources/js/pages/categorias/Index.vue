@@ -3,7 +3,7 @@
  * A2.3 · Catálogo de categorías (HU-017, HU-018, HU-019).
  *
  * Catálogo común a todos los diagnósticos: la tabla usa todo el ancho, con el
- * filtro Todas / En uso / Archivadas. Editar, crear (A2.3b) y archivar
+ * filtro Todas / En uso / Archivadas y 10 categorías por página. Editar, crear (A2.3b) y archivar
  * (A2.3c) abren un modal en el centro.
  */
 import { Head, router } from '@inertiajs/vue3';
@@ -11,10 +11,12 @@ import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
+import Paginacion from '@/components/base/Paginacion.vue';
 import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import ModalCategoria from '@/components/categorias/ModalCategoria.vue';
 import ModalEditarCategoria from '@/components/categorias/ModalEditarCategoria.vue';
 import ModalRetirarCategoria from '@/components/categorias/ModalRetirarCategoria.vue';
+import { usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { Categoria, DiagnosticoBorrador } from '@/types/diagnosticos';
@@ -66,6 +68,12 @@ const filas = computed(() => {
 
     return [...enUso.value, ...archivadas.value];
 });
+
+const POR_PAGINA = 10;
+const { pagina, paginas, total, desde, visibles } = usePaginacion(
+    filas,
+    POR_PAGINA,
+);
 
 const elegidaId = ref<number | null>(null);
 const elegida = computed(
@@ -162,7 +170,7 @@ function restaurar(categoria: Categoria): void {
                     </thead>
                     <tbody>
                         <tr
-                            v-for="categoria in filas"
+                            v-for="categoria in visibles"
                             :key="categoria.id"
                             class="border-b border-linea last:border-b-0"
                         >
@@ -232,6 +240,15 @@ function restaurar(categoria: Categoria): void {
                     </tbody>
                 </table>
             </div>
+
+            <Paginacion
+                v-if="filas.length > 0"
+                v-model:pagina="pagina"
+                :desde="desde"
+                :cantidad="visibles.length"
+                :total="total"
+                :paginas="paginas"
+            />
         </section>
     </div>
 

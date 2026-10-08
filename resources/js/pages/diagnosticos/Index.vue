@@ -7,9 +7,9 @@
  * "Todos", agrupados por sector, con orden y filtro por estado.
  * Props completas en docs/14_FRONTEND.md.
  *
- * En pantallas grandes la página no se desplaza: ocupa el alto de la ventana
- * y solo bajan y suben la lista de sectores, la tabla de diagnósticos y la de
- * empresas, cada una en su espacio. La búsqueda filtra por nombre, sin mirar
+ * En pantallas grandes la página no se desplaza: ocupa el alto de la ventana.
+ * La tabla de diagnósticos va paginada con las filas que caben; la lista de
+ * sectores y la de empresas bajan y suben en su espacio. La búsqueda filtra por nombre, sin mirar
  * tildes ni mayúsculas.
  */
 import { Head } from '@inertiajs/vue3';
@@ -186,7 +186,7 @@ function elegir(
 
             <div class="flex min-w-0 flex-col gap-5 lg:min-h-0">
                 <section
-                    class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0"
+                    class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0 lg:flex-1"
                 >
                     <header
                         class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3"
@@ -324,7 +324,7 @@ function elegir(
 
                     <TablaDiagnosticos
                         v-else
-                        class="min-h-0"
+                        class="min-h-0 flex-1"
                         :filas="filas"
                         :mostrar-sector="!sector"
                         @duplicar="elegir($event, 'duplicar')"
