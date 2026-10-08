@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ColaboradoresController;
 use App\Http\Controllers\DiagnosticosController;
+use App\Http\Controllers\InicioController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
@@ -22,7 +23,10 @@ Route::get('ubicaciones/{pais}', [UbicacionesController::class, 'show'])
     ->name('ubicaciones.pais');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    // T-048: /dashboard es la entrada después del login; cada cuenta va a su inicio.
+    Route::get('dashboard', [InicioController::class, 'redirigir'])->name('dashboard');
+    Route::get('inicio', [InicioController::class, 'administrador'])->name('inicio.administrador');
+    Route::get('mi-inicio', [InicioController::class, 'empresa'])->name('inicio.empresa');
 
     // A2 · Diagnósticos, sectores y categorías (T-049, T-050). Ver:
     // diagnosticos.ver; cambiar: diagnosticos.editar (docs/17_SEGURIDAD.md).

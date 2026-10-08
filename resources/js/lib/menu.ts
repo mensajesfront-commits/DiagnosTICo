@@ -11,7 +11,7 @@
  * los enlaces apuntan a la URL prevista.
  */
 import type { InertiaLinkProps } from '@inertiajs/vue3';
-import { dashboard } from '@/routes';
+import { administrador, empresa } from '@/routes/inicio';
 
 export type ItemMenu = {
     titulo: string;
@@ -23,7 +23,7 @@ export type ItemMenu = {
 };
 
 export const menuAdministrador: ItemMenu[] = [
-    { titulo: 'Inicio', href: dashboard() },
+    { titulo: 'Inicio', href: administrador() },
     {
         titulo: 'Diagnósticos',
         href: '/diagnosticos',
@@ -44,7 +44,7 @@ export const menuAdministrador: ItemMenu[] = [
 ];
 
 export const menuEmpresa: ItemMenu[] = [
-    { titulo: 'Inicio', href: dashboard() },
+    { titulo: 'Inicio', href: empresa() },
     { titulo: 'Mi historial', href: '/historial', permiso: 'resultados.ver' },
     // HU-076 / RN-025: solo la cuenta principal; el colaborador no la ve.
     // A5.2 no tiene un permiso para esto: lo decide el rol.
