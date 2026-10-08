@@ -9,6 +9,7 @@ use App\Models\Opcion;
 use App\Models\Pregunta;
 use App\Models\Sector;
 use App\Models\VersionDiagnostico;
+use App\Services\Diagnosticos\ContenidoDiagnostico;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -68,7 +69,7 @@ class DiagnosticoFactory extends Factory
             VersionDiagnostico::create([
                 'diagnostico_id' => $diagnostico->id,
                 'numero' => 1,
-                'contenido' => ['nombre' => $diagnostico->nombre, 'categorias' => []],
+                'contenido' => app(ContenidoDiagnostico::class)->congelar($diagnostico),
                 'publicada_en' => now(),
             ]);
         });
