@@ -83,7 +83,7 @@ return new class extends Migration
             $table->foreignId('medicion_id')->unique()->constrained('mediciones')->cascadeOnDelete();
             // Promedio ponderado (RN-018).
             $table->unsignedTinyInteger('puntaje_total');
-            // RN-019: critico · mejorar · buen_camino · sigue_asi
+            // RN-019: critico · mejorar · camino · sigue (App\Support\Niveles)
             $table->string('nivel', 20);
             // Frente a la medición anterior; null en la primera (RN-020).
             $table->smallInteger('variacion')->nullable();
