@@ -40,7 +40,8 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - La página queda fija; solo bajan y suben la lista de sectores, la tabla de diagnósticos y la de empresas, cada una en su espacio.
 - Barra de búsqueda de diagnósticos por nombre.
 - Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (sin mirar mayúsculas ni espacios de más).
-- "Todos los diagnósticos" ya no agrupa por sector: tiene la columna "Sector" al lado de "Estado".
+- "Todos los diagnósticos" ya no agrupa por sector: tiene la columna "Sector" antes de "Estado".
+- Duplicar, Archivar y Eliminar pasan a un menú dentro de "Editar ▾" para ahorrar espacio.
 
 ### Cambiado (registro)
 
