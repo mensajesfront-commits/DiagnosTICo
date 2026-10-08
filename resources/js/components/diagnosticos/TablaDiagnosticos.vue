@@ -260,7 +260,7 @@ const columnas = computed(() => [
                                     Publicado · v{{ fila.version_publicada }}
                                 </Etiqueta>
                                 <Etiqueta v-else tono="alerta">
-                                    Borrador · sin publicar
+                                    Borrador
                                 </Etiqueta>
                                 <Etiqueta v-if="fila.borrador_pendiente">
                                     ✎ Borrador v{{ fila.borrador_pendiente }}

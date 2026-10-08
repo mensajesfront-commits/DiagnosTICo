@@ -203,9 +203,7 @@ const empresasPorNivel = {
                             :nivel="nivel"
                         />
                         <Etiqueta tono="exito">✓ v2 publicada</Etiqueta>
-                        <Etiqueta tono="alerta"
-                            >Borrador · sin publicar</Etiqueta
-                        >
+                        <Etiqueta tono="alerta">Borrador</Etiqueta>
                         <Etiqueta tono="aviso">⚠ 2 por corregir</Etiqueta>
                         <EtiquetaEstado estado="enviada" />
                     </div>
