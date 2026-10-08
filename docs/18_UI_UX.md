@@ -79,7 +79,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.7 | Duplicar diagnóstico | `…/ModalDuplicarDiagnostico.vue` | Hecha |
 | — | Archivar diagnóstico | `…/ModalArchivarDiagnostico.vue` | Hecha. Sin diseño (PA-005). |
 | — | Eliminar diagnóstico o borrador | `…/ModalEliminarDiagnostico.vue` | Hecha |
-| A2.3 | Catálogo de categorías, con el panel para editar | `pages/categorias/Index.vue`, `components/categorias/PanelEditarCategoria.vue` | Hecha y conectada |
+| A2.3 | Catálogo de categorías; editar abre un modal en el centro | `pages/categorias/Index.vue`, `components/categorias/ModalEditarCategoria.vue` | Hecha y conectada |
 | A2.3b | Crear / editar categoría | `components/categorias/ModalCategoria.vue` | Hecha |
 | A2.3c | Archivar o eliminar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Eliminar no tiene wireframe, sale de HU-019. |
 | A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha y conectada |

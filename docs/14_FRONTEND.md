@@ -166,7 +166,7 @@ Ruta prevista: `GET /categorias`.
 | `totalDiagnosticos` | `number` | Diagnósticos activos en total, para "13 de 13". |
 | `borradores` | `DiagnosticoBorrador[]` | Diagnósticos en borrador (con `version`), para agregarles una categoría nueva (HU-018 CA-004). |
 
-La categoría se edita en el panel de la derecha (`PanelEditarCategoria`) y envía `nombre` y `descripcion`. Crear (A2.3b) y archivar (A2.3c) abren un modal. Las archivadas tienen "Restaurar".
+La tabla usa todo el ancho. La categoría se edita en un modal en el centro (`ModalEditarCategoria`) que envía `nombre` y `descripcion`; "Archivar…" o "Eliminar…" desde ese modal abre el de A2.3c. Crear (A2.3b) y archivar (A2.3c) abren un modal. Las archivadas tienen "Restaurar".
 
 ### A2.5 · Crear diagnóstico (`diagnosticos/Crear`)
 
