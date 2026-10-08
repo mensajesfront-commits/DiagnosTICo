@@ -37,7 +37,6 @@ class DiagnosticosController extends Controller
             'sector' => $sector ? DatosDiagnosticos::sector($sector) : null,
             'resumen' => DatosDiagnosticos::resumen($sector),
             'diagnosticos' => DatosDiagnosticos::diagnosticos($sector),
-            'empresas' => $sector ? DatosDiagnosticos::empresas($sector) : [],
         ]);
     }
 

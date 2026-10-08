@@ -1343,6 +1343,8 @@ Permite administrar un sector en un solo lugar viendo sus diagnósticos, resumen
 
 **Entonces** muestra diagnóstico asignado, medición y puntaje, con "Ver empresa".
 
+**[INCONSISTENCIA DETECTADA]** Por decisión del equipo (8 de octubre de 2026), la tabla "Empresas del sector" se quitó de A2 para ganar espacio. El resumen del sector enlaza a la lista de Empresas filtrada por ese sector (A3), donde se mostrarán estos datos.
+
 #### CA-006 — Accesos superiores
 
 **Dado** que elegí un sector,

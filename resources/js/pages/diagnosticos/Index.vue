@@ -9,7 +9,8 @@
  *
  * En pantallas grandes la página no se desplaza: ocupa el alto de la ventana.
  * La tabla de diagnósticos va paginada con las filas que caben; la lista de
- * sectores y la de empresas bajan y suben en su espacio. La búsqueda filtra por nombre, sin mirar
+ * sectores baja y sube en su espacio. Las empresas del sector se ven en
+ * Empresas (A3), con "Ver en Empresas" desde el resumen. La búsqueda filtra por nombre, sin mirar
  * tildes ni mayúsculas.
  */
 import { Head } from '@inertiajs/vue3';
@@ -18,7 +19,6 @@ import Boton from '@/components/base/Boton.vue';
 import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
-import EmpresasDelSector from '@/components/diagnosticos/EmpresasDelSector.vue';
 import ListaSectores from '@/components/diagnosticos/ListaSectores.vue';
 import ModalArchivarDiagnostico from '@/components/diagnosticos/modales/ModalArchivarDiagnostico.vue';
 import ModalDuplicarDiagnostico from '@/components/diagnosticos/modales/ModalDuplicarDiagnostico.vue';
@@ -32,7 +32,6 @@ import TablaDiagnosticos from '@/components/diagnosticos/TablaDiagnosticos.vue';
 import { rutas } from '@/lib/rutas';
 import { normalizar } from '@/lib/texto';
 import type {
-    EmpresaDelSector,
     FilaDiagnostico,
     MedicionesPorEstado,
     ResumenDiagnosticos as Resumen,
@@ -46,10 +45,8 @@ const props = withDefaults(
         sector?: Sector | null;
         resumen: Resumen & { mediciones_por_estado?: MedicionesPorEstado };
         diagnosticos: FilaDiagnostico[];
-        /** Solo con sector: primeras empresas del sector. */
-        empresas?: EmpresaDelSector[];
     }>(),
-    { sector: null, empresas: () => [] },
+    { sector: null },
 );
 
 const totalDiagnosticos = computed(() =>
@@ -103,10 +100,6 @@ const filas = computed(() => {
                 Number(b.version_publicada === null),
     );
 });
-
-const sePuedeEliminar = computed(
-    () => props.resumen.empresas === 0 && props.resumen.mediciones === 0,
-);
 
 // --- Modales ------------------------------------------------------------------
 const modalSector = ref(false);
@@ -333,16 +326,6 @@ function elegir(
                         @eliminar-borrador="elegir($event, 'borrador')"
                     />
                 </section>
-
-                <EmpresasDelSector
-                    v-if="sector"
-                    class="shrink-0"
-                    :sector="sector"
-                    :empresas="empresas"
-                    :total="resumen.empresas"
-                    :se-puede-eliminar="sePuedeEliminar"
-                    @desactivar="modalEstado = true"
-                />
             </div>
         </div>
     </div>

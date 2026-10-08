@@ -7,6 +7,7 @@ use App\Models\Medicion;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\SectorReasignado;
+use App\Support\DatosDiagnosticos;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -22,7 +23,7 @@ beforeEach(function () {
 
 // --- A2 / A2·T · Lista ------------------------------------------------------------
 
-it('muestra Todos y un sector con su resumen, diagnósticos y empresas', function () {
+it('muestra Todos y un sector con su resumen y diagnósticos', function () {
     $abogados = Sector::factory()->create(['nombre' => 'Abogados']);
     $publicado = Diagnostico::factory()->publicado()->create(['sector_id' => $abogados->id, 'nombre' => 'Diagnóstico general']);
     Diagnostico::factory()->conCategorias(3)->create(['sector_id' => $abogados->id]);
@@ -49,10 +50,14 @@ it('muestra Todos y un sector con su resumen, diagnósticos y empresas', functio
             ->where('resumen.publicados', 1)
             ->where('resumen.borradores', 1)
             ->where('resumen.ultima_medicion.en_curso', 1)
-            ->has('empresas', 1)
-            ->where('empresas.0.medicion.estado', 'en_curso')
-            ->where('empresas.0.medicion.avance.total', 2)
+            ->missing('empresas')
             ->where('diagnosticos', fn ($filas) => collect($filas)->firstWhere('id', $publicado->id)['version_publicada'] === 1));
+
+    // Los datos de las empresas del sector quedan para Empresas (A3).
+    $empresas = DatosDiagnosticos::empresas($abogados);
+    expect($empresas)->toHaveCount(1)
+        ->and($empresas[0]['medicion']['estado'])->toBe('en_curso')
+        ->and($empresas[0]['medicion']['avance']['total'])->toBe(2);
 });
 
 it('no deja ver ni editar diagnósticos a una cuenta de empresa', function () {

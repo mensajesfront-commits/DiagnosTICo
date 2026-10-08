@@ -143,13 +143,13 @@ Ruta prevista: `GET /diagnosticos` (Todos) y `GET /diagnosticos?sector={id}`.
 | `sector` | `Sector \| null` | El sector elegido; `null` en "Todos". |
 | `resumen` | `ResumenDiagnosticos` | Del sector o general. En "Todos" incluye `sectores_activos`. Con sector, también `mediciones_por_estado` (todas las mediciones) para el modal de reasignar. |
 | `diagnosticos` | `FilaDiagnostico[]` | Del sector, o de todos. Sin archivados. |
-| `empresas` | `EmpresaDelSector[]` | Solo con sector. Las primeras N; el total sale de `resumen.empresas`. |
 
 Comportamiento:
 
 - **Página fija** en pantallas grandes (`lg`): ocupa el alto de la ventana y no se desplaza.
   - **La tabla de diagnósticos va paginada** (Todos y cada sector): muestra las filas que caben en su espacio, con "Mostrando 1–9 de 31 · Página 1 de 4", "Anterior" y "Siguiente" (`components/base/Paginacion.vue`, `lib/paginacion.ts`). En pantallas pequeñas, 10 por página. Al buscar, filtrar u ordenar vuelve a la página 1.
-  - La lista de sectores y la tabla de empresas del sector bajan y suben en su espacio.
+  - La lista de sectores baja y sube en su espacio.
+- **Empresas del sector:** se quitó de A2 para ganar espacio. El resumen del sector tiene "Ver las N empresas en Empresas", que lleva a `/empresas?sector={id}` (A3). Los datos (diagnóstico asignado, medición y puntaje) siguen en `DatosDiagnosticos::empresas()` y el tipo `EmpresaDelSector`, para usarlos en A3.
 - En pantallas pequeñas la página se desplaza normal.
 - **"Todos":** no agrupa por sector; la columna "Sector", antes de "Estado", dice de qué sector es cada diagnóstico (enlace al sector).
 - **Acciones por fila:** "Editar ▾" abre un menú con Editar diagnóstico, Duplicar, Archivar o Eliminar, y Eliminar borrador cuando corresponde. Al lado queda "Vista previa".

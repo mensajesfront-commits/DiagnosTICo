@@ -117,7 +117,13 @@ class DatosDiagnosticos
         return $lista;
     }
 
-    /** @return list<array<string, mixed>> */
+    /**
+     * Empresas de un sector con su diagnóstico asignado, su última medición
+     * y su puntaje. Ya no se muestra en A2 (se quitó para ganar espacio);
+     * queda para la lista de Empresas filtrada por sector (A3, semanas 4–5).
+     *
+     * @return list<array<string, mixed>>
+     */
     public static function empresas(Sector $sector): array
     {
         $empresas = Empresa::where('sector_id', $sector->id)
