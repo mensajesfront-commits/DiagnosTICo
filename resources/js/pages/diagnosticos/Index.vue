@@ -179,7 +179,7 @@ function elegir(
         </EncabezadoPagina>
 
         <div
-            class="grid items-start gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[200px_1fr] lg:grid-rows-[minmax(0,1fr)] lg:items-stretch xl:grid-cols-[240px_1fr]"
+            class="grid items-start gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[240px_1fr] lg:grid-rows-[minmax(0,1fr)] lg:items-stretch"
         >
             <div class="flex flex-col gap-4 lg:min-h-0">
                 <ListaSectores

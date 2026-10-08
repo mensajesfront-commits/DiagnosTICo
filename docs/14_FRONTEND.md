@@ -154,7 +154,6 @@ Comportamiento:
 - **"Todos":** no agrupa por sector; la columna "Sector", antes de "Estado", dice de qué sector es cada diagnóstico (enlace al sector).
 - **Acciones por fila:** "Editar ▾" abre un menú con Editar diagnóstico, Duplicar, Archivar o Eliminar, y Eliminar borrador cuando corresponde. Al lado queda "Vista previa".
 - **Eliminar varios:** cada fila tiene una casilla; solo se pueden elegir los diagnósticos que nunca se publicaron (los publicados se archivan). La casilla del encabezado elige los de la página. La selección se mantiene al cambiar de página. Con algo elegido, el pie muestra "N seleccionados · Quitar selección · Eliminar seleccionados", y el modal `ModalEliminarVarios` pide la segunda confirmación ("Sí, eliminar N diagnósticos"). Envía `DELETE /diagnosticos` con `ids[]`.
-- **Sin moverse a izquierda y derecha:** la tabla cabe desde 1024 px de ancho. Preguntas, empresas y mediciones van juntas en la columna "Uso"; "Editar ▾" y "Vista previa" van uno debajo del otro; en pantallas de menos de 1280 px el sector va debajo del nombre y la lista de sectores es más angosta.
 - **Búsqueda:** filtra los diagnósticos por nombre en el navegador, sin mirar tildes ni mayúsculas (`lib/texto.ts`). Funciona en un sector y en "Todos", junto con el orden y el filtro de estado.
 
 **Volver:** A2.3 y A2.5 tienen arriba del título la flecha "← Diagnósticos" (`EncabezadoPagina`, prop `volver`). Desde A2.5 vuelve al sector del que se vino.
