@@ -37,6 +37,12 @@ class Sector extends Model
         return $this->hasMany(ActividadEconomica::class);
     }
 
+    /** @return HasMany<Diagnostico, $this> */
+    public function diagnosticos(): HasMany
+    {
+        return $this->hasMany(Diagnostico::class);
+    }
+
     /** @return HasMany<Empresa, $this> */
     public function empresas(): HasMany
     {
