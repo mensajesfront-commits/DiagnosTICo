@@ -20,6 +20,9 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-012 | Del kit solo se deja el registro; sin modo oscuro | Vigente |
 | DEC-013 | La llamada real a OpenAI se prueba cuando se use la IA | Vigente |
 | DEC-014 | Reglas de acceso propias sobre Fortify | Vigente |
+| DEC-015 | Registro en dos pasos y actividad económica CIIU | Vigente |
+| DEC-016 | País, departamento y ciudad en cascada | Vigente |
+| DEC-017 | Eliminar cuentas con 90 días para recuperarlas | Vigente |
 
 ---
 

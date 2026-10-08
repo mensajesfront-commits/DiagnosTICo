@@ -168,7 +168,7 @@ Ruta prevista: `GET /diagnosticos/crear?sector={id}`.
 | `categorias` | `{ id, nombre }[]` | Categorías activas del catálogo. |
 | `publicados` | `DiagnosticoPublicado[]` | Última versión publicada de cada diagnóstico, de todos los sectores, con los nombres de sus categorías. |
 
-Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1 y redirige al editor (A2.1).
+Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1; mientras no exista el editor (A2.1, semana 4) vuelve a A2 con un aviso.
 
 ### A5 · Usuarios y roles: pestaña Usuarios (`usuarios/Index`)
 

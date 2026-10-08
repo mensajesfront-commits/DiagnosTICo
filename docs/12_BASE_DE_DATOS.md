@@ -1,20 +1,16 @@
 # Base de datos
 
-**Estado:** EN CURSO · el MER es un BORRADOR revisado contra todos los wireframes (T-007 y T-039, 6 de octubre). Falta la aprobación del equipo (hito T-044).
-
-Ya existen las migraciones de `sectores`, `empresas` y las columnas `empresa_id`, `cargo`, `telefono` y `activo` de `users` (6 de octubre; ver `15_BACKEND.md`). El resto del MER sigue sin migración.
+**Estado:** EN CURSO · el MER está migrado completo (T-045, 8 de octubre). Falta la aprobación formal del equipo (hito T-044).
 
 **Motor:** PostgreSQL 18.
 
-Este documento tiene el modelo entidad-relación (MER) armado a partir de los wireframes y de `05_REQUISITOS_FUNCIONALES.md`.
+Este documento tiene:
 
-Pasos que siguen:
+- el modelo entidad-relación (MER), armado a partir de los wireframes y de `05_REQUISITOS_FUNCIONALES.md`;
+- el diccionario de datos de todas las tablas (T-040);
+- cada tabla explicada con un ejemplo y los campos JSONB (T-064).
 
-- **Semana 3:**
-  - Cristian revisa que cada dato que se muestra tenga dónde guardarse (T-039).
-  - Diccionario de datos de las tablas existentes (T-040): hecho, más abajo.
-  - El MER se aprueba antes de crear las migraciones (hito T-044).
-- **Más adelante:** se explica cada tabla con un ejemplo (T-064).
+Todas las tablas del MER tienen migración en `database/migrations/` y modelo en `app/Models/`. Las fábricas para las pruebas están en `database/factories/` (T-058).
 
 ## Criterios del modelo
 
@@ -30,7 +26,7 @@ Pasos que siguen:
   - Sectores, categorías, diagnósticos y cuentas con datos se desactivan o se archivan (RN-004, RN-008 y RN-009).
   - Se usan columnas `activo` o `archivado_en`.
 
-## MER (borrador)
+## MER
 
 ```mermaid
 erDiagram
@@ -81,7 +77,8 @@ erDiagram
         bigint sector_id FK
         bigint actividad_economica_id FK "CIIU del sector (L2)"
         string ciudad
-        string pais
+        string departamento "estado o provincia según el país"
+        string pais "uno de los 18 de Hispanoamérica"
         string telefono "opcional (A3.2)"
         string logo_ruta "logo de la empresa (E11)"
         string sitio_web "opcional (A3.2)"
@@ -90,6 +87,7 @@ erDiagram
         boolean activa "desactivarla desactiva a sus colaboradores (RN-025)"
         timestamp desactivada_en
         string motivo_desactivacion "opcional (A3.1f)"
+        timestamp deleted_at "eliminada: 90 días para recuperarla (DEC-017)"
         timestamps timestamps
     }
 
@@ -99,8 +97,9 @@ erDiagram
         string email UK "un correo, una cuenta (RN-002)"
         string password "null mientras la invitación esté pendiente (A5.3)"
         string telefono "opcional"
-        string cargo "opcional"
+        string cargo "obligatorio en L2 y E12"
         string ciudad "opcional (A6)"
+        string departamento "opcional (A6)"
         string pais "opcional (A6)"
         string foto_ruta "foto de perfil (A6)"
         string zona_horaria "A6"
@@ -111,6 +110,7 @@ erDiagram
         timestamp ultimo_acceso_en "A3.1, A5"
         timestamp invitacion_enviada_en "A5.3"
         timestamp contrasena_actualizada_en "A6"
+        timestamp deleted_at "eliminada: 90 días para recuperarla (DEC-017)"
         timestamps timestamps
     }
 
@@ -129,6 +129,8 @@ erDiagram
         string descripcion
         string estado "borrador, publicado, archivado"
         int version_borrador "número del borrador en curso (v1, v2...)"
+        timestamp archivado_en
+        bigint creado_por FK
         timestamps timestamps
     }
 
@@ -282,11 +284,11 @@ Tablas que ya existen por el kit o por paquetes y que no se dibujan:
 - **[INFORMACIÓN PENDIENTE]** ¿Se guarda un registro de cada recordatorio enviado y se muestra en la ficha de la empresa? (PA-004, HU-008). Si la respuesta es sí, hace falta una tabla `avisos_medicion`.
 - **Resuelto con A3.1e:** el correo de aviso es una plantilla general (`plantillas_correo`) que se puede editar para una medición (`mediciones.correo_asunto` y `correo_cuerpo`); "Guardar como plantilla" reemplaza la general.
 - **[FUNCIONALIDAD POR DEFINIR]** El bot de WhatsApp está aplazado. Si se retoma, sus tablas van separadas (conversaciones y resultados del bot) y no se relacionan con `empresas` ni con `mediciones` (RN-029).
-- Las respuestas y los análisis apuntan a preguntas y categorías por su identificador dentro del JSON de la versión (`pregunta_ref`, `categoria_ref`), no por llave foránea. Así siguen siendo válidos aunque el borrador cambie. Esto debe confirmarse al revisar el MER (T-039).
+- Las respuestas y los análisis apuntan a preguntas y categorías por su identificador dentro del JSON de la versión (`pregunta_ref`, `categoria_ref`), no por llave foránea. Así siguen siendo válidos aunque el borrador cambie. Así quedó en las migraciones (T-045).
 
-## Diccionario de datos de las tablas que ya existen (T-040)
+## Diccionario de datos (T-040)
 
-Son las tablas del acceso (L1–L4) y de Mi perfil (A6, E11). Las demás se agregan al diccionario cuando tengan migración.
+Cada campo con su tipo, si es obligatorio y un ejemplo.
 
 ### `sectores`
 
@@ -327,7 +329,10 @@ Las carga `ActividadesEconomicasSeeder` (lo llama `SectoresSeeder`). **[INFORMAC
 | `sitio_web` | varchar(255) | No | `https://www.laesquina.co` | |
 | `numero_empleados` | varchar(255) | No | `11 a 50` | Rango (E11) |
 | `logo_ruta` | varchar(255) | No | `logos/abc123.png` | Archivo privado; se sirve por `/imagenes/empresa/{id}` |
+| `registrada_por` | bigint → `users.id` | No | `null` | `null` si se registró sola (L2); el Administrador si la registró (A3.2) |
 | `activa` | boolean | Sí (por defecto `true`) | `true` | Desactivada: nadie de la empresa entra (RN-025) |
+| `desactivada_en` | timestamp | No | `null` | A3.1f |
+| `motivo_desactivacion` | varchar(255) | No | `null` | Opcional (A3.1f) |
 | `deleted_at` | timestamp | No | `2026-10-08 10:00:00` | Eliminada: se puede recuperar 90 días y luego se borra para siempre (DEC-017) |
 | `created_at`, `updated_at` | timestamp | No | | |
 
@@ -349,12 +354,296 @@ Las carga `ActividadesEconomicasSeeder` (lo llama `SectoresSeeder`). **[INFORMAC
 | `password` | varchar(255) | Sí | `$2y$12$…` | Cifrada con bcrypt; nunca en texto |
 | `activo` | boolean | Sí (por defecto `true`) | `true` | Desactivada: no entra (RN-004) |
 | `deleted_at` | timestamp | No | `2026-10-08 10:00:00` | Eliminada: no entra; se recupera en 90 días o se borra para siempre (DEC-017) |
-| `ultimo_acceso_en` | timestamp | No | `2026-10-06 15:24:00` | Se guarda al iniciar sesión |
+| `ultimo_acceso_en` | timestamp | No | `2026-10-06 15:24:00` | Se guarda al iniciar sesión; ya no se muestra en A5 ni en E12, solo queda en la base |
 | `contrasena_actualizada_en` | timestamp | No | `2026-08-01 10:00:00` | "Última actualización" en Mi perfil |
 | `terminos_aceptados_en` | timestamp | No | `2026-10-06 15:20:11` | Constancia de la aceptación al registrarse |
+| `invitacion_enviada_en` | timestamp | No | `2026-10-07 09:30:00` | Invitación pendiente (A5.3); `password` vacío hasta crearla |
 | `email_verified_at` | timestamp | No | `null` | Del kit; la verificación de correo no se usa (DEC-012) |
 | `remember_token` | varchar(100) | No | | "Mantener la sesión iniciada" |
 | `created_at`, `updated_at` | timestamp | No | | "Cuenta creada" en Mi perfil |
+
+### `categorias`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `3` | |
+| `nombre` | varchar(40) | Sí, único | `Redes sociales` | Máximo 40 caracteres, sin repetir (RN-009) |
+| `descripcion` | varchar(255) | No | `Presencia y actividad en las redes de la empresa.` | |
+| `archivado_en` | timestamp | No | `null` | Archivada: no se ofrece en diagnósticos nuevos (RN-009) |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+Las 10 categorías del wireframe las carga `CategoriasSeeder`.
+
+### `diagnosticos`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `2` | |
+| `sector_id` | bigint → `sectores.id` | Sí | `4` | No se puede borrar un sector con diagnósticos |
+| `nombre` | varchar(60) | Sí | `Diagnóstico de restaurantes` | |
+| `descripcion` | text | No | `Mide la presencia digital de restaurantes y cafés.` | |
+| `estado` | varchar(20) | Sí (por defecto `borrador`) | `publicado` | `borrador`, `publicado` o `archivado` |
+| `version_borrador` | smallint | No (por defecto `1`) | `3` | Número del borrador en curso; `null` si no hay cambios sobre la última versión |
+| `archivado_en` | timestamp | No | `null` | |
+| `creado_por` | bigint → `users.id` | No | `1` | `null` si se borra la cuenta |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `diagnostico_categoria`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `11` | |
+| `diagnostico_id` | bigint → `diagnosticos.id` | Sí | `2` | Se borra con el diagnóstico |
+| `categoria_id` | bigint → `categorias.id` | Sí | `3` | Única por diagnóstico |
+| `importancia` | decimal(5,2) | Sí (por defecto `0`) | `25.00` | Porcentaje; las del diagnóstico suman 100 (RN-011) |
+| `orden` | smallint | Sí (por defecto `0`) | `1` | |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `preguntas`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `40` | |
+| `diagnostico_categoria_id` | bigint → `diagnostico_categoria.id` | Sí | `11` | Se borra con su categoría del diagnóstico |
+| `texto` | text | Sí | `¿Con qué frecuencia publican en redes?` | |
+| `tipo` | varchar(20) | Sí | `opcion_unica` | `abierta`, `opcion_unica` o `seleccion_multiple` |
+| `indicacion` | text | Sí | `Elige la opción más cercana a lo que hacen hoy.` | Obligatoria (RN-013) |
+| `criterio_ia` | text | Solo en abiertas | `Da más puntaje si nombra un público concreto.` | Cómo la califica la IA |
+| `obligatoria` | boolean | Sí (por defecto `true`) | `true` | |
+| `orden` | smallint | Sí (por defecto `0`) | `2` | |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `opciones`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `120` | |
+| `pregunta_id` | bigint → `preguntas.id` | Sí | `40` | Se borra con su pregunta |
+| `texto` | varchar(255) | Sí | `Varias veces por semana` | |
+| `puntaje` | smallint | Sí | `75` | De 0 a 100 |
+| `ten_en_cuenta` | varchar(200) | No | `Si publican sin plan, no pasa de 50.` | Nota para la IA; la empresa no la ve |
+| `orden` | smallint | Sí (por defecto `0`) | `3` | |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `versiones_diagnostico`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `5` | |
+| `diagnostico_id` | bigint → `diagnosticos.id` | Sí | `2` | No se puede borrar un diagnóstico con versiones |
+| `numero` | smallint | Sí, único por diagnóstico | `2` | v1, v2, v3… |
+| `nota_cambios` | text | No | `Se agregó la categoría Correo.` | |
+| `contenido` | jsonb | Sí | Ver «Campos JSONB» | Copia congelada; no se edita nunca (RN-010) |
+| `publicada_por` | bigint → `users.id` | No | `1` | |
+| `publicada_en` | timestamp | Sí | `2026-10-20 09:00:00` | |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `mediciones`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `9` | |
+| `empresa_id` | bigint → `empresas.id` | Sí | `1` | Se borra con la empresa (al borrarla para siempre, DEC-017) |
+| `version_diagnostico_id` | bigint → `versiones_diagnostico.id` | Sí | `5` | La versión congelada que se responde, nunca el borrador |
+| `numero` | smallint | Sí, único por empresa | `2` | "Medición 2" |
+| `estado` | varchar(20) | Sí (por defecto `no_iniciada`) | `en_curso` | `no_iniciada`, `en_curso`, `enviada`, `terminada`, `vencida`, `cancelada` (RN-015) |
+| `fecha_limite` | date | No | `2026-11-15` | |
+| `mensaje` | text | No | `Por favor respondan antes del cierre de mes.` | Va en el correo de aviso |
+| `aviso_por_correo` | boolean | Sí (por defecto `true`) | `true` | A3.1b |
+| `correo_asunto`, `correo_cuerpo` | varchar(255), text | No | `null` | `null` = el de la plantilla (A3.1e) |
+| `reemplazada_por` | bigint → `mediciones.id` | No | `null` | La medición nueva que la reemplazó (A3.1c) |
+| `cancelada_en` | timestamp | No | `null` | |
+| `asignada_por` | bigint → `users.id` | No | `1` | |
+| `enviada_en`, `terminada_en` | timestamp | No | `2026-10-25 16:40:00` | |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `respuestas`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `301` | |
+| `medicion_id` | bigint → `mediciones.id` | Sí | `9` | Se borra con la medición |
+| `pregunta_ref` | varchar(255) | Sí, único por medición | `p40` | Identificador de la pregunta en el JSON de la versión |
+| `opciones_elegidas` | jsonb | En opción única o múltiple | `["o120"]` | Ver «Campos JSONB» |
+| `texto` | text | En abiertas | `Le hablamos a familias del barrio…` | Máx. 1000 caracteres |
+| `puntaje` | smallint | No | `75` | Calculado o dado por la IA (RN-018) |
+| `observacion_ia` | text | No | `Publican seguido, pero sin calendario.` | Una frase por pregunta (A3.3, E6) |
+| `respondida_por` | bigint → `users.id` | No | `7` | Empresa o colaborador |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `analisis_categoria`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `44` | |
+| `medicion_id` | bigint → `mediciones.id` | Sí | `9` | |
+| `categoria_ref` | varchar(255) | Sí, único por medición | `c3` | Identificador de la categoría en el JSON de la versión |
+| `estado` | varchar(20) | Sí (por defecto `pendiente`) | `terminado` | `pendiente`, `terminado` o `fallido` |
+| `intentos` | smallint | Sí (por defecto `0`) | `1` | Máximo 3 (RN-021) |
+| `prompt` | text | No | | El prompt exacto que se envió (RN-023) |
+| `respuesta_ia` | jsonb | No | Ver «Campos JSONB» | |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `resultados`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `6` | |
+| `medicion_id` | bigint → `mediciones.id` | Sí, único | `9` | Un resultado por medición |
+| `puntaje_total` | smallint | Sí | `62` | Promedio ponderado (RN-018) |
+| `nivel` | varchar(20) | Sí | `camino` | `critico`, `mejorar`, `camino`, `sigue` (RN-019, `App\Support\Niveles`) |
+| `variacion` | smallint | No | `8` | Frente a la medición anterior; `null` en la primera (RN-020) |
+| `por_categoria` | jsonb | Sí | Ver «Campos JSONB» | |
+| `pdf_ruta` | varchar(255) | No | `pdfs/medicion-9.pdf` | PDF guardado (RN-024) |
+| `publicado_en` | timestamp | Sí | `2026-10-25 16:45:00` | Desde aquí no cambia (RN-023) |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `solicitudes_medicion`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `2` | |
+| `empresa_id` | bigint → `empresas.id` | Sí | `1` | |
+| `medicion_vencida_id` | bigint → `mediciones.id` | No | `8` | La medición vencida que la originó |
+| `estado` | varchar(20) | Sí (por defecto `abierta`) | `abierta` | `abierta` o `atendida`; una abierta a la vez (SUP-003) |
+| `solicitada_por` | bigint → `users.id` | No | `7` | |
+| `atendida_en` | timestamp | No | `null` | |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `prompts`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `3` | |
+| `etapa` | varchar(40) | Sí (por defecto `analizar_categoria`) | `analizar_categoria` | La única etapa por ahora |
+| `alcance` | varchar(20) | Sí | `sector` | `general`, `sector` o `empresa` (RN-022) |
+| `sector_id` | bigint → `sectores.id` | Solo en alcance `sector` | `4` | |
+| `empresa_id` | bigint → `empresas.id` | Solo en alcance `empresa` | `null` | |
+| `modo_contexto`, `modo_tarea`, `modo_detalles`, `modo_ejemplos` | varchar(20) | Sí (por defecto `usar`) | `agregar` | `usar`, `agregar` o `reemplazar`, por parte (A4.3, A4.4) |
+| `contexto`, `tarea`, `detalles`, `ejemplos` | text | No | `En restaurantes, valora las reseñas en Google.` | Texto de cada parte |
+| `actualizado_por` | bigint → `users.id` | No | `1` | "Última edición" (A4) |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+Única por `etapa` + `alcance` + `sector_id` + `empresa_id`. El texto general original vive en el código ("Restaurar texto original").
+
+### `plantillas_correo`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `1` | |
+| `clave` | varchar(40) | Sí, única | `aviso_medicion` | |
+| `asunto` | varchar(255) | Sí | `Tienes una medición nueva` | |
+| `cuerpo` | text | Sí | `Hola {nombre_usuario}, {empresa} tiene…` | Con variables |
+| `actualizado_por` | bigint → `users.id` | No | `1` | |
+| `created_at`, `updated_at` | timestamp | No | | |
+
+### `registros_ver_como`
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `1` | |
+| `administrador_id` | bigint → `users.id` | Sí | `1` | Quién usó "Ver como" |
+| `cuenta_id` | bigint → `users.id` | Sí | `7` | La cuenta que se miró |
+| `inicio` | timestamp | Sí | `2026-10-26 10:00:00` | |
+| `fin` | timestamp | No | `2026-10-26 10:12:00` | `null` mientras siga mirando (RN-026) |
+
+## Cada tabla con un ejemplo (T-064)
+
+Un solo caso de punta a punta: el restaurante «La Esquina» responde su segunda medición.
+
+| Tabla | Qué guarda | En el ejemplo |
+|---|---|---|
+| `sectores` | Los sectores que se ofrecen | «Restaurantes» (id 4) |
+| `actividades_economicas` | Códigos CIIU de cada sector | «5611 · Expendio a la mesa de comidas preparadas» |
+| `empresas` | Cada empresa registrada | «Restaurante La Esquina», de Cali, sector 4 |
+| `users` | Todas las cuentas | Laura (cuenta principal, rol Empresa) y Camila (Colaborador), las dos con `empresa_id = 1`; Cristian (Administrador) con `empresa_id = null` |
+| `categorias` | El catálogo general | «Redes sociales», «Sitio web»… |
+| `diagnosticos` | El diagnóstico de cada sector, en borrador o publicado | «Diagnóstico de restaurantes», estado `publicado` |
+| `diagnostico_categoria` | Qué categorías usa y cuánto pesa cada una | «Redes sociales» con importancia 25 % |
+| `preguntas`, `opciones` | El borrador editable | «¿Con qué frecuencia publican?» con 4 opciones de 0 a 100 |
+| `versiones_diagnostico` | La foto que se publica | v2, con todo el contenido copiado en `contenido` |
+| `mediciones` | Cada vez que se le pide a una empresa responder | Medición 2 de La Esquina, versión v2, fecha límite 15 nov |
+| `respuestas` | Una fila por pregunta respondida | `p40` → `["o120"]`, puntaje 75, respondida por Camila |
+| `analisis_categoria` | Un análisis de la IA por categoría | `c3` terminado al primer intento |
+| `resultados` | El resultado publicado | 62 puntos, nivel `camino`, +8 frente a la Medición 1 |
+| `solicitudes_medicion` | Cuando la empresa pide otra medición | Si la Medición 2 vence, Laura pide una nueva |
+| `prompts` | Ajustes de la IA por sector o empresa | Restaurantes «agrega» un detalle sobre reseñas en Google |
+| `plantillas_correo` | El correo de aviso | Asunto y cuerpo de `aviso_medicion` |
+| `registros_ver_como` | Quién miró qué cuenta | Cristian miró la cuenta de Laura 12 minutos |
+
+## Campos JSONB
+
+### `versiones_diagnostico.contenido`
+
+La copia congelada del diagnóstico al publicar. La arma `App\Services\Diagnosticos\ContenidoDiagnostico::congelar`. Cada elemento lleva un `ref` estable: `c` + id de la categoría, `p` + id de la pregunta, `o` + id de la opción.
+
+```json
+{
+  "nombre": "Diagnóstico de restaurantes",
+  "descripcion": "Mide la presencia digital de restaurantes y cafés.",
+  "categorias": [
+    {
+      "ref": "c3", "categoria_id": 3, "nombre": "Redes sociales", "importancia": 25.0, "orden": 1,
+      "preguntas": [
+        {
+          "ref": "p40", "texto": "¿Con qué frecuencia publican en redes?", "tipo": "opcion_unica",
+          "indicacion": "Elige la opción más cercana a lo que hacen hoy.", "criterio_ia": null,
+          "obligatoria": true, "orden": 1,
+          "opciones": [
+            { "ref": "o119", "texto": "Casi nunca", "puntaje": 0, "ten_en_cuenta": null, "orden": 1 },
+            { "ref": "o120", "texto": "Varias veces por semana", "puntaje": 75, "ten_en_cuenta": null, "orden": 2 }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### `respuestas.opciones_elegidas`
+
+Lista de los `ref` de las opciones elegidas: una en opción única, varias en selección múltiple. `null` en las abiertas.
+
+```json
+["o120"]
+```
+
+### `analisis_categoria.respuesta_ia`
+
+Lo que devuelve la IA para una categoría (etapa 1).
+
+```json
+{
+  "observacion": "Tienen presencia constante, pero sin un plan de contenidos.",
+  "recomendacion": "Armen un calendario mensual con 3 publicaciones por semana.",
+  "preguntas": [
+    { "ref": "p41", "puntaje": 60, "observacion": "Nombra un público, pero muy general." }
+  ]
+}
+```
+
+**[INFORMACIÓN PENDIENTE]** La forma final sale de la prueba técnica de OpenAI (T-019), que espera la clave (DEC-013). El ejemplo es la forma propuesta.
+
+### `resultados.por_categoria`
+
+Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran A3.3, E5 y E6.
+
+```json
+[
+  { "ref": "c3", "nombre": "Redes sociales", "importancia": 25.0, "puntaje": 70, "nivel": "camino", "variacion": 10 },
+  { "ref": "c5", "nombre": "Sitio web", "importancia": 20.0, "puntaje": 40, "nivel": "mejorar", "variacion": null }
+]
+```
+
+**[INFORMACIÓN PENDIENTE]** Se confirma cuando se programe el cálculo del resultado (semana 5).
+
+### `users.avisos`
+
+Avisos por correo que la cuenta elige en Mi perfil (A6).
+
+```json
+{ "ia_falla": true, "resumen_semanal": false }
+```
 
 ### Roles y permisos (spatie/laravel-permission)
 

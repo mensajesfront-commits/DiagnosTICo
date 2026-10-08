@@ -1,10 +1,31 @@
 # Backend
 
-**Estado:** EN CURSO. La lista de rutas es una PROPUESTA que REQUIERE VALIDACIÓN (T-043).
+**Estado:** REQUIERE VALIDACIÓN (T-043). Las rutas de acceso, Mi perfil, inicio, A2, A5 y E12 ya existen; las demás son la propuesta para las semanas 4 a 6.
 
-La lista sale de lo que necesitan las pantallas ya construidas. **Luis decide los nombres finales.** Si cambia una URL, se actualiza en `resources/js/lib/rutas.ts`, o se reemplaza ese archivo por las funciones de Wayfinder (`@/routes/...`) cuando las rutas existan.
+Todas las rutas con sesión van con `auth` y con el rol o permiso indicado (matriz en `17_SEGURIDAD.md`). El frontend usa las funciones de Wayfinder (`@/routes/...`); si cambia una URL, se regenera con `php artisan wayfinder:generate --with-form`.
 
-Todas las rutas del Administrador van con `auth` y con el permiso indicado (matriz en `17_SEGURIDAD.md`).
+## Rutas por módulo (T-043)
+
+Resumen: cada módulo con su controlador, su protección y sus pantallas. El detalle de cada ruta está en las secciones de abajo.
+
+| Módulo | URL base | Controlador | Protección | Pantallas | Estado |
+|---|---|---|---|---|---|
+| Acceso | `/login`, `/register`, `/forgot-password`, `/reset-password` | Fortify (`FortifyServiceProvider`, `CreateNewUser`) | Invitado + límite de intentos | L1–L4 | Hecho |
+| Ubicaciones | `/ubicaciones/{pais}` | `UbicacionesController` | Pública, 60 por minuto | L2, A6, E11 | Hecho |
+| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | Redirección hecha; pantallas en semanas 5 y 6 |
+| Mi perfil | `/mi-perfil`, `/imagenes/{tipo}/{id}` | `PerfilController` | `auth` | A6, E11 | Hecho |
+| Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.2, A2.5, A2.7 | Hecho; editor A2.1 y vista previa A2.4 en semana 4 |
+| Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
+| Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho ("Ver como" en semana 6) |
+| Colaboradores | `/colaboradores` | `ColaboradoresController` | `role:Empresa` + cuenta principal | E12 | Hecho |
+| Empresas y mediciones | `/empresas` | `EmpresasController`, `MedicionesController` (por crear) | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1–A3.5 | Semanas 4–5 |
+| Responder medición | `/mediciones/{id}` | `ResponderController` (por crear) | `diagnostico.responder` + su empresa | E2–E4 | Semana 5 |
+| Resultados | `/resultados/{id}`, `/resultados/{id}/pdf` | `ResultadosController` (por crear) | `resultados.ver`, `resultados.pdf` + su empresa (o cualquier empresa si es interna) | E5, E6, A3.3 | Semana 5 |
+| Configuración de la IA | `/configuracion-ia` | `PromptsController` (por crear) | `ia.ver` / `ia.editar` | A4, A4.1–A4.4 | Semana 5 |
+| Historial | `/historial` | `HistorialController` (por crear) | `resultados.ver` + su empresa | E8 | Semana 6 |
+| Webhook del bot de WhatsApp | `/webhook/whatsapp` | — | Firma del proveedor, sin sesión | — | **Aplazado** (EP-013). **[FUNCIONALIDAD POR DEFINIR]** Si se retoma, va separado de empresas y mediciones (RN-029) |
+
+Los permisos son los 15 de `RolesYPermisosSeeder`. **[INFORMACIÓN PENDIENTE]** Los nombres de los controladores "por crear" los confirma Luis al programar cada módulo.
 
 ## Acceso (Fortify, ya existen)
 
@@ -46,7 +67,19 @@ Seguridad del acceso completa (7 de octubre): cuentas y empresas desactivadas, c
 | Textos en español | `lang/es/*.php`, `lang/es.json` |
 | Pruebas | `tests/Feature/Auth/SeguridadAccesoTest.php` |
 
-Queda fuera del acceso (lo hace el backend de cada módulo): la redirección según el rol (T-048), que depende de las pantallas A1 y E1.
+Ubicaciones (DEC-016): `GET /ubicaciones/{pais}` devuelve los departamentos y ciudades de uno de los 18 países (`app/Support/Ubicaciones.php`, archivos en `resources/ubicaciones/`).
+
+## Inicio según el rol (T-048, hecho)
+
+Fortify redirige a `/dashboard` después del login y del registro. `InicioController` manda a cada cuenta a su inicio. Pruebas en `tests/Feature/InicioTest.php`.
+
+| Método | URL | Nombre | Qué hace |
+|---|---|---|---|
+| GET | `/dashboard` | `dashboard` | Empresa y Colaborador → `/mi-inicio`; Administrador y roles internos → `/inicio` |
+| GET | `/inicio` | `inicio.administrador` | A1. Una cuenta de empresa que entra aquí vuelve a `/mi-inicio` |
+| GET | `/mi-inicio` | `inicio.empresa` | E1. Una cuenta interna que entra aquí vuelve a `/inicio` |
+
+**[FUNCIONALIDAD POR DEFINIR]** A1 y E1 son pantallas de bienvenida hasta las semanas 5 y 6.
 
 ## Mi perfil (ya existe)
 
@@ -58,7 +91,7 @@ Queda fuera del acceso (lo hace el backend de cada módulo): la redirección seg
 | POST | `/mi-perfil/foto` | `perfil.foto` | Foto de la cuenta o logo de la empresa |
 | GET | `/imagenes/{tipo}/{id}` | `perfil.imagen` | Sirve la foto o el logo a la misma cuenta, su empresa o quien tenga `empresas.ver` / `usuarios.ver` |
 
-Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/security`) y la opción de eliminar la cuenta: las cuentas se desactivan, no se borran (RN-004). `/settings` redirige a `/mi-perfil`. El "último acceso" se guarda al iniciar sesión (`AppServiceProvider`).
+Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/security`) y la opción de que cada cuenta se elimine sola: solo el Administrador elimina cuentas (A5, DEC-017). `/settings` redirige a `/mi-perfil`. El "último acceso" se guarda al iniciar sesión (`AppServiceProvider`).
 
 ## Diagnósticos y sectores (T-049, T-050)
 
@@ -67,10 +100,10 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | GET | `/diagnosticos` | `diagnosticos.ver` | A2·T: todos los diagnósticos | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos?sector={id}` | `diagnosticos.ver` | A2 / A2b: un sector | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos/crear?sector={id}` | `diagnosticos.editar` | A2.5 | Props de `diagnosticos/Crear` |
-| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1 y redirige al editor | `nombre`, `sector_id`, `descripcion`, `punto_partida`, `categorias[]`, `copiar_de` |
+| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1. Mientras no exista el editor A2.1 vuelve a A2 con un aviso | `nombre`, `sector_id`, `descripcion`, `punto_partida`, `categorias[]`, `copiar_de` |
 | GET | `/diagnosticos/{id}/editar` | `diagnosticos.editar` | A2.1 (semana 4) | |
 | GET | `/diagnosticos/{id}/vista-previa` | `diagnosticos.ver` | A2.4 (semana 4) | |
-| POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 y abre el editor | `nombre` (máx. 60), `sector_id` |
+| POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 (por ahora vuelve a A2 con un aviso) | `nombre` (máx. 60), `sector_id` |
 | POST | `/diagnosticos/{id}/archivar` | `diagnosticos.editar` | Archiva un diagnóstico publicado | — |
 | DELETE | `/diagnosticos/{id}` | `diagnosticos.editar` | Elimina un borrador que nunca se publicó | — |
 | DELETE | `/diagnosticos/{id}/borrador` | `diagnosticos.editar` | Elimina el borrador pendiente (vN) sin tocar la versión publicada | — |
@@ -155,11 +188,7 @@ Reglas que valida el servidor:
 
 ## Otras secciones del menú (rutas previstas)
 
-| URL | Pantalla | Semana |
-|---|---|---|
-| `/empresas`, `/empresas?sector={id}`, `/empresas/{id}` | A3, A3.1 | 4–5 |
-| `/configuracion-ia` | A4 | 5 |
-| `/historial` | E8 | 6 |
+Están en la tabla «Rutas por módulo». Las tablas que usan ya tienen migración y modelo (T-045): `mediciones`, `respuestas`, `analisis_categoria`, `resultados`, `solicitudes_medicion`, `prompts`, `plantillas_correo` y `registros_ver_como`.
 
 ## Respuestas después de una acción
 

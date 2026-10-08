@@ -22,10 +22,18 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Mi perfil (A6 y E11) conectado: datos personales, datos de la empresa para la cuenta principal, avisos por correo, foto o logo y cambio de contraseña. Se guarda el último acceso.
 - Al abrir el sistema (`/`) se entra directo al inicio de sesión.
 - Seguridad del acceso completa: cuentas y empresas desactivadas no entran, contraseña fuerte en todos los entornos, mismo aviso en la recuperación, enlace sin vencimiento, límite de intentos, mensajes y correo en español, constancia de los términos (DEC-014).
-- Cuentas de demostración (`DemoSeeder`) y diccionario de datos de las tablas existentes.
+- Diccionario de datos de las tablas del acceso.
 - Usuarios y roles (A5, A5.1–A5.5): lista de cuentas con búsqueda y filtros, roles del sistema y creados, modales de invitar, desactivar, cambiar y asignar rol, crear y eliminar rol, conectados al backend (invitaciones por correo, desactivar, cambiar y asignar rol, CRUD de roles). "Ver como" llega con A5.4.
 - Colaboradores de la empresa (E12, E12.1–E12.3): lista, agregar, datos para compartir, cambiar contraseña, desactivar y reactivar. Conectado al backend (`ColaboradoresController`): solo la cuenta principal entra; cambiar la contraseña o desactivar cierra las sesiones del colaborador.
 - Documentos 02 (visión y objetivos), 04 (stakeholders), 06 (requisitos no funcionales), 09 (flujos, con el diagrama de secuencia de la medición) y 10 (arquitectura).
+
+### Agregado (modelo de datos y backend de A2, 8 de octubre)
+
+- Migraciones, modelos y fábricas de todo el MER (T-045, T-058): categorías, diagnósticos, sus categorías con importancia, preguntas, opciones, versiones congeladas en JSONB, mediciones, respuestas, análisis de la IA, resultados, solicitudes de medición, prompts, plantilla de correo y registro de "Ver como".
+- Datos iniciales (T-046): las 10 categorías del wireframe (`CategoriasSeeder`) y los niveles de RN-019 en `App\Support\Niveles`.
+- Backend de A2 conectado (T-049, T-050): diagnósticos (listar, crear en blanco o copiando, duplicar, archivar, eliminar el borrador), sectores (crear, editar, reasignar con aviso por correo, desactivar, reactivar, eliminar) y catálogo de categorías (crear, editar, archivar, restaurar, eliminar). Pruebas en `tests/Feature/DiagnosticosYCatalogoTest.php`.
+- Redirección después del login según el rol (T-048): `/dashboard` lleva a A1 (`/inicio`) o a E1 (`/mi-inicio`). A1 y E1 son pantallas de bienvenida hasta las semanas 5 y 6.
+- Documentos: `08_CASOS_DE_USO.md` (T-041) y `30_RIESGOS.md` (T-067). Diccionario de datos de todas las tablas, cada tabla con un ejemplo y los campos JSONB (T-040, T-064). Rutas por módulo en `15_BACKEND.md` (T-043). Tabla historia → requisito en `05_REQUISITOS_FUNCIONALES.md` (T-061). Términos técnicos nuevos en el glosario (T-068).
 
 ### Cambiado (registro)
 
@@ -48,7 +56,6 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 ### Quitado
 
 - La columna "Último acceso" de Usuarios y roles (A5). El dato se sigue guardando en `users.ultimo_acceso_en`.
-
 - Las cuentas de demostración (`DemoSeeder`, `DEMO_PASSWORD`). El equipo trabaja con cuentas creadas por ellos mismos.
 
 ### Cambiado (Mi perfil de la empresa)

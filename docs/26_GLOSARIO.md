@@ -38,3 +38,15 @@
 | **Mailpit** | Servidor de correo de prueba: atrapa los correos para verlos en `http://localhost:8025` sin enviarlos. |
 | **Pest / Vitest** | Herramientas de pruebas automáticas del backend y del frontend. |
 | **Pint / Oxlint** | Formateadores y revisores de código: Pint para PHP y Oxlint con Oxfmt (vía Vite+) para TypeScript y Vue. |
+| **Migración** | Archivo de PHP que crea o cambia una tabla de la base de datos (`database/migrations/`). Se corre con `php artisan migrate` y así las dos personas tienen la misma estructura. |
+| **Seeder** | Archivo que carga datos iniciales en la base (`database/seeders/`): roles y permisos, sectores, actividades CIIU, las 10 categorías y el Administrador inicial. Se corre con `php artisan db:seed`. |
+| **Factory** | Receta para crear datos falsos en las pruebas (`database/factories/`), por ejemplo una empresa o un diagnóstico publicado. |
+| **Modelo** | Clase de PHP que representa una tabla (`app/Models/`): `Empresa` para `empresas`, `Medicion` para `mediciones`. |
+| **Rol** | Tipo de cuenta: Administrador, Empresa o Colaborador (y los que se creen en A5.1). Cada cuenta tiene uno solo y define qué menú ve (RN-027). Se maneja con spatie/laravel-permission. |
+| **Permiso** | Acción concreta que un rol puede hacer, como `diagnosticos.ver` o `usuarios.gestionar`. Son 15 (A5.2). El servidor los revisa en cada ruta; ocultar un botón no basta. |
+| **Middleware** | Filtro que corre antes del controlador: revisa la sesión, el rol o el permiso (`role:Empresa`, `permission:diagnosticos.editar`) o el límite de intentos. |
+| **Ruta** | Dirección de la aplicación (`/diagnosticos`) unida al controlador que la atiende. Están en `routes/web.php`; la lista por módulo está en `15_BACKEND.md`. |
+| **Controlador** | Clase de PHP (`app/Http/Controllers/`) que recibe la petición de una ruta, valida, guarda y responde con una pantalla o una redirección. |
+| **Componente** | Pieza de pantalla de Vue reutilizable (`.vue`), como `Boton.vue` o `Modal.vue`. Los base están en `resources/js/components/base/`; una página es un componente completo en `resources/js/pages/`. |
+| **Soft delete** | Borrado "suave": la fila no se borra, se marca con `deleted_at` y deja de verse. Se usa al eliminar cuentas para poder recuperarlas en 90 días (DEC-017). |
+| **Cola** | Lista de trabajos que se hacen en segundo plano (correos, análisis de la IA) para no hacer esperar a la pantalla (RNF-004). |

@@ -9765,6 +9765,99 @@ Requisito → Épica → Historia → Criterio de aceptación.
 | RF-039 — Configurar el bot de WhatsApp | EP-013 | HU-071 | HU-071: CA-001–CA-005 | Completa (aplazada) |
 | RF-040 — Diagnóstico por WhatsApp | EP-013 | HU-072, HU-073, HU-074, HU-075 | HU-072: CA-001–CA-003; HU-073: CA-001–CA-006; HU-074: CA-001–CA-004; HU-075: CA-001–CA-004 | Completa (aplazada) |
 
+## Historia → requisito (T-061)
+
+Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha" quiere decir que tiene pantalla, backend y pruebas.
+
+| Historia | Requisito | Estado |
+|---|---|---|
+| HU-001 — Iniciar sesión | RF-001 | Hecha |
+| HU-002 — Registrar mi empresa | RF-002 | Hecha |
+| HU-003 — Recuperar mi contraseña | RF-003 | Hecha |
+| HU-004 — Crear una contraseña nueva | RF-003 | Hecha |
+| HU-005 — Cerrar sesión | RF-004 | Hecha |
+| HU-006 — Ver el inicio con indicadores | RF-005 | Pendiente |
+| HU-007 — Filtrar las mediciones por estado | RF-005 | Pendiente |
+| HU-008 — Recordar o reenviar el aviso | RF-006 | Pendiente |
+| HU-009 — Dar una nueva fecha a una medición vencida | RF-007 | Pendiente |
+| HU-010 — Ver los diagnósticos de un sector | RF-008 | Hecha |
+| HU-011 — Ver todos los diagnósticos | RF-008 | Hecha |
+| HU-012 — Crear un sector | RF-009 | Hecha |
+| HU-013 — Editar un sector | RF-009 | Hecha |
+| HU-014 — Reasignar las empresas de un sector | RF-009 | Hecha |
+| HU-015 — Desactivar un sector | RF-009 | Hecha |
+| HU-016 — Eliminar un sector | RF-009 | Hecha |
+| HU-017 — Ver y editar el catálogo de categorías | RF-010 | Hecha |
+| HU-018 — Crear una categoría | RF-010 | Hecha |
+| HU-019 — Eliminar o archivar una categoría | RF-010 | Hecha |
+| HU-020 — Crear un diagnóstico | RF-011 | Hecha |
+| HU-021 — Duplicar un diagnóstico | RF-011 | Hecha |
+| HU-022 — Archivar o eliminar un diagnóstico | RF-011 | Hecha |
+| HU-023 — Ver y ordenar el contenido del diagnóstico | RF-012 | Pendiente |
+| HU-024 — Agregar una pregunta | RF-013 | Pendiente |
+| HU-025 — Editar o eliminar una pregunta | RF-013 | Pendiente |
+| HU-026 — Agregar categorías al diagnóstico | RF-012 | Pendiente |
+| HU-027 — Editar la importancia de las categorías | RF-012 | Pendiente |
+| HU-028 — Ver la vista previa y el estado | RF-014 | Pendiente |
+| HU-029 — Publicar una versión | RF-014 | Pendiente |
+| HU-030 — Ver un resultado de ejemplo | RF-015 | Pendiente |
+| HU-031 — Ver la lista de empresas | RF-016 | Pendiente |
+| HU-032 — Registrar una empresa | RF-017 | Pendiente |
+| HU-033 — Ver la ficha e historial de una empresa | RF-016 | Pendiente |
+| HU-034 — Editar los datos de la cuenta de una empresa | RF-017 | Pendiente |
+| HU-035 — Desactivar o reactivar la cuenta de una empresa | RF-017 | Pendiente |
+| HU-036 — Asignar una medición | RF-018 | Pendiente |
+| HU-037 — Editar el correo de aviso de la medición | RF-006 | Pendiente |
+| HU-038 — Ver el resultado de una empresa | RF-019 | Pendiente |
+| HU-039 — Ver el historial de una empresa | RF-019 | Pendiente |
+| HU-040 — Ver las respuestas de una empresa | RF-019 | Pendiente |
+| HU-041 — Editar las instrucciones generales de la IA | RF-020 | Pendiente |
+| HU-042 — Ajustar el prompt para un sector | RF-021 | Pendiente |
+| HU-043 — Ajustar el prompt para una empresa | RF-021 | Pendiente |
+| HU-044 — Ver el prompt completo | RF-022 | Pendiente |
+| HU-045 — Probar el prompt con un ejemplo | RF-022 | Pendiente |
+| HU-046 — Ver las cuentas del sistema | RF-023 | Hecha |
+| HU-047 — Desactivar o reactivar una cuenta | RF-023 | Hecha |
+| HU-048 — Ver los roles del sistema | RF-024 | Hecha |
+| HU-049 — Crear un rol | RF-024 | Hecha |
+| HU-050 — Editar un rol | RF-024 | Hecha |
+| HU-051 — Eliminar un rol | RF-024 | Hecha |
+| HU-052 — Asignar o quitar un rol | RF-024 | Hecha |
+| HU-053 — Ver el sistema como una empresa | RF-025 | Pendiente |
+| HU-054 — Ver el sistema como otro administrador | RF-025 | Pendiente |
+| HU-055 — Editar mi perfil (Administrador) | RF-026 | Hecha |
+| HU-056 — Editar mi perfil (Empresa o Colaborador) | RF-026 | Hecha |
+| HU-057 — Ver mi inicio la primera vez | RF-027 | Pendiente |
+| HU-058 — Ver mi medición pendiente | RF-027 | Pendiente |
+| HU-059 — Ver mi inicio sin medición pendiente | RF-027 | Pendiente |
+| HU-060 — Responder el diagnóstico | RF-028 | Pendiente |
+| HU-061 — Revisar antes de enviar | RF-029 | Pendiente |
+| HU-062 — Enviar el diagnóstico | RF-029 | Pendiente |
+| HU-063 — Esperar el análisis | RF-030 | Pendiente |
+| HU-064 — Ver mi resultado | RF-031 | Pendiente |
+| HU-065 — Ver mis respuestas | RF-031 | Pendiente |
+| HU-066 — Descargar el informe en PDF | RF-032 | Pendiente |
+| HU-067 — Ver mi historial | RF-033 | Pendiente |
+| HU-068 — Calcular los puntajes | RF-036 | Pendiente |
+| HU-069 — Analizar cada categoría con la IA | RF-037 | Pendiente |
+| HU-070 — Marcar mediciones vencidas | RF-007 | Pendiente |
+| HU-071 — Configurar las preguntas del bot | RF-039 | Aplazada |
+| HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Aplazada |
+| HU-073 — Responder las preguntas del bot | RF-040 | Aplazada |
+| HU-074 — Retomar la conversación | RF-040 | Aplazada |
+| HU-075 — Recibir el resultado por WhatsApp | RF-040 | Aplazada |
+| HU-076 — Ver los colaboradores de mi empresa | RF-035 | Hecha |
+| HU-077 — Crear un colaborador | RF-035 | Hecha |
+| HU-078 — Cambiar la contraseña de un colaborador | RF-035 | Hecha |
+| HU-079 — Desactivar o reactivar un colaborador | RF-035 | Hecha |
+| HU-080 — Entender cómo se arma el prompt final | RF-020 | Pendiente |
+| HU-081 — Armar el prompt de cada categoría | RF-037 | Pendiente |
+| HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Pendiente |
+| HU-083 — Atender las solicitudes de nueva medición | RF-034 | Pendiente |
+| HU-084 — Publicar el resultado | RF-038 | Pendiente |
+
+HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la semana 4; mientras tanto vuelven a A2 con un aviso. HU-078 también permite editar el nombre, el cargo y el correo del colaborador, y E12 permite eliminarlo (DEC-017).
+
 ## Cobertura de vistas del prototipo
 
 | Vista | Historias |

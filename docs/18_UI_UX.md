@@ -65,12 +65,13 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | Código | Pantalla | Componente | Estado |
 |---|---|---|---|
 | L1 | Iniciar sesión | `pages/auth/Login.vue` | Hecha |
-| L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha. El backend de los campos de empresa va en T-047. |
+| L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha y conectada (dos pasos, DEC-015 y DEC-016) |
 | L3 | ¿Olvidaste tu contraseña? | `pages/auth/ForgotPassword.vue` | Hecha |
 | L4 | Crea una contraseña nueva | `pages/auth/ResetPassword.vue` | Hecha |
-| A2 | Diagnósticos de un sector | `pages/diagnosticos/Index.vue` | Hecha (vista previa) |
-| A2·T | Todos los diagnósticos | `pages/diagnosticos/Index.vue` | Hecha (vista previa) |
-| A2b | Sector sin diagnósticos | `pages/diagnosticos/Index.vue` | Hecha (vista previa) |
+| A1 | Inicio del Administrador | `pages/inicio/Administrador.vue` | Bienvenida provisional; la pantalla completa es de la semana 5 (T-048 ya redirige aquí) |
+| A2 | Diagnósticos de un sector | `pages/diagnosticos/Index.vue` | Hecha y conectada |
+| A2·T | Todos los diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
+| A2b | Sector sin diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2.2 / A2.2a | Editar / crear sector | `components/diagnosticos/modales/ModalSector.vue` | Hecha |
 | A2.2b | Reasignar empresas | `…/ModalReasignarSector.vue` | Hecha |
 | A2.2c | Desactivar / reactivar sector | `…/ModalEstadoSector.vue` | Hecha. Sin wireframe, sale de HU-015. |
@@ -78,10 +79,10 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.7 | Duplicar diagnóstico | `…/ModalDuplicarDiagnostico.vue` | Hecha |
 | — | Archivar diagnóstico | `…/ModalArchivarDiagnostico.vue` | Hecha. Sin diseño (PA-005). |
 | — | Eliminar diagnóstico o borrador | `…/ModalEliminarDiagnostico.vue` | Hecha |
-| A2.3 | Catálogo de categorías, con el panel para editar | `pages/categorias/Index.vue`, `components/categorias/PanelEditarCategoria.vue` | Hecha (vista previa) |
+| A2.3 | Catálogo de categorías, con el panel para editar | `pages/categorias/Index.vue`, `components/categorias/PanelEditarCategoria.vue` | Hecha y conectada |
 | A2.3b | Crear / editar categoría | `components/categorias/ModalCategoria.vue` | Hecha |
 | A2.3c | Archivar o eliminar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Eliminar no tiene wireframe, sale de HU-019. |
-| A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha (vista previa) |
+| A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha y conectada |
 | A5 | Usuarios: lista con búsqueda, filtros y acciones | `pages/usuarios/Index.vue` | Hecha y conectada |
 | A5.1, A5.1b, A5.1e | Roles del sistema (Administrador, Empresa, Colaborador) | `pages/usuarios/Roles.vue`, `components/usuarios/PanelRol.vue` | Hecha y conectada |
 | A5.1c | Editar un rol creado | `components/usuarios/PanelRol.vue` | Hecha y conectada |
@@ -91,6 +92,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A5.5 | Cambiar o asignar rol | `ModalCambiarRol.vue`, `ModalAsignarRol.vue` | Hecha |
 | — | Invitar usuario interno | `components/usuarios/ModalInvitarUsuario.vue` | Hecha. El wireframe no le da código. |
 | A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
+| E1 | Inicio de la empresa | `pages/inicio/Empresa.vue` | Bienvenida provisional; la pantalla completa es de la semana 6 (T-048 ya redirige aquí) |
 | E11 | Mi perfil de la empresa (y del colaborador) | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
 | E12 | Colaboradores de la empresa | `pages/colaboradores/Index.vue` | Hecha y conectada |
 | E12.1 | Agregar colaborador | `components/colaboradores/ModalAgregarColaborador.vue` | Hecha |
