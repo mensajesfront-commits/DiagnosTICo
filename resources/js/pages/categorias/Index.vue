@@ -32,18 +32,6 @@ const props = withDefaults(
     { borradores: () => [] },
 );
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            { title: 'Diagnósticos', href: rutas.diagnosticos.todos() },
-            {
-                title: 'Catálogo de categorías',
-                href: rutas.categorias.catalogo(),
-            },
-        ],
-    },
-});
-
 const filtro = ref<Filtro>('todas');
 
 const enUso = computed(() => props.categorias.filter((c) => !c.archivada));
@@ -112,7 +100,13 @@ function restaurar(categoria: Categoria): void {
     <Head title="Catálogo de categorías" />
 
     <div class="flex flex-col gap-5 p-6">
-        <EncabezadoPagina titulo="Catálogo de categorías">
+        <EncabezadoPagina
+            titulo="Catálogo de categorías"
+            :volver="{
+                href: rutas.diagnosticos.todos(),
+                texto: 'Diagnósticos',
+            }"
+        >
             <Boton @click="modalCrear = true">+ Crear categoría</Boton>
         </EncabezadoPagina>
 

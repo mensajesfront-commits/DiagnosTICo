@@ -156,6 +156,8 @@ Comportamiento:
 - **Acciones por fila:** "Editar ▾" abre un menú con Editar diagnóstico, Duplicar, Archivar o Eliminar, y Eliminar borrador cuando corresponde. Al lado queda "Vista previa".
 - **Búsqueda:** filtra los diagnósticos por nombre en el navegador, sin mirar tildes ni mayúsculas (`lib/texto.ts`). Funciona en un sector y en "Todos", junto con el orden y el filtro de estado.
 
+**Volver:** A2.3 y A2.5 tienen arriba del título la flecha "← Diagnósticos" (`EncabezadoPagina`, prop `volver`). Desde A2.5 vuelve al sector del que se vino.
+
 ### A2.3 · Catálogo de categorías (`categorias/Index`)
 
 Ruta prevista: `GET /categorias`.

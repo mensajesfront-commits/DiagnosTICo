@@ -38,15 +38,6 @@ const props = withDefaults(
     { sectorId: null },
 );
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            { title: 'Diagnósticos', href: rutas.diagnosticos.todos() },
-            { title: 'Crear diagnóstico', href: rutas.diagnosticos.crear() },
-        ],
-    },
-});
-
 const form = useForm<{
     nombre: string;
     sector_id: number | '';
@@ -111,7 +102,15 @@ function crear(): void {
     <Head title="Crear diagnóstico" />
 
     <div class="flex flex-col gap-5 p-6">
-        <EncabezadoPagina titulo="Crear diagnóstico" />
+        <EncabezadoPagina
+            titulo="Crear diagnóstico"
+            :volver="{
+                href: sectorId
+                    ? rutas.diagnosticos.sector(sectorId)
+                    : rutas.diagnosticos.todos(),
+                texto: 'Diagnósticos',
+            }"
+        />
 
         <div class="grid items-start gap-5 xl:grid-cols-[1fr_300px]">
             <form
