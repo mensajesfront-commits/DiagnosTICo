@@ -7,6 +7,7 @@ use App\Models\DiagnosticoCategoria;
 use App\Models\Sector;
 use App\Rules\NombreDiagnosticoUnico;
 use App\Services\Diagnosticos\ContenidoDiagnostico;
+use App\Support\CatalogoCiiu;
 use App\Support\DatosDiagnosticos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,6 +38,8 @@ class DiagnosticosController extends Controller
             'sector' => $sector ? DatosDiagnosticos::sector($sector) : null,
             'resumen' => DatosDiagnosticos::resumen($sector),
             'diagnosticos' => DatosDiagnosticos::diagnosticos($sector),
+            // Para elegir la división CIIU al crear o editar un sector (DEC-018).
+            'divisionesCiiu' => CatalogoCiiu::divisiones(),
         ]);
     }
 

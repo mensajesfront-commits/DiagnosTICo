@@ -27,6 +27,7 @@ class DatosDiagnosticos
         $sectores = Sector::query()
             ->when($soloActivos, fn (Builder $q) => $q->where('activo', true))
             ->withCount(['diagnosticos' => fn (Builder $q) => $q->where('estado', '!=', Diagnostico::ARCHIVADO)])
+            ->withCount(['actividades' => fn (Builder $q) => $q->where('activo', true)])
             ->orderBy('nombre')
             ->get();
 
@@ -47,6 +48,9 @@ class DatosDiagnosticos
             'nombre' => $sector->nombre,
             'descripcion' => $sector->descripcion,
             'activo' => $sector->activo,
+            'ciiu_division' => $sector->ciiu_division,
+            // Subsectores activos (actividades CIIU que se ofrecen en L2).
+            'subsectores' => (int) ($sector->actividades_count ?? $sector->actividades()->where('activo', true)->count()),
             'diagnosticos' => (int) ($sector->diagnosticos_count ?? $sector->diagnosticos()->where('estado', '!=', Diagnostico::ARCHIVADO)->count()),
         ];
     }

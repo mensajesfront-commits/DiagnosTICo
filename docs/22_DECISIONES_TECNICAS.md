@@ -23,6 +23,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-015 | Registro en dos pasos y actividad económica CIIU | Vigente |
 | DEC-016 | País, departamento y ciudad en cascada | Vigente |
 | DEC-017 | Eliminar cuentas con 90 días para recuperarlas | Vigente |
+| DEC-018 | Catálogo CIIU Rev. 5 A.C. y subsectores por división | Vigente |
 
 ---
 
@@ -152,7 +153,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 
 - **Decisión:**
   - El registro (L2) tiene dos pasos: «Mi empresa» y «Tu usuario».
-  - La empresa elige su **actividad económica** de la clasificación **CIIU Rev. 4 A.C.** (la que usa la DIAN en el RUT), filtrada por el sector elegido. Tabla `actividades_economicas`; cada sector tiene sus códigos.
+  - La empresa elige su **actividad económica** de la clasificación **CIIU Rev. 4 A.C.** (la que usa la DIAN en el RUT), filtrada por el sector elegido. Tabla `actividades_economicas`; cada sector tiene sus códigos. **Actualizado por DEC-018:** ahora es la CIIU Rev. 5 A.C. del DANE.
   - La **descripción corta** (máximo 300 caracteres) y el **cargo** son obligatorios.
 - **Por qué:** lo pidió el equipo (7 de octubre de 2026). El CIIU es la clasificación oficial en Colombia, así que la empresa la reconoce de su RUT. La descripción le da contexto a la IA, y el cargo dice quién pide el acceso.
 - **Pendiente:** **[INFORMACIÓN PENDIENTE]** NuevasTIC debe confirmar qué códigos van en cada sector. Un sector sin actividades no pide la actividad.
@@ -181,3 +182,18 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 - **Colaboradores (E12):** la cuenta principal de la empresa también elimina a sus colaboradores, con la misma espera de 90 días. Ahí la doble confirmación es con **dos botones** ("Eliminar" → "Sí, eliminar a…") en lugar de escribir el correo, porque el correo y el nombre del colaborador se pueden cambiar.
 - **Ojo:** mientras dure la espera, el correo sigue ocupado: no se puede registrar ni invitar otra cuenta con él.
 - **Pendiente:** cuando existan mediciones y resultados, decidir si se borran con la empresa o se conservan anonimizados para las estadísticas. La cantidad de días se cambia con `DIAS_PARA_RECUPERAR_CUENTA`.
+
+### DEC-018 — Catálogo CIIU Rev. 5 A.C. y subsectores por división
+
+- **Decisión:**
+  - Se carga en la base el catálogo oficial **CIIU Rev. 5 A.C. del DANE** (22 secciones, 87 divisiones, 544 clases) desde `resources/ciiu/` (el Excel original y su JSON). Tablas `ciiu_divisiones` y `ciiu_clases`; lo carga `CiiuSeeder`.
+  - Un sector puede asociarse a una **división** (dos dígitos, columna `sectores.ciiu_division`). Al hacerlo, **todas las clases** de esa división (cuatro dígitos) pasan a ser sus **subsectores**: las actividades económicas que la empresa elige en el registro (L2) y en Mi perfil (E11).
+  - En crear y editar sector (A2.2a, A2.2) hay un campo "Subsectores · división CIIU" con búsqueda por código o nombre. Si el **nombre del sector es exactamente el de una división** (sin mirar tildes ni mayúsculas), se elige sola.
+  - El sector conserva su nombre corto (máx. 40). No se usa el nombre de la división como nombre del sector porque 57 de las 87 divisiones pasan de 40 caracteres (la más larga tiene 222).
+  - Al cambiar de división, los subsectores que ya no son de la nueva se **desactivan**, no se borran, porque puede haber empresas que los usen. Al quitar la división se conservan.
+  - Los 6 sectores iniciales pasan a la Rev. 5: Alojamientos → 55, Comidas → 56, Inmobiliarias → 68, Turismo → 79, Médicos → 86 y Abogados → solo la clase 6910 (la división 69 incluye contabilidad). Los códigos de la Rev. 4 que ya no existen (6820, 5514, 5519, 5520) quedan desactivados.
+- **Por qué:** lo pidió el equipo (9 de octubre de 2026). Así un sector nuevo trae sus subsectores sin escribirlos a mano, y los códigos y nombres salen del archivo oficial (no se inventan). Se descartó la tabla CIIU Rev. 4 armada aparte porque se extrajo de un texto y 203 nombres traían pegados los códigos de grupo.
+- **Ojo:**
+  - En la Rev. 5 algunos códigos cambiaron de significado. Por ejemplo, 8691 era "apoyo diagnóstico" y ahora es "intermediación para los servicios de salud". Una empresa que ya tenía uno de esos códigos queda con el nombre nuevo.
+  - **[INFORMACIÓN PENDIENTE]** Confirmar con NuevasTIC si el RUT de la DIAN ya usa la Rev. 5 o sigue con la Rev. 4.
+

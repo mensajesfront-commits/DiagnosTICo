@@ -1,0 +1,3252 @@
+{
+    "fuente": "DANE · CIIU Rev. 5 A.C., estructura detallada (CIIU_5_AC_Estructura_detallada.xlsx)",
+    "secciones": [
+        {
+            "codigo": "A",
+            "nombre": "Agricultura, ganadería, caza, silvicultura y pesca"
+        },
+        {
+            "codigo": "B",
+            "nombre": "Explotación de minas y canteras"
+        },
+        {
+            "codigo": "C",
+            "nombre": "Industrias manufactureras"
+        },
+        {
+            "codigo": "D",
+            "nombre": "Suministro de electricidad, gas, vapor y aire acondicionado"
+        },
+        {
+            "codigo": "E",
+            "nombre": "Distribución de agua; evacuación y tratamiento de aguas residuales, gestión de residuos y actividades de saneamiento ambiental"
+        },
+        {
+            "codigo": "F",
+            "nombre": "Construcción"
+        },
+        {
+            "codigo": "G",
+            "nombre": "Comercio al por mayor y al por menor"
+        },
+        {
+            "codigo": "H",
+            "nombre": "Transporte y almacenamiento"
+        },
+        {
+            "codigo": "I",
+            "nombre": "Actividades de alojamiento y de servicios de comidas"
+        },
+        {
+            "codigo": "J",
+            "nombre": "Actividades editoriales, de radiodifusión y de producción y distribución de contenidos"
+        },
+        {
+            "codigo": "K",
+            "nombre": "Telecomunicaciones, programación informática, consultoría, infraestructura informática y otras actividades de servicios de información"
+        },
+        {
+            "codigo": "L",
+            "nombre": "Actividades financieras y de seguros"
+        },
+        {
+            "codigo": "M",
+            "nombre": "Actividades inmobiliarias"
+        },
+        {
+            "codigo": "N",
+            "nombre": "Actividades profesionales, científicas y técnicas"
+        },
+        {
+            "codigo": "O",
+            "nombre": "Actividades de servicios administrativos y de apoyo"
+        },
+        {
+            "codigo": "P",
+            "nombre": "Administración pública y defensa; planes de seguridad social de afiliación obligatoria"
+        },
+        {
+            "codigo": "Q",
+            "nombre": "Educación"
+        },
+        {
+            "codigo": "R",
+            "nombre": "Actividades de atención de la salud humana y de asistencia social"
+        },
+        {
+            "codigo": "S",
+            "nombre": "Actividades artísticas, deportivas y recreativas"
+        },
+        {
+            "codigo": "T",
+            "nombre": "Otras actividades de servicios"
+        },
+        {
+            "codigo": "U",
+            "nombre": "Actividades de los hogares individuales en calidad de empleadores; actividades no diferenciadas de los hogares individuales como productores de bienes y servicios para uso propio"
+        },
+        {
+            "codigo": "V",
+            "nombre": "Actividades de organizaciones y entidades extraterritoriales"
+        }
+    ],
+    "divisiones": [
+        {
+            "codigo": "01",
+            "nombre": "Agricultura, ganadería, caza y actividades de servicios conexas",
+            "seccion": "A"
+        },
+        {
+            "codigo": "02",
+            "nombre": "Silvicultura y extracción de madera",
+            "seccion": "A"
+        },
+        {
+            "codigo": "03",
+            "nombre": "Pesca y acuicultura",
+            "seccion": "A"
+        },
+        {
+            "codigo": "05",
+            "nombre": "Extracción de carbón de piedra y lignito",
+            "seccion": "B"
+        },
+        {
+            "codigo": "06",
+            "nombre": "Extracción de petróleo crudo y gas natural",
+            "seccion": "B"
+        },
+        {
+            "codigo": "07",
+            "nombre": "Extracción de minerales metalíferos",
+            "seccion": "B"
+        },
+        {
+            "codigo": "08",
+            "nombre": "Extracción de otras minas y canteras",
+            "seccion": "B"
+        },
+        {
+            "codigo": "09",
+            "nombre": "Actividades de servicios de apoyo para la explotación de minas y canteras",
+            "seccion": "B"
+        },
+        {
+            "codigo": "10",
+            "nombre": "Elaboración de productos alimenticios",
+            "seccion": "C"
+        },
+        {
+            "codigo": "11",
+            "nombre": "Elaboración de bebidas",
+            "seccion": "C"
+        },
+        {
+            "codigo": "12",
+            "nombre": "Elaboración de productos de tabaco",
+            "seccion": "C"
+        },
+        {
+            "codigo": "13",
+            "nombre": "Fabricación de productos textiles",
+            "seccion": "C"
+        },
+        {
+            "codigo": "14",
+            "nombre": "Confección de prendas de vestir",
+            "seccion": "C"
+        },
+        {
+            "codigo": "15",
+            "nombre": "Curtido y recurtido de cueros; fabricación de calzado; fabricación de artículos de viaje, maletas, bolsos de mano y artículos similares, y fabricación de artículos de talabartería y guarnicionería; adobo y teñido de pieles",
+            "seccion": "C"
+        },
+        {
+            "codigo": "16",
+            "nombre": "Transformación de la madera y fabricación de productos de madera y de corcho, excepto muebles; fabricación de artículos de cestería y espartería",
+            "seccion": "C"
+        },
+        {
+            "codigo": "17",
+            "nombre": "Fabricación de papel, cartón y productos de papel y cartón",
+            "seccion": "C"
+        },
+        {
+            "codigo": "18",
+            "nombre": "Actividades de impresión y de producción de copias a partir de grabaciones originales",
+            "seccion": "C"
+        },
+        {
+            "codigo": "19",
+            "nombre": "Coquización, fabricación de productos de la refinación del petróleo y actividad de mezcla de combustibles",
+            "seccion": "C"
+        },
+        {
+            "codigo": "20",
+            "nombre": "Fabricación de sustancias y productos químicos",
+            "seccion": "C"
+        },
+        {
+            "codigo": "21",
+            "nombre": "Fabricación de productos farmacéuticos, sustancias químicas medicinales y productos botánicos de uso farmacéutico",
+            "seccion": "C"
+        },
+        {
+            "codigo": "22",
+            "nombre": "Fabricación de productos de caucho y de plástico",
+            "seccion": "C"
+        },
+        {
+            "codigo": "23",
+            "nombre": "Fabricación de otros productos minerales no metálicos",
+            "seccion": "C"
+        },
+        {
+            "codigo": "24",
+            "nombre": "Fabricación de productos metalúrgicos básicos",
+            "seccion": "C"
+        },
+        {
+            "codigo": "25",
+            "nombre": "Fabricación de productos elaborados de metal, excepto maquinaria y equipo",
+            "seccion": "C"
+        },
+        {
+            "codigo": "26",
+            "nombre": "Fabricación de productos informáticos, electrónicos y ópticos",
+            "seccion": "C"
+        },
+        {
+            "codigo": "27",
+            "nombre": "Fabricación de aparatos y equipo eléctrico",
+            "seccion": "C"
+        },
+        {
+            "codigo": "28",
+            "nombre": "Fabricación de maquinaria y equipo n.c.p.",
+            "seccion": "C"
+        },
+        {
+            "codigo": "29",
+            "nombre": "Fabricación de vehículos automotores, remolques y semirremolques",
+            "seccion": "C"
+        },
+        {
+            "codigo": "30",
+            "nombre": "Fabricación de otros tipos de equipo de transporte",
+            "seccion": "C"
+        },
+        {
+            "codigo": "31",
+            "nombre": "Fabricación de muebles, colchones y somieres",
+            "seccion": "C"
+        },
+        {
+            "codigo": "32",
+            "nombre": "Otras industrias manufactureras",
+            "seccion": "C"
+        },
+        {
+            "codigo": "33",
+            "nombre": "Instalación, mantenimiento y reparación especializado de maquinaria y equipo",
+            "seccion": "C"
+        },
+        {
+            "codigo": "35",
+            "nombre": "Suministro de electricidad, gas, vapor y aire acondicionado",
+            "seccion": "D"
+        },
+        {
+            "codigo": "36",
+            "nombre": "Captación, tratamiento y distribución de agua",
+            "seccion": "E"
+        },
+        {
+            "codigo": "37",
+            "nombre": "Evacuación y tratamiento de aguas residuales",
+            "seccion": "E"
+        },
+        {
+            "codigo": "38",
+            "nombre": "Recolección, tratamiento y disposición de residuos y actividades de recuperación",
+            "seccion": "E"
+        },
+        {
+            "codigo": "39",
+            "nombre": "Actividades de saneamiento ambiental y otros servicios de gestión de residuos",
+            "seccion": "E"
+        },
+        {
+            "codigo": "41",
+            "nombre": "Construcción de edificios",
+            "seccion": "F"
+        },
+        {
+            "codigo": "42",
+            "nombre": "Construcción de obras de ingeniería civil",
+            "seccion": "F"
+        },
+        {
+            "codigo": "43",
+            "nombre": "Actividades especializadas para la construcción de edificios y obras de ingeniería civil",
+            "seccion": "F"
+        },
+        {
+            "codigo": "46",
+            "nombre": "Comercio al por mayor",
+            "seccion": "G"
+        },
+        {
+            "codigo": "47",
+            "nombre": "Comercio al por menor",
+            "seccion": "G"
+        },
+        {
+            "codigo": "49",
+            "nombre": "Transporte terrestre; transporte por tuberías",
+            "seccion": "H"
+        },
+        {
+            "codigo": "50",
+            "nombre": "Transporte acuático",
+            "seccion": "H"
+        },
+        {
+            "codigo": "51",
+            "nombre": "Transporte aéreo",
+            "seccion": "H"
+        },
+        {
+            "codigo": "52",
+            "nombre": "Almacenamiento y actividades complementarias al transporte",
+            "seccion": "H"
+        },
+        {
+            "codigo": "53",
+            "nombre": "Actividades postales y servicios de mensajería",
+            "seccion": "H"
+        },
+        {
+            "codigo": "55",
+            "nombre": "Alojamiento",
+            "seccion": "I"
+        },
+        {
+            "codigo": "56",
+            "nombre": "Actividades de servicios de comidas y bebidas",
+            "seccion": "I"
+        },
+        {
+            "codigo": "58",
+            "nombre": "Actividades de edición",
+            "seccion": "J"
+        },
+        {
+            "codigo": "59",
+            "nombre": "Producción de películas, videos y programas de televisión, grabación de sonido y edición de música",
+            "seccion": "J"
+        },
+        {
+            "codigo": "60",
+            "nombre": "Actividades de programación, difusión, agencias de noticias y otras actividades de distribución de contenidos",
+            "seccion": "J"
+        },
+        {
+            "codigo": "61",
+            "nombre": "Telecomunicaciones",
+            "seccion": "K"
+        },
+        {
+            "codigo": "62",
+            "nombre": "Programación informática, consultoría informática y actividades conexas",
+            "seccion": "K"
+        },
+        {
+            "codigo": "63",
+            "nombre": "Actividades de infraestructura informática, procesamiento de datos, alojamiento web y otras actividades de servicios de información",
+            "seccion": "K"
+        },
+        {
+            "codigo": "64",
+            "nombre": "Actividades de servicios financieros, excepto las de seguros y de pensiones",
+            "seccion": "L"
+        },
+        {
+            "codigo": "65",
+            "nombre": "Seguros, reaseguros, seguros sociales y fondos de pensiones, excepto la seguridad social",
+            "seccion": "L"
+        },
+        {
+            "codigo": "66",
+            "nombre": "Actividades auxiliares de las actividades de servicios financieros",
+            "seccion": "L"
+        },
+        {
+            "codigo": "68",
+            "nombre": "Actividades inmobiliarias",
+            "seccion": "M"
+        },
+        {
+            "codigo": "69",
+            "nombre": "Actividades jurídicas y de contabilidad",
+            "seccion": "N"
+        },
+        {
+            "codigo": "70",
+            "nombre": "Actividades de las oficinas principales; actividades de consultoría de gestión",
+            "seccion": "N"
+        },
+        {
+            "codigo": "71",
+            "nombre": "Actividades de arquitectura e ingeniería; ensayos y análisis técnicos",
+            "seccion": "N"
+        },
+        {
+            "codigo": "72",
+            "nombre": "Investigación y desarrollo científico",
+            "seccion": "N"
+        },
+        {
+            "codigo": "73",
+            "nombre": "Actividades de publicidad, estudios de mercado y relaciones públicas",
+            "seccion": "N"
+        },
+        {
+            "codigo": "74",
+            "nombre": "Otras actividades profesionales, científicas y técnicas",
+            "seccion": "N"
+        },
+        {
+            "codigo": "75",
+            "nombre": "Actividades veterinarias",
+            "seccion": "N"
+        },
+        {
+            "codigo": "77",
+            "nombre": "Actividades de alquiler y arrendamiento",
+            "seccion": "O"
+        },
+        {
+            "codigo": "78",
+            "nombre": "Actividades de empleo",
+            "seccion": "O"
+        },
+        {
+            "codigo": "79",
+            "nombre": "Actividades de agencias de viajes, operadores turísticos y actividades conexas",
+            "seccion": "O"
+        },
+        {
+            "codigo": "80",
+            "nombre": "Actividades de investigación y seguridad",
+            "seccion": "O"
+        },
+        {
+            "codigo": "81",
+            "nombre": "Actividades de servicios a edificios y de paisajismo",
+            "seccion": "O"
+        },
+        {
+            "codigo": "82",
+            "nombre": "Actividades administrativas y de apoyo de oficina y otras actividades de apoyo a las empresas",
+            "seccion": "O"
+        },
+        {
+            "codigo": "84",
+            "nombre": "Administración pública y defensa; planes de seguridad social de afiliación obligatoria",
+            "seccion": "P"
+        },
+        {
+            "codigo": "85",
+            "nombre": "Educación",
+            "seccion": "Q"
+        },
+        {
+            "codigo": "86",
+            "nombre": "Actividades de atención de la salud humana",
+            "seccion": "R"
+        },
+        {
+            "codigo": "87",
+            "nombre": "Actividades de atención residencial",
+            "seccion": "R"
+        },
+        {
+            "codigo": "88",
+            "nombre": "Actividades de asistencia social sin alojamiento",
+            "seccion": "R"
+        },
+        {
+            "codigo": "90",
+            "nombre": "Actividades de creación artística y de artes escénicas",
+            "seccion": "S"
+        },
+        {
+            "codigo": "91",
+            "nombre": "Actividades de bibliotecas, archivos, museos y otras actividades culturales",
+            "seccion": "S"
+        },
+        {
+            "codigo": "92",
+            "nombre": "Actividades de juegos de azar y apuestas",
+            "seccion": "S"
+        },
+        {
+            "codigo": "93",
+            "nombre": "Actividades deportivas, recreativas y de esparcimiento",
+            "seccion": "S"
+        },
+        {
+            "codigo": "94",
+            "nombre": "Actividades de asociaciones",
+            "seccion": "T"
+        },
+        {
+            "codigo": "95",
+            "nombre": "Mantenimiento y reparación de computadores, efectos personales y enseres domésticos, y de vehículos automotores y motocicletas",
+            "seccion": "T"
+        },
+        {
+            "codigo": "96",
+            "nombre": "Otras actividades de servicios personales",
+            "seccion": "T"
+        },
+        {
+            "codigo": "97",
+            "nombre": "Actividades de los hogares individuales como empleadores de personal doméstico",
+            "seccion": "U"
+        },
+        {
+            "codigo": "98",
+            "nombre": "Actividades no diferenciadas de los hogares individuales como productores de bienes y servicios para uso propio",
+            "seccion": "U"
+        },
+        {
+            "codigo": "99",
+            "nombre": "Actividades de organizaciones y entidades extraterritoriales",
+            "seccion": "V"
+        }
+    ],
+    "clases": [
+        {
+            "codigo": "0111",
+            "nombre": "Cultivo de cereales (excepto arroz), legumbres y semillas oleaginosas",
+            "division": "01"
+        },
+        {
+            "codigo": "0112",
+            "nombre": "Cultivo de arroz",
+            "division": "01"
+        },
+        {
+            "codigo": "0113",
+            "nombre": "Cultivo de hortalizas, raíces y tubérculos",
+            "division": "01"
+        },
+        {
+            "codigo": "0114",
+            "nombre": "Cultivo de tabaco",
+            "division": "01"
+        },
+        {
+            "codigo": "0115",
+            "nombre": "Cultivo de plantas de fibra",
+            "division": "01"
+        },
+        {
+            "codigo": "0119",
+            "nombre": "Otros cultivos transitorios n.c.p.",
+            "division": "01"
+        },
+        {
+            "codigo": "0121",
+            "nombre": "Cultivo de frutas tropicales y subtropicales",
+            "division": "01"
+        },
+        {
+            "codigo": "0122",
+            "nombre": "Cultivo de plátano y banano",
+            "division": "01"
+        },
+        {
+            "codigo": "0123",
+            "nombre": "Cultivo de café",
+            "division": "01"
+        },
+        {
+            "codigo": "0124",
+            "nombre": "Cultivo de caña de azúcar",
+            "division": "01"
+        },
+        {
+            "codigo": "0125",
+            "nombre": "Cultivo de flor de corte",
+            "division": "01"
+        },
+        {
+            "codigo": "0126",
+            "nombre": "Cultivo de palma para aceite (palma africana) y otros frutos oleaginosos",
+            "division": "01"
+        },
+        {
+            "codigo": "0127",
+            "nombre": "Cultivo de plantas con las que se preparan bebidas",
+            "division": "01"
+        },
+        {
+            "codigo": "0128",
+            "nombre": "Cultivo de especias y de plantas aromáticas y medicinales",
+            "division": "01"
+        },
+        {
+            "codigo": "0129",
+            "nombre": "Otros cultivos permanentes n.c.p.",
+            "division": "01"
+        },
+        {
+            "codigo": "0130",
+            "nombre": "Propagación de plantas (actividades de los viveros, excepto las de los viveros forestales)",
+            "division": "01"
+        },
+        {
+            "codigo": "0141",
+            "nombre": "Cría de ganado bovino y bufalino",
+            "division": "01"
+        },
+        {
+            "codigo": "0142",
+            "nombre": "Cría de caballos y otros equinos",
+            "division": "01"
+        },
+        {
+            "codigo": "0143",
+            "nombre": "Cría de ovejas y cabras",
+            "division": "01"
+        },
+        {
+            "codigo": "0144",
+            "nombre": "Cría de ganado porcino",
+            "division": "01"
+        },
+        {
+            "codigo": "0145",
+            "nombre": "Cría de aves de corral",
+            "division": "01"
+        },
+        {
+            "codigo": "0149",
+            "nombre": "Cría de otros animales n.c.p.",
+            "division": "01"
+        },
+        {
+            "codigo": "0150",
+            "nombre": "Explotación mixta (agrícola y pecuaria)",
+            "division": "01"
+        },
+        {
+            "codigo": "0161",
+            "nombre": "Actividades de apoyo a la agricultura",
+            "division": "01"
+        },
+        {
+            "codigo": "0162",
+            "nombre": "Actividades de apoyo a la ganadería",
+            "division": "01"
+        },
+        {
+            "codigo": "0163",
+            "nombre": "Actividades posteriores a la cosecha",
+            "division": "01"
+        },
+        {
+            "codigo": "0164",
+            "nombre": "Tratamiento de semillas para propagación",
+            "division": "01"
+        },
+        {
+            "codigo": "0170",
+            "nombre": "Caza ordinaria, caza mediante trampas y actividades de servicios conexas",
+            "division": "01"
+        },
+        {
+            "codigo": "0210",
+            "nombre": "Silvicultura y otras actividades forestales",
+            "division": "02"
+        },
+        {
+            "codigo": "0220",
+            "nombre": "Extracción de madera",
+            "division": "02"
+        },
+        {
+            "codigo": "0230",
+            "nombre": "Recolección de productos forestales diferentes a la madera",
+            "division": "02"
+        },
+        {
+            "codigo": "0240",
+            "nombre": "Servicios de apoyo a la silvicultura",
+            "division": "02"
+        },
+        {
+            "codigo": "0311",
+            "nombre": "Pesca marítima",
+            "division": "03"
+        },
+        {
+            "codigo": "0312",
+            "nombre": "Pesca de agua dulce",
+            "division": "03"
+        },
+        {
+            "codigo": "0321",
+            "nombre": "Acuicultura marítima",
+            "division": "03"
+        },
+        {
+            "codigo": "0322",
+            "nombre": "Acuicultura de agua dulce",
+            "division": "03"
+        },
+        {
+            "codigo": "0330",
+            "nombre": "Actividades de apoyo a la pesca y la acuicultura",
+            "division": "03"
+        },
+        {
+            "codigo": "0510",
+            "nombre": "Extracción de hulla (carbón de piedra)",
+            "division": "05"
+        },
+        {
+            "codigo": "0520",
+            "nombre": "Extracción de carbón lignito",
+            "division": "05"
+        },
+        {
+            "codigo": "0610",
+            "nombre": "Extracción de petróleo crudo",
+            "division": "06"
+        },
+        {
+            "codigo": "0620",
+            "nombre": "Extracción de gas natural",
+            "division": "06"
+        },
+        {
+            "codigo": "0710",
+            "nombre": "Extracción de minerales de hierro",
+            "division": "07"
+        },
+        {
+            "codigo": "0721",
+            "nombre": "Extracción de minerales de uranio y de torio",
+            "division": "07"
+        },
+        {
+            "codigo": "0722",
+            "nombre": "Extracción de oro y otros metales preciosos",
+            "division": "07"
+        },
+        {
+            "codigo": "0723",
+            "nombre": "Extracción de minerales de níquel",
+            "division": "07"
+        },
+        {
+            "codigo": "0729",
+            "nombre": "Extracción de otros minerales metalíferos no ferrosos n.c.p.",
+            "division": "07"
+        },
+        {
+            "codigo": "0811",
+            "nombre": "Extracción de piedra, arena, arcillas comunes, yeso y anhidrita",
+            "division": "08"
+        },
+        {
+            "codigo": "0812",
+            "nombre": "Extracción de arcillas de uso industrial, caliza, caolín y bentonitas",
+            "division": "08"
+        },
+        {
+            "codigo": "0820",
+            "nombre": "Extracción de esmeraldas, piedras preciosas y semipreciosas",
+            "division": "08"
+        },
+        {
+            "codigo": "0891",
+            "nombre": "Extracción de minerales para la fabricación de abonos y productos químicos",
+            "division": "08"
+        },
+        {
+            "codigo": "0892",
+            "nombre": "Extracción de halita (sal)",
+            "division": "08"
+        },
+        {
+            "codigo": "0899",
+            "nombre": "Extracción de otros minerales no metálicos n.c.p.",
+            "division": "08"
+        },
+        {
+            "codigo": "0910",
+            "nombre": "Actividades de apoyo para la extracción de petróleo y de gas natural",
+            "division": "09"
+        },
+        {
+            "codigo": "0990",
+            "nombre": "Actividades de apoyo para otras actividades de explotación de minas y canteras",
+            "division": "09"
+        },
+        {
+            "codigo": "1011",
+            "nombre": "Procesamiento y conservación de carne y productos cárnicos",
+            "division": "10"
+        },
+        {
+            "codigo": "1012",
+            "nombre": "Procesamiento y conservación de pescados, crustáceos y moluscos",
+            "division": "10"
+        },
+        {
+            "codigo": "1020",
+            "nombre": "Procesamiento y conservación de frutas, legumbres, hortalizas y tubérculos",
+            "division": "10"
+        },
+        {
+            "codigo": "1031",
+            "nombre": "Extracción de aceites de origen vegetal crudos",
+            "division": "10"
+        },
+        {
+            "codigo": "1032",
+            "nombre": "Elaboración de aceites y grasas de origen vegetal refinados",
+            "division": "10"
+        },
+        {
+            "codigo": "1033",
+            "nombre": "Elaboración de aceites y grasas de origen animal",
+            "division": "10"
+        },
+        {
+            "codigo": "1040",
+            "nombre": "Elaboración de productos lácteos",
+            "division": "10"
+        },
+        {
+            "codigo": "1051",
+            "nombre": "Elaboración de productos de molinería",
+            "division": "10"
+        },
+        {
+            "codigo": "1052",
+            "nombre": "Elaboración de almidones y productos derivados del almidón",
+            "division": "10"
+        },
+        {
+            "codigo": "1061",
+            "nombre": "Trilla de café",
+            "division": "10"
+        },
+        {
+            "codigo": "1062",
+            "nombre": "Descafeinado, tostión y molienda del café",
+            "division": "10"
+        },
+        {
+            "codigo": "1063",
+            "nombre": "Otros derivados del café",
+            "division": "10"
+        },
+        {
+            "codigo": "1071",
+            "nombre": "Elaboración y refinación de azúcar",
+            "division": "10"
+        },
+        {
+            "codigo": "1072",
+            "nombre": "Elaboración de panela",
+            "division": "10"
+        },
+        {
+            "codigo": "1081",
+            "nombre": "Elaboración de productos de panadería",
+            "division": "10"
+        },
+        {
+            "codigo": "1082",
+            "nombre": "Elaboración de cacao, chocolate y productos de confitería",
+            "division": "10"
+        },
+        {
+            "codigo": "1083",
+            "nombre": "Elaboración de macarrones, fideos, alcuzcuz y productos farináceos similares",
+            "division": "10"
+        },
+        {
+            "codigo": "1084",
+            "nombre": "Elaboración de comidas y platos preparados",
+            "division": "10"
+        },
+        {
+            "codigo": "1089",
+            "nombre": "Elaboración de otros productos alimenticios n.c.p.",
+            "division": "10"
+        },
+        {
+            "codigo": "1090",
+            "nombre": "Elaboración de alimentos preparados para animales",
+            "division": "10"
+        },
+        {
+            "codigo": "1101",
+            "nombre": "Destilación, rectificación y mezcla de bebidas alcohólicas",
+            "division": "11"
+        },
+        {
+            "codigo": "1102",
+            "nombre": "Elaboración de bebidas fermentadas no destiladas",
+            "division": "11"
+        },
+        {
+            "codigo": "1103",
+            "nombre": "Producción de malta, elaboración de cervezas y otras bebidas malteadas",
+            "division": "11"
+        },
+        {
+            "codigo": "1104",
+            "nombre": "Elaboración de bebidas no alcohólicas, producción de aguas minerales y otras aguas embotelladas",
+            "division": "11"
+        },
+        {
+            "codigo": "1200",
+            "nombre": "Elaboración de productos de tabaco",
+            "division": "12"
+        },
+        {
+            "codigo": "1311",
+            "nombre": "Preparación e hilatura de fibras textiles",
+            "division": "13"
+        },
+        {
+            "codigo": "1312",
+            "nombre": "Tejeduría de productos textiles",
+            "division": "13"
+        },
+        {
+            "codigo": "1313",
+            "nombre": "Acabado de productos textiles",
+            "division": "13"
+        },
+        {
+            "codigo": "1391",
+            "nombre": "Fabricación de tejidos de punto y ganchillo",
+            "division": "13"
+        },
+        {
+            "codigo": "1392",
+            "nombre": "Confección de artículos con materiales textiles, excepto prendas de vestir",
+            "division": "13"
+        },
+        {
+            "codigo": "1393",
+            "nombre": "Fabricación de tapetes y alfombras para pisos",
+            "division": "13"
+        },
+        {
+            "codigo": "1394",
+            "nombre": "Fabricación de cuerdas, cordeles, cables, bramantes y redes",
+            "division": "13"
+        },
+        {
+            "codigo": "1399",
+            "nombre": "Fabricación de otros artículos textiles n.c.p.",
+            "division": "13"
+        },
+        {
+            "codigo": "1410",
+            "nombre": "Confección de prendas de vestir, excepto prendas de piel",
+            "division": "14"
+        },
+        {
+            "codigo": "1420",
+            "nombre": "Fabricación de artículos de piel",
+            "division": "14"
+        },
+        {
+            "codigo": "1430",
+            "nombre": "Fabricación de artículos de punto y ganchillo",
+            "division": "14"
+        },
+        {
+            "codigo": "1511",
+            "nombre": "Curtido y recurtido de cueros; recurtido y teñido de pieles",
+            "division": "15"
+        },
+        {
+            "codigo": "1512",
+            "nombre": "Fabricación de artículos de viaje, bolsos de mano y artículos similares elaborados en cuero, y fabricación de artículos de talabartería y guarnicionería",
+            "division": "15"
+        },
+        {
+            "codigo": "1513",
+            "nombre": "Fabricación de artículos de viaje, bolsos de mano y artículos similares; artículos de talabartería y guarnicionería elaborados en otros materiales",
+            "division": "15"
+        },
+        {
+            "codigo": "1521",
+            "nombre": "Fabricación de calzado de cuero y piel, con cualquier tipo de suela",
+            "division": "15"
+        },
+        {
+            "codigo": "1522",
+            "nombre": "Fabricación de otros tipos de calzado, excepto calzado de cuero y piel",
+            "division": "15"
+        },
+        {
+            "codigo": "1523",
+            "nombre": "Fabricación de partes del calzado",
+            "division": "15"
+        },
+        {
+            "codigo": "1610",
+            "nombre": "Aserrado, acepillado e impregnación de la madera",
+            "division": "16"
+        },
+        {
+            "codigo": "1620",
+            "nombre": "Fabricación de hojas de madera para enchapado; fabricación de tableros contrachapados, tableros laminados, tableros de partículas y otros tableros y paneles",
+            "division": "16"
+        },
+        {
+            "codigo": "1630",
+            "nombre": "Fabricación de partes y piezas de madera, de carpintería y ebanistería para la construcción",
+            "division": "16"
+        },
+        {
+            "codigo": "1640",
+            "nombre": "Fabricación de recipientes de madera",
+            "division": "16"
+        },
+        {
+            "codigo": "1690",
+            "nombre": "Fabricación de otros productos de madera; fabricación de artículos de corcho, cestería y espartería",
+            "division": "16"
+        },
+        {
+            "codigo": "1701",
+            "nombre": "Fabricación de pulpas (pastas) celulósicas; papel y cartón",
+            "division": "17"
+        },
+        {
+            "codigo": "1702",
+            "nombre": "Fabricación de papel y cartón ondulado (corrugado); fabricación de envases, empaques y de embalajes de papel y cartón",
+            "division": "17"
+        },
+        {
+            "codigo": "1709",
+            "nombre": "Fabricación de otros artículos de papel y cartón",
+            "division": "17"
+        },
+        {
+            "codigo": "1811",
+            "nombre": "Actividades de impresión",
+            "division": "18"
+        },
+        {
+            "codigo": "1812",
+            "nombre": "Actividades de servicios relacionados con la impresión",
+            "division": "18"
+        },
+        {
+            "codigo": "1820",
+            "nombre": "Producción de copias a partir de grabaciones originales",
+            "division": "18"
+        },
+        {
+            "codigo": "1910",
+            "nombre": "Fabricación de productos de hornos de coque",
+            "division": "19"
+        },
+        {
+            "codigo": "1921",
+            "nombre": "Fabricación de productos de la refinación del petróleo",
+            "division": "19"
+        },
+        {
+            "codigo": "1922",
+            "nombre": "Actividad de mezcla de combustibles",
+            "division": "19"
+        },
+        {
+            "codigo": "2011",
+            "nombre": "Fabricación de sustancias y productos químicos básicos",
+            "division": "20"
+        },
+        {
+            "codigo": "2012",
+            "nombre": "Fabricación de abonos y compuestos inorgánicos nitrogenados",
+            "division": "20"
+        },
+        {
+            "codigo": "2013",
+            "nombre": "Fabricación de plásticos en formas primarias",
+            "division": "20"
+        },
+        {
+            "codigo": "2014",
+            "nombre": "Fabricación de caucho sintético en formas primarias",
+            "division": "20"
+        },
+        {
+            "codigo": "2021",
+            "nombre": "Fabricación de plaguicidas y otros productos químicos de uso agropecuario",
+            "division": "20"
+        },
+        {
+            "codigo": "2022",
+            "nombre": "Fabricación de pinturas, barnices y revestimientos similares, tintas para impresión y masillas",
+            "division": "20"
+        },
+        {
+            "codigo": "2023",
+            "nombre": "Fabricación de jabones y detergentes, preparados para limpiar y pulir; perfumes y preparados de tocador",
+            "division": "20"
+        },
+        {
+            "codigo": "2029",
+            "nombre": "Fabricación de otros productos químicos n.c.p.",
+            "division": "20"
+        },
+        {
+            "codigo": "2030",
+            "nombre": "Fabricación de fibras sintéticas y artificiales",
+            "division": "20"
+        },
+        {
+            "codigo": "2100",
+            "nombre": "Fabricación de productos farmacéuticos, sustancias químicas medicinales y productos botánicos de uso farmacéutico",
+            "division": "21"
+        },
+        {
+            "codigo": "2211",
+            "nombre": "Fabricación de llantas y neumáticos de caucho",
+            "division": "22"
+        },
+        {
+            "codigo": "2212",
+            "nombre": "Reencauche de llantas usadas",
+            "division": "22"
+        },
+        {
+            "codigo": "2219",
+            "nombre": "Fabricación de formas básicas de caucho y otros productos de caucho n.c.p.",
+            "division": "22"
+        },
+        {
+            "codigo": "2221",
+            "nombre": "Fabricación de formas básicas de plástico",
+            "division": "22"
+        },
+        {
+            "codigo": "2229",
+            "nombre": "Fabricación de artículos de plástico n.c.p.",
+            "division": "22"
+        },
+        {
+            "codigo": "2310",
+            "nombre": "Fabricación de vidrio y productos de vidrio",
+            "division": "23"
+        },
+        {
+            "codigo": "2391",
+            "nombre": "Fabricación de productos refractarios",
+            "division": "23"
+        },
+        {
+            "codigo": "2392",
+            "nombre": "Fabricación de materiales de arcilla para la construcción",
+            "division": "23"
+        },
+        {
+            "codigo": "2393",
+            "nombre": "Fabricación de otros productos de cerámica y porcelana",
+            "division": "23"
+        },
+        {
+            "codigo": "2394",
+            "nombre": "Fabricación de cemento, cal y yeso",
+            "division": "23"
+        },
+        {
+            "codigo": "2395",
+            "nombre": "Fabricación de artículos de hormigón, cemento y yeso",
+            "division": "23"
+        },
+        {
+            "codigo": "2396",
+            "nombre": "Corte, tallado y acabado de la piedra",
+            "division": "23"
+        },
+        {
+            "codigo": "2399",
+            "nombre": "Fabricación de otros productos minerales no metálicos n.c.p.",
+            "division": "23"
+        },
+        {
+            "codigo": "2410",
+            "nombre": "Industrias básicas de hierro y de acero",
+            "division": "24"
+        },
+        {
+            "codigo": "2421",
+            "nombre": "Industrias básicas de metales preciosos",
+            "division": "24"
+        },
+        {
+            "codigo": "2429",
+            "nombre": "Industrias básicas de otros metales no ferrosos",
+            "division": "24"
+        },
+        {
+            "codigo": "2431",
+            "nombre": "Fundición de hierro y de acero",
+            "division": "24"
+        },
+        {
+            "codigo": "2432",
+            "nombre": "Fundición de metales no ferrosos",
+            "division": "24"
+        },
+        {
+            "codigo": "2511",
+            "nombre": "Fabricación de productos metálicos para uso estructural",
+            "division": "25"
+        },
+        {
+            "codigo": "2512",
+            "nombre": "Fabricación de tanques, depósitos y recipientes de metal, excepto los utilizados para el envase o el transporte de mercancías",
+            "division": "25"
+        },
+        {
+            "codigo": "2513",
+            "nombre": "Fabricación de generadores de vapor, excepto calderas de agua caliente para calefacción central",
+            "division": "25"
+        },
+        {
+            "codigo": "2520",
+            "nombre": "Fabricación de armas y municiones",
+            "division": "25"
+        },
+        {
+            "codigo": "2591",
+            "nombre": "Forja, prensado, estampado y laminado de metal; pulvimetalurgia",
+            "division": "25"
+        },
+        {
+            "codigo": "2592",
+            "nombre": "Tratamiento y revestimiento de metales; mecanizado",
+            "division": "25"
+        },
+        {
+            "codigo": "2593",
+            "nombre": "Fabricación de artículos de cuchillería, herramientas de mano y artículos de ferretería",
+            "division": "25"
+        },
+        {
+            "codigo": "2599",
+            "nombre": "Fabricación de otros productos elaborados de metal n.c.p.",
+            "division": "25"
+        },
+        {
+            "codigo": "2611",
+            "nombre": "Fabricación de celdas solares, paneles solares e inversores fotovoltaicos",
+            "division": "26"
+        },
+        {
+            "codigo": "2619",
+            "nombre": "Fabricación de otros componentes y tableros electrónicos",
+            "division": "26"
+        },
+        {
+            "codigo": "2620",
+            "nombre": "Fabricación de computadoras y de equipo periférico",
+            "division": "26"
+        },
+        {
+            "codigo": "2630",
+            "nombre": "Fabricación de equipos de comunicación",
+            "division": "26"
+        },
+        {
+            "codigo": "2640",
+            "nombre": "Fabricación de aparatos electrónicos de consumo",
+            "division": "26"
+        },
+        {
+            "codigo": "2651",
+            "nombre": "Fabricación de equipo de medición, prueba, navegación y control",
+            "division": "26"
+        },
+        {
+            "codigo": "2652",
+            "nombre": "Fabricación de relojes",
+            "division": "26"
+        },
+        {
+            "codigo": "2660",
+            "nombre": "Fabricación de equipo de irradiación y equipo electrónico de uso médico y terapéutico",
+            "division": "26"
+        },
+        {
+            "codigo": "2670",
+            "nombre": "Fabricación de instrumentos ópticos y equipo fotográfico",
+            "division": "26"
+        },
+        {
+            "codigo": "2680",
+            "nombre": "Fabricación de medios magnéticos y ópticos para almacenamiento de datos",
+            "division": "26"
+        },
+        {
+            "codigo": "2711",
+            "nombre": "Fabricación de motores, generadores y transformadores eléctricos",
+            "division": "27"
+        },
+        {
+            "codigo": "2712",
+            "nombre": "Fabricación de aparatos de distribución y control de la energía eléctrica",
+            "division": "27"
+        },
+        {
+            "codigo": "2720",
+            "nombre": "Fabricación de pilas, baterías y acumuladores eléctricos",
+            "division": "27"
+        },
+        {
+            "codigo": "2731",
+            "nombre": "Fabricación de hilos y cables eléctricos y de fibra óptica",
+            "division": "27"
+        },
+        {
+            "codigo": "2732",
+            "nombre": "Fabricación de dispositivos de cableado",
+            "division": "27"
+        },
+        {
+            "codigo": "2740",
+            "nombre": "Fabricación de equipos eléctricos de iluminación",
+            "division": "27"
+        },
+        {
+            "codigo": "2750",
+            "nombre": "Fabricación de aparatos de uso doméstico",
+            "division": "27"
+        },
+        {
+            "codigo": "2790",
+            "nombre": "Fabricación de otros tipos de equipo eléctrico n.c.p.",
+            "division": "27"
+        },
+        {
+            "codigo": "2811",
+            "nombre": "Fabricación de motores, turbinas, y partes para motores de combustión interna",
+            "division": "28"
+        },
+        {
+            "codigo": "2812",
+            "nombre": "Fabricación de equipos de potencia hidráulica y neumática",
+            "division": "28"
+        },
+        {
+            "codigo": "2813",
+            "nombre": "Fabricación de otras bombas, compresores, grifos y válvulas",
+            "division": "28"
+        },
+        {
+            "codigo": "2814",
+            "nombre": "Fabricación de cojinetes, engranajes, trenes de engranajes y piezas de transmisión",
+            "division": "28"
+        },
+        {
+            "codigo": "2815",
+            "nombre": "Fabricación de hornos, hogares y equipos permanentes de calefacción doméstica",
+            "division": "28"
+        },
+        {
+            "codigo": "2816",
+            "nombre": "Fabricación de equipo de elevación y manipulación",
+            "division": "28"
+        },
+        {
+            "codigo": "2817",
+            "nombre": "Fabricación de maquinaria y equipo de oficina (excepto computadoras y equipo periférico)",
+            "division": "28"
+        },
+        {
+            "codigo": "2818",
+            "nombre": "Fabricación de herramientas manuales con motor",
+            "division": "28"
+        },
+        {
+            "codigo": "2819",
+            "nombre": "Fabricación de otros tipos de maquinaria y equipo de uso general n.c.p.",
+            "division": "28"
+        },
+        {
+            "codigo": "2821",
+            "nombre": "Fabricación de maquinaria agropecuaria y forestal",
+            "division": "28"
+        },
+        {
+            "codigo": "2822",
+            "nombre": "Fabricación de máquinas formadoras de metal y de máquinas herramienta",
+            "division": "28"
+        },
+        {
+            "codigo": "2823",
+            "nombre": "Fabricación de maquinaria para la metalurgia",
+            "division": "28"
+        },
+        {
+            "codigo": "2824",
+            "nombre": "Fabricación de maquinaria para explotación de minas y canteras y para obras de construcción",
+            "division": "28"
+        },
+        {
+            "codigo": "2825",
+            "nombre": "Fabricación de maquinaria para la elaboración de alimentos, bebidas y tabaco",
+            "division": "28"
+        },
+        {
+            "codigo": "2826",
+            "nombre": "Fabricación de maquinaria para la elaboración de productos textiles, prendas de vestir y cueros",
+            "division": "28"
+        },
+        {
+            "codigo": "2829",
+            "nombre": "Fabricación de otros tipos de maquinaria y equipo de uso especial n.c.p.",
+            "division": "28"
+        },
+        {
+            "codigo": "2910",
+            "nombre": "Fabricación de vehículos automotores y sus motores",
+            "division": "29"
+        },
+        {
+            "codigo": "2920",
+            "nombre": "Fabricación de carrocerías para vehículos automotores; fabricación de remolques y semirremolques",
+            "division": "29"
+        },
+        {
+            "codigo": "2930",
+            "nombre": "Fabricación de partes, piezas (autopartes) y accesorios (lujos) para vehículos automotores",
+            "division": "29"
+        },
+        {
+            "codigo": "3011",
+            "nombre": "Construcción de barcos y de estructuras flotantes",
+            "division": "30"
+        },
+        {
+            "codigo": "3012",
+            "nombre": "Construcción de embarcaciones de recreo y deporte",
+            "division": "30"
+        },
+        {
+            "codigo": "3020",
+            "nombre": "Fabricación de locomotoras y de material rodante para ferrocarriles",
+            "division": "30"
+        },
+        {
+            "codigo": "3030",
+            "nombre": "Fabricación de aeronaves, naves espaciales y de maquinaria conexa",
+            "division": "30"
+        },
+        {
+            "codigo": "3040",
+            "nombre": "Fabricación de vehículos militares de combate",
+            "division": "30"
+        },
+        {
+            "codigo": "3091",
+            "nombre": "Fabricación de motocicletas",
+            "division": "30"
+        },
+        {
+            "codigo": "3092",
+            "nombre": "Fabricación de bicicletas y de sillas de ruedas para personas con discapacidad",
+            "division": "30"
+        },
+        {
+            "codigo": "3099",
+            "nombre": "Fabricación de otros tipos de equipo de transporte n.c.p.",
+            "division": "30"
+        },
+        {
+            "codigo": "3111",
+            "nombre": "Fabricación de muebles de madera",
+            "division": "31"
+        },
+        {
+            "codigo": "3112",
+            "nombre": "Fabricación de muebles de materiales diferentes a la madera",
+            "division": "31"
+        },
+        {
+            "codigo": "3120",
+            "nombre": "Fabricación de colchones y somieres",
+            "division": "31"
+        },
+        {
+            "codigo": "3211",
+            "nombre": "Fabricación de joyas y artículos conexos",
+            "division": "32"
+        },
+        {
+            "codigo": "3212",
+            "nombre": "Fabricación de bisutería y artículos conexos",
+            "division": "32"
+        },
+        {
+            "codigo": "3220",
+            "nombre": "Fabricación de instrumentos musicales",
+            "division": "32"
+        },
+        {
+            "codigo": "3230",
+            "nombre": "Fabricación de artículos y equipo para la práctica del deporte",
+            "division": "32"
+        },
+        {
+            "codigo": "3240",
+            "nombre": "Fabricación de juegos, juguetes y rompecabezas",
+            "division": "32"
+        },
+        {
+            "codigo": "3250",
+            "nombre": "Fabricación de instrumentos, aparatos y materiales médicos y odontológicos (incluido mobiliario)",
+            "division": "32"
+        },
+        {
+            "codigo": "3290",
+            "nombre": "Otras industrias manufactureras n.c.p.",
+            "division": "32"
+        },
+        {
+            "codigo": "3311",
+            "nombre": "Mantenimiento y reparación especializado de productos elaborados en metal",
+            "division": "33"
+        },
+        {
+            "codigo": "3312",
+            "nombre": "Mantenimiento y reparación especializado de maquinaria y equipo",
+            "division": "33"
+        },
+        {
+            "codigo": "3313",
+            "nombre": "Mantenimiento y reparación especializado de equipo electrónico y óptico",
+            "division": "33"
+        },
+        {
+            "codigo": "3314",
+            "nombre": "Mantenimiento y reparación especializado de equipo eléctrico",
+            "division": "33"
+        },
+        {
+            "codigo": "3315",
+            "nombre": "Mantenimiento y reparación especializado de equipo de transporte, excepto de vehículos automotores, motocicletas y bicicletas",
+            "division": "33"
+        },
+        {
+            "codigo": "3319",
+            "nombre": "Mantenimiento y reparación de otros tipos de equipos y sus componentes n.c.p.",
+            "division": "33"
+        },
+        {
+            "codigo": "3320",
+            "nombre": "Instalación especializada de maquinaria y equipo industrial",
+            "division": "33"
+        },
+        {
+            "codigo": "3511",
+            "nombre": "Actividades de generación de energía eléctrica a partir de fuentes no renovables",
+            "division": "35"
+        },
+        {
+            "codigo": "3512",
+            "nombre": "Actividades de generación de energía eléctrica a partir de fuentes renovables",
+            "division": "35"
+        },
+        {
+            "codigo": "3513",
+            "nombre": "Actividades de transmisión de energía eléctrica",
+            "division": "35"
+        },
+        {
+            "codigo": "3514",
+            "nombre": "Actividades de distribución de energía eléctrica",
+            "division": "35"
+        },
+        {
+            "codigo": "3515",
+            "nombre": "Actividades de comercialización de energía eléctrica",
+            "division": "35"
+        },
+        {
+            "codigo": "3520",
+            "nombre": "Producción de gas; distribución de combustibles gaseosos por tuberías",
+            "division": "35"
+        },
+        {
+            "codigo": "3530",
+            "nombre": "Suministro de vapor y aire acondicionado",
+            "division": "35"
+        },
+        {
+            "codigo": "3540",
+            "nombre": "Actividades de intermediación para los servicios de energía eléctrica y gas natural",
+            "division": "35"
+        },
+        {
+            "codigo": "3600",
+            "nombre": "Captación, tratamiento y distribución de agua",
+            "division": "36"
+        },
+        {
+            "codigo": "3700",
+            "nombre": "Evacuación y tratamiento de aguas residuales",
+            "division": "37"
+        },
+        {
+            "codigo": "3811",
+            "nombre": "Recolección de residuos no peligrosos",
+            "division": "38"
+        },
+        {
+            "codigo": "3812",
+            "nombre": "Recolección de residuos peligrosos",
+            "division": "38"
+        },
+        {
+            "codigo": "3821",
+            "nombre": "Tratamiento y disposición de residuos no peligrosos",
+            "division": "38"
+        },
+        {
+            "codigo": "3822",
+            "nombre": "Tratamiento y disposición de residuos peligrosos",
+            "division": "38"
+        },
+        {
+            "codigo": "3830",
+            "nombre": "Recuperación y aprovechamiento de materiales y otros residuos",
+            "division": "38"
+        },
+        {
+            "codigo": "3900",
+            "nombre": "Actividades de saneamiento ambiental y otros servicios de gestión de residuos",
+            "division": "39"
+        },
+        {
+            "codigo": "4111",
+            "nombre": "Construcción de edificios residenciales",
+            "division": "41"
+        },
+        {
+            "codigo": "4112",
+            "nombre": "Construcción de edificios no residenciales",
+            "division": "41"
+        },
+        {
+            "codigo": "4210",
+            "nombre": "Construcción de carreteras y vías de ferrocarril",
+            "division": "42"
+        },
+        {
+            "codigo": "4220",
+            "nombre": "Construcción de proyectos de servicio público",
+            "division": "42"
+        },
+        {
+            "codigo": "4290",
+            "nombre": "Construcción de otras obras de ingeniería civil",
+            "division": "42"
+        },
+        {
+            "codigo": "4311",
+            "nombre": "Demolición",
+            "division": "43"
+        },
+        {
+            "codigo": "4312",
+            "nombre": "Preparación del terreno",
+            "division": "43"
+        },
+        {
+            "codigo": "4321",
+            "nombre": "Instalaciones eléctricas",
+            "division": "43"
+        },
+        {
+            "codigo": "4322",
+            "nombre": "Instalaciones de fontanería, calefacción y aire acondicionado",
+            "division": "43"
+        },
+        {
+            "codigo": "4329",
+            "nombre": "Otras instalaciones especializadas",
+            "division": "43"
+        },
+        {
+            "codigo": "4330",
+            "nombre": "Terminación y acabado de edificios y obras de ingeniería civil",
+            "division": "43"
+        },
+        {
+            "codigo": "4340",
+            "nombre": "Actividades de intermediación para los servicios especializados de construcción",
+            "division": "43"
+        },
+        {
+            "codigo": "4390",
+            "nombre": "Otras actividades especializadas para la construcción de edificios y obras de ingeniería civil",
+            "division": "43"
+        },
+        {
+            "codigo": "4610",
+            "nombre": "Comercio al por mayor a cambio de una retribución o por contrata",
+            "division": "46"
+        },
+        {
+            "codigo": "4620",
+            "nombre": "Comercio al por mayor de materias primas agropecuarias y animales vivos",
+            "division": "46"
+        },
+        {
+            "codigo": "4631",
+            "nombre": "Comercio al por mayor de productos alimenticios",
+            "division": "46"
+        },
+        {
+            "codigo": "4632",
+            "nombre": "Comercio al por mayor de bebidas y tabaco",
+            "division": "46"
+        },
+        {
+            "codigo": "4641",
+            "nombre": "Comercio al por mayor de productos textiles, productos confeccionados para uso doméstico",
+            "division": "46"
+        },
+        {
+            "codigo": "4642",
+            "nombre": "Comercio al por mayor de prendas de vestir",
+            "division": "46"
+        },
+        {
+            "codigo": "4643",
+            "nombre": "Comercio al por mayor de calzado",
+            "division": "46"
+        },
+        {
+            "codigo": "4644",
+            "nombre": "Comercio al por mayor de aparatos y equipo de uso doméstico",
+            "division": "46"
+        },
+        {
+            "codigo": "4645",
+            "nombre": "Comercio al por mayor de productos farmacéuticos y medicinales, cosméticos y de artículos de tocador",
+            "division": "46"
+        },
+        {
+            "codigo": "4646",
+            "nombre": "Comercio al por mayor de muebles para el hogar, oficina, almacenes y tiendas, alfombras y equipo de iluminación",
+            "division": "46"
+        },
+        {
+            "codigo": "4649",
+            "nombre": "Comercio al por mayor de otros utensilios domésticos n.c.p.",
+            "division": "46"
+        },
+        {
+            "codigo": "4651",
+            "nombre": "Comercio al por mayor de computadores, equipo periférico y programas de informática",
+            "division": "46"
+        },
+        {
+            "codigo": "4652",
+            "nombre": "Comercio al por mayor de equipo, partes y piezas electrónicos y de telecomunicaciones",
+            "division": "46"
+        },
+        {
+            "codigo": "4653",
+            "nombre": "Comercio al por mayor de maquinaria y equipos agropecuarios",
+            "division": "46"
+        },
+        {
+            "codigo": "4659",
+            "nombre": "Comercio al por mayor de otros tipos de maquinaria y equipo n.c.p.",
+            "division": "46"
+        },
+        {
+            "codigo": "4661",
+            "nombre": "Comercio al por mayor de vehículos automotores nuevos",
+            "division": "46"
+        },
+        {
+            "codigo": "4662",
+            "nombre": "Comercio al por mayor de vehículos automotores usados",
+            "division": "46"
+        },
+        {
+            "codigo": "4663",
+            "nombre": "Comercio al por mayor de partes, piezas (autopartes) y accesorios (lujos) para vehículos automotores",
+            "division": "46"
+        },
+        {
+            "codigo": "4664",
+            "nombre": "Comercio al por mayor de motocicletas nuevas y usadas, sus partes, piezas y accesorios",
+            "division": "46"
+        },
+        {
+            "codigo": "4671",
+            "nombre": "Comercio al por mayor de combustibles sólidos, líquidos, gaseosos y productos conexos",
+            "division": "46"
+        },
+        {
+            "codigo": "4672",
+            "nombre": "Comercio al por mayor de metales y minerales metalíferos",
+            "division": "46"
+        },
+        {
+            "codigo": "4673",
+            "nombre": "Comercio al por mayor de materiales de construcción, artículos de ferretería, pinturas, productos de vidrio, equipo y materiales de fontanería y calefacción",
+            "division": "46"
+        },
+        {
+            "codigo": "4674",
+            "nombre": "Comercio al por mayor de productos químicos básicos, cauchos y plásticos en formas primarias y productos químicos de uso agropecuario",
+            "division": "46"
+        },
+        {
+            "codigo": "4675",
+            "nombre": "Comercio al por mayor de desperdicios, residuos y chatarra",
+            "division": "46"
+        },
+        {
+            "codigo": "4679",
+            "nombre": "Comercio al por mayor de otros productos n.c.p.",
+            "division": "46"
+        },
+        {
+            "codigo": "4690",
+            "nombre": "Comercio al por mayor no especializado",
+            "division": "46"
+        },
+        {
+            "codigo": "4711",
+            "nombre": "Comercio al por menor en establecimientos no especializados con surtido compuesto principalmente por alimentos, bebidas (alcohólicas y no alcohólicas) o tabaco",
+            "division": "47"
+        },
+        {
+            "codigo": "4719",
+            "nombre": "Comercio al por menor en establecimientos no especializados, con surtido compuesto principalmente por productos diferentes de alimentos (víveres en general), bebidas (alcohólicas y no alcohólicas) y tabaco",
+            "division": "47"
+        },
+        {
+            "codigo": "4721",
+            "nombre": "Comercio al por menor de productos agrícolas para el consumo, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4722",
+            "nombre": "Comercio al por menor de leche, productos lácteos y huevos, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4723",
+            "nombre": "Comercio al por menor de carnes, productos cárnicos, pescados y productos de mar, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4724",
+            "nombre": "Comercio al por menor de bebidas, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4725",
+            "nombre": "Comercio al por menor de productos del tabaco y accesorios relacionados, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4729",
+            "nombre": "Comercio al por menor de otros productos alimenticios n.c.p., en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4731",
+            "nombre": "Comercio al por menor de combustible para automotores",
+            "division": "47"
+        },
+        {
+            "codigo": "4732",
+            "nombre": "Comercio al por menor de lubricantes (aceites, grasas), aditivos y productos de limpieza para vehículos automotores",
+            "division": "47"
+        },
+        {
+            "codigo": "4741",
+            "nombre": "Comercio al por menor de computadores, equipos periféricos, programas de informática y equipos de telecomunicaciones en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4742",
+            "nombre": "Comercio al por menor de equipos y aparatos de sonido y de video, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4751",
+            "nombre": "Comercio al por menor de productos textiles, distintos de prendas de vestir, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4752",
+            "nombre": "Comercio al por menor de artículos de ferretería, pinturas y productos de vidrio en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4753",
+            "nombre": "Comercio al por menor de tapices, alfombras y recubrimientos para paredes y pisos en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4754",
+            "nombre": "Comercio al por menor de electrodomésticos y gasodomésticos, muebles y equipos de iluminación en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4755",
+            "nombre": "Comercio al por menor de artículos y utensilios de uso doméstico en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4759",
+            "nombre": "Comercio al por menor de otros artículos domésticos en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4761",
+            "nombre": "Comercio al por menor de libros, periódicos, materiales y artículos de papelería y escritorio, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4762",
+            "nombre": "Comercio al por menor de artículos deportivos, en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4763",
+            "nombre": "Comercio al por menor de juegos y juguetes",
+            "division": "47"
+        },
+        {
+            "codigo": "4769",
+            "nombre": "Comercio al por menor de otros artículos culturales y de entretenimiento n.c.p., en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4771",
+            "nombre": "Comercio al por menor de prendas de vestir y sus accesorios (incluye artículos de piel) en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4772",
+            "nombre": "Comercio al por menor de calzado y artículos de cuero y sucedáneos del cuero en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4773",
+            "nombre": "Comercio al por menor de productos farmacéuticos y medicinales, cosméticos y artículos de tocador en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4774",
+            "nombre": "Comercio al por menor de otros productos nuevos en establecimientos especializados",
+            "division": "47"
+        },
+        {
+            "codigo": "4775",
+            "nombre": "Comercio al por menor de artículos de segunda mano",
+            "division": "47"
+        },
+        {
+            "codigo": "4781",
+            "nombre": "Comercio al por menor de vehículos automotores nuevos",
+            "division": "47"
+        },
+        {
+            "codigo": "4782",
+            "nombre": "Comercio al por menor de vehículos automotores usados",
+            "division": "47"
+        },
+        {
+            "codigo": "4783",
+            "nombre": "Comercio al por menor de partes, piezas (autopartes) y accesorios (lujos) para vehículos automotores",
+            "division": "47"
+        },
+        {
+            "codigo": "4784",
+            "nombre": "Comercio al por menor de motocicletas nuevas",
+            "division": "47"
+        },
+        {
+            "codigo": "4785",
+            "nombre": "Comercio al por menor de motocicletas usadas",
+            "division": "47"
+        },
+        {
+            "codigo": "4786",
+            "nombre": "Comercio al por menor de partes, piezas y accesorios para motocicletas",
+            "division": "47"
+        },
+        {
+            "codigo": "4790",
+            "nombre": "Actividades de intermediación para el comercio al por menor",
+            "division": "47"
+        },
+        {
+            "codigo": "4911",
+            "nombre": "Transporte férreo de pasajeros",
+            "division": "49"
+        },
+        {
+            "codigo": "4912",
+            "nombre": "Transporte férreo de carga",
+            "division": "49"
+        },
+        {
+            "codigo": "4921",
+            "nombre": "Transporte terrestre de pasajeros",
+            "division": "49"
+        },
+        {
+            "codigo": "4922",
+            "nombre": "Transporte mixto terrestre",
+            "division": "49"
+        },
+        {
+            "codigo": "4923",
+            "nombre": "Otro transporte terrestre de pasajeros",
+            "division": "49"
+        },
+        {
+            "codigo": "4924",
+            "nombre": "Transporte de carga por carretera",
+            "division": "49"
+        },
+        {
+            "codigo": "4930",
+            "nombre": "Transporte por tuberías",
+            "division": "49"
+        },
+        {
+            "codigo": "5011",
+            "nombre": "Transporte de pasajeros marítimo y de cabotaje",
+            "division": "50"
+        },
+        {
+            "codigo": "5012",
+            "nombre": "Transporte de carga marítimo y de cabotaje",
+            "division": "50"
+        },
+        {
+            "codigo": "5021",
+            "nombre": "Transporte fluvial de pasajeros",
+            "division": "50"
+        },
+        {
+            "codigo": "5022",
+            "nombre": "Transporte fluvial de carga",
+            "division": "50"
+        },
+        {
+            "codigo": "5111",
+            "nombre": "Transporte aéreo nacional de pasajeros",
+            "division": "51"
+        },
+        {
+            "codigo": "5112",
+            "nombre": "Transporte aéreo internacional de pasajeros",
+            "division": "51"
+        },
+        {
+            "codigo": "5121",
+            "nombre": "Transporte aéreo nacional de carga",
+            "division": "51"
+        },
+        {
+            "codigo": "5122",
+            "nombre": "Transporte aéreo internacional de carga",
+            "division": "51"
+        },
+        {
+            "codigo": "5210",
+            "nombre": "Almacenamiento y depósito",
+            "division": "52"
+        },
+        {
+            "codigo": "5221",
+            "nombre": "Actividades complementarias al transporte terrestre",
+            "division": "52"
+        },
+        {
+            "codigo": "5222",
+            "nombre": "Actividades complementarias al transporte acuático",
+            "division": "52"
+        },
+        {
+            "codigo": "5223",
+            "nombre": "Actividades complementarias al transporte aéreo",
+            "division": "52"
+        },
+        {
+            "codigo": "5224",
+            "nombre": "Manipulación de carga",
+            "division": "52"
+        },
+        {
+            "codigo": "5229",
+            "nombre": "Otras actividades complementarias al transporte",
+            "division": "52"
+        },
+        {
+            "codigo": "5231",
+            "nombre": "Actividades de intermediación para los servicios de transporte de carga",
+            "division": "52"
+        },
+        {
+            "codigo": "5232",
+            "nombre": "Actividades de intermediación para los servicios de transporte de pasajeros",
+            "division": "52"
+        },
+        {
+            "codigo": "5310",
+            "nombre": "Actividades postales nacionales",
+            "division": "53"
+        },
+        {
+            "codigo": "5320",
+            "nombre": "Actividades de mensajería",
+            "division": "53"
+        },
+        {
+            "codigo": "5330",
+            "nombre": "Servicios de intermediación para los servicios postales y de mensajería",
+            "division": "53"
+        },
+        {
+            "codigo": "5511",
+            "nombre": "Alojamiento en hoteles",
+            "division": "55"
+        },
+        {
+            "codigo": "5512",
+            "nombre": "Alojamiento en apartahoteles",
+            "division": "55"
+        },
+        {
+            "codigo": "5513",
+            "nombre": "Alojamiento en centros vacacionales",
+            "division": "55"
+        },
+        {
+            "codigo": "5521",
+            "nombre": "Alojamiento en hostales",
+            "division": "55"
+        },
+        {
+            "codigo": "5522",
+            "nombre": "Alojamiento en viviendas turísticas",
+            "division": "55"
+        },
+        {
+            "codigo": "5529",
+            "nombre": "Otras actividades de alojamiento para estancias cortas n.c.p.",
+            "division": "55"
+        },
+        {
+            "codigo": "5530",
+            "nombre": "Actividades de zonas de camping y parques para vehículos recreacionales",
+            "division": "55"
+        },
+        {
+            "codigo": "5540",
+            "nombre": "Servicio de estancia por horas",
+            "division": "55"
+        },
+        {
+            "codigo": "5550",
+            "nombre": "Actividades de intermediación para los servicios de alojamiento",
+            "division": "55"
+        },
+        {
+            "codigo": "5590",
+            "nombre": "Otras actividades de alojamiento n.c.p.",
+            "division": "55"
+        },
+        {
+            "codigo": "5611",
+            "nombre": "Expendio a la mesa de comidas preparadas",
+            "division": "56"
+        },
+        {
+            "codigo": "5612",
+            "nombre": "Expendio por autoservicio de comidas preparadas",
+            "division": "56"
+        },
+        {
+            "codigo": "5613",
+            "nombre": "Expendio de comidas preparadas en cafeterías",
+            "division": "56"
+        },
+        {
+            "codigo": "5619",
+            "nombre": "Otros tipos de expendio de comidas preparadas n.c.p.",
+            "division": "56"
+        },
+        {
+            "codigo": "5621",
+            "nombre": "Actividades de catering para eventos",
+            "division": "56"
+        },
+        {
+            "codigo": "5629",
+            "nombre": "Actividades de otros servicios de comidas",
+            "division": "56"
+        },
+        {
+            "codigo": "5630",
+            "nombre": "Expendio de bebidas alcohólicas para el consumo dentro del establecimiento",
+            "division": "56"
+        },
+        {
+            "codigo": "5640",
+            "nombre": "Actividades de intermediación para los servicios de comidas y bebidas",
+            "division": "56"
+        },
+        {
+            "codigo": "5811",
+            "nombre": "Edición de libros",
+            "division": "58"
+        },
+        {
+            "codigo": "5812",
+            "nombre": "Edición de periódicos, revistas y otras publicaciones periódicas",
+            "division": "58"
+        },
+        {
+            "codigo": "5819",
+            "nombre": "Otras actividades de edición",
+            "division": "58"
+        },
+        {
+            "codigo": "5821",
+            "nombre": "Edición de videojuegos",
+            "division": "58"
+        },
+        {
+            "codigo": "5829",
+            "nombre": "Edición de otros programas informáticos",
+            "division": "58"
+        },
+        {
+            "codigo": "5911",
+            "nombre": "Actividades de producción de películas cinematográficas, videos y programas de televisión",
+            "division": "59"
+        },
+        {
+            "codigo": "5912",
+            "nombre": "Actividades de postproducción de películas cinematográficas, videos y programas de televisión",
+            "division": "59"
+        },
+        {
+            "codigo": "5913",
+            "nombre": "Actividades de distribución de películas cinematográficas, videos y programas de televisión",
+            "division": "59"
+        },
+        {
+            "codigo": "5914",
+            "nombre": "Actividades de exhibición de películas cinematográficas y videos",
+            "division": "59"
+        },
+        {
+            "codigo": "5920",
+            "nombre": "Actividades de grabación de sonido y edición de música",
+            "division": "59"
+        },
+        {
+            "codigo": "6010",
+            "nombre": "Actividades de radiodifusión y distribución de audio",
+            "division": "60"
+        },
+        {
+            "codigo": "6021",
+            "nombre": "Actividades de programación de televisión, emisión y distribución de videos",
+            "division": "60"
+        },
+        {
+            "codigo": "6022",
+            "nombre": "Actividades de transmisión de contenido audiovisual en vivo",
+            "division": "60"
+        },
+        {
+            "codigo": "6031",
+            "nombre": "Actividades de las agencias de noticias",
+            "division": "60"
+        },
+        {
+            "codigo": "6039",
+            "nombre": "Sitios de redes sociales y otras actividades de distribución de contenido",
+            "division": "60"
+        },
+        {
+            "codigo": "6110",
+            "nombre": "Actividades de telecomunicaciones alámbricas, inalámbricas y satelitales",
+            "division": "61"
+        },
+        {
+            "codigo": "6120",
+            "nombre": "Reventa de servicios de telecomunicaciones y actividades de intermediación para los servicios de telecomunicaciones",
+            "division": "61"
+        },
+        {
+            "codigo": "6190",
+            "nombre": "Otras actividades de telecomunicaciones",
+            "division": "61"
+        },
+        {
+            "codigo": "6211",
+            "nombre": "Desarrollo de videojuegos, software de videojuegos y herramientas de software de videojuegos",
+            "division": "62"
+        },
+        {
+            "codigo": "6219",
+            "nombre": "Otras actividades de programación informática",
+            "division": "62"
+        },
+        {
+            "codigo": "6220",
+            "nombre": "Actividades de consultoría informática y gestión de instalaciones informáticas",
+            "division": "62"
+        },
+        {
+            "codigo": "6290",
+            "nombre": "Otras actividades de tecnologías de la información y servicios informáticos",
+            "division": "62"
+        },
+        {
+            "codigo": "6310",
+            "nombre": "Infraestructura informática, procesamiento de datos, alojamiento web y actividades relacionadas",
+            "division": "63"
+        },
+        {
+            "codigo": "6390",
+            "nombre": "Actividades de portales de búsqueda en la web y otras actividades de servicios de información",
+            "division": "63"
+        },
+        {
+            "codigo": "6411",
+            "nombre": "Banco Central",
+            "division": "64"
+        },
+        {
+            "codigo": "6412",
+            "nombre": "Bancos comerciales",
+            "division": "64"
+        },
+        {
+            "codigo": "6413",
+            "nombre": "Actividades de las corporaciones financieras",
+            "division": "64"
+        },
+        {
+            "codigo": "6414",
+            "nombre": "Actividades de las compañías de financiamiento",
+            "division": "64"
+        },
+        {
+            "codigo": "6415",
+            "nombre": "Banca de segundo piso",
+            "division": "64"
+        },
+        {
+            "codigo": "6416",
+            "nombre": "Actividades de las cooperativas financieras",
+            "division": "64"
+        },
+        {
+            "codigo": "6421",
+            "nombre": "Actividades de sociedades de cartera",
+            "division": "64"
+        },
+        {
+            "codigo": "6422",
+            "nombre": "Actividades de los canales de financiación",
+            "division": "64"
+        },
+        {
+            "codigo": "6431",
+            "nombre": "Fideicomisos, fondos (mercado monetario y no monetario) y entidades financieras similares",
+            "division": "64"
+        },
+        {
+            "codigo": "6432",
+            "nombre": "Fondos de cesantías",
+            "division": "64"
+        },
+        {
+            "codigo": "6433",
+            "nombre": "Actividades de cuentas fiduciarias, patrimoniales y de agencia",
+            "division": "64"
+        },
+        {
+            "codigo": "6491",
+            "nombre": "Leasing financiero (arrendamiento financiero)",
+            "division": "64"
+        },
+        {
+            "codigo": "6492",
+            "nombre": "Actividades financieras de fondos de empleados y otras formas asociativas del sector solidario",
+            "division": "64"
+        },
+        {
+            "codigo": "6493",
+            "nombre": "Actividades de compra de cartera y factoring",
+            "division": "64"
+        },
+        {
+            "codigo": "6494",
+            "nombre": "Otras actividades de distribución de fondos",
+            "division": "64"
+        },
+        {
+            "codigo": "6495",
+            "nombre": "Instituciones especiales oficiales",
+            "division": "64"
+        },
+        {
+            "codigo": "6496",
+            "nombre": "Capitalización",
+            "division": "64"
+        },
+        {
+            "codigo": "6497",
+            "nombre": "Actividades de financiación del comercio internacional",
+            "division": "64"
+        },
+        {
+            "codigo": "6498",
+            "nombre": "Actividades de titulización",
+            "division": "64"
+        },
+        {
+            "codigo": "6499",
+            "nombre": "Otras actividades de servicios financieros n.c.p., excepto las de seguros y pensiones",
+            "division": "64"
+        },
+        {
+            "codigo": "6511",
+            "nombre": "Seguros generales",
+            "division": "65"
+        },
+        {
+            "codigo": "6512",
+            "nombre": "Seguros de vida",
+            "division": "65"
+        },
+        {
+            "codigo": "6513",
+            "nombre": "Reaseguros",
+            "division": "65"
+        },
+        {
+            "codigo": "6515",
+            "nombre": "Seguros de salud",
+            "division": "65"
+        },
+        {
+            "codigo": "6521",
+            "nombre": "Servicios de seguros sociales de salud",
+            "division": "65"
+        },
+        {
+            "codigo": "6522",
+            "nombre": "Servicios de seguros sociales en riesgos laborales",
+            "division": "65"
+        },
+        {
+            "codigo": "6523",
+            "nombre": "Servicios de seguros sociales en riesgos familia",
+            "division": "65"
+        },
+        {
+            "codigo": "6531",
+            "nombre": "Régimen de prima media con prestación definida (RPM)",
+            "division": "65"
+        },
+        {
+            "codigo": "6532",
+            "nombre": "Régimen de ahorro individual con solidaridad (RAIS)",
+            "division": "65"
+        },
+        {
+            "codigo": "6611",
+            "nombre": "Administración de mercados financieros",
+            "division": "66"
+        },
+        {
+            "codigo": "6612",
+            "nombre": "Corretaje de valores y de contratos de productos básicos",
+            "division": "66"
+        },
+        {
+            "codigo": "6613",
+            "nombre": "Otras actividades relacionadas con el mercado de valores",
+            "division": "66"
+        },
+        {
+            "codigo": "6614",
+            "nombre": "Actividades de las sociedades de intermediación cambiaria y de servicios financieros especiales",
+            "division": "66"
+        },
+        {
+            "codigo": "6615",
+            "nombre": "Actividades de los profesionales de compra y venta de divisas",
+            "division": "66"
+        },
+        {
+            "codigo": "6619",
+            "nombre": "Otras actividades auxiliares de las actividades de servicios financieros n.c.p.",
+            "division": "66"
+        },
+        {
+            "codigo": "6621",
+            "nombre": "Actividades de agentes y corredores de seguros",
+            "division": "66"
+        },
+        {
+            "codigo": "6629",
+            "nombre": "Evaluación de riesgos y daños, y otras actividades de servicios auxiliares",
+            "division": "66"
+        },
+        {
+            "codigo": "6630",
+            "nombre": "Actividades de administración de fondos",
+            "division": "66"
+        },
+        {
+            "codigo": "6810",
+            "nombre": "Actividades inmobiliarias realizadas con bienes propios o arrendados",
+            "division": "68"
+        },
+        {
+            "codigo": "6821",
+            "nombre": "Actividades de intermediación inmobiliaria",
+            "division": "68"
+        },
+        {
+            "codigo": "6829",
+            "nombre": "Otras actividades inmobiliarias realizadas a cambio de una retribución o por contrata",
+            "division": "68"
+        },
+        {
+            "codigo": "6910",
+            "nombre": "Actividades jurídicas",
+            "division": "69"
+        },
+        {
+            "codigo": "6920",
+            "nombre": "Actividades de contabilidad, teneduría de libros, auditoría financiera y asesoría tributaria",
+            "division": "69"
+        },
+        {
+            "codigo": "7010",
+            "nombre": "Actividades de las oficinas principales",
+            "division": "70"
+        },
+        {
+            "codigo": "7020",
+            "nombre": "Actividades de consultoría empresarial y de gestión",
+            "division": "70"
+        },
+        {
+            "codigo": "7111",
+            "nombre": "Actividades de arquitectura",
+            "division": "71"
+        },
+        {
+            "codigo": "7112",
+            "nombre": "Actividades de ingeniería y otras actividades conexas de consultoría técnica",
+            "division": "71"
+        },
+        {
+            "codigo": "7120",
+            "nombre": "Ensayos, pruebas y análisis técnicos",
+            "division": "71"
+        },
+        {
+            "codigo": "7210",
+            "nombre": "Investigaciones y desarrollo experimental en el campo de las ciencias naturales y la ingeniería",
+            "division": "72"
+        },
+        {
+            "codigo": "7220",
+            "nombre": "Investigaciones y desarrollo experimental en el campo de las ciencias sociales y las humanidades",
+            "division": "72"
+        },
+        {
+            "codigo": "7310",
+            "nombre": "Actividades de publicidad",
+            "division": "73"
+        },
+        {
+            "codigo": "7320",
+            "nombre": "Actividades de estudios de mercado y de encuestas de opinión pública",
+            "division": "73"
+        },
+        {
+            "codigo": "7330",
+            "nombre": "Actividades de relaciones públicas",
+            "division": "73"
+        },
+        {
+            "codigo": "7410",
+            "nombre": "Actividades especializadas de diseño",
+            "division": "74"
+        },
+        {
+            "codigo": "7420",
+            "nombre": "Actividades de fotografía",
+            "division": "74"
+        },
+        {
+            "codigo": "7430",
+            "nombre": "Actividades de traducción e interpretación",
+            "division": "74"
+        },
+        {
+            "codigo": "7491",
+            "nombre": "Actividades de servicios de intermediación y comercialización de patentes",
+            "division": "74"
+        },
+        {
+            "codigo": "7499",
+            "nombre": "Todas las demás actividades profesionales, científicas y técnicas n.c.p.",
+            "division": "74"
+        },
+        {
+            "codigo": "7500",
+            "nombre": "Actividades veterinarias",
+            "division": "75"
+        },
+        {
+            "codigo": "7710",
+            "nombre": "Alquiler y arrendamiento de vehículos automotores",
+            "division": "77"
+        },
+        {
+            "codigo": "7721",
+            "nombre": "Alquiler y arrendamiento de equipo recreativo y deportivo",
+            "division": "77"
+        },
+        {
+            "codigo": "7729",
+            "nombre": "Alquiler y arrendamiento de otros efectos personales y enseres domésticos n.c.p.",
+            "division": "77"
+        },
+        {
+            "codigo": "7730",
+            "nombre": "Alquiler y arrendamiento de otros tipos de maquinaria, equipo y bienes tangibles",
+            "division": "77"
+        },
+        {
+            "codigo": "7740",
+            "nombre": "Arrendamiento de propiedad intelectual y productos similares, excepto obras protegidas por derechos de autor",
+            "division": "77"
+        },
+        {
+            "codigo": "7751",
+            "nombre": "Actividades de intermediación para los servicios de alquiler y arrendamiento de automóviles, casas rodantes y remolques",
+            "division": "77"
+        },
+        {
+            "codigo": "7752",
+            "nombre": "Actividades de intermediación para los servicios de alquiler y arrendamiento de otros bienes tangibles y activos intangibles no financieros",
+            "division": "77"
+        },
+        {
+            "codigo": "7810",
+            "nombre": "Actividades de agencias de gestión y colocación de empleo",
+            "division": "78"
+        },
+        {
+            "codigo": "7820",
+            "nombre": "Actividades de empresas de servicios temporales",
+            "division": "78"
+        },
+        {
+            "codigo": "7911",
+            "nombre": "Actividades de las agencias de viaje",
+            "division": "79"
+        },
+        {
+            "codigo": "7912",
+            "nombre": "Actividades de operadores turísticos",
+            "division": "79"
+        },
+        {
+            "codigo": "7990",
+            "nombre": "Otras actividades relacionadas con los viajes",
+            "division": "79"
+        },
+        {
+            "codigo": "8011",
+            "nombre": "Actividades de investigación y seguridad privada",
+            "division": "80"
+        },
+        {
+            "codigo": "8019",
+            "nombre": "Actividades de seguridad n.c.p.",
+            "division": "80"
+        },
+        {
+            "codigo": "8110",
+            "nombre": "Actividades combinadas de apoyo a instalaciones",
+            "division": "81"
+        },
+        {
+            "codigo": "8121",
+            "nombre": "Limpieza general de edificios",
+            "division": "81"
+        },
+        {
+            "codigo": "8129",
+            "nombre": "Otras actividades de limpieza",
+            "division": "81"
+        },
+        {
+            "codigo": "8130",
+            "nombre": "Actividades de servicios de paisajismo",
+            "division": "81"
+        },
+        {
+            "codigo": "8210",
+            "nombre": "Actividades administrativas y de apoyo de oficina",
+            "division": "82"
+        },
+        {
+            "codigo": "8220",
+            "nombre": "Actividades de centros de llamadas (call center)",
+            "division": "82"
+        },
+        {
+            "codigo": "8230",
+            "nombre": "Organización de convenciones y eventos comerciales",
+            "division": "82"
+        },
+        {
+            "codigo": "8240",
+            "nombre": "Actividades de intermediación para los servicios de apoyo empresarial n.c.p. (excepto intermediación financiera)",
+            "division": "82"
+        },
+        {
+            "codigo": "8291",
+            "nombre": "Actividades de agencias de cobranza y oficinas de calificación crediticia",
+            "division": "82"
+        },
+        {
+            "codigo": "8292",
+            "nombre": "Actividades de envase y empaque",
+            "division": "82"
+        },
+        {
+            "codigo": "8299",
+            "nombre": "Otras actividades de servicios de apoyo a las empresas n.c.p.",
+            "division": "82"
+        },
+        {
+            "codigo": "8411",
+            "nombre": "Actividades legislativas de la administración pública",
+            "division": "84"
+        },
+        {
+            "codigo": "8412",
+            "nombre": "Actividades ejecutivas de la administración pública",
+            "division": "84"
+        },
+        {
+            "codigo": "8413",
+            "nombre": "Regulación de las actividades de organismos que prestan servicios de salud, educativos, culturales y otros servicios sociales, excepto servicios de seguridad social obligatoria y medio ambiente",
+            "division": "84"
+        },
+        {
+            "codigo": "8414",
+            "nombre": "Regulación de las actividades de prestación de servicios ambientales",
+            "division": "84"
+        },
+        {
+            "codigo": "8415",
+            "nombre": "Regulación de las actividades facilitadoras de la actividad económica",
+            "division": "84"
+        },
+        {
+            "codigo": "8416",
+            "nombre": "Actividades de los órganos de control y otras instituciones",
+            "division": "84"
+        },
+        {
+            "codigo": "8421",
+            "nombre": "Relaciones exteriores",
+            "division": "84"
+        },
+        {
+            "codigo": "8422",
+            "nombre": "Actividades de defensa",
+            "division": "84"
+        },
+        {
+            "codigo": "8423",
+            "nombre": "Orden público y actividades de seguridad",
+            "division": "84"
+        },
+        {
+            "codigo": "8424",
+            "nombre": "Administración de justicia",
+            "division": "84"
+        },
+        {
+            "codigo": "8430",
+            "nombre": "Actividades de planes de seguridad social de afiliación obligatoria",
+            "division": "84"
+        },
+        {
+            "codigo": "8511",
+            "nombre": "Educación de la primera infancia",
+            "division": "85"
+        },
+        {
+            "codigo": "8512",
+            "nombre": "Educación preescolar",
+            "division": "85"
+        },
+        {
+            "codigo": "8520",
+            "nombre": "Educación básica primaria",
+            "division": "85"
+        },
+        {
+            "codigo": "8531",
+            "nombre": "Educación básica secundaria",
+            "division": "85"
+        },
+        {
+            "codigo": "8532",
+            "nombre": "Educación media académica",
+            "division": "85"
+        },
+        {
+            "codigo": "8533",
+            "nombre": "Educación media técnica y vocacional",
+            "division": "85"
+        },
+        {
+            "codigo": "8540",
+            "nombre": "Establecimientos que combinan diferentes niveles de educación",
+            "division": "85"
+        },
+        {
+            "codigo": "8551",
+            "nombre": "Educación técnica profesional",
+            "division": "85"
+        },
+        {
+            "codigo": "8552",
+            "nombre": "Educación tecnológica",
+            "division": "85"
+        },
+        {
+            "codigo": "8553",
+            "nombre": "Educación de instituciones universitarias o de escuelas tecnológicas",
+            "division": "85"
+        },
+        {
+            "codigo": "8554",
+            "nombre": "Educación de universidades",
+            "division": "85"
+        },
+        {
+            "codigo": "8561",
+            "nombre": "Formación para el trabajo",
+            "division": "85"
+        },
+        {
+            "codigo": "8562",
+            "nombre": "Educación deportiva y recreativa",
+            "division": "85"
+        },
+        {
+            "codigo": "8563",
+            "nombre": "Educación cultural",
+            "division": "85"
+        },
+        {
+            "codigo": "8564",
+            "nombre": "Actividades de las escuelas de conducción y pilotaje",
+            "division": "85"
+        },
+        {
+            "codigo": "8569",
+            "nombre": "Otros tipos de educación n.c.p.",
+            "division": "85"
+        },
+        {
+            "codigo": "8571",
+            "nombre": "Actividades de intermediación para cursos y tutores",
+            "division": "85"
+        },
+        {
+            "codigo": "8579",
+            "nombre": "Otras actividades de apoyo educativo",
+            "division": "85"
+        },
+        {
+            "codigo": "8610",
+            "nombre": "Actividades de hospitales y clínicas, con internación",
+            "division": "86"
+        },
+        {
+            "codigo": "8621",
+            "nombre": "Actividades de la práctica médica, sin internación",
+            "division": "86"
+        },
+        {
+            "codigo": "8622",
+            "nombre": "Actividades de la práctica odontológica",
+            "division": "86"
+        },
+        {
+            "codigo": "8691",
+            "nombre": "Actividades de intermediación para los servicios médicos, odontológicos y otros servicios de salud humana",
+            "division": "86"
+        },
+        {
+            "codigo": "8692",
+            "nombre": "Actividades de apoyo diagnóstico por imagen y laboratorio médico",
+            "division": "86"
+        },
+        {
+            "codigo": "8693",
+            "nombre": "Actividades de apoyo terapéutico",
+            "division": "86"
+        },
+        {
+            "codigo": "8699",
+            "nombre": "Otras actividades de atención de la salud humana n.c.p.",
+            "division": "86"
+        },
+        {
+            "codigo": "8710",
+            "nombre": "Actividades de atención residencial medicalizada de tipo general",
+            "division": "87"
+        },
+        {
+            "codigo": "8720",
+            "nombre": "Actividades de atención en instituciones para personas que padecen o tienen un diagnóstico de una enfermedad mental o abuso de sustancias",
+            "division": "87"
+        },
+        {
+            "codigo": "8730",
+            "nombre": "Actividades de atención en instituciones para el cuidado de adultos mayores o personas con discapacidades físicas",
+            "division": "87"
+        },
+        {
+            "codigo": "8791",
+            "nombre": "Actividades de intermediación para los servicios de atención en instituciones residenciales",
+            "division": "87"
+        },
+        {
+            "codigo": "8799",
+            "nombre": "Otras actividades de atención y servicio social en instituciones con alojamiento n.c.p.",
+            "division": "87"
+        },
+        {
+            "codigo": "8810",
+            "nombre": "Actividades de asistencia social sin alojamiento para adultos mayores o personas con discapacidades",
+            "division": "88"
+        },
+        {
+            "codigo": "8891",
+            "nombre": "Actividades de guarderías para niños y niñas",
+            "division": "88"
+        },
+        {
+            "codigo": "8899",
+            "nombre": "Otras actividades de asistencia social sin alojamiento n.c.p.",
+            "division": "88"
+        },
+        {
+            "codigo": "9011",
+            "nombre": "Actividades de creación literaria",
+            "division": "90"
+        },
+        {
+            "codigo": "9012",
+            "nombre": "Actividades de composición musical",
+            "division": "90"
+        },
+        {
+            "codigo": "9013",
+            "nombre": "Actividades de creación de artes plásticas y visuales",
+            "division": "90"
+        },
+        {
+            "codigo": "9014",
+            "nombre": "Actividades de creación teatral",
+            "division": "90"
+        },
+        {
+            "codigo": "9015",
+            "nombre": "Actividades de creación audiovisual",
+            "division": "90"
+        },
+        {
+            "codigo": "9016",
+            "nombre": "Otras actividades de creación artística",
+            "division": "90"
+        },
+        {
+            "codigo": "9021",
+            "nombre": "Actividades teatrales",
+            "division": "90"
+        },
+        {
+            "codigo": "9022",
+            "nombre": "Actividades de espectáculos musicales en vivo",
+            "division": "90"
+        },
+        {
+            "codigo": "9029",
+            "nombre": "Otras actividades de artes escénicas en vivo n.c.p.",
+            "division": "90"
+        },
+        {
+            "codigo": "9031",
+            "nombre": "Funcionamiento de instalaciones y espacios artísticos",
+            "division": "90"
+        },
+        {
+            "codigo": "9039",
+            "nombre": "Otras actividades de apoyo a la creación artística y las artes escénicas",
+            "division": "90"
+        },
+        {
+            "codigo": "9111",
+            "nombre": "Actividades de las bibliotecas",
+            "division": "91"
+        },
+        {
+            "codigo": "9112",
+            "nombre": "Actividades de archivo",
+            "division": "91"
+        },
+        {
+            "codigo": "9121",
+            "nombre": "Actividades de museos y colecciones",
+            "division": "91"
+        },
+        {
+            "codigo": "9122",
+            "nombre": "Actividades de sitios históricos y monumentos",
+            "division": "91"
+        },
+        {
+            "codigo": "9130",
+            "nombre": "Conservación, restauración y otras actividades de apoyo al patrimonio cultural",
+            "division": "91"
+        },
+        {
+            "codigo": "9141",
+            "nombre": "Actividades de jardines botánicos y zoológicos",
+            "division": "91"
+        },
+        {
+            "codigo": "9142",
+            "nombre": "Actividades de reservas naturales",
+            "division": "91"
+        },
+        {
+            "codigo": "9200",
+            "nombre": "Actividades de juegos de azar y apuestas",
+            "division": "92"
+        },
+        {
+            "codigo": "9311",
+            "nombre": "Gestión de instalaciones deportivas",
+            "division": "93"
+        },
+        {
+            "codigo": "9312",
+            "nombre": "Actividades de clubes deportivos",
+            "division": "93"
+        },
+        {
+            "codigo": "9319",
+            "nombre": "Otras actividades deportivas",
+            "division": "93"
+        },
+        {
+            "codigo": "9321",
+            "nombre": "Actividades de parques de atracciones y parques temáticos",
+            "division": "93"
+        },
+        {
+            "codigo": "9329",
+            "nombre": "Otras actividades recreativas y de esparcimiento n.c.p.",
+            "division": "93"
+        },
+        {
+            "codigo": "9411",
+            "nombre": "Actividades de asociaciones empresariales y de empleadores",
+            "division": "94"
+        },
+        {
+            "codigo": "9412",
+            "nombre": "Actividades de asociaciones profesionales",
+            "division": "94"
+        },
+        {
+            "codigo": "9420",
+            "nombre": "Actividades de sindicatos",
+            "division": "94"
+        },
+        {
+            "codigo": "9491",
+            "nombre": "Actividades de asociaciones religiosas",
+            "division": "94"
+        },
+        {
+            "codigo": "9492",
+            "nombre": "Actividades de asociaciones políticas",
+            "division": "94"
+        },
+        {
+            "codigo": "9499",
+            "nombre": "Actividades de otras asociaciones n.c.p.",
+            "division": "94"
+        },
+        {
+            "codigo": "9511",
+            "nombre": "Mantenimiento y reparación de computadores y de equipo periférico",
+            "division": "95"
+        },
+        {
+            "codigo": "9512",
+            "nombre": "Mantenimiento y reparación de equipos de comunicación",
+            "division": "95"
+        },
+        {
+            "codigo": "9521",
+            "nombre": "Mantenimiento y reparación de aparatos electrónicos de consumo",
+            "division": "95"
+        },
+        {
+            "codigo": "9522",
+            "nombre": "Mantenimiento y reparación de aparatos y equipos domésticos y de jardinería",
+            "division": "95"
+        },
+        {
+            "codigo": "9523",
+            "nombre": "Mantenimiento y reparación de calzado y artículos de cuero",
+            "division": "95"
+        },
+        {
+            "codigo": "9524",
+            "nombre": "Mantenimiento y reparación de muebles y accesorios domésticos",
+            "division": "95"
+        },
+        {
+            "codigo": "9529",
+            "nombre": "Mantenimiento y reparación de otros efectos personales y enseres domésticos",
+            "division": "95"
+        },
+        {
+            "codigo": "9531",
+            "nombre": "Mantenimiento y reparación de vehículos automotores",
+            "division": "95"
+        },
+        {
+            "codigo": "9532",
+            "nombre": "Mantenimiento y reparación de motocicletas",
+            "division": "95"
+        },
+        {
+            "codigo": "9540",
+            "nombre": "Actividades de intermediación para los servicios de mantenimiento y reparación de computadores, de efectos personales y enseres domésticos, y de vehículos automotores y motocicletas",
+            "division": "95"
+        },
+        {
+            "codigo": "9610",
+            "nombre": "Lavado y limpieza, incluso la limpieza en seco, de productos textiles y de piel",
+            "division": "96"
+        },
+        {
+            "codigo": "9621",
+            "nombre": "Actividades de peluquería y barbería",
+            "division": "96"
+        },
+        {
+            "codigo": "9622",
+            "nombre": "Cuidado de la belleza y otras actividades de tratamientos de belleza",
+            "division": "96"
+        },
+        {
+            "codigo": "9623",
+            "nombre": "Actividades de spa, saunas y baños de vapor",
+            "division": "96"
+        },
+        {
+            "codigo": "9630",
+            "nombre": "Pompas fúnebres y actividades relacionadas",
+            "division": "96"
+        },
+        {
+            "codigo": "9640",
+            "nombre": "Actividades de intermediación para los servicios personales",
+            "division": "96"
+        },
+        {
+            "codigo": "9690",
+            "nombre": "Otras actividades de servicios personales n.c.p.",
+            "division": "96"
+        },
+        {
+            "codigo": "9700",
+            "nombre": "Actividades de los hogares individuales como empleadores de personal doméstico",
+            "division": "97"
+        },
+        {
+            "codigo": "9810",
+            "nombre": "Actividades no diferenciadas de los hogares individuales como productores de bienes para uso propio",
+            "division": "98"
+        },
+        {
+            "codigo": "9820",
+            "nombre": "Actividades no diferenciadas de los hogares individuales como productores de servicios para uso propio",
+            "division": "98"
+        },
+        {
+            "codigo": "9900",
+            "nombre": "Actividades de organizaciones y entidades extraterritoriales",
+            "division": "99"
+        }
+    ]
+}

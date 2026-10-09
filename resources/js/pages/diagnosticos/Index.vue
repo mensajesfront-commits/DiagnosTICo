@@ -33,6 +33,7 @@ import TablaDiagnosticos from '@/components/diagnosticos/TablaDiagnosticos.vue';
 import { rutas } from '@/lib/rutas';
 import { normalizar } from '@/lib/texto';
 import type {
+    DivisionCiiu,
     FilaDiagnostico,
     MedicionesPorEstado,
     ResumenDiagnosticos as Resumen,
@@ -46,8 +47,10 @@ const props = withDefaults(
         sector?: Sector | null;
         resumen: Resumen & { mediciones_por_estado?: MedicionesPorEstado };
         diagnosticos: FilaDiagnostico[];
+        /** Catálogo CIIU para elegir los subsectores de un sector (DEC-018). */
+        divisionesCiiu?: DivisionCiiu[];
     }>(),
-    { sector: null },
+    { sector: null, divisionesCiiu: () => [] },
 );
 
 const totalDiagnosticos = computed(() =>
@@ -355,6 +358,7 @@ function elegir(
         v-model:abierto="modalSector"
         :sector="editandoSector ? sector : null"
         :resumen="resumen"
+        :divisiones="divisionesCiiu"
         @reasignar="modalReasignar = true"
         @desactivar="modalEstado = true"
         @eliminar="modalEliminarSector = true"

@@ -108,8 +108,8 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | DELETE | `/diagnosticos` | `diagnosticos.editar` | Elimina varios a la vez (selección en la tabla). Solo los que nunca se publicaron; si alguno tiene versiones no se elimina ninguno y el error en `ids` dice cuáles archivar | `ids[]` |
 | DELETE | `/diagnosticos/{id}` | `diagnosticos.editar` | Elimina un borrador que nunca se publicó | — |
 | DELETE | `/diagnosticos/{id}/borrador` | `diagnosticos.editar` | Elimina el borrador pendiente (vN) sin tocar la versión publicada | — |
-| POST | `/sectores` | `diagnosticos.editar` | A2.2a: crear | `nombre` (máx. 40, único), `descripcion`, `activo` |
-| PUT | `/sectores/{id}` | `diagnosticos.editar` | A2.2: editar | `nombre`, `descripcion` |
+| POST | `/sectores` | `diagnosticos.editar` | A2.2a: crear. Con división CIIU (elegida, o porque el nombre es exactamente el de una división) le pone todas sus clases como subsectores (DEC-018) | `nombre` (máx. 40, único), `descripcion`, `ciiu_division` (opcional), `activo` |
+| PUT | `/sectores/{id}` | `diagnosticos.editar` | A2.2: editar. Cambiar la división cambia los subsectores (los que ya no van se desactivan) | `nombre`, `descripcion`, `ciiu_division` |
 | POST | `/sectores/{id}/reasignar` | `diagnosticos.editar` | A2.2b | `sector_destino_id`, `avisar` |
 | POST | `/sectores/{id}/desactivar` | `diagnosticos.editar` | A2.2c | — |
 | POST | `/sectores/{id}/reactivar` | `diagnosticos.editar` | Reactivar desde A2.2 | — |

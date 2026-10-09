@@ -32,6 +32,8 @@ Todas las tablas del MER tienen migración en `database/migrations/` y modelo en
 erDiagram
     sectores ||--o{ empresas : "agrupa"
     sectores ||--o{ actividades_economicas : "ofrece"
+    ciiu_divisiones ||--o{ ciiu_clases : "agrupa"
+    ciiu_divisiones ||--o{ sectores : "da subsectores a"
     actividades_economicas ||--o{ empresas : "clasifica"
     sectores ||--o{ diagnosticos : "tiene"
     empresas ||--o{ users : "cuentas (empresa y colaboradores)"
@@ -65,7 +67,7 @@ erDiagram
     actividades_economicas {
         bigint id PK
         bigint sector_id FK
-        string codigo "CIIU Rev. 4 A.C., 4 dígitos"
+        string codigo "clase CIIU Rev. 5 A.C., 4 dígitos"
         string nombre
         boolean activo
     }
@@ -297,6 +299,7 @@ Cada campo con su tipo, si es obligatorio y un ejemplo.
 | `id` | bigint | Sí | `1` | Llave primaria |
 | `nombre` | varchar(40) | Sí, único | `Abogados` | |
 | `descripcion` | varchar(255) | No | `Bufetes, abogados independientes y notarías.` | |
+| `ciiu_division` | char(2) → `ciiu_divisiones.codigo` | No | `56` | División de la que salen sus subsectores (DEC-018) |
 | `activo` | boolean | Sí (por defecto `true`) | `true` | Solo los activos se ofrecen al registrarse (RN-003) |
 | `created_at`, `updated_at` | timestamp | No | `2026-10-06 17:52:50` | |
 
@@ -306,12 +309,25 @@ Cada campo con su tipo, si es obligatorio y un ejemplo.
 |---|---|---|---|---|
 | `id` | bigint | Sí | `12` | |
 | `sector_id` | bigint → `sectores.id` | Sí | `4` | Se borran con su sector |
-| `codigo` | varchar(4) | Sí, único por sector | `5611` | Código CIIU Rev. 4 A.C. (DIAN) |
+| `codigo` | varchar(4) | Sí, único por sector | `5611` | Clase CIIU Rev. 5 A.C. (DANE), copiada del catálogo (DEC-018) |
 | `nombre` | varchar(255) | Sí | `Expendio a la mesa de comidas preparadas` | |
 | `activo` | boolean | Sí (por defecto `true`) | `true` | Solo las activas se ofrecen en L2 |
 | `created_at`, `updated_at` | timestamp | No | | |
 
-Las carga `ActividadesEconomicasSeeder` (lo llama `SectoresSeeder`). **[INFORMACIÓN PENDIENTE]** NuevasTIC debe confirmar qué códigos van en cada sector. **[FUNCIONALIDAD POR DEFINIR]** Pantalla para que el Administrador las edite; por ahora solo el seeder.
+Salen del catálogo CIIU: al elegir la división de un sector (A2.2a, A2.2) se copian todas sus clases (DEC-018). Las de los sectores iniciales las pone `ActividadesEconomicasSeeder`. Una actividad que ya no va se desactiva (`activo = false`), no se borra. **[INFORMACIÓN PENDIENTE]** NuevasTIC debe confirmar qué va en cada sector.
+
+### `ciiu_divisiones` y `ciiu_clases` (catálogo CIIU Rev. 5 A.C.)
+
+| Tabla | Campo | Tipo | Ejemplo | Nota |
+|---|---|---|---|---|
+| `ciiu_divisiones` | `codigo` | char(2), llave | `56` | 87 divisiones |
+| | `nombre` | varchar(255) | `Actividades de servicios de comidas y bebidas` | |
+| | `seccion`, `seccion_nombre` | char(1), varchar(255) | `I`, `Alojamiento y servicios de comida` | |
+| `ciiu_clases` | `codigo` | char(4), llave | `5611` | 544 clases |
+| | `nombre` | varchar(255) | `Expendio a la mesa de comidas preparadas` | |
+| | `division_codigo` | char(2) → `ciiu_divisiones.codigo` | `56` | |
+
+Las carga `CiiuSeeder` desde `resources/ciiu/ciiu-rev5-ac.json` (fuente: Excel oficial del DANE en la misma carpeta). No se editan desde el sistema.
 
 ### `empresas`
 

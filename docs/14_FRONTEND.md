@@ -158,6 +158,8 @@ Comportamiento:
 
 **Volver:** A2.3 y A2.5 tienen arriba del título la flecha "← Diagnósticos" (`EncabezadoPagina`, prop `volver`). Desde A2.5 vuelve al sector del que se vino.
 
+**Subsectores del sector (DEC-018):** el modal de crear o editar sector (`ModalSector`, A2.2a / A2.2) tiene "Subsectores · división CIIU", un `Combobox` con las 87 divisiones (prop `divisionesCiiu` de A2). Si el nombre escrito es exactamente el de una división, se elige sola. Envía `ciiu_division`. Cada `Sector` trae `ciiu_division` y `subsectores` (cuántos activos).
+
 ### A2.3 · Catálogo de categorías (`categorias/Index`)
 
 Ruta prevista: `GET /categorias`.

@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * Actividad económica de una empresa, con su código CIIU (Rev. 4 A.C.).
- * Cada sector ofrece las suyas en el registro (L2).
+ * Actividad económica (subsector) de una empresa, con su código de clase
+ * CIIU Rev. 5 A.C. Cada sector ofrece las suyas en el registro (L2); salen
+ * del catálogo CIIU (DEC-018).
  *
  * @property int $id
  * @property int $sector_id
