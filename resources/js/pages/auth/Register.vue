@@ -180,7 +180,7 @@ const pasos = [
 <template>
     <Head title="Registra tu empresa" />
 
-    <form class="flex flex-col gap-5" novalidate @submit.prevent="enviar">
+    <form class="flex flex-col gap-4" novalidate @submit.prevent="enviar">
         <!-- Indicador de pasos -->
         <ol class="grid grid-cols-2 gap-3" aria-label="Pasos del registro">
             <li
@@ -216,16 +216,13 @@ const pasos = [
         <div
             v-show="paso === 1"
             ref="pasoUno"
-            class="grid gap-4 sm:grid-cols-2"
+            class="grid gap-x-4 gap-y-3 sm:grid-cols-2"
         >
-            <h2 class="text-base font-semibold sm:col-span-2">Mi empresa</h2>
-
             <Campo
                 obligatorio
                 etiqueta="Nombre de la empresa"
                 para="empresa_nombre"
                 :error="form.errors.empresa_nombre"
-                class="sm:col-span-2"
             >
                 <Entrada
                     id="empresa_nombre"
@@ -243,7 +240,6 @@ const pasos = [
                 etiqueta="Sector"
                 para="sector_id"
                 :error="form.errors.sector_id"
-                class="sm:col-span-2"
             >
                 <Seleccion
                     id="sector_id"
@@ -261,9 +257,7 @@ const pasos = [
                     </option>
                 </Seleccion>
                 <template #ayuda>
-                    Define qué diagnóstico recibirás.
-                    <strong>No podrás cambiarlo después</strong>; si te
-                    equivocas, escribe a NuevasTIC.
+                    <strong>No podrás cambiarlo después.</strong>
                 </template>
             </Campo>
 
@@ -312,7 +306,7 @@ const pasos = [
                     id="descripcion"
                     v-model="form.descripcion"
                     required
-                    rows="3"
+                    rows="2"
                     :maxlength="MAX_DESCRIPCION"
                     placeholder="Ej. Restaurante de comida casera con almuerzos del día y domicilios en el barrio."
                     :invalida="!!form.errors.descripcion"
@@ -338,12 +332,8 @@ const pasos = [
         </div>
 
         <!-- Paso 2 · Tu usuario -->
-        <div v-if="paso === 2" ref="pasoDos" class="flex flex-col gap-5">
-            <div class="grid gap-4 sm:grid-cols-2">
-                <h2 class="text-base font-semibold sm:col-span-2">
-                    Tu usuario
-                </h2>
-
+        <div v-if="paso === 2" ref="pasoDos" class="flex flex-col gap-4">
+            <div class="grid gap-x-4 gap-y-3 sm:grid-cols-2">
                 <Campo
                     obligatorio
                     etiqueta="Nombre del usuario"
@@ -364,7 +354,6 @@ const pasos = [
                     obligatorio
                     etiqueta="Cargo"
                     para="cargo"
-                    ayuda="Así sabemos quién registra la empresa."
                     :error="form.errors.cargo"
                 >
                     <Entrada
@@ -490,11 +479,6 @@ const pasos = [
                     Registrar empresa
                 </Boton>
             </div>
-
-            <p class="text-xs text-tinta-suave">
-                Tu cuenta queda lista al instante y entras a tu inicio, donde
-                aparece tu primer diagnóstico.
-            </p>
         </div>
 
         <p class="text-center text-sm text-tinta-suave">

@@ -29,7 +29,7 @@ const {
                 class="flex items-center gap-3 text-base font-semibold text-white"
             >
                 <Logo class="size-10" />
-                <span class="text-xl">Captter</span>
+                <span class="text-xl">CAPTTER</span>
             </p>
 
             <div class="max-w-lg">
@@ -59,17 +59,17 @@ const {
         </aside>
 
         <main
-            class="flex min-h-screen flex-1 items-center justify-center px-4 py-10 lg:ml-[42%]"
+            class="flex min-h-screen flex-1 items-center justify-center px-4 py-6 lg:ml-[42%]"
         >
             <div :class="['w-full', ancho === 'lg' ? 'max-w-xl' : 'max-w-sm']">
                 <p
                     class="mb-8 flex items-center gap-2.5 text-base font-semibold lg:hidden"
                 >
                     <Logo class="size-8" />
-                    <span class="text-xl">Captter</span>
+                    <span class="text-xl">CAPTTER</span>
                 </p>
 
-                <header v-if="title" class="mb-5">
+                <header v-if="title" class="mb-4">
                     <h1 class="text-2xl font-semibold">{{ title }}</h1>
                     <p v-if="description" class="mt-1 text-sm text-tinta-suave">
                         {{ description }}

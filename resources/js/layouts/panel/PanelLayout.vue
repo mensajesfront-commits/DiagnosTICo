@@ -66,7 +66,7 @@ router.on('navigate', () => {
                 </button>
                 <span class="flex items-center gap-2 text-sm font-semibold">
                     <Logo class="size-7" />
-                    <span class="text-base">Captter</span>
+                    <span class="text-base">CAPTTER</span>
                 </span>
             </div>
 
