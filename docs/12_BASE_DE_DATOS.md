@@ -321,13 +321,15 @@ Salen del catálogo CIIU: al elegir la división de un sector (A2.2a, A2.2) se c
 | Tabla | Campo | Tipo | Ejemplo | Nota |
 |---|---|---|---|---|
 | `ciiu_divisiones` | `codigo` | char(2), llave | `56` | 87 divisiones |
-| | `nombre` | varchar(255) | `Actividades de servicios de comidas y bebidas` | |
+| | `nombre` | varchar(255) | `Comidas y bebidas` | Nombre corto, el que se muestra |
+| | `nombre_oficial` | varchar(255) | `Actividades de servicios de comidas y bebidas` | Título del DANE |
 | | `seccion`, `seccion_nombre` | char(1), varchar(255) | `I`, `Alojamiento y servicios de comida` | |
 | `ciiu_clases` | `codigo` | char(4), llave | `5611` | 544 clases |
-| | `nombre` | varchar(255) | `Expendio a la mesa de comidas preparadas` | |
+| | `nombre` | varchar(255) | `Bebidas no alcohólicas y aguas embotelladas` | Nombre corto; es el que se copia a `actividades_economicas` |
+| | `nombre_oficial` | varchar(255) | `Elaboración de bebidas no alcohólicas, producción de aguas minerales y otras aguas embotelladas` | Título del DANE |
 | | `division_codigo` | char(2) → `ciiu_divisiones.codigo` | `56` | |
 
-Las carga `CiiuSeeder` desde `resources/ciiu/ciiu-rev5-ac.json` (fuente: Excel oficial del DANE en la misma carpeta). No se editan desde el sistema.
+Las carga `CiiuSeeder` desde `resources/ciiu/ciiu-rev5-ac.json` (fuentes: el Excel oficial del DANE y la versión con nombres cortos del equipo, en la misma carpeta). Al cargarlas, los subsectores ya creados toman el nombre corto. No se editan desde el sistema.
 
 ### `empresas`
 

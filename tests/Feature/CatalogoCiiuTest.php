@@ -26,6 +26,11 @@ it('carga el catálogo oficial completo', function () {
         ->and(DB::table('ciiu_clases')->count())->toBe(544)
         ->and(DB::table('ciiu_clases')->where('codigo', '5611')->value('nombre'))->toBe('Expendio a la mesa de comidas preparadas');
 
+    // Nombre corto para mostrar y el oficial del DANE.
+    $division = DB::table('ciiu_divisiones')->where('codigo', '56')->first();
+    expect($division->nombre)->toBe('Comidas y bebidas')
+        ->and($division->nombre_oficial)->toBe('Actividades de servicios de comidas y bebidas');
+
     // Se puede volver a correr sin duplicar.
     $this->seed(CiiuSeeder::class);
     expect(DB::table('ciiu_clases')->count())->toBe(544);
@@ -69,6 +74,23 @@ it('al cambiar la división desactiva los subsectores que ya no van, sin borrarl
     expect($sector->fresh()->ciiu_division)->toBe('75')
         ->and($clase->fresh()->activo)->toBeFalse()
         ->and(ActividadEconomica::where('sector_id', $sector->id)->where('activo', true)->pluck('codigo')->all())->toBe(['7500']);
+});
+
+it('reconoce el nombre corto y el oficial de la división', function () {
+    $this->actingAs($this->admin)->post(route('sectores.store'), ['nombre' => 'Comidas y bebidas']);
+    $this->actingAs($this->admin)->post(route('sectores.store'), ['nombre' => 'Actividades jurídicas y de contabilidad']);
+
+    expect(Sector::where('nombre', 'Comidas y bebidas')->value('ciiu_division'))->toBe('56')
+        ->and(Sector::where('nombre', 'Actividades jurídicas y de contabilidad')->value('ciiu_division'))->toBe('69');
+});
+
+it('al volver a cargar el catálogo, los subsectores toman el nombre corto', function () {
+    $sector = Sector::factory()->create();
+    $vieja = ActividadEconomica::create(['sector_id' => $sector->id, 'codigo' => '1104', 'nombre' => 'Elaboración de bebidas no alcohólicas, producción de aguas minerales y otras aguas embotelladas']);
+
+    $this->seed(CiiuSeeder::class);
+
+    expect($vieja->fresh()->nombre)->toBe('Bebidas no alcohólicas y aguas embotelladas');
 });
 
 it('rechaza una división que no existe', function () {

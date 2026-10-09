@@ -10,6 +10,9 @@ use Illuminate\Support\Str;
 /**
  * Catálogo CIIU Rev. 5 A.C. del DANE (DEC-018, `resources/ciiu/`).
  *
+ * Cada división y clase tiene `nombre` (corto, el que se muestra) y
+ * `nombre_oficial` (el título del DANE).
+ *
  * Un sector se asocia a una división (dos dígitos) y todas las clases de esa
  * división (cuatro dígitos) pasan a ser sus subsectores, es decir, sus
  * actividades económicas para el registro (L2) y Mi perfil (E11).
@@ -21,11 +24,11 @@ class CatalogoCiiu
     /**
      * Contenido del JSON del DANE.
      *
-     * @return array{secciones: list<array{codigo: string, nombre: string}>, divisiones: list<array{codigo: string, nombre: string, seccion: string}>, clases: list<array{codigo: string, nombre: string, division: string}>}
+     * @return array{secciones: list<array{codigo: string, nombre: string}>, divisiones: list<array{codigo: string, nombre: string, nombre_oficial: string, seccion: string}>, clases: list<array{codigo: string, nombre: string, nombre_oficial: string, division: string}>}
      */
     public static function archivo(): array
     {
-        /** @var array{secciones: list<array{codigo: string, nombre: string}>, divisiones: list<array{codigo: string, nombre: string, seccion: string}>, clases: list<array{codigo: string, nombre: string, division: string}>} $datos */
+        /** @var array{secciones: list<array{codigo: string, nombre: string}>, divisiones: list<array{codigo: string, nombre: string, nombre_oficial: string, seccion: string}>, clases: list<array{codigo: string, nombre: string, nombre_oficial: string, division: string}>} $datos */
         $datos = json_decode((string) file_get_contents(resource_path(self::ARCHIVO)), true, flags: JSON_THROW_ON_ERROR);
 
         return $datos;
@@ -55,15 +58,16 @@ class CatalogoCiiu
     }
 
     /**
-     * La división cuyo nombre es exactamente el escrito, sin mirar tildes,
-     * mayúsculas ni espacios de más. Null si no hay.
+     * La división cuyo nombre (corto u oficial) es exactamente el escrito,
+     * sin mirar tildes, mayúsculas ni espacios de más. Null si no hay.
      */
     public static function divisionPorNombre(string $nombre): ?string
     {
         $buscado = self::normalizar($nombre);
 
-        foreach (DB::table('ciiu_divisiones')->get(['codigo', 'nombre']) as $division) {
-            if (self::normalizar((string) $division->nombre) === $buscado) {
+        foreach (DB::table('ciiu_divisiones')->get(['codigo', 'nombre', 'nombre_oficial']) as $division) {
+            if (self::normalizar((string) $division->nombre) === $buscado
+                || self::normalizar((string) $division->nombre_oficial) === $buscado) {
                 return (string) $division->codigo;
             }
         }
