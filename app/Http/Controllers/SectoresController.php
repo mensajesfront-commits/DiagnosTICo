@@ -151,7 +151,7 @@ class SectoresController extends Controller
     {
         /** @var array{nombre: string, descripcion?: string|null} $datos */
         $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:40', Rule::unique('sectores', 'nombre')->ignore($sector?->id)],
+            'nombre' => ['required', 'string', 'max:60', Rule::unique('sectores', 'nombre')->ignore($sector?->id)],
             'descripcion' => ['nullable', 'string', 'max:255'],
         ], ['nombre.unique' => 'Ya existe un sector con ese nombre.']);
 

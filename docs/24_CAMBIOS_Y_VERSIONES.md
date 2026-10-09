@@ -41,6 +41,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Barra de búsqueda de diagnósticos por nombre.
 - Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (sin mirar mayúsculas ni espacios de más).
 - "Todos los diagnósticos" ya no agrupa por sector: tiene la columna "Sector" antes de "Estado".
+- El nombre del sector admite hasta 60 caracteres (antes 40), para que quepan todas las divisiones CIIU.
 - Nombres cortos en el catálogo CIIU (71 divisiones y 88 clases, del Excel del equipo); se guarda también el nombre oficial del DANE. Los subsectores existentes toman el nombre corto.
 - Catálogo CIIU Rev. 5 A.C. del DANE en la base (87 divisiones, 544 clases). Al crear o editar un sector se elige su división CIIU y sus clases pasan a ser los subsectores; si el nombre es exactamente el de una división, se elige sola. Los 6 sectores iniciales pasan a la Rev. 5 (DEC-018).
 - Se quitó el sector «Talleres» (y sus 6 actividades CIIU) de los datos iniciales: quedan 6 sectores, como dice T-046.

@@ -2,7 +2,7 @@
 /**
  * A2.2a · Crear sector (HU-012) y A2.2 · Editar sector (HU-013).
  *
- * Envía: nombre (máx. 40, único), descripcion (opcional), ciiu_division
+ * Envía: nombre (máx. 60, único), descripcion (opcional), ciiu_division
  * (opcional) y, al crear, activo.
  *
  * Subsectores (DEC-018): al elegir una división CIIU, todas sus clases pasan
@@ -29,7 +29,7 @@ import type {
     Sector,
 } from '@/types/diagnosticos';
 
-const MAXIMO_NOMBRE = 40;
+const MAXIMO_NOMBRE = 60;
 
 const props = withDefaults(
     defineProps<{

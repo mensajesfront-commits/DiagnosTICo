@@ -297,7 +297,7 @@ Cada campo con su tipo, si es obligatorio y un ejemplo.
 | Campo | Tipo | Obligatorio | Ejemplo | Nota |
 |---|---|---|---|---|
 | `id` | bigint | Sí | `1` | Llave primaria |
-| `nombre` | varchar(40) | Sí, único | `Abogados` | |
+| `nombre` | varchar(60) | Sí, único | `Abogados` | Hasta 60 para que quepan los nombres cortos de las divisiones CIIU |
 | `descripcion` | varchar(255) | No | `Bufetes, abogados independientes y notarías.` | |
 | `ciiu_division` | char(2) → `ciiu_divisiones.codigo` | No | `56` | División de la que salen sus subsectores (DEC-018) |
 | `activo` | boolean | Sí (por defecto `true`) | `true` | Solo los activos se ofrecen al registrarse (RN-003) |

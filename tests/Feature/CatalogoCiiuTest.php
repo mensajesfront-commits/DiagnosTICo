@@ -82,6 +82,13 @@ it('reconoce el nombre corto y el oficial de la división', function () {
 
     expect(Sector::where('nombre', 'Comidas y bebidas')->value('ciiu_division'))->toBe('56')
         ->and(Sector::where('nombre', 'Actividades jurídicas y de contabilidad')->value('ciiu_division'))->toBe('69');
+
+    // El nombre corto más largo (54) cabe: el límite es 60.
+    $this->actingAs($this->admin)->post(route('sectores.store'), ['nombre' => 'Infraestructura informática y servicios de información'])
+        ->assertSessionHasNoErrors();
+    expect(Sector::where('nombre', 'Infraestructura informática y servicios de información')->value('ciiu_division'))->toBe('63');
+    $this->actingAs($this->admin)->post(route('sectores.store'), ['nombre' => str_repeat('a', 61)])
+        ->assertSessionHasErrors('nombre');
 });
 
 it('al volver a cargar el catálogo, los subsectores toman el nombre corto', function () {
