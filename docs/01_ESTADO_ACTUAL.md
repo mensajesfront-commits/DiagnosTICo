@@ -106,6 +106,6 @@ Para ver las pantallas de la prueba técnica, entra como un usuario con rol Admi
 - **Bot de WhatsApp:** aplazado. El cronograma todavía lo tiene en las semanas 2, 6 y 7 (`03_ALCANCE.md`).
 - **Clave de OpenAI y modelo por defecto:** sin definir; bloquean T-019 y se necesitan en la semana 5 (DEC-013, R-002).
 - **Datos de NuevasTIC:** lista real de sectores y códigos CIIU, y confirmar la eliminación de cuentas con 90 días (DEC-017).
-- **[INCONSISTENCIA DETECTADA]** T-046 habla de 6 sectores, pero el wireframe y el seeder tienen 7.
+- T-046 habla de 6 sectores: el equipo quitó «Talleres» (9 de octubre) y el seeder queda con 6 (Abogados, Alojamientos, Comidas, Inmobiliarias, Médicos y Turismo). El wireframe todavía muestra Talleres en sus ejemplos.
 - **Contraseña:** RN-001 pide un carácter especial que los wireframes L2 y L4 no muestran (`17_SEGURIDAD.md`).
 - **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Los requisitos vigentes dicen una sola etapa y un PDF de 3 páginas, sin FODA.

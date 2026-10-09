@@ -56,14 +56,6 @@ class ActividadesEconomicasSeeder extends Seeder
             '7912' => 'Actividades de operadores turísticos',
             '7990' => 'Otros servicios de reserva y actividades relacionadas',
         ],
-        'Talleres' => [
-            '4520' => 'Mantenimiento y reparación de vehículos automotores',
-            '4542' => 'Mantenimiento y reparación de motocicletas y de sus partes y piezas',
-            '3311' => 'Mantenimiento y reparación especializado de productos elaborados en metal',
-            '3312' => 'Mantenimiento y reparación especializado de maquinaria y equipo',
-            '9511' => 'Mantenimiento y reparación de computadores y de equipo periférico',
-            '9521' => 'Mantenimiento y reparación de aparatos electrónicos de consumo',
-        ],
     ];
 
     public function run(): void

@@ -49,7 +49,7 @@ Se hizo desde el frontend para poder probar el registro y el menú de la empresa
 | Tabla `empresas` y columnas nuevas en `users` | `database/migrations/2026_10_06_000002_create_empresas_table.php` | `empresas`: `nombre`, `sector_id`, `ciudad`, `pais`, `activa`. `users`: `empresa_id`, `cargo`, `telefono`, `activo` |
 | Modelos | `app/Models/Sector.php`, `app/Models/Empresa.php`, `User::empresa()` | `Sector::activos()` para RN-003 |
 | Roles y permisos | `database/seeders/RolesYPermisosSeeder.php` | La matriz de `17_SEGURIDAD.md` (3 roles, 15 permisos) |
-| Sectores de ejemplo | `database/seeders/SectoresSeeder.php` | Los 7 del wireframe. **[INFORMACIÓN PENDIENTE]** lista real |
+| Sectores de ejemplo | `database/seeders/SectoresSeeder.php` | 6 sectores (se quitó Talleres, 9 de octubre). **[INFORMACIÓN PENDIENTE]** lista real |
 | Administrador inicial | `database/seeders/DatabaseSeeder.php`, `config/diagnostico.php` | `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `.env` |
 | Registro | `app/Actions/Fortify/CreateNewUser.php` | Valida los campos de L2 y crea empresa + usuario en una transacción |
 | Pruebas | `tests/Feature/Auth/RegistrationTest.php` | Solo sectores activos, registro completo, sector inactivo y términos |

@@ -16,7 +16,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - `lib/contrasena.ts` (requisitos de RN-001, con pruebas) y `lib/rutas.ts` (URLs propuestas).
 - Vistas previas con datos de ejemplo: `/prueba-tecnica/vistas/{vista}` lee `resources/datos-ejemplo/{vista}.json`.
 - Documentos `14_FRONTEND.md`, `15_BACKEND.md` y `18_UI_UX.md`.
-- Backend mínimo para el registro: tablas `sectores` y `empresas`, roles y permisos, 7 sectores de ejemplo, Administrador inicial (`migrate --seed`) y registro que crea la empresa con su usuario de rol Empresa.
+- Backend mínimo para el registro: tablas `sectores` y `empresas`, roles y permisos, 7 sectores de ejemplo (luego 6, sin Talleres), Administrador inicial (`migrate --seed`) y registro que crea la empresa con su usuario de rol Empresa.
 - Inicio provisional en español para revisar el menú de cada rol.
 - Logo del sistema en el menú, el acceso y el ícono del navegador. El sistema se llama **Captter**.
 - Mi perfil (A6 y E11) conectado: datos personales, datos de la empresa para la cuenta principal, avisos por correo, foto o logo y cambio de contraseña. Se guarda el último acceso.
@@ -41,6 +41,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Barra de búsqueda de diagnósticos por nombre.
 - Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (sin mirar mayúsculas ni espacios de más).
 - "Todos los diagnósticos" ya no agrupa por sector: tiene la columna "Sector" antes de "Estado".
+- Se quitó el sector «Talleres» (y sus 6 actividades CIIU) de los datos iniciales: quedan 6 sectores, como dice T-046.
 - Eliminar varios diagnósticos a la vez: casillas en la tabla, "Eliminar seleccionados" y confirmación. Solo los que nunca se publicaron (`DELETE /diagnosticos`).
 - Se quitó "Empresas del sector" de A2 para ganar espacio; queda para la lista de Empresas filtrada por sector (A3). El resumen del sector enlaza a ella.
 - Listas paginadas en lugar de bajar y subir: todos los diagnósticos y los de cada sector (las filas que caben en la pantalla) y el catálogo de categorías (10 por página). Componente `Paginacion` y `lib/paginacion.ts`, con pruebas.

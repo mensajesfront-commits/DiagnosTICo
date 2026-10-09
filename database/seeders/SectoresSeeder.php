@@ -20,7 +20,6 @@ class SectoresSeeder extends Seeder
             'Comidas' => null,
             'Alojamientos' => null,
             'Turismo' => null,
-            'Talleres' => null,
         ];
 
         foreach ($sectores as $nombre => $descripcion) {

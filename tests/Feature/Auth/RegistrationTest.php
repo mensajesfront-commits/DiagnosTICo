@@ -61,7 +61,7 @@ class RegistrationTest extends TestCase
         $activo = Sector::factory()->create(['nombre' => 'Abogados']);
         ActividadEconomica::create(['sector_id' => $activo->id, 'codigo' => '6910', 'nombre' => 'Actividades jurídicas']);
         ActividadEconomica::create(['sector_id' => $activo->id, 'codigo' => '6999', 'nombre' => 'Retirada', 'activo' => false]);
-        Sector::factory()->inactivo()->create(['nombre' => 'Talleres']);
+        Sector::factory()->inactivo()->create(['nombre' => 'Turismo']);
 
         $this->get(route('register'))
             ->assertOk()
