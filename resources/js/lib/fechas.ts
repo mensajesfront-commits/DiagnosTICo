@@ -122,3 +122,13 @@ function diasEntre(desde: Date, hasta: Date): number {
 
     return Math.round((fin.getTime() - inicio.getTime()) / 86_400_000);
 }
+
+/**
+ * Fecha "AAAA-MM-DD" como fecha local. `new Date('2026-10-09')` la toma en
+ * UTC y en Colombia saldría el día anterior.
+ */
+export function fechaLocal(texto: string): Date {
+    const [anio, mes, dia] = texto.split('-').map(Number);
+
+    return new Date(anio, (mes ?? 1) - 1, dia ?? 1);
+}

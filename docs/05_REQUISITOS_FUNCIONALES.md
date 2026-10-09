@@ -9778,8 +9778,8 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-003 — Recuperar mi contraseña | RF-003 | Hecha |
 | HU-004 — Crear una contraseña nueva | RF-003 | Hecha |
 | HU-005 — Cerrar sesión | RF-004 | Hecha |
-| HU-006 — Ver el inicio con indicadores | RF-005 | Pendiente |
-| HU-007 — Filtrar las mediciones por estado | RF-005 | Pendiente |
+| HU-006 — Ver el inicio con indicadores | RF-005 | Hecha (la ficha A3.1 llega con Empresas) |
+| HU-007 — Filtrar las mediciones por estado | RF-005 | Hecha |
 | HU-008 — Recordar o reenviar el aviso | RF-006 | Pendiente |
 | HU-009 — Dar una nueva fecha a una medición vencida | RF-007 | Pendiente |
 | HU-010 — Ver los diagnósticos de un sector | RF-008 | Hecha |

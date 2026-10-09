@@ -12,7 +12,7 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 |---|---|---|---|---|---|
 | Acceso | `/login`, `/register`, `/forgot-password`, `/reset-password` | Fortify (`FortifyServiceProvider`, `CreateNewUser`) | Invitado + límite de intentos | L1–L4 | Hecho |
 | Ubicaciones | `/ubicaciones/{pais}` | `UbicacionesController` | Pública, 60 por minuto | L2, A6, E11 | Hecho |
-| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | Redirección hecha; pantallas en semanas 5 y 6 |
+| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | A1 hecha (sin las acciones A1b–A1e); E1 en la semana 6 |
 | Mi perfil | `/mi-perfil`, `/imagenes/{tipo}/{id}` | `PerfilController` | `auth` | A6, E11 | Hecho |
 | Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.2, A2.5, A2.7 | Hecho; editor A2.1 y vista previa A2.4 en semana 4 |
 | Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
@@ -76,10 +76,10 @@ Fortify redirige a `/dashboard` después del login y del registro. `InicioContro
 | Método | URL | Nombre | Qué hace |
 |---|---|---|---|
 | GET | `/dashboard` | `dashboard` | Empresa y Colaborador → `/mi-inicio`; Administrador y roles internos → `/inicio` |
-| GET | `/inicio` | `inicio.administrador` | A1. Una cuenta de empresa que entra aquí vuelve a `/mi-inicio` |
+| GET | `/inicio` | `inicio.administrador` | A1: indicadores, mediciones, empresas por nivel y diagnósticos por sector (`DatosInicio`). Una cuenta de empresa que entra aquí vuelve a `/mi-inicio` |
 | GET | `/mi-inicio` | `inicio.empresa` | E1. Una cuenta interna que entra aquí vuelve a `/inicio` |
 
-**[FUNCIONALIDAD POR DEFINIR]** A1 y E1 son pantallas de bienvenida hasta las semanas 5 y 6.
+**[FUNCIONALIDAD POR DEFINIR]** E1 es una pantalla de bienvenida hasta la semana 6.
 
 ## Mi perfil (ya existe)
 

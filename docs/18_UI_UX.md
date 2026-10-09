@@ -68,7 +68,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha y conectada (dos pasos, DEC-015 y DEC-016) |
 | L3 | ¿Olvidaste tu contraseña? | `pages/auth/ForgotPassword.vue` | Hecha |
 | L4 | Crea una contraseña nueva | `pages/auth/ResetPassword.vue` | Hecha |
-| A1 | Inicio del Administrador | `pages/inicio/Administrador.vue` | Bienvenida provisional; la pantalla completa es de la semana 5 (T-048 ya redirige aquí) |
+| A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada. Las acciones de la tabla (A1b–A1e) llegan con Empresas (A3) |
 | A2 | Diagnósticos de un sector | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2·T | Todos los diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2b | Sector sin diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |

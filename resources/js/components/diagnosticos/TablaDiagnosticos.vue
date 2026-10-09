@@ -24,14 +24,7 @@
  */
 import { Link, router } from '@inertiajs/vue3';
 import { ChevronDown } from '@lucide/vue';
-import {
-    computed,
-    nextTick,
-    onBeforeUnmount,
-    onMounted,
-    ref,
-    watch,
-} from 'vue';
+import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
 import Paginacion from '@/components/base/Paginacion.vue';
@@ -42,7 +35,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { filasQueCaben, usePaginacion } from '@/lib/paginacion';
+import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import type { FilaDiagnostico } from '@/types/diagnosticos';
 
@@ -67,70 +60,20 @@ defineEmits<{
 }>();
 
 // --- Paginado según el alto disponible --------------------------------------
-const POR_PAGINA_MOVIL = 10;
 const contenedor = ref<HTMLElement | null>(null);
-const porPagina = ref(POR_PAGINA_MOVIL);
-let observador: ResizeObserver | null = null;
-const pantallaGrande =
-    typeof window !== 'undefined'
-        ? window.matchMedia('(min-width: 1024px)')
-        : null;
+const { porPagina, medir, ajustar } = useFilasQueCaben(contenedor);
 
 const { pagina, paginas, total, desde, visibles } = usePaginacion(
     () => props.filas,
     porPagina,
 );
 
-function medir(): void {
-    const caja = contenedor.value;
-
-    if (!caja || !pantallaGrande?.matches) {
-        porPagina.value = POR_PAGINA_MOVIL;
-
-        return;
-    }
-
-    // La fila más alta de las que se ven ahora. Solo se mide al cambiar el
-    // tamaño (no al cambiar de página), así el número de filas no salta.
-    let altoFila = 0;
-
-    for (const fila of caja.querySelectorAll('tbody tr')) {
-        altoFila = Math.max(altoFila, fila.getBoundingClientRect().height);
-    }
-
-    altoFila ||= 72;
-
-    const encabezado = caja.querySelector('thead')?.clientHeight ?? 40;
-    porPagina.value = filasQueCaben(
-        caja.clientHeight - encabezado,
-        altoFila,
-        3,
-    );
-}
-
-onMounted(() => {
-    observador = new ResizeObserver(() => medir());
-
-    if (contenedor.value) {
-        observador.observe(contenedor.value);
-    }
-
-    pantallaGrande?.addEventListener('change', medir);
-    medir();
-    // Con la letra ya cargada las filas cambian de alto.
-    document.fonts?.ready.then(() => nextTick(medir));
-});
-
-onBeforeUnmount(() => {
-    observador?.disconnect();
-    pantallaGrande?.removeEventListener('change', medir);
-});
-
 // Si la lista pasa de vacía a tener filas, se mide otra vez.
 watch(
     () => props.filas.length > 0,
-    () => nextTick(medir),
+    () => medir(),
 );
+watch(visibles, ajustar);
 
 const seElimina = (fila: FilaDiagnostico) => fila.version_publicada === null;
 

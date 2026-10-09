@@ -1,6 +1,13 @@
-import { computed, ref, watch } from 'vue';
-import type { MaybeRefOrGetter } from 'vue';
-import { toValue } from 'vue';
+import {
+    computed,
+    nextTick,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    toValue,
+    watch,
+} from 'vue';
+import type { MaybeRefOrGetter, Ref } from 'vue';
 
 /** Número de páginas para `total` elementos; siempre al menos 1. */
 export function contarPaginas(total: number, porPagina: number): number {
@@ -53,4 +60,90 @@ export function usePaginacion<T>(
     });
 
     return { pagina, paginas, total, desde, visibles };
+}
+
+/**
+ * Cuántas filas de una tabla caben en su caja (`contenedor`) en pantallas
+ * grandes, para que la página no se desplace; en pantallas pequeñas,
+ * `movil` por página. Mide la fila más alta que se ve y vuelve a medir al
+ * cambiar el tamaño de la caja o cuando carga la letra. Llamar `medir()`
+ * cuando la tabla pasa de vacía a tener filas y `ajustar()` después de
+ * mostrar otra página (por si sus filas son más altas).
+ */
+export function useFilasQueCaben(
+    contenedor: Ref<HTMLElement | null>,
+    { movil = 10, minimo = 3 }: { movil?: number; minimo?: number } = {},
+) {
+    const porPagina = ref(movil);
+    let observador: ResizeObserver | null = null;
+    const pantallaGrande =
+        typeof window !== 'undefined'
+            ? window.matchMedia('(min-width: 1024px)')
+            : null;
+
+    function medir(): void {
+        const caja = contenedor.value;
+
+        if (!caja || !pantallaGrande?.matches) {
+            porPagina.value = movil;
+
+            return;
+        }
+
+        // Solo se mide al cambiar el tamaño (no al cambiar de página), así el
+        // número de filas no salta.
+        let altoFila = 0;
+
+        for (const fila of caja.querySelectorAll('tbody tr')) {
+            altoFila = Math.max(altoFila, fila.getBoundingClientRect().height);
+        }
+
+        const encabezado = caja.querySelector('thead')?.clientHeight ?? 40;
+        porPagina.value = filasQueCaben(
+            caja.clientHeight - encabezado,
+            altoFila || 72,
+            minimo,
+        );
+    }
+
+    onMounted(() => {
+        observador = new ResizeObserver(() => medir());
+
+        if (contenedor.value) {
+            observador.observe(contenedor.value);
+        }
+
+        pantallaGrande?.addEventListener('change', medir);
+        medir();
+        // Al cargar la letra y terminar de pintar, las filas cambian de alto.
+        void document.fonts?.ready.then(() => nextTick(medir));
+        setTimeout(medir, 300);
+    });
+
+    onBeforeUnmount(() => {
+        observador?.disconnect();
+        pantallaGrande?.removeEventListener('change', medir);
+    });
+
+    /**
+     * Después de pintar una página: si sus filas no caben (algunas son más
+     * altas), se muestra una menos por página. Solo baja, así no salta.
+     */
+    function ajustar(): void {
+        void nextTick(() => {
+            const caja = contenedor.value;
+
+            if (
+                caja &&
+                pantallaGrande?.matches &&
+                caja.scrollHeight > caja.clientHeight + 1 &&
+                porPagina.value > minimo
+            ) {
+                porPagina.value--;
+                ajustar();
+            }
+        });
+    }
+
+    return { porPagina, medir: () => nextTick(medir), ajustar };
 }

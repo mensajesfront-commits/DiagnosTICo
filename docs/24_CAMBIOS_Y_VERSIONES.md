@@ -41,6 +41,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Barra de búsqueda de diagnósticos por nombre.
 - Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (sin mirar mayúsculas ni espacios de más).
 - "Todos los diagnósticos" ya no agrupa por sector: tiene la columna "Sector" antes de "Estado".
+- **A1 · Inicio del Administrador** (HU-006, HU-007): 4 indicadores (empresas registradas, mediciones pendientes, diagnósticos completados este mes y puntaje promedio), tabla «Mediciones» con pestañas por estado, avance por categorías y paginado, «Empresas por nivel» y «Diagnósticos por sector». Las acciones de la tabla llevan por ahora a la ficha de la empresa.
 - El nombre del sistema se muestra en mayúsculas, «CAPTTER», junto al logo (menú, acceso y barra del celular).
 - El registro (L2) cabe en la pantalla sin bajar, en los dos pasos, desde 1280 × 720: nombre de la empresa y sector lado a lado, sin los títulos «Mi empresa» y «Tu usuario» (ya los dice la barra de pasos), descripción de 2 líneas y menos espacio entre campos.
 - El nombre del sector admite hasta 60 caracteres (antes 40), para que quepan todas las divisiones CIIU.

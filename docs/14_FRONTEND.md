@@ -133,6 +133,22 @@ Envía `email` a `POST /forgot-password`.
 
 Envía `token`, `email`, `password` y `password_confirmation` a `POST /reset-password`. Si el enlace ya se usó, el error en `email` muestra "Este enlace ya no es válido" con "Pedir otro enlace".
 
+### A1 · Inicio del Administrador (`inicio/Administrador`)
+
+Ruta: `GET /inicio` (`InicioController@administrador`, datos de `App\Support\DatosInicio`). Tipos en `types/inicio.ts`.
+
+| Prop | Tipo | Nota |
+|---|---|---|
+| `indicadores` | `IndicadoresInicio` | Empresas (y en cuántos sectores), mediciones pendientes por estado, terminadas este mes y puntaje promedio del último resultado de cada empresa |
+| `mediciones` | `FilaMedicion[]` | Sin canceladas. Primero vencidas, luego en curso, no iniciadas y terminadas. `estado` es `vencida` también si pasó la fecha límite. `avance` = categorías completas |
+| `niveles` | `Record<Nivel, number>` | Empresas por nivel de su último resultado; `sin` = sin diagnóstico |
+| `sectores` | `SectorInicio[]` | Sectores activos con empresas y versión publicada |
+
+- Pestañas Todas · En curso · No iniciadas · Vencidas · Terminadas con su contador (HU-007); "Enviada" cuenta como en curso.
+- Página fija en pantallas grandes; la tabla va paginada con las filas que caben (`useFilasQueCaben` en `lib/paginacion.ts`, que también usa A2).
+- **[FUNCIONALIDAD POR DEFINIR]** Las acciones (Recordatorio, Reenviar aviso, Nueva fecha, Cancelar, Ver resultado, Asignar nueva) abren los modales A1b–A1e, que llegan con Empresas (A3). Por ahora llevan a la ficha de la empresa (`/empresas/{id}`).
+- **[FUNCIONALIDAD POR DEFINIR]** "Último aviso" muestra el aviso de la asignación: todavía no se registran los avisos reenviados (PA-004).
+
 ### A2 / A2·T / A2b · Diagnósticos (`diagnosticos/Index`)
 
 Ruta prevista: `GET /diagnosticos` (Todos) y `GET /diagnosticos?sector={id}`.

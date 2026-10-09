@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Support\DatosInicio;
 use App\Support\DatosUsuarios;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,8 +17,9 @@ use Inertia\Response;
  * - Empresa y Colaborador → E1 (/mi-inicio).
  * - Administrador y cualquier rol interno → A1 (/inicio).
  *
- * [FUNCIONALIDAD POR DEFINIR] A1 y E1 se construyen en las semanas 5 y 6;
- * por ahora son pantallas de bienvenida.
+ * A1 tiene indicadores, mediciones y paneles (HU-006, HU-007, DatosInicio).
+ * [FUNCIONALIDAD POR DEFINIR] E1 se construye en la semana 6; por ahora es
+ * una pantalla de bienvenida.
  */
 class InicioController extends Controller
 {
@@ -33,7 +35,7 @@ class InicioController extends Controller
             return to_route('inicio.empresa');
         }
 
-        return Inertia::render('inicio/Administrador');
+        return Inertia::render('inicio/Administrador', DatosInicio::administrador());
     }
 
     /** E1 · Inicio de la empresa. */

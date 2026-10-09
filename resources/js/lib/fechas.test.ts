@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { haceCuanto, mesYAnio, momento, ultimoAcceso } from '@/lib/fechas';
+import {
+    fechaLocal,
+    haceCuanto,
+    mesYAnio,
+    momento,
+    ultimoAcceso,
+} from '@/lib/fechas';
 
 const ahora = new Date(2026, 9, 6, 16, 0);
 
@@ -47,5 +53,15 @@ describe('fechas', () => {
         expect(ultimoAcceso(iso(new Date(2025, 7, 2)), ahora)).toBe(
             '2 ago 2025',
         );
+    });
+
+    it('lee "AAAA-MM-DD" como fecha local, sin correrse un día', () => {
+        const fecha = fechaLocal('2026-10-09');
+
+        expect([
+            fecha.getFullYear(),
+            fecha.getMonth(),
+            fecha.getDate(),
+        ]).toEqual([2026, 9, 9]);
     });
 });
