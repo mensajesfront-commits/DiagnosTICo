@@ -27,7 +27,7 @@ const props = defineProps<{
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 
-const emit = defineEmits<{ retirar: [] }>();
+const emit = defineEmits<{ retirar: [accion: 'archivar' | 'eliminar'] }>();
 
 const form = useForm({ nombre: '', descripcion: '' });
 
@@ -53,9 +53,9 @@ function guardar(): void {
     });
 }
 
-function retirar(): void {
+function retirar(accion: 'archivar' | 'eliminar'): void {
     abierto.value = false;
-    emit('retirar');
+    emit('retirar', accion);
 }
 </script>
 
@@ -129,13 +129,11 @@ function retirar(): void {
             <p
                 class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
             >
-                <template v-if="categoria.tiene_respuestas">
-                    <strong class="text-tinta">Al archivar:</strong> deja de
-                    poder agregarse a diagnósticos y se conserva en los
-                    resultados anteriores. Puedes restaurarla desde el filtro
-                    «Archivadas».
-                </template>
-                <template v-else>
+                <strong class="text-tinta">Al archivar:</strong> deja de poder
+                agregarse a diagnósticos y se conserva en los resultados
+                anteriores. Puedes restaurarla desde el filtro «Archivadas».
+                <template v-if="!categoria.tiene_respuestas">
+                    <br />
                     <strong class="text-tinta">Al eliminar:</strong> ninguna
                     empresa la ha respondido, así que se borra del catálogo.
                 </template>
@@ -143,9 +141,18 @@ function retirar(): void {
         </form>
 
         <template #pie>
-            <Boton variante="secundario" class="mr-auto" @click="retirar">
-                {{ categoria.tiene_respuestas ? 'Archivar…' : 'Eliminar…' }}
-            </Boton>
+            <span class="mr-auto flex gap-2">
+                <Boton variante="secundario" @click="retirar('archivar')">
+                    Archivar…
+                </Boton>
+                <Boton
+                    v-if="!categoria.tiene_respuestas"
+                    variante="secundario"
+                    @click="retirar('eliminar')"
+                >
+                    Eliminar…
+                </Boton>
+            </span>
             <Boton variante="secundario" @click="abierto = false">
                 Cancelar
             </Boton>

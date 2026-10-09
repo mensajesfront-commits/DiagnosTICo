@@ -89,9 +89,12 @@ function editar(categoria: Categoria): void {
 const modalCrear = ref(false);
 const modalRetirar = ref(false);
 const aRetirar = ref<Categoria | null>(null);
+const accionRetirar = ref<'archivar' | 'eliminar'>('archivar');
 
-function retirar(categoria: Categoria): void {
+/** Archivar se puede siempre; eliminar, solo si nadie la ha respondido. */
+function retirar(categoria: Categoria, accion: 'archivar' | 'eliminar'): void {
     aRetirar.value = categoria;
+    accionRetirar.value = accion;
     modalRetirar.value = true;
 }
 
@@ -225,15 +228,27 @@ function restaurar(categoria: Categoria): void {
                                     >
                                     <button
                                         type="button"
-                                        class="text-tinta underline hover:text-aviso"
-                                        @click="retirar(categoria)"
+                                        class="text-tinta underline hover:text-marca"
+                                        @click="retirar(categoria, 'archivar')"
                                     >
-                                        {{
-                                            categoria.tiene_respuestas
-                                                ? 'Archivar'
-                                                : 'Eliminar'
-                                        }}
+                                        Archivar
                                     </button>
+                                    <template
+                                        v-if="!categoria.tiene_respuestas"
+                                    >
+                                        <span class="mx-1.5 text-tinta-suave"
+                                            >·</span
+                                        >
+                                        <button
+                                            type="button"
+                                            class="text-tinta underline hover:text-aviso"
+                                            @click="
+                                                retirar(categoria, 'eliminar')
+                                            "
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </template>
                                 </template>
                             </td>
                         </tr>
@@ -258,11 +273,12 @@ function restaurar(categoria: Categoria): void {
         v-model:abierto="modalEditar"
         :categoria="elegida"
         :total-diagnosticos="totalDiagnosticos"
-        @retirar="retirar(elegida)"
+        @retirar="retirar(elegida, $event)"
     />
     <ModalRetirarCategoria
         v-if="aRetirar"
         v-model:abierto="modalRetirar"
         :categoria="aRetirar"
+        :accion="accionRetirar"
     />
 </template>

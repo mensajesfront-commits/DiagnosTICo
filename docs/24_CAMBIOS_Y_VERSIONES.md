@@ -41,6 +41,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Barra de búsqueda de diagnósticos por nombre.
 - Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (sin mirar mayúsculas ni espacios de más).
 - "Todos los diagnósticos" ya no agrupa por sector: tiene la columna "Sector" antes de "Estado".
+- Catálogo de categorías: «Archivar» está siempre disponible (en la fila y en el modal de editar); «Eliminar» aparece además cuando ninguna empresa ha respondido la categoría.
 - Zona horaria en Mi perfil: ahora ofrece las 45 zonas oficiales (IANA) de los 18 países, como «México · Tijuana (UTC−7)», en vez de 5. Si una cuenta tenía una zona de antes que ya no está (Europe/Madrid), se conserva.
 - El menú lateral se puede cerrar y abrir (botón junto al logo): cerrado queda una barra angosta con los iconos de cada sección (el nombre sale al pasar el ratón), la inicial de la cuenta y «Cerrar sesión». Se recuerda en el navegador. En el celular el menú sigue igual.
 - **A1 · Inicio del Administrador** (HU-006, HU-007): 4 indicadores (empresas registradas, mediciones pendientes, diagnósticos completados este mes y puntaje promedio), tabla «Mediciones» con pestañas por estado, avance por categorías y paginado, «Empresas por nivel» y «Diagnósticos por sector». Las acciones de la tabla llevan por ahora a la ficha de la empresa.

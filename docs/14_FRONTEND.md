@@ -193,7 +193,7 @@ Ruta prevista: `GET /categorias`.
 | `totalDiagnosticos` | `number` | Diagnósticos activos en total, para "13 de 13". |
 | `borradores` | `DiagnosticoBorrador[]` | Diagnósticos en borrador (con `version`), para agregarles una categoría nueva (HU-018 CA-004). |
 
-La tabla usa todo el ancho y va paginada, 10 categorías por página (vuelve a la 1 al cambiar el filtro). La categoría se edita en un modal en el centro (`ModalEditarCategoria`) que envía `nombre` y `descripcion`; "Archivar…" o "Eliminar…" desde ese modal abre el de A2.3c. Crear (A2.3b) y archivar (A2.3c) abren un modal. Las archivadas tienen "Restaurar".
+La tabla usa todo el ancho y va paginada, 10 categorías por página (vuelve a la 1 al cambiar el filtro). La categoría se edita en un modal en el centro (`ModalEditarCategoria`) que envía `nombre` y `descripcion`; Cada categoría tiene "Archivar" siempre y "Eliminar" solo si nadie la ha respondido (en la fila y en el modal de editar); los dos abren A2.3c (`ModalRetirarCategoria`, prop `accion`). Crear (A2.3b) y archivar (A2.3c) abren un modal. Las archivadas tienen "Restaurar".
 
 ### A2.5 · Crear diagnóstico (`diagnosticos/Crear`)
 
