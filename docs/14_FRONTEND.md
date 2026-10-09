@@ -133,6 +133,13 @@ Envía `email` a `POST /forgot-password`.
 
 Envía `token`, `email`, `password` y `password_confirmation` a `POST /reset-password`. Si el enlace ya se usó, el error en `email` muestra "Este enlace ya no es válido" con "Pedir otro enlace".
 
+### Menú lateral (`components/base/MenuLateral.vue`)
+
+- Secciones por rol en `lib/menu.ts`, cada una con su `icono` (Lucide).
+- En pantallas grandes se cierra y se abre con el botón junto al logo. Cerrado mide 64 px y muestra solo los iconos (el nombre sale en `title` y queda para lectores de pantalla), la inicial de la cuenta (Mi perfil) y el icono de cerrar sesión.
+- El estado vive en `composables/useMenuPlegado.ts`: se comparte entre páginas y se guarda en `localStorage` (`captter.menu-plegado`); si el navegador no deja guardar, arranca abierto.
+- En el menú del celular (`plegable = false`) siempre se ve completo.
+
 ### A1 · Inicio del Administrador (`inicio/Administrador`)
 
 Ruta: `GET /inicio` (`InicioController@administrador`, datos de `App\Support\DatosInicio`). Tipos en `types/inicio.ts`.

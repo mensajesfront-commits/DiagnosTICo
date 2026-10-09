@@ -40,7 +40,7 @@ router.on('navigate', () => {
             role="dialog"
             aria-modal="true"
         >
-            <MenuLateral />
+            <MenuLateral :plegable="false" />
             <button
                 type="button"
                 class="flex-1 bg-menu/45"
