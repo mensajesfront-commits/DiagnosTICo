@@ -168,6 +168,8 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 - **Por qué:** lo pidió el equipo (8 de octubre de 2026). Escribir evita buscar en listas largas (México tiene más de 9.000 localidades). Las listas públicas no traen todos los municipios, y por eso la ciudad queda libre.
 - **Pendiente:** España y Guinea Ecuatorial quedan por fuera (respuesta del equipo: solo Hispanoamérica).
 
+- **Zonas horarias (9 de octubre de 2026):** Mi perfil ofrece las zonas horarias de los mismos 18 países, sacadas de la base oficial de zonas (IANA, la que trae PHP): 45 en total, por ejemplo 12 en México, 12 en Argentina y 4 en Chile. Se muestran como «País · Ciudad (UTC−5)», con los nombres de ciudad en español (`OpcionesPerfil::zonasHorarias`).
+
 ### DEC-017 — Eliminar cuentas con 90 días para recuperarlas
 
 - **Decisión:**

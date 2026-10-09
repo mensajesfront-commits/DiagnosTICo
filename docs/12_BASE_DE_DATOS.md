@@ -365,7 +365,7 @@ Las carga `CiiuSeeder` desde `resources/ciiu/ciiu-rev5-ac.json` (fuentes: el Exc
 | `cargo` | varchar(255) | Sí en L2 (cuenta principal); no en las demás | `Administradora` | Quién registró la empresa |
 | `telefono` | varchar(255) | No | `+57 311 555 0142` | |
 | `ciudad`, `departamento`, `pais` | varchar(255) | No | `Bogotá`, `Bogotá D.C.`, `Colombia` | Mi perfil (A6); mismas reglas que en la empresa |
-| `zona_horaria` | varchar(255) | Sí (por defecto `America/Bogota`) | `America/Bogota` | |
+| `zona_horaria` | varchar(255) | Sí (por defecto `America/Bogota`) | `America/Bogota` | Identificador IANA de una de las zonas de los 18 países (DEC-016) |
 | `idioma` | varchar(5) | Sí (por defecto `es`) | `es` | |
 | `avisos` | jsonb | No | `{"ia_falla": true, "resumen_semanal": false}` | Avisos por correo elegidos en Mi perfil |
 | `foto_ruta` | varchar(255) | No | `fotos/abc123.jpg` | Archivo privado; se sirve por `/imagenes/usuario/{id}` |

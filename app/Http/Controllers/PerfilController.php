@@ -60,7 +60,7 @@ class PerfilController extends Controller
             'editaEmpresa' => $empresa !== null && $rol === 'Empresa',
             'opciones' => [
                 'paises' => Ubicaciones::paises(),
-                'zonas' => OpcionesPerfil::ZONAS_HORARIAS,
+                'zonas' => OpcionesPerfil::zonasHorarias($usuario->zona_horaria),
                 'idiomas' => OpcionesPerfil::IDIOMAS,
                 'empleados' => OpcionesPerfil::RANGOS_EMPLEADOS,
                 // Actividades (CIIU) del sector de la empresa; la actual va

@@ -228,3 +228,31 @@ it('la cuenta principal cambia el subsector y la descripción de la empresa', fu
     expect($empresa->refresh()->actividad_economica_id)->toBe($propia->id)
         ->and($empresa->descripcion)->toBe('Almuerzos del día.');
 });
+
+it('ofrece las zonas horarias de los 18 países y acepta cualquiera de ellas', function () {
+    $admin = User::factory()->create(['zona_horaria' => 'America/Bogota'])->assignRole('Administrador');
+
+    $this->actingAs($admin)->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('opciones.zonas', fn ($zonas) => count($zonas) >= 40
+                && str_starts_with($zonas['America/Mexico_City'], 'México · Ciudad de México (UTC')
+                && str_starts_with($zonas['Pacific/Galapagos'], 'Ecuador · Galápagos (UTC')
+                && ! isset($zonas['Europe/Madrid'])));
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['zona_horaria' => 'America/Tijuana']))
+        ->assertSessionHasNoErrors();
+    expect($admin->fresh()->zona_horaria)->toBe('America/Tijuana');
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['zona_horaria' => 'Asia/Tokyo']))
+        ->assertSessionHasErrors('zona_horaria');
+});
+
+it('conserva una zona de antes que ya no está en la lista', function () {
+    $admin = User::factory()->create(['zona_horaria' => 'Europe/Madrid'])->assignRole('Administrador');
+
+    $this->actingAs($admin)->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('opciones.zonas.Europe/Madrid', fn ($z) => str_starts_with($z, 'Otra zona · Madrid')));
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['zona_horaria' => 'Europe/Madrid']))
+        ->assertSessionHasNoErrors();
+});

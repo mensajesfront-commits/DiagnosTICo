@@ -37,7 +37,7 @@ class ActualizarPerfilRequest extends FormRequest
             'pais' => ['nullable', 'string', Rule::in(Ubicaciones::nombresDePaises())],
             'departamento' => ['nullable', 'string', new DepartamentoDelPais($this->string('pais')->value())],
             'ciudad' => ['nullable', 'string', 'min:2', 'max:255'],
-            'zona_horaria' => ['required', 'string', Rule::in(array_keys(OpcionesPerfil::ZONAS_HORARIAS))],
+            'zona_horaria' => ['required', 'string', Rule::in(array_keys(OpcionesPerfil::zonasHorarias($usuario->zona_horaria)))],
             'idioma' => ['required', 'string', Rule::in(array_keys(OpcionesPerfil::IDIOMAS))],
             'avisos' => ['array'],
         ];
