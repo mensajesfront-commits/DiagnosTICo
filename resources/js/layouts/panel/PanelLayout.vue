@@ -40,7 +40,7 @@ router.on('navigate', () => {
             role="dialog"
             aria-modal="true"
         >
-            <MenuLateral />
+            <MenuLateral :plegable="false" />
             <button
                 type="button"
                 class="flex-1 bg-menu/45"
@@ -66,7 +66,7 @@ router.on('navigate', () => {
                 </button>
                 <span class="flex items-center gap-2 text-sm font-semibold">
                     <Logo class="size-7" />
-                    <span class="text-base">Captter</span>
+                    <span class="text-base">CAPTTER</span>
                 </span>
             </div>
 

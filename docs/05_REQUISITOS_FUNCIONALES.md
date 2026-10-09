@@ -376,10 +376,11 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 ### Caso de éxito
 
-1. Completo nombre de la empresa, sector, ciudad, país, nombre del usuario, cargo, correo, teléfono, contraseña y confirmación.
-2. Acepto los términos de uso y el tratamiento de datos.
-3. Pulso “Crear cuenta”.
-4. Se guardan la empresa y su usuario principal en una sola operación y entro a E1.
+1. Paso 1 · Mi empresa: completo nombre de la empresa, sector, actividad económica (del sector elegido), descripción corta, ciudad y país, y pulso "Siguiente".
+2. Paso 2 · Tu usuario: completo nombre del usuario, cargo, correo, teléfono (opcional), contraseña y confirmación.
+3. Acepto los términos de uso y el tratamiento de datos.
+4. Pulso “Registrar empresa”.
+5. Se guardan la empresa y su usuario principal en una sola operación y entro a E1.
 
 ### Criterios de aceptación
 
@@ -387,7 +388,7 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 **Dado** que no tengo sesión iniciada y completo todos los campos con datos válidos y acepto los términos,
 
-**Cuando** pulso "Crear cuenta",
+**Cuando** pulso "Registrar empresa",
 
 **Entonces** se guardan la empresa y su usuario principal y entro al inicio de la empresa.
 
@@ -403,7 +404,7 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 **Dado** que el correo ya pertenece a una cuenta,
 
-**Cuando** pulso "Crear cuenta",
+**Cuando** pulso "Registrar empresa",
 
 **Entonces** veo un aviso bajo el campo y no se crea nada.
 
@@ -423,6 +424,22 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 **Entonces** no se puede crear la cuenta.
 
+#### CA-006 — Actividad económica ligada al sector
+
+**Dado** que no elegí un sector,
+
+**Cuando** reviso la actividad económica,
+
+**Entonces** no la puedo elegir; al elegir el sector aparecen solo sus actividades (código CIIU), y si cambio de sector debo elegirla de nuevo.
+
+#### CA-007 — Dos pasos
+
+**Dado** que falta un dato obligatorio de "Mi empresa",
+
+**Cuando** pulso "Siguiente",
+
+**Entonces** no paso a "Tu usuario" y se me indica el campo que falta.
+
 ### Reglas de negocio
 
 - RN-001 — Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
@@ -431,7 +448,12 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 ### Validaciones
 
-- Campos del formulario: nombre de la empresa, sector, ciudad, país, nombre del usuario, cargo, correo, teléfono, contraseña y confirmación.
+- Campos del formulario: nombre de la empresa, sector, actividad económica, descripción corta, ciudad, país, nombre del usuario, cargo, correo, teléfono (opcional), contraseña y confirmación.
+- La actividad económica debe ser del sector elegido; es obligatoria si el sector tiene actividades.
+- La descripción corta es obligatoria, de máximo 300 caracteres.
+- País → departamento (estado, provincia o región) → ciudad, en ese orden. El país es uno de los 18 de Hispanoamérica y el departamento debe ser de ese país; la ciudad se elige o se escribe (DEC-016).
+- El cargo es obligatorio, para saber quién registra la empresa.
+- Cambio pedido por el equipo el 7 de octubre de 2026 (dos pasos, actividad económica, descripción y cargo obligatorio; DEC-015).
 - Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
 - La contraseña debe coincidir con su confirmación.
 - El correo no puede estar ya registrado.
@@ -1320,6 +1342,8 @@ Permite administrar un sector en un solo lugar viendo sus diagnósticos, resumen
 **Cuando** veo "Empresas del sector",
 
 **Entonces** muestra diagnóstico asignado, medición y puntaje, con "Ver empresa".
+
+**[INCONSISTENCIA DETECTADA]** Por decisión del equipo (8 de octubre de 2026), la tabla "Empresas del sector" se quitó de A2 para ganar espacio. El resumen del sector enlaza a la lista de Empresas filtrada por ese sector (A3), donde se mostrarán estos datos.
 
 #### CA-006 — Accesos superiores
 
@@ -9656,13 +9680,13 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 | RN-001 | Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial. | HU-002, HU-004, HU-055, HU-056, HU-077, HU-078 |
 | RN-002 | Un correo no puede pertenecer a más de una cuenta. | HU-002, HU-032, HU-034, HU-077 |
 | RN-003 | Solo se ofrecen sectores activos al registrar empresas; no existe la opción “Otro”. | HU-002, HU-012, HU-013, HU-014, HU-015, HU-032 |
-| RN-004 | Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar. | HU-001, HU-003, HU-035, HU-047, HU-079 |
+| RN-004 | Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar. Además, el Administrador puede **eliminar** una cuenta escribiendo su correo exacto para confirmar; se puede recuperar durante 90 días y después se borra para siempre (decisión del equipo, 8 de octubre de 2026, DEC-017). | HU-001, HU-003, HU-035, HU-047, HU-079 |
 | RN-005 | Los avisos de inicio de sesión y recuperación no revelan si un correo está registrado. | HU-001, HU-003 |
 | RN-006 | El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas. | HU-003, HU-004, HU-032, HU-034 |
 | RN-007 | Cada rol ve solo las secciones que le corresponden; empresa y colaborador ven solo la información de su propia empresa. | HU-001, HU-046, HU-048, HU-053, HU-056, HU-057, HU-065, HU-076 |
 | RN-008 | Un sector con empresas o mediciones no se elimina: se reasigna o se desactiva; las mediciones hechas se conservan. | HU-013, HU-014, HU-015, HU-016, HU-034 |
 | RN-009 | El nombre de una categoría es obligatorio, de máximo 40 caracteres y único; una categoría con respuestas se archiva en lugar de borrarse. | HU-017, HU-018, HU-019, HU-026 |
-| RN-010 | Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron. | HU-010, HU-018, HU-020, HU-021, HU-022, HU-023, HU-025, HU-029, HU-084 |
+| RN-010 | Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron. Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (decisión del equipo, 8 de octubre de 2026). | HU-010, HU-018, HU-020, HU-021, HU-022, HU-023, HU-025, HU-029, HU-084 |
 | RN-011 | La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%. | HU-018, HU-019, HU-020, HU-026, HU-027, HU-068 |
 | RN-012 | Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos. | HU-018, HU-020, HU-024, HU-026, HU-028, HU-029 |
 | RN-013 | Pregunta: abierta, opción única o selección múltiple; opciones con puntaje 0–100; la indicación para responder es obligatoria; “Ten en cuenta” por respuesta es opcional (máx. 200 caracteres), no lo ve la empresa y solo se usa si esa respuesta fue elegida; la abierta tiene un único criterio de calificación; texto abierto de máximo 1000 caracteres. | HU-024, HU-025, HU-081 |
@@ -9742,6 +9766,99 @@ Requisito → Épica → Historia → Criterio de aceptación.
 | RF-038 — Publicar el resultado | EP-012 | HU-084 | HU-084: CA-001–CA-005 | Completa |
 | RF-039 — Configurar el bot de WhatsApp | EP-013 | HU-071 | HU-071: CA-001–CA-005 | Completa (aplazada) |
 | RF-040 — Diagnóstico por WhatsApp | EP-013 | HU-072, HU-073, HU-074, HU-075 | HU-072: CA-001–CA-003; HU-073: CA-001–CA-006; HU-074: CA-001–CA-004; HU-075: CA-001–CA-004 | Completa (aplazada) |
+
+## Historia → requisito (T-061)
+
+Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha" quiere decir que tiene pantalla, backend y pruebas.
+
+| Historia | Requisito | Estado |
+|---|---|---|
+| HU-001 — Iniciar sesión | RF-001 | Hecha |
+| HU-002 — Registrar mi empresa | RF-002 | Hecha |
+| HU-003 — Recuperar mi contraseña | RF-003 | Hecha |
+| HU-004 — Crear una contraseña nueva | RF-003 | Hecha |
+| HU-005 — Cerrar sesión | RF-004 | Hecha |
+| HU-006 — Ver el inicio con indicadores | RF-005 | Hecha (la ficha A3.1 llega con Empresas) |
+| HU-007 — Filtrar las mediciones por estado | RF-005 | Hecha |
+| HU-008 — Recordar o reenviar el aviso | RF-006 | Pendiente |
+| HU-009 — Dar una nueva fecha a una medición vencida | RF-007 | Pendiente |
+| HU-010 — Ver los diagnósticos de un sector | RF-008 | Hecha |
+| HU-011 — Ver todos los diagnósticos | RF-008 | Hecha |
+| HU-012 — Crear un sector | RF-009 | Hecha |
+| HU-013 — Editar un sector | RF-009 | Hecha |
+| HU-014 — Reasignar las empresas de un sector | RF-009 | Hecha |
+| HU-015 — Desactivar un sector | RF-009 | Hecha |
+| HU-016 — Eliminar un sector | RF-009 | Hecha |
+| HU-017 — Ver y editar el catálogo de categorías | RF-010 | Hecha |
+| HU-018 — Crear una categoría | RF-010 | Hecha |
+| HU-019 — Eliminar o archivar una categoría | RF-010 | Hecha |
+| HU-020 — Crear un diagnóstico | RF-011 | Hecha |
+| HU-021 — Duplicar un diagnóstico | RF-011 | Hecha |
+| HU-022 — Archivar o eliminar un diagnóstico | RF-011 | Hecha |
+| HU-023 — Ver y ordenar el contenido del diagnóstico | RF-012 | Pendiente |
+| HU-024 — Agregar una pregunta | RF-013 | Pendiente |
+| HU-025 — Editar o eliminar una pregunta | RF-013 | Pendiente |
+| HU-026 — Agregar categorías al diagnóstico | RF-012 | Pendiente |
+| HU-027 — Editar la importancia de las categorías | RF-012 | Pendiente |
+| HU-028 — Ver la vista previa y el estado | RF-014 | Pendiente |
+| HU-029 — Publicar una versión | RF-014 | Pendiente |
+| HU-030 — Ver un resultado de ejemplo | RF-015 | Pendiente |
+| HU-031 — Ver la lista de empresas | RF-016 | Pendiente |
+| HU-032 — Registrar una empresa | RF-017 | Pendiente |
+| HU-033 — Ver la ficha e historial de una empresa | RF-016 | Pendiente |
+| HU-034 — Editar los datos de la cuenta de una empresa | RF-017 | Pendiente |
+| HU-035 — Desactivar o reactivar la cuenta de una empresa | RF-017 | Pendiente |
+| HU-036 — Asignar una medición | RF-018 | Pendiente |
+| HU-037 — Editar el correo de aviso de la medición | RF-006 | Pendiente |
+| HU-038 — Ver el resultado de una empresa | RF-019 | Pendiente |
+| HU-039 — Ver el historial de una empresa | RF-019 | Pendiente |
+| HU-040 — Ver las respuestas de una empresa | RF-019 | Pendiente |
+| HU-041 — Editar las instrucciones generales de la IA | RF-020 | Pendiente |
+| HU-042 — Ajustar el prompt para un sector | RF-021 | Pendiente |
+| HU-043 — Ajustar el prompt para una empresa | RF-021 | Pendiente |
+| HU-044 — Ver el prompt completo | RF-022 | Pendiente |
+| HU-045 — Probar el prompt con un ejemplo | RF-022 | Pendiente |
+| HU-046 — Ver las cuentas del sistema | RF-023 | Hecha |
+| HU-047 — Desactivar o reactivar una cuenta | RF-023 | Hecha |
+| HU-048 — Ver los roles del sistema | RF-024 | Hecha |
+| HU-049 — Crear un rol | RF-024 | Hecha |
+| HU-050 — Editar un rol | RF-024 | Hecha |
+| HU-051 — Eliminar un rol | RF-024 | Hecha |
+| HU-052 — Asignar o quitar un rol | RF-024 | Hecha |
+| HU-053 — Ver el sistema como una empresa | RF-025 | Pendiente |
+| HU-054 — Ver el sistema como otro administrador | RF-025 | Pendiente |
+| HU-055 — Editar mi perfil (Administrador) | RF-026 | Hecha |
+| HU-056 — Editar mi perfil (Empresa o Colaborador) | RF-026 | Hecha |
+| HU-057 — Ver mi inicio la primera vez | RF-027 | Pendiente |
+| HU-058 — Ver mi medición pendiente | RF-027 | Pendiente |
+| HU-059 — Ver mi inicio sin medición pendiente | RF-027 | Pendiente |
+| HU-060 — Responder el diagnóstico | RF-028 | Pendiente |
+| HU-061 — Revisar antes de enviar | RF-029 | Pendiente |
+| HU-062 — Enviar el diagnóstico | RF-029 | Pendiente |
+| HU-063 — Esperar el análisis | RF-030 | Pendiente |
+| HU-064 — Ver mi resultado | RF-031 | Pendiente |
+| HU-065 — Ver mis respuestas | RF-031 | Pendiente |
+| HU-066 — Descargar el informe en PDF | RF-032 | Pendiente |
+| HU-067 — Ver mi historial | RF-033 | Pendiente |
+| HU-068 — Calcular los puntajes | RF-036 | Pendiente |
+| HU-069 — Analizar cada categoría con la IA | RF-037 | Pendiente |
+| HU-070 — Marcar mediciones vencidas | RF-007 | Pendiente |
+| HU-071 — Configurar las preguntas del bot | RF-039 | Aplazada |
+| HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Aplazada |
+| HU-073 — Responder las preguntas del bot | RF-040 | Aplazada |
+| HU-074 — Retomar la conversación | RF-040 | Aplazada |
+| HU-075 — Recibir el resultado por WhatsApp | RF-040 | Aplazada |
+| HU-076 — Ver los colaboradores de mi empresa | RF-035 | Hecha |
+| HU-077 — Crear un colaborador | RF-035 | Hecha |
+| HU-078 — Cambiar la contraseña de un colaborador | RF-035 | Hecha |
+| HU-079 — Desactivar o reactivar un colaborador | RF-035 | Hecha |
+| HU-080 — Entender cómo se arma el prompt final | RF-020 | Pendiente |
+| HU-081 — Armar el prompt de cada categoría | RF-037 | Pendiente |
+| HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Pendiente |
+| HU-083 — Atender las solicitudes de nueva medición | RF-034 | Pendiente |
+| HU-084 — Publicar el resultado | RF-038 | Pendiente |
+
+HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la semana 4; mientras tanto vuelven a A2 con un aviso. HU-078 también permite editar el nombre, el cargo y el correo del colaborador, y E12 permite eliminarlo (DEC-017).
 
 ## Cobertura de vistas del prototipo
 

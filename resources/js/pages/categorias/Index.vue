@@ -2,19 +2,21 @@
 /**
  * A2.3 · Catálogo de categorías (HU-017, HU-018, HU-019).
  *
- * Catálogo común a todos los diagnósticos. A la izquierda, la tabla con el
- * filtro Todas / En uso / Archivadas; a la derecha, el panel para editar la
- * categoría elegida. Crear (A2.3b) y archivar (A2.3c) abren un modal.
+ * Catálogo común a todos los diagnósticos: la tabla usa todo el ancho, con el
+ * filtro Todas / En uso / Archivadas y 10 categorías por página. Editar, crear (A2.3b) y archivar
+ * (A2.3c) abren un modal en el centro.
  */
 import { Head, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
+import Paginacion from '@/components/base/Paginacion.vue';
 import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import ModalCategoria from '@/components/categorias/ModalCategoria.vue';
+import ModalEditarCategoria from '@/components/categorias/ModalEditarCategoria.vue';
 import ModalRetirarCategoria from '@/components/categorias/ModalRetirarCategoria.vue';
-import PanelEditarCategoria from '@/components/categorias/PanelEditarCategoria.vue';
+import { usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { Categoria, DiagnosticoBorrador } from '@/types/diagnosticos';
@@ -31,18 +33,6 @@ const props = withDefaults(
     }>(),
     { borradores: () => [] },
 );
-
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            { title: 'Diagnósticos', href: rutas.diagnosticos.todos() },
-            {
-                title: 'Catálogo de categorías',
-                href: rutas.categorias.catalogo(),
-            },
-        ],
-    },
-});
 
 const filtro = ref<Filtro>('todas');
 
@@ -79,17 +69,32 @@ const filas = computed(() => {
     return [...enUso.value, ...archivadas.value];
 });
 
-const elegidaId = ref<number | null>(enUso.value[0]?.id ?? null);
+const POR_PAGINA = 10;
+const { pagina, paginas, total, desde, visibles } = usePaginacion(
+    filas,
+    POR_PAGINA,
+);
+
+const elegidaId = ref<number | null>(null);
 const elegida = computed(
     () => props.categorias.find((c) => c.id === elegidaId.value) ?? null,
 );
+const modalEditar = ref(false);
+
+function editar(categoria: Categoria): void {
+    elegidaId.value = categoria.id;
+    modalEditar.value = true;
+}
 
 const modalCrear = ref(false);
 const modalRetirar = ref(false);
 const aRetirar = ref<Categoria | null>(null);
+const accionRetirar = ref<'archivar' | 'eliminar'>('archivar');
 
-function retirar(categoria: Categoria): void {
+/** Archivar se puede siempre; eliminar, solo si nadie la ha respondido. */
+function retirar(categoria: Categoria, accion: 'archivar' | 'eliminar'): void {
     aRetirar.value = categoria;
+    accionRetirar.value = accion;
     modalRetirar.value = true;
 }
 
@@ -106,170 +111,174 @@ function restaurar(categoria: Categoria): void {
     <Head title="Catálogo de categorías" />
 
     <div class="flex flex-col gap-5 p-6">
-        <EncabezadoPagina titulo="Catálogo de categorías">
+        <EncabezadoPagina
+            titulo="Catálogo de categorías"
+            :volver="{
+                href: rutas.diagnosticos.todos(),
+                texto: 'Diagnósticos',
+            }"
+        >
             <Boton @click="modalCrear = true">+ Crear categoría</Boton>
         </EncabezadoPagina>
 
-        <div class="grid items-start gap-5 xl:grid-cols-[1fr_440px]">
-            <section class="rounded-xl border border-linea bg-white">
-                <header
-                    class="flex flex-wrap items-center justify-between gap-4 px-5 py-4"
-                >
-                    <p class="min-w-60 flex-1 text-sm text-tinta-suave">
-                        El catálogo es común a todos los diagnósticos. Cada
-                        diagnóstico elige cuáles categorías usa. Aquí se crean,
-                        editan, archivan y restauran.
-                    </p>
-                    <SelectorCompacto
-                        v-model="filtro"
-                        :opciones="opcionesFiltro"
-                        etiqueta-accesible="Filtrar categorías"
-                        class="shrink-0"
-                    />
-                </header>
-
-                <p
-                    v-if="filas.length === 0"
-                    class="border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
-                >
-                    {{
-                        filtro === 'archivadas'
-                            ? 'No hay categorías archivadas.'
-                            : 'Todavía no hay categorías. Crea la primera con «+ Crear categoría».'
-                    }}
+        <section class="rounded-xl border border-linea bg-white">
+            <header
+                class="flex flex-wrap items-center justify-between gap-4 px-5 py-4"
+            >
+                <p class="min-w-60 flex-1 text-sm text-tinta-suave">
+                    El catálogo es común a todos los diagnósticos. Cada
+                    diagnóstico elige cuáles categorías usa. Aquí se crean,
+                    editan, archivan y restauran.
                 </p>
+                <SelectorCompacto
+                    v-model="filtro"
+                    :opciones="opcionesFiltro"
+                    etiqueta-accesible="Filtrar categorías"
+                    class="shrink-0"
+                />
+            </header>
 
-                <div v-else class="overflow-x-auto">
-                    <table class="w-full border-collapse text-sm">
-                        <thead>
-                            <tr
-                                class="border-y border-linea bg-[#f9f8f4] text-left"
+            <p
+                v-if="filas.length === 0"
+                class="border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
+            >
+                {{
+                    filtro === 'archivadas'
+                        ? 'No hay categorías archivadas.'
+                        : 'Todavía no hay categorías. Crea la primera con «+ Crear categoría».'
+                }}
+            </p>
+
+            <div v-else class="overflow-x-auto">
+                <table class="w-full border-collapse text-sm">
+                    <thead>
+                        <tr
+                            class="border-y border-linea bg-[#f9f8f4] text-left"
+                        >
+                            <th
+                                v-for="columna in [
+                                    'Categoría',
+                                    'Diagnósticos',
+                                    'Preguntas',
+                                    'Estado',
+                                    'Acciones',
+                                ]"
+                                :key="columna"
+                                scope="col"
+                                class="px-5 py-2.5 text-xs font-normal text-tinta-suave"
                             >
-                                <th
-                                    v-for="columna in [
-                                        'Categoría',
-                                        'Diagnósticos',
-                                        'Preguntas',
-                                        'Estado',
-                                        'Acciones',
-                                    ]"
-                                    :key="columna"
-                                    scope="col"
-                                    class="px-5 py-2.5 text-xs font-normal text-tinta-suave"
-                                >
-                                    {{ columna }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="categoria in filas"
-                                :key="categoria.id"
+                                {{ columna }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="categoria in visibles"
+                            :key="categoria.id"
+                            class="border-b border-linea last:border-b-0"
+                        >
+                            <td
                                 :class="
                                     cn(
-                                        'border-b border-linea last:border-b-0',
-                                        categoria.id === elegidaId &&
-                                            'bg-marca-suave shadow-[inset_3px_0_0_var(--color-marca)]',
+                                        'px-5 py-3 font-medium',
+                                        categoria.archivada &&
+                                            'text-tinta-suave',
                                     )
                                 "
                             >
-                                <td
-                                    :class="
-                                        cn(
-                                            'px-5 py-3 font-medium',
-                                            categoria.archivada &&
-                                                'text-tinta-suave',
-                                        )
-                                    "
+                                {{ categoria.nombre }}
+                            </td>
+                            <td class="px-5 py-3 font-mono whitespace-nowrap">
+                                {{
+                                    categoria.archivada
+                                        ? '—'
+                                        : `${categoria.diagnosticos} de ${totalDiagnosticos}`
+                                }}
+                            </td>
+                            <td class="px-5 py-3 font-mono">
+                                {{ categoria.preguntas }}
+                            </td>
+                            <td class="px-5 py-3">
+                                <Etiqueta v-if="categoria.archivada">
+                                    ▣ Archivada
+                                </Etiqueta>
+                                <Etiqueta v-else tono="exito">
+                                    ✓ En uso
+                                </Etiqueta>
+                            </td>
+                            <td class="px-5 py-3 whitespace-nowrap">
+                                <button
+                                    v-if="categoria.archivada"
+                                    type="button"
+                                    class="text-marca underline hover:text-marca-hover"
+                                    @click="restaurar(categoria)"
                                 >
-                                    {{ categoria.nombre }}
-                                    <span
-                                        v-if="categoria.id === elegidaId"
-                                        class="text-xs font-normal whitespace-nowrap text-marca"
-                                    >
-                                        · editando
-                                    </span>
-                                </td>
-                                <td
-                                    class="px-5 py-3 font-mono whitespace-nowrap"
-                                >
-                                    {{
-                                        categoria.archivada
-                                            ? '—'
-                                            : `${categoria.diagnosticos} de ${totalDiagnosticos}`
-                                    }}
-                                </td>
-                                <td class="px-5 py-3 font-mono">
-                                    {{ categoria.preguntas }}
-                                </td>
-                                <td class="px-5 py-3">
-                                    <Etiqueta v-if="categoria.archivada">
-                                        ▣ Archivada
-                                    </Etiqueta>
-                                    <Etiqueta v-else tono="exito">
-                                        ✓ En uso
-                                    </Etiqueta>
-                                </td>
-                                <td class="px-5 py-3 whitespace-nowrap">
+                                    Restaurar
+                                </button>
+                                <template v-else>
                                     <button
-                                        v-if="categoria.archivada"
                                         type="button"
                                         class="text-marca underline hover:text-marca-hover"
-                                        @click="restaurar(categoria)"
+                                        @click="editar(categoria)"
                                     >
-                                        Restaurar
+                                        Editar
                                     </button>
-                                    <template v-else>
-                                        <button
-                                            type="button"
-                                            class="text-marca underline hover:text-marca-hover"
-                                            @click="elegidaId = categoria.id"
-                                        >
-                                            Editar
-                                        </button>
+                                    <span class="mx-1.5 text-tinta-suave"
+                                        >·</span
+                                    >
+                                    <button
+                                        type="button"
+                                        class="text-tinta underline hover:text-marca"
+                                        @click="retirar(categoria, 'archivar')"
+                                    >
+                                        Archivar
+                                    </button>
+                                    <template
+                                        v-if="!categoria.tiene_respuestas"
+                                    >
                                         <span class="mx-1.5 text-tinta-suave"
                                             >·</span
                                         >
                                         <button
                                             type="button"
                                             class="text-tinta underline hover:text-aviso"
-                                            @click="retirar(categoria)"
+                                            @click="
+                                                retirar(categoria, 'eliminar')
+                                            "
                                         >
-                                            {{
-                                                categoria.tiene_respuestas
-                                                    ? 'Archivar'
-                                                    : 'Eliminar'
-                                            }}
+                                            Eliminar
                                         </button>
                                     </template>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                                </template>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-            <PanelEditarCategoria
-                v-if="elegida && !elegida.archivada"
-                :categoria="elegida"
-                :total-diagnosticos="totalDiagnosticos"
-                @cerrar="elegidaId = null"
-                @retirar="retirar(elegida)"
+            <Paginacion
+                v-if="filas.length > 0"
+                v-model:pagina="pagina"
+                :desde="desde"
+                :cantidad="visibles.length"
+                :total="total"
+                :paginas="paginas"
             />
-            <aside
-                v-else
-                class="rounded-xl border border-dashed border-linea-fuerte p-5 text-sm text-tinta-suave"
-            >
-                Elige «Editar» en una categoría para cambiar su nombre o la
-                descripción que lee la empresa.
-            </aside>
-        </div>
+        </section>
     </div>
 
     <ModalCategoria v-model:abierto="modalCrear" :borradores="borradores" />
+    <ModalEditarCategoria
+        v-if="elegida && !elegida.archivada"
+        v-model:abierto="modalEditar"
+        :categoria="elegida"
+        :total-diagnosticos="totalDiagnosticos"
+        @retirar="retirar(elegida, $event)"
+    />
     <ModalRetirarCategoria
         v-if="aRetirar"
         v-model:abierto="modalRetirar"
         :categoria="aRetirar"
+        :accion="accionRetirar"
     />
 </template>

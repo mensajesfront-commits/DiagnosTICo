@@ -12,7 +12,9 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
-     * Roles, sectores y la cuenta del Administrador (T-046).
+     * Roles, sectores con sus actividades, las 10 categorías y la cuenta del
+     * Administrador (T-046). Los niveles son fijos (RN-019) y están en
+     * App\Support\Niveles.
      *
      * El correo y la contraseña del Administrador salen de ADMIN_EMAIL y
      * ADMIN_PASSWORD en .env (config/diagnostico.php). Sin contraseña, se
@@ -20,7 +22,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([RolesYPermisosSeeder::class, SectoresSeeder::class]);
+        $this->call([RolesYPermisosSeeder::class, SectoresSeeder::class, CategoriasSeeder::class]);
 
         $correo = (string) config('diagnostico.admin.email');
 

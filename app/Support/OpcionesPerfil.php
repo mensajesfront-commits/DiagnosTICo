@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Console\Commands\GenerarUbicaciones;
 use App\Models\User;
 
 /**
@@ -9,18 +10,80 @@ use App\Models\User;
  */
 class OpcionesPerfil
 {
-    /** [INFORMACIÓN PENDIENTE] Lista de países; por ahora solo Colombia. */
-    public const array PAISES = ['Colombia'];
-
-    /** @var array<string, string> */
-    public const array ZONAS_HORARIAS = [
-        'America/Bogota' => 'América/Bogotá (UTC−5)',
-        'America/Mexico_City' => 'América/Ciudad de México (UTC−6)',
-        'America/Lima' => 'América/Lima (UTC−5)',
-        'America/Santiago' => 'América/Santiago (UTC−4/−3)',
-        'America/Argentina/Buenos_Aires' => 'América/Buenos Aires (UTC−3)',
-        'Europe/Madrid' => 'Europa/Madrid (UTC+1/+2)',
+    /**
+     * Ciudades de las zonas horarias con su nombre en español (la base de
+     * zonas las trae en inglés y sin tildes). Las que no están aquí se
+     * muestran como vienen, cambiando "_" por espacio.
+     *
+     * @var array<string, string>
+     */
+    private const array CIUDADES = [
+        'Asuncion' => 'Asunción',
+        'Bahia_Banderas' => 'Bahía de Banderas',
+        'Bogota' => 'Bogotá',
+        'Cancun' => 'Cancún',
+        'Ciudad_Juarez' => 'Ciudad Juárez',
+        'Cordoba' => 'Córdoba',
+        'Costa_Rica' => 'San José',
+        'Easter' => 'Isla de Pascua',
+        'El_Salvador' => 'San Salvador',
+        'Galapagos' => 'Galápagos',
+        'Guatemala' => 'Ciudad de Guatemala',
+        'Havana' => 'La Habana',
+        'Mazatlan' => 'Mazatlán',
+        'Merida' => 'Mérida',
+        'Mexico_City' => 'Ciudad de México',
+        'Panama' => 'Ciudad de Panamá',
+        'Rio_Gallegos' => 'Río Gallegos',
+        'Tucuman' => 'Tucumán',
     ];
+
+    /**
+     * Zonas horarias de los 18 países del sistema (DEC-016), sacadas de la
+     * base oficial de zonas (IANA, la que trae PHP): identificador → "País ·
+     * Ciudad (UTC−5)", ordenadas por país y ciudad. La diferencia con UTC es
+     * la de hoy (en algunos países cambia con el horario de verano).
+     *
+     * `$incluir` agrega la zona que ya tiene la cuenta si no está en la
+     * lista (por ejemplo, Europe/Madrid de antes), para no perderla.
+     *
+     * @return array<string, string>
+     */
+    public static function zonasHorarias(?string $incluir = null): array
+    {
+        $zonas = [];
+
+        foreach (Ubicaciones::PAISES as $iso => [$pais]) {
+            foreach (\DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $iso) as $id) {
+                $zonas[$id] = [$pais, self::ciudad($id), self::diferencia($id)];
+            }
+        }
+
+        if ($incluir !== null && ! isset($zonas[$incluir]) && in_array($incluir, \DateTimeZone::listIdentifiers(), true)) {
+            $zonas[$incluir] = ['Otra zona', self::ciudad($incluir), self::diferencia($incluir)];
+        }
+
+        uasort($zonas, fn (array $a, array $b): int => GenerarUbicaciones::comparar($a[0], $b[0]) ?: GenerarUbicaciones::comparar($a[1], $b[1]));
+
+        return array_map(fn (array $z): string => "{$z[0]} · {$z[1]} ({$z[2]})", $zonas);
+    }
+
+    private static function ciudad(string $id): string
+    {
+        $ultima = substr($id, (int) strrpos($id, '/') + 1);
+
+        return self::CIUDADES[$ultima] ?? str_replace('_', ' ', $ultima);
+    }
+
+    /** "UTC−5", "UTC−3", "UTC+1" (con el signo menos tipográfico). */
+    private static function diferencia(string $id): string
+    {
+        $segundos = (new \DateTimeZone($id))->getOffset(new \DateTimeImmutable('now'));
+        $horas = intdiv(abs($segundos), 3600);
+        $minutos = intdiv(abs($segundos) % 3600, 60);
+
+        return 'UTC'.($segundos < 0 ? '−' : '+').$horas.($minutos > 0 ? ':'.str_pad((string) $minutos, 2, '0', STR_PAD_LEFT) : '');
+    }
 
     /** [INFORMACIÓN PENDIENTE] El sistema solo está en español. */
     public const array IDIOMAS = ['es' => 'Español'];

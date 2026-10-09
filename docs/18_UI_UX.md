@@ -65,12 +65,13 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | Código | Pantalla | Componente | Estado |
 |---|---|---|---|
 | L1 | Iniciar sesión | `pages/auth/Login.vue` | Hecha |
-| L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha. El backend de los campos de empresa va en T-047. |
+| L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha y conectada (dos pasos, DEC-015 y DEC-016) |
 | L3 | ¿Olvidaste tu contraseña? | `pages/auth/ForgotPassword.vue` | Hecha |
 | L4 | Crea una contraseña nueva | `pages/auth/ResetPassword.vue` | Hecha |
-| A2 | Diagnósticos de un sector | `pages/diagnosticos/Index.vue` | Hecha (vista previa) |
-| A2·T | Todos los diagnósticos | `pages/diagnosticos/Index.vue` | Hecha (vista previa) |
-| A2b | Sector sin diagnósticos | `pages/diagnosticos/Index.vue` | Hecha (vista previa) |
+| A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada. Las acciones de la tabla (A1b–A1e) llegan con Empresas (A3) |
+| A2 | Diagnósticos de un sector | `pages/diagnosticos/Index.vue` | Hecha y conectada |
+| A2·T | Todos los diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
+| A2b | Sector sin diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2.2 / A2.2a | Editar / crear sector | `components/diagnosticos/modales/ModalSector.vue` | Hecha |
 | A2.2b | Reasignar empresas | `…/ModalReasignarSector.vue` | Hecha |
 | A2.2c | Desactivar / reactivar sector | `…/ModalEstadoSector.vue` | Hecha. Sin wireframe, sale de HU-015. |
@@ -78,12 +79,25 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.7 | Duplicar diagnóstico | `…/ModalDuplicarDiagnostico.vue` | Hecha |
 | — | Archivar diagnóstico | `…/ModalArchivarDiagnostico.vue` | Hecha. Sin diseño (PA-005). |
 | — | Eliminar diagnóstico o borrador | `…/ModalEliminarDiagnostico.vue` | Hecha |
-| A2.3 | Catálogo de categorías, con el panel para editar | `pages/categorias/Index.vue`, `components/categorias/PanelEditarCategoria.vue` | Hecha (vista previa) |
+| A2.3 | Catálogo de categorías; editar abre un modal en el centro | `pages/categorias/Index.vue`, `components/categorias/ModalEditarCategoria.vue` | Hecha y conectada |
 | A2.3b | Crear / editar categoría | `components/categorias/ModalCategoria.vue` | Hecha |
 | A2.3c | Archivar o eliminar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Eliminar no tiene wireframe, sale de HU-019. |
-| A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha (vista previa) |
+| A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha y conectada |
+| A5 | Usuarios: lista con búsqueda, filtros y acciones | `pages/usuarios/Index.vue` | Hecha y conectada |
+| A5.1, A5.1b, A5.1e | Roles del sistema (Administrador, Empresa, Colaborador) | `pages/usuarios/Roles.vue`, `components/usuarios/PanelRol.vue` | Hecha y conectada |
+| A5.1c | Editar un rol creado | `components/usuarios/PanelRol.vue` | Hecha y conectada |
+| A5.1d | Eliminar rol | `components/usuarios/ModalEliminarRol.vue` | Hecha |
+| A5.2 | Crear rol | `components/usuarios/ModalCrearRol.vue` | Hecha |
+| A5.3b | Desactivar o eliminar cuenta | `components/usuarios/ModalDesactivarEliminar.vue` | Hecha y conectada |
+| A5.5 | Cambiar o asignar rol | `ModalCambiarRol.vue`, `ModalAsignarRol.vue` | Hecha |
+| — | Invitar usuario interno | `components/usuarios/ModalInvitarUsuario.vue` | Hecha. El wireframe no le da código. |
 | A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
+| E1 | Inicio de la empresa | `pages/inicio/Empresa.vue` | Bienvenida provisional; la pantalla completa es de la semana 6 (T-048 ya redirige aquí) |
 | E11 | Mi perfil de la empresa (y del colaborador) | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
+| E12 | Colaboradores de la empresa | `pages/colaboradores/Index.vue` | Hecha y conectada |
+| E12.1 | Agregar colaborador | `components/colaboradores/ModalAgregarColaborador.vue` | Hecha |
+| E12.2 | Comparte estos datos | `components/colaboradores/ModalDatosDeAcceso.vue` | Hecha |
+| E12.3 | Editar un colaborador (datos y contraseña) | `components/colaboradores/ModalEditarColaborador.vue` | Hecha y conectada |
 
 ## Diferencias con el wireframe
 
@@ -92,7 +106,15 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2, L4 | La lista de requisitos de la contraseña tiene 5 puntos (agrega "Al menos un carácter especial"); el wireframe muestra 4. | RN-001 lo exige. **[INCONSISTENCIA DETECTADA]**, pendiente de decidir. |
 | L1–L4 | El panel oscuro ocupa el 42 % de la pantalla; en el wireframe es más angosto. | Lo pidió el equipo (6 de octubre). |
 | L1 | No tiene la "Nota del prototipo" con atajos de entrada. | El wireframe aclara que no es parte del diseño. |
-| L2 | El país solo ofrece "Colombia". | **[INFORMACIÓN PENDIENTE]** Falta la lista de países. |
+| E12 | "Desactivar" pasa a "Desactivar / Eliminar"; eliminar se confirma con dos botones ("Eliminar" → "Sí, eliminar a…"). Los desactivados tienen "Reactivar · Eliminar". | Pedido por el equipo (8 de octubre, DEC-017): sin escribir el correo, porque se puede cambiar. |
+| E12.3 | "Cambiar contraseña" pasa a ser "Editar": nombre, cargo, correo y, opcional, contraseña nueva. | Pedido por el equipo (8 de octubre). El wireframe solo cambia la contraseña. |
+| E12, E12.1 | Columna "Cargo" en lugar de "Último acceso"; al agregar un colaborador el cargo es obligatorio (lista con búsqueda: Marketing, Producción… o escrito). | Pedido por el equipo (8 de octubre). |
+| A5 | Sin la columna "Último acceso": se guarda en la base (`users.ultimo_acceso_en`) pero no se muestra. "Enviada el…" (invitación) y "Se borra el…" (eliminada) van bajo el Estado. | Pedido por el equipo (8 de octubre). |
+| A5, A5.3b | "Desactivar / Eliminar" abre un modal para elegir; eliminar pide escribir el correo exacto. Las desactivadas tienen "Reactivar · Eliminar" y las invitaciones "Reenviar invitación · Eliminar". | Pedido por el equipo (8 de octubre, DEC-017). El wireframe solo tiene "Desactivar". |
+| Todas | Los campos obligatorios llevan un asterisco rojo (`Campo obligatorio`); los opcionales siguen con "(opcional)". | Pedido por el equipo (8 de octubre). |
+| L1 | Cuenta desactivada y demasiados intentos se avisan en un modal, no bajo el campo. | Pedido por el equipo (7 de octubre). El wireframe no los dibuja. |
+| L2 | El registro va en dos pasos (Mi empresa → Tu usuario), con actividad económica CIIU, descripción corta (máx. 300) y cargo obligatorio. | Cambio pedido por el equipo (7 de octubre, DEC-015). El wireframe muestra un solo formulario. |
+| L2, A6, E11 | País → departamento → ciudad en listas con búsqueda; la etiqueta del departamento cambia según el país (Estado, Provincia, Región). | Pedido por el equipo (8 de octubre, DEC-016). El wireframe muestra solo ciudad y país. |
 | L2 | Los enlaces de términos y de política apuntan a `#`. | **[INFORMACIÓN PENDIENTE]** Faltan las URL reales. |
 | A2.5 | En blanco, se eligen las categorías con casillas y se muestra cuánto vale cada una al empezar. | HU-020 pide elegir las categorías; el wireframe solo muestra la opción de copiar. |
 | A2.3 | Si la categoría nunca se respondió, la acción es «Eliminar» en vez de «Archivar». | HU-019 y RN-009. El wireframe solo muestra «Archivar». |
@@ -101,3 +123,11 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A6 | La lista de requisitos de la contraseña tiene 5 puntos; el wireframe muestra 3. | RN-001. **[INCONSISTENCIA DETECTADA]** (también en L2 y L4). |
 | E11 | Al cambiar el correo se guarda directo, sin enlace de verificación. | La verificación de correo está quitada (DEC-012). **[FUNCIONALIDAD POR DEFINIR]** |
 | E11 | El colaborador ve «Información de empresa» bloqueada, con una nota. | RN-025: solo la cuenta principal cambia esos datos. El wireframe solo muestra la cuenta principal. |
+| A5 | "Ver como" no aparece en las cuentas de Administrador. | Respuesta del equipo (6 oct): "Ver como" es para revisar lo que ven los otros roles. |
+| A5.5 | "Cambiar rol" no ofrece "Colaborador", y a las cuentas internas tampoco "Empresa". | Un colaborador lo crea su empresa (RN-025); una cuenta sin empresa no puede ser Empresa. |
+| A5.1c | Con un rol creado que tiene cuentas, "Eliminar rol" queda desactivado con una nota. | HU-051: solo se elimina un rol sin cuentas. |
+| E12.1, E12.3 | La contraseña muestra los 4 requisitos de RN-001; el wireframe dice solo "Mínimo 8 caracteres". | RN-001 y HU-077/HU-078 piden contraseña fuerte. |
+| E12 | "Desactivar" pide confirmación en un modal. | HU-079 CA-001 ("elijo Desactivar y confirmo"); el wireframe no lo dibuja. |
+| E12 | Sin colaboradores, la tabla muestra un mensaje y el botón para crear. | HU-076 CA-004. |
+| E12.2 | También se abre después de cambiar una contraseña (E12.3), con "Contraseña cambiada para…". | HU-078: "guardo y comparto la nueva contraseña". |
+| A5 | "Quitar rol" (HU-052) no está. | Cada cuenta tiene un solo rol (RN-027); se cambia con "Cambiar rol". **[FUNCIONALIDAD POR DEFINIR]** qué rol queda al "quitar". |

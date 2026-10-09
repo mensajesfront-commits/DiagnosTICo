@@ -72,6 +72,7 @@ const totalRequisitos = computed(
         </Aviso>
 
         <Campo
+            obligatorio
             etiqueta="Contraseña nueva"
             para="password"
             :error="errors.password"
@@ -89,6 +90,7 @@ const totalRequisitos = computed(
         </Campo>
 
         <Campo
+            obligatorio
             etiqueta="Confirmar contraseña"
             para="password_confirmation"
             :error="errors.password_confirmation"

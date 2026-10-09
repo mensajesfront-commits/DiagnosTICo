@@ -65,6 +65,8 @@ class AuthenticationTest extends TestCase
             'password' => 'wrong-password',
         ]);
 
-        $response->assertTooManyRequests();
+        // Vuelve a L1 con el error `bloqueo`, que se muestra en un modal.
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('bloqueo');
     }
 }

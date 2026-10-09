@@ -2,19 +2,33 @@
 /**
  * A2.3c · Archivar o eliminar una categoría (HU-019).
  *
- * Con respuestas → se archiva (RN-009): las versiones publicadas no cambian,
- * se quita de los borradores (quedan sin publicar hasta repartir su
- * importancia) y se puede restaurar desde «Archivadas».
- * Nunca respondida → se elimina. [FUNCIONALIDAD POR DEFINIR] El wireframe
- * solo muestra archivar; eliminar sale de HU-019.
+ * `accion`:
+ * - "archivar" (siempre se puede, RN-009): las versiones publicadas no
+ *   cambian, se quita de los borradores (quedan sin publicar hasta repartir
+ *   su importancia) y se puede restaurar desde «Archivadas».
+ * - "eliminar" (solo si nunca se respondió): se borra del catálogo.
+ *   [FUNCIONALIDAD POR DEFINIR] El wireframe solo muestra archivar; eliminar
+ *   sale de HU-019.
  */
 import { useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
 import { rutas } from '@/lib/rutas';
 import type { Categoria } from '@/types/diagnosticos';
 
-const props = defineProps<{ categoria: Categoria }>();
+const props = withDefaults(
+    defineProps<{
+        categoria: Categoria;
+        accion?: 'archivar' | 'eliminar';
+    }>(),
+    { accion: 'archivar' },
+);
+
+// Con respuestas solo se archiva, aunque se pida eliminar.
+const archivar = computed(
+    () => props.accion === 'archivar' || props.categoria.tiene_respuestas,
+);
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 
@@ -26,7 +40,7 @@ function confirmar(): void {
         onSuccess: () => (abierto.value = false),
     };
 
-    if (props.categoria.tiene_respuestas) {
+    if (archivar.value) {
         form.post(rutas.categorias.archivar(props.categoria.id), opciones);
     } else {
         form.delete(rutas.categorias.eliminar(props.categoria.id), opciones);
@@ -38,14 +52,16 @@ function confirmar(): void {
     <Modal
         v-model:abierto="abierto"
         :titulo="
-            categoria.tiene_respuestas
+            archivar
                 ? `¿Archivar la categoría “${categoria.nombre}”?`
                 : `¿Eliminar la categoría “${categoria.nombre}”?`
         "
         :descripcion="
-            categoria.tiene_respuestas
-                ? 'Ya tiene respuestas de empresas, por eso no se borra: se archiva. Los resultados y mediciones anteriores la conservan.'
-                : 'Ninguna empresa la ha respondido, por eso se elimina del catálogo. No se puede deshacer.'
+            !archivar
+                ? 'Ninguna empresa la ha respondido, por eso se puede eliminar del catálogo. No se puede deshacer.'
+                : categoria.tiene_respuestas
+                  ? 'Ya tiene respuestas de empresas, por eso no se borra: se archiva. Los resultados y mediciones anteriores la conservan.'
+                  : 'Deja de ofrecerse para diagnósticos nuevos. No se borra: la puedes restaurar cuando quieras.'
         "
         ancho="lg"
     >
@@ -87,7 +103,7 @@ function confirmar(): void {
             </div>
 
             <p
-                v-if="categoria.tiene_respuestas"
+                v-if="archivar"
                 class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
             >
                 Puedes restaurarla desde el filtro «Archivadas» del catálogo. Al
@@ -101,15 +117,11 @@ function confirmar(): void {
                 Cancelar
             </Boton>
             <Boton
-                :variante="categoria.tiene_respuestas ? 'primario' : 'peligro'"
+                :variante="archivar ? 'primario' : 'peligro'"
                 :cargando="form.processing"
                 @click="confirmar"
             >
-                {{
-                    categoria.tiene_respuestas
-                        ? 'Archivar categoría'
-                        : 'Eliminar categoría'
-                }}
+                {{ archivar ? 'Archivar categoría' : 'Eliminar categoría' }}
             </Boton>
         </template>
     </Modal>

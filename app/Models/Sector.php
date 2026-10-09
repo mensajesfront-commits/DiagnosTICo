@@ -15,12 +15,14 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $nombre
  * @property string|null $descripcion
+ * @property string|null $ciiu_division División CIIU (DEC-018)
  * @property bool $activo
+ * @property int|null $actividades_count
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
 #[Table('sectores')]
-#[Fillable(['nombre', 'descripcion', 'activo'])]
+#[Fillable(['nombre', 'descripcion', 'ciiu_division', 'activo'])]
 class Sector extends Model
 {
     /** @use HasFactory<SectorFactory> */
@@ -29,6 +31,18 @@ class Sector extends Model
     protected function casts(): array
     {
         return ['activo' => 'boolean'];
+    }
+
+    /** @return HasMany<ActividadEconomica, $this> */
+    public function actividades(): HasMany
+    {
+        return $this->hasMany(ActividadEconomica::class);
+    }
+
+    /** @return HasMany<Diagnostico, $this> */
+    public function diagnosticos(): HasMany
+    {
+        return $this->hasMany(Diagnostico::class);
     }
 
     /** @return HasMany<Empresa, $this> */

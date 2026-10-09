@@ -11,11 +11,23 @@
  * los enlaces apuntan a la URL prevista.
  */
 import type { InertiaLinkProps } from '@inertiajs/vue3';
-import { dashboard } from '@/routes';
+import {
+    Building2,
+    ClipboardList,
+    History,
+    House,
+    Sparkles,
+    Users,
+    UsersRound,
+} from '@lucide/vue';
+import type { Component } from 'vue';
+import { administrador, empresa } from '@/routes/inicio';
 
 export type ItemMenu = {
     titulo: string;
     href?: NonNullable<InertiaLinkProps['href']>;
+    /** Icono de la sección; es lo único que se ve con el menú plegado. */
+    icono?: Component;
     permiso?: string;
     roles?: string[];
     /** Submenú plegable. */
@@ -23,32 +35,50 @@ export type ItemMenu = {
 };
 
 export const menuAdministrador: ItemMenu[] = [
-    { titulo: 'Inicio', href: dashboard() },
+    { titulo: 'Inicio', href: administrador(), icono: House },
     {
         titulo: 'Diagnósticos',
         href: '/diagnosticos',
+        icono: ClipboardList,
         permiso: 'diagnosticos.ver',
     },
-    { titulo: 'Empresas', href: '/empresas', permiso: 'empresas.ver' },
+    {
+        titulo: 'Empresas',
+        href: '/empresas',
+        icono: Building2,
+        permiso: 'empresas.ver',
+    },
     // HU-041 CA-001: "Configuración IA" va sin submenú de fases.
     {
         titulo: 'Configuración IA',
         href: '/configuracion-ia',
+        icono: Sparkles,
         permiso: 'ia.ver',
     },
     {
         titulo: 'Usuarios y roles',
         href: '/usuarios',
+        icono: Users,
         permiso: 'usuarios.ver',
     },
 ];
 
 export const menuEmpresa: ItemMenu[] = [
-    { titulo: 'Inicio', href: dashboard() },
-    { titulo: 'Mi historial', href: '/historial', permiso: 'resultados.ver' },
+    { titulo: 'Inicio', href: empresa(), icono: House },
+    {
+        titulo: 'Mi historial',
+        href: '/historial',
+        icono: History,
+        permiso: 'resultados.ver',
+    },
     // HU-076 / RN-025: solo la cuenta principal; el colaborador no la ve.
     // A5.2 no tiene un permiso para esto: lo decide el rol.
-    { titulo: 'Colaboradores', href: '/colaboradores', roles: ['Empresa'] },
+    {
+        titulo: 'Colaboradores',
+        href: '/colaboradores',
+        icono: UsersRound,
+        roles: ['Empresa'],
+    },
 ];
 
 /** Roles de las cuentas de empresa; el resto usa el menú del Administrador. */

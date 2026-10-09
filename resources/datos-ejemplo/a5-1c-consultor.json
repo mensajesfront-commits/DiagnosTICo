@@ -1,0 +1,446 @@
+{
+    "componente": "usuarios/Roles",
+    "props": {
+        "roles": [
+            {
+                "id": 1,
+                "nombre": "Administrador",
+                "descripcion": "Acceso total al sistema",
+                "resumen": "Acceso total",
+                "activo": true,
+                "del_sistema": true,
+                "permisos": [
+                    "diagnosticos.ver",
+                    "diagnosticos.editar",
+                    "diagnosticos.publicar",
+                    "empresas.ver",
+                    "empresas.registrar",
+                    "mediciones.asignar",
+                    "diagnostico.responder",
+                    "resultados.ver",
+                    "resultados.pdf",
+                    "ia.ver",
+                    "ia.editar",
+                    "usuarios.ver",
+                    "usuarios.gestionar",
+                    "perfil.editar",
+                    "contrasena.cambiar"
+                ],
+                "notas_permisos": {},
+                "cuentas_total": 2,
+                "cuentas": [
+                    {
+                        "id": 1,
+                        "nombre": "Cristian A.",
+                        "detalle": "cristian@nuevastic.co",
+                        "es_tuya": true
+                    },
+                    {
+                        "id": 2,
+                        "nombre": "Luis Carlos S.",
+                        "detalle": "luis@nuevastic.co",
+                        "es_tuya": false
+                    }
+                ],
+                "aviso": null
+            },
+            {
+                "id": 2,
+                "nombre": "Empresa",
+                "descripcion": "Responde y ve los resultados de su empresa",
+                "resumen": "Responde y ve sus resultados",
+                "activo": true,
+                "del_sistema": true,
+                "permisos": [
+                    "diagnostico.responder",
+                    "resultados.ver",
+                    "resultados.pdf",
+                    "perfil.editar",
+                    "contrasena.cambiar"
+                ],
+                "notas_permisos": {
+                    "diagnostico.responder": "solo su empresa",
+                    "resultados.ver": "solo su empresa",
+                    "resultados.pdf": "solo su empresa"
+                },
+                "cuentas_total": 39,
+                "cuentas": [
+                    {
+                        "id": 4,
+                        "nombre": "Laura Gómez",
+                        "detalle": "Restaurante La Esquina",
+                        "es_tuya": false
+                    },
+                    {
+                        "id": 8,
+                        "nombre": "Andrés Rojas",
+                        "detalle": "Rojas & Asociados",
+                        "es_tuya": false
+                    },
+                    {
+                        "id": 9,
+                        "nombre": "Paola Díaz",
+                        "detalle": "Clínica Dental Sonríe",
+                        "es_tuya": false
+                    }
+                ],
+                "aviso": null
+            },
+            {
+                "id": 3,
+                "nombre": "Colaborador",
+                "descripcion": "Trabaja con la empresa, sin gestionar el equipo",
+                "resumen": "Sin gestionar equipo",
+                "activo": true,
+                "del_sistema": true,
+                "permisos": [
+                    "diagnostico.responder",
+                    "resultados.ver",
+                    "resultados.pdf",
+                    "perfil.editar",
+                    "contrasena.cambiar"
+                ],
+                "notas_permisos": {
+                    "diagnostico.responder": "solo su empresa",
+                    "resultados.ver": "solo su empresa",
+                    "resultados.pdf": "solo su empresa"
+                },
+                "cuentas_total": 3,
+                "cuentas": [
+                    {
+                        "id": 5,
+                        "nombre": "Andrés Pérez",
+                        "detalle": "Restaurante La Esquina · colaborador",
+                        "es_tuya": false
+                    },
+                    {
+                        "id": 6,
+                        "nombre": "Camila Rojas",
+                        "detalle": "Restaurante La Esquina · colaborador",
+                        "es_tuya": false
+                    },
+                    {
+                        "id": 7,
+                        "nombre": "Diego Torres",
+                        "detalle": "Restaurante La Esquina · colaborador",
+                        "es_tuya": false
+                    }
+                ],
+                "aviso": null
+            },
+            {
+                "id": 4,
+                "nombre": "Consultor",
+                "descripcion": "Acompaña a sus empresas vinculadas.",
+                "resumen": "Próxima fase",
+                "activo": false,
+                "del_sistema": false,
+                "permisos": [
+                    "empresas.ver",
+                    "diagnostico.responder",
+                    "resultados.ver",
+                    "resultados.pdf",
+                    "perfil.editar",
+                    "contrasena.cambiar"
+                ],
+                "notas_permisos": {
+                    "empresas.ver": "solo las vinculadas",
+                    "diagnostico.responder": "en nombre de la empresa"
+                },
+                "cuentas_total": 0,
+                "cuentas": [],
+                "aviso": "Disponible en la próxima fase: vincular empresas. Hasta entonces este rol queda inactivo y no se puede asignar a ninguna cuenta."
+            }
+        ],
+        "bloques": [
+            {
+                "bloque": "Diagnósticos",
+                "permisos": [
+                    {
+                        "nombre": "diagnosticos.ver",
+                        "texto": "Ver diagnósticos"
+                    },
+                    {
+                        "nombre": "diagnosticos.editar",
+                        "texto": "Editar preguntas e importancia"
+                    },
+                    {
+                        "nombre": "diagnosticos.publicar",
+                        "texto": "Publicar versiones"
+                    }
+                ]
+            },
+            {
+                "bloque": "Empresas",
+                "permisos": [
+                    {
+                        "nombre": "empresas.ver",
+                        "texto": "Ver empresas"
+                    },
+                    {
+                        "nombre": "empresas.registrar",
+                        "texto": "Registrar empresas"
+                    },
+                    {
+                        "nombre": "mediciones.asignar",
+                        "texto": "Asignar mediciones"
+                    }
+                ]
+            },
+            {
+                "bloque": "Mediciones y resultados",
+                "permisos": [
+                    {
+                        "nombre": "diagnostico.responder",
+                        "texto": "Responder el diagnóstico"
+                    },
+                    {
+                        "nombre": "resultados.ver",
+                        "texto": "Ver resultados y respuestas"
+                    },
+                    {
+                        "nombre": "resultados.pdf",
+                        "texto": "Descargar PDF"
+                    }
+                ]
+            },
+            {
+                "bloque": "Configuración IA",
+                "permisos": [
+                    {
+                        "nombre": "ia.ver",
+                        "texto": "Ver configuración"
+                    },
+                    {
+                        "nombre": "ia.editar",
+                        "texto": "Editar prompts"
+                    }
+                ]
+            },
+            {
+                "bloque": "Usuarios y roles",
+                "permisos": [
+                    {
+                        "nombre": "usuarios.ver",
+                        "texto": "Ver usuarios"
+                    },
+                    {
+                        "nombre": "usuarios.gestionar",
+                        "texto": "Gestionar usuarios y roles"
+                    }
+                ]
+            },
+            {
+                "bloque": "Su cuenta",
+                "permisos": [
+                    {
+                        "nombre": "perfil.editar",
+                        "texto": "Editar su perfil"
+                    },
+                    {
+                        "nombre": "contrasena.cambiar",
+                        "texto": "Cambiar su contraseña"
+                    }
+                ]
+            }
+        ],
+        "cuentas": [
+            {
+                "id": 1,
+                "nombre": "Cristian A.",
+                "correo": "cristian@nuevastic.co",
+                "rol": "Administrador",
+                "empresa": null,
+                "es_principal": false,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": true
+            },
+            {
+                "id": 2,
+                "nombre": "Luis Carlos S.",
+                "correo": "luis@nuevastic.co",
+                "rol": "Administrador",
+                "empresa": null,
+                "es_principal": false,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 3,
+                "nombre": "Valentina Ortiz",
+                "correo": "valentina@nuevastic.co",
+                "rol": "Administrador",
+                "empresa": null,
+                "es_principal": false,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "invitacion",
+                "invitacion_enviada_en": "2026-09-29T10:00:00-05:00",
+                "es_tuya": false
+            },
+            {
+                "id": 4,
+                "nombre": "Laura Gómez",
+                "correo": "laura@laesquina.co",
+                "rol": "Empresa",
+                "empresa": "Restaurante La Esquina",
+                "es_principal": true,
+                "colaboradores_activos": 2,
+                "medicion_pendiente": "Medición 4 no iniciada (vence el 20 oct)",
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 5,
+                "nombre": "Andrés Pérez",
+                "correo": "andres@laesquina.co",
+                "rol": "Colaborador",
+                "empresa": "Restaurante La Esquina",
+                "es_principal": false,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 6,
+                "nombre": "Camila Rojas",
+                "correo": "camila@laesquina.co",
+                "rol": "Colaborador",
+                "empresa": "Restaurante La Esquina",
+                "es_principal": false,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 7,
+                "nombre": "Diego Torres",
+                "correo": "diego@laesquina.co",
+                "rol": "Colaborador",
+                "empresa": "Restaurante La Esquina",
+                "es_principal": false,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "desactivada",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 8,
+                "nombre": "Andrés Rojas",
+                "correo": "andres@rojasasociados.co",
+                "rol": "Empresa",
+                "empresa": "Rojas & Asociados",
+                "es_principal": true,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": "Medición 5 en curso (8/10)",
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 9,
+                "nombre": "Paola Díaz",
+                "correo": "gerencia@sonrie.co",
+                "rol": "Empresa",
+                "empresa": "Clínica Dental Sonríe",
+                "es_principal": true,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 10,
+                "nombre": "Julián Mora",
+                "correo": "info@casaverde.co",
+                "rol": "Empresa",
+                "empresa": "Hostal Casa Verde",
+                "es_principal": true,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "desactivada",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 11,
+                "nombre": "Camila Ruiz",
+                "correo": "hola@rutaandina.co",
+                "rol": "Empresa",
+                "empresa": "Ruta Andina Tours",
+                "es_principal": true,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": "Medición 1 no iniciada",
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 12,
+                "nombre": "Marco Luigi",
+                "correo": "marco@donluigi.co",
+                "rol": "Empresa",
+                "empresa": "Pizzería Don Luigi",
+                "es_principal": true,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": "Medición 1 no iniciada",
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 13,
+                "nombre": "Sofía Herrera",
+                "correo": "sofia@gomezabogados.co",
+                "rol": "Empresa",
+                "empresa": "Gómez Abogados",
+                "es_principal": true,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 14,
+                "nombre": "Mateo Vargas",
+                "correo": "mateo@vital.co",
+                "rol": "Empresa",
+                "empresa": "Centro Médico Vital",
+                "es_principal": true,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": null,
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            },
+            {
+                "id": 15,
+                "nombre": "Natalia Cruz",
+                "correo": "natalia@horizonte.co",
+                "rol": "Empresa",
+                "empresa": "Inmobiliaria Horizonte",
+                "es_principal": true,
+                "colaboradores_activos": 0,
+                "medicion_pendiente": "Medición 3 en curso (2/10)",
+                "estado": "activa",
+                "invitacion_enviada_en": null,
+                "es_tuya": false
+            }
+        ],
+        "rolId": 4
+    }
+}

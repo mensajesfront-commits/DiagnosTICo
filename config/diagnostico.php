@@ -12,11 +12,11 @@ return [
     ],
 
     /*
-    | Contraseña de las cuentas de demostración (DemoSeeder). Sin valor, el
-    | seeder genera una y la muestra en la terminal.
+    | Días que una cuenta eliminada se puede recuperar antes de que la tarea
+    | diaria `cuentas:purgar` la borre para siempre (DEC-017).
     */
-    'demo' => [
-        'password' => env('DEMO_PASSWORD'),
+    'eliminacion' => [
+        'dias' => (int) env('DIAS_PARA_RECUPERAR_CUENTA', 90),
     ],
 
 ];
