@@ -463,7 +463,7 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `id` | bigint | Sí | `9` | |
 | `empresa_id` | bigint → `empresas.id` | Sí | `1` | Se borra con la empresa (al borrarla para siempre, DEC-017) |
 | `version_diagnostico_id` | bigint → `versiones_diagnostico.id` | Sí | `5` | La versión congelada que se responde, nunca el borrador |
-| `numero` | smallint | Sí, único por empresa | `2` | "Medición 2" |
+| `numero` | smallint | Sí, único por empresa entre las no canceladas | `2` | "Medición 2". Índice parcial `mediciones_empresa_numero_activas` (`where estado <> 'cancelada'`): la que reemplaza a una pendiente toma su mismo número (A3.1c) |
 | `estado` | varchar(20) | Sí (por defecto `no_iniciada`) | `en_curso` | `no_iniciada`, `en_curso`, `enviada`, `terminada`, `vencida`, `cancelada` (RN-015) |
 | `fecha_limite` | date | No | `2026-11-15` | |
 | `mensaje` | text | No | `Por favor respondan antes del cierre de mes.` | Va en el correo de aviso |

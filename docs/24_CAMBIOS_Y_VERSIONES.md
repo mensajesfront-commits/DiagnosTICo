@@ -27,6 +27,17 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Colaboradores de la empresa (E12, E12.1–E12.3): lista, agregar, datos para compartir, cambiar contraseña, desactivar y reactivar. Conectado al backend (`ColaboradoresController`): solo la cuenta principal entra; cambiar la contraseña o desactivar cierra las sesiones del colaborador.
 - Documentos 02 (visión y objetivos), 04 (stakeholders), 06 (requisitos no funcionales), 09 (flujos, con el diagrama de secuencia de la medición) y 10 (arquitectura).
 
+### Agregado (Empresas, 11 de octubre)
+
+- **A3 · Empresas:** lista con búsqueda, filtros (sector, nivel, cuenta y medición) y paginado por filas que caben.
+- **A3.1 · Ficha:** último puntaje, variación, gráfica de evolución con franjas de nivel, mediciones, la pendiente con "Cambiar fecha" y "Cancelar medición", y "Asignar otra medición".
+- **A3.1d · Datos de la cuenta** y **A3.1f · Desactivar / Reactivar** (nadie de la empresa entra; se conservan sus mediciones).
+- **A3.2 · Registrar empresa:** la empresa y su usuario principal, con invitación para crear la contraseña y la primera medición opcional.
+- **A3.1b · Asignar medición** con buscador, borradores visibles pero bloqueados, vista previa "Así lo verá la empresa", aviso por correo y **A3.1c** para reemplazar la pendiente.
+- A1: "Nueva fecha", "Cancelar" y "Asignar nueva" conectadas.
+- Backend: `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion`, `Invitaciones`, notificaciones `AvisoMedicion` y `EmpresaDesactivada`.
+- El número de medición es único por empresa solo entre las no canceladas (índice parcial): la que reemplaza toma el mismo número.
+
 ### Agregado (modelo de datos y backend de A2, 8 de octubre)
 
 - Migraciones, modelos y fábricas de todo el MER (T-045, T-058): categorías, diagnósticos, sus categorías con importancia, preguntas, opciones, versiones congeladas en JSONB, mediciones, respuestas, análisis de la IA, resultados, solicitudes de medición, prompts, plantilla de correo y registro de "Ver como".

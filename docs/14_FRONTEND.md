@@ -153,7 +153,8 @@ Ruta: `GET /inicio` (`InicioController@administrador`, datos de `App\Support\Dat
 
 - Pestañas Todas · En curso · No iniciadas · Vencidas · Terminadas con su contador (HU-007); "Enviada" cuenta como en curso.
 - Página fija en pantallas grandes; la tabla va paginada con las filas que caben (`useFilasQueCaben` en `lib/paginacion.ts`, que también usa A2).
-- **[FUNCIONALIDAD POR DEFINIR]** Las acciones (Recordatorio, Reenviar aviso, Nueva fecha, Cancelar, Ver resultado, Asignar nueva) abren los modales A1b–A1e, que llegan con Empresas (A3). Por ahora llevan a la ficha de la empresa (`/empresas/{id}`).
+- Acciones: "Nueva fecha" (A1d) y "Cancelar" abren su modal en la misma tabla (`ModalCambiarFecha`, `ModalCancelarMedicion`); "Asignar nueva" (A1e) abre A3.1b con la empresa elegida.
+- **[FUNCIONALIDAD POR DEFINIR]** "Recordatorio" y "Reenviar aviso" (A1b, A1c) abren el correo de la medición (A3.1e, HU-037), y "Ver resultado" abre A3.3 (HU-038). Mientras llegan, llevan a la ficha de la empresa (`/empresas/{id}`).
 - **[FUNCIONALIDAD POR DEFINIR]** "Último aviso" muestra el aviso de la asignación: todavía no se registran los avisos reenviados (PA-004).
 
 ### A2 / A2·T / A2b · Diagnósticos (`diagnosticos/Index`)
@@ -207,6 +208,52 @@ Ruta prevista: `GET /diagnosticos/crear?sector={id}`.
 | `publicados` | `DiagnosticoPublicado[]` | Última versión publicada de cada diagnóstico, de todos los sectores, con los nombres de sus categorías. |
 
 Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1; mientras no exista el editor (A2.1, semana 4) vuelve a A2 con un aviso.
+
+### A3 · Empresas (`empresas/Index`)
+
+Ruta: `GET /empresas` (`EmpresasController@index`, datos de `App\Support\DatosEmpresas::lista()`). Tipos en `types/empresas.ts`.
+
+| Prop | Tipo | Nota |
+|---|---|---|
+| `empresas` | `FilaEmpresa[]` | Por nombre. Último puntaje y nivel (`sin` si no tiene), variación frente a la anterior (RN-020), mediciones terminadas, la pendiente con su estado y avance, y si la cuenta está activa |
+| `sectores` | `{ id, nombre }[]` | Para el filtro |
+| `sectorInicial` | `number \| null` | `?sector=` desde A2 ("Ver en Empresas") |
+
+- Buscar por nombre (sin tildes ni mayúsculas) y filtros Sector, Nivel, Cuenta y Medición (No iniciada, En curso —incluye Enviada—, Vencida, Sin medición pendiente).
+- Página fija; la tabla va paginada con las filas que caben. Sin resultados, "Quitar filtros".
+- Arriba, "Asignar medición" (A3.1b) y "+ Registrar empresa" (A3.2).
+
+### A3.1 · Ficha de la empresa (`empresas/Ver`)
+
+Ruta: `GET /empresas/{empresa}` (`EmpresasController@ver`, `DatosEmpresas::ficha()` + `opciones()`). Props en el tipo `FichaEmpresa`.
+
+- **Historial:** tarjetas Último puntaje, Variación (desde la 2.ª) y Medición pendiente; gráfica `graficas/EvolucionPuntaje.vue` (línea con las franjas de nivel y el puntaje sobre cada punto); tabla de mediciones paginada; a la derecha la pendiente con "Cambiar fecha" y "Cancelar medición", y "Asignar otra medición" (formulario corto; si hay pendiente, confirma el reemplazo con `ModalReemplazarMedicion`, A3.1c).
+- **Datos de la cuenta (A3.1d):** `components/empresas/CamposEmpresa.vue` (el mismo de A3.2), "Estado de la cuenta" (estado, registro, último acceso, mediciones y colaboradores en solo lectura) y "Acciones": Ver como, Asignar medición, Desactivar cuenta (`ModalDesactivarEmpresa`, A3.1f) o Reactivar. `?pestana=cuenta` abre esta pestaña.
+- **Consultores:** "Próximamente" (rol aplazado).
+- **[FUNCIONALIDAD POR DEFINIR]** "Ver resultado" (A3.3, HU-038) aparece sin enlace hasta que exista Resultados.
+
+### A3.2 · Registrar empresa (`empresas/Registrar`)
+
+Ruta: `GET /empresas/registrar`; envía `POST /empresas`. Prop `opciones: OpcionesEmpresa` (sectores con sus actividades CIIU y diagnósticos publicados, los 18 países y los rangos de empleados).
+
+- Campos de la empresa (con actividad CIIU y país → departamento → ciudad, DEC-015 y DEC-016) y del usuario principal, sin contraseña: le llega el enlace para crearla (RN-006).
+- "Asignar la primera medición al registrar" (opcional): diagnóstico publicado del sector y fecha límite.
+- A la derecha, "Qué pasa al registrar".
+
+### A3.1b · Asignar medición (`mediciones/Asignar`)
+
+Ruta: `GET /mediciones/asignar` (con `?empresa=` llega elegida); envía `POST /mediciones` con `empresa_id`, `diagnostico_id`, `fecha_limite`, `mensaje`, `aviso` y `reemplazar`.
+
+| Prop | Tipo | Nota |
+|---|---|---|
+| `empresas` | `EmpresaAsignable[]` | Solo activas; con su pendiente (id, estado, vence, diagnóstico, si tiene respuestas) y el número que tendrá la nueva |
+| `diagnosticos` | `Record<sectorId, { publicados, borradores }>` | Los borradores se ven pero no se eligen (CA-004) |
+| `empresaInicial` | `number \| null` | |
+
+- Buscador de empresa (`components/empresas/BuscadorEmpresa.vue`) con su sector y su pendiente.
+- "Así lo verá la empresa": la tarjeta de su inicio con el mensaje y la fecha (CA-005).
+- Con pendiente: aviso, y al asignar `ModalReemplazarMedicion` (A3.1c). Si está vencida, también "dale una nueva fecha" (HU-009).
+- **[FUNCIONALIDAD POR DEFINIR]** "Ver y editar el correo" (A3.1e, HU-037). Por ahora el aviso sale con el texto de `AvisoMedicion` y el mensaje escrito aquí.
 
 ### A5 · Usuarios y roles: pestaña Usuarios (`usuarios/Index`)
 

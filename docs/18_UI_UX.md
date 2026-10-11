@@ -68,7 +68,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha y conectada (dos pasos, DEC-015 y DEC-016) |
 | L3 | ¿Olvidaste tu contraseña? | `pages/auth/ForgotPassword.vue` | Hecha |
 | L4 | Crea una contraseña nueva | `pages/auth/ResetPassword.vue` | Hecha |
-| A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada. Las acciones de la tabla (A1b–A1e) llegan con Empresas (A3) |
+| A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada. "Nueva fecha", "Cancelar" y "Asignar nueva" conectadas; Recordatorio y Reenviar aviso esperan A3.1e |
 | A2 | Diagnósticos de un sector | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2·T | Todos los diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2b | Sector sin diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
@@ -83,6 +83,14 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.3b | Crear / editar categoría | `components/categorias/ModalCategoria.vue` | Hecha |
 | A2.3c | Archivar o eliminar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Eliminar no tiene wireframe, sale de HU-019. |
 | A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha y conectada |
+| A3 | Empresas: búsqueda, filtros y tabla paginada | `pages/empresas/Index.vue` | Hecha y conectada |
+| A3.1 | Ficha de la empresa: Historial y gráfica de evolución | `pages/empresas/Ver.vue`, `components/graficas/EvolucionPuntaje.vue` | Hecha y conectada ("Ver resultado" espera A3.3) |
+| A3.1b | Asignar medición, con vista previa | `pages/mediciones/Asignar.vue`, `components/empresas/BuscadorEmpresa.vue` | Hecha y conectada ("Ver y editar el correo" espera A3.1e) |
+| A3.1c | Reemplazar la medición pendiente | `components/empresas/ModalReemplazarMedicion.vue` | Hecha |
+| — | Cambiar fecha / Cancelar medición | `ModalCambiarFecha.vue`, `ModalCancelarMedicion.vue` | Hechas. Sin wireframe propio, salen de A3.1 y HU-009 |
+| A3.1d | Datos de la cuenta | `pages/empresas/Ver.vue`, `components/empresas/CamposEmpresa.vue` | Hecha y conectada |
+| A3.1f | Desactivar cuenta de la empresa | `components/empresas/ModalDesactivarEmpresa.vue` | Hecha |
+| A3.2 | Registrar empresa | `pages/empresas/Registrar.vue` | Hecha y conectada |
 | A5 | Usuarios: lista con búsqueda, filtros y acciones | `pages/usuarios/Index.vue` | Hecha y conectada |
 | A5.1, A5.1b, A5.1e | Roles del sistema (Administrador, Empresa, Colaborador) | `pages/usuarios/Roles.vue`, `components/usuarios/PanelRol.vue` | Hecha y conectada |
 | A5.1c | Editar un rol creado | `components/usuarios/PanelRol.vue` | Hecha y conectada |
@@ -131,3 +139,10 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | E12 | Sin colaboradores, la tabla muestra un mensaje y el botón para crear. | HU-076 CA-004. |
 | E12.2 | También se abre después de cambiar una contraseña (E12.3), con "Contraseña cambiada para…". | HU-078: "guardo y comparto la nueva contraseña". |
 | A5 | "Quitar rol" (HU-052) no está. | Cada cuenta tiene un solo rol (RN-027); se cambia con "Cambiar rol". **[FUNCIONALIDAD POR DEFINIR]** qué rol queda al "quitar". |
+| A3.1, A3.1b, A3.2 | Sin migas "Empresas › …": arriba va la flecha "← Empresas" (o "← Ficha de la empresa"). | Pedido del equipo para volver (A2). Así la página no se desplaza. |
+| A3.1d, A3.2 | Agregan actividad económica (subsector CIIU), departamento y descripción corta. Los obligatorios llevan asterisco. | DEC-015, DEC-016 y el pedido del 8 de octubre. |
+| A3.1 | Los colaboradores se ven en Datos de la cuenta, al pulsar "N activos" en Estado de la cuenta. "Ver historial completo" no aparece. | HU-033 CA-003 pide verlos; el wireframe solo muestra el número. A3.4 llega con Resultados. |
+| A3.1 | La gráfica no tiene el selector "Ver: Puntaje total". | **[FUNCIONALIDAD POR DEFINIR]** Ver por categoría necesita los resultados por categoría (semana 5). |
+| A3.1b | Sin "unos 25 minutos" en cada diagnóstico. | **[INFORMACIÓN PENDIENTE]** No hay una regla para estimar el tiempo. |
+| A1d | "Nueva fecha" abre un modal en la misma tabla, en vez de llevar a A3.1b. La medición conserva sus respuestas. | Menos pasos. HU-009 CA-002 se cumple igual; A3.1b también ofrece "dale una nueva fecha". |
+| A3.1d | Al cambiar el correo no se envía enlace de verificación: se guarda y se cierran sus sesiones. | DEC-012 (verificación quitada). |

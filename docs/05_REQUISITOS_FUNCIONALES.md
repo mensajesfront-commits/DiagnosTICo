@@ -9778,10 +9778,10 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-003 — Recuperar mi contraseña | RF-003 | Hecha |
 | HU-004 — Crear una contraseña nueva | RF-003 | Hecha |
 | HU-005 — Cerrar sesión | RF-004 | Hecha |
-| HU-006 — Ver el inicio con indicadores | RF-005 | Hecha (la ficha A3.1 llega con Empresas) |
+| HU-006 — Ver el inicio con indicadores | RF-005 | Hecha |
 | HU-007 — Filtrar las mediciones por estado | RF-005 | Hecha |
 | HU-008 — Recordar o reenviar el aviso | RF-006 | Pendiente |
-| HU-009 — Dar una nueva fecha a una medición vencida | RF-007 | Pendiente |
+| HU-009 — Dar una nueva fecha a una medición vencida | RF-007 | Hecha ("Nueva fecha" abre un modal en A1 y en la ficha; A3.1b también la ofrece) |
 | HU-010 — Ver los diagnósticos de un sector | RF-008 | Hecha |
 | HU-011 — Ver todos los diagnósticos | RF-008 | Hecha |
 | HU-012 — Crear un sector | RF-009 | Hecha |
@@ -9803,12 +9803,12 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-028 — Ver la vista previa y el estado | RF-014 | Pendiente |
 | HU-029 — Publicar una versión | RF-014 | Pendiente |
 | HU-030 — Ver un resultado de ejemplo | RF-015 | Pendiente |
-| HU-031 — Ver la lista de empresas | RF-016 | Pendiente |
-| HU-032 — Registrar una empresa | RF-017 | Pendiente |
-| HU-033 — Ver la ficha e historial de una empresa | RF-016 | Pendiente |
-| HU-034 — Editar los datos de la cuenta de una empresa | RF-017 | Pendiente |
-| HU-035 — Desactivar o reactivar la cuenta de una empresa | RF-017 | Pendiente |
-| HU-036 — Asignar una medición | RF-018 | Pendiente |
+| HU-031 — Ver la lista de empresas | RF-016 | Hecha |
+| HU-032 — Registrar una empresa | RF-017 | Hecha |
+| HU-033 — Ver la ficha e historial de una empresa | RF-016 | Hecha |
+| HU-034 — Editar los datos de la cuenta de una empresa | RF-017 | Hecha |
+| HU-035 — Desactivar o reactivar la cuenta de una empresa | RF-017 | Hecha |
+| HU-036 — Asignar una medición | RF-018 | Hecha (editar el correo, CA-006, llega con HU-037) |
 | HU-037 — Editar el correo de aviso de la medición | RF-006 | Pendiente |
 | HU-038 — Ver el resultado de una empresa | RF-019 | Pendiente |
 | HU-039 — Ver el historial de una empresa | RF-019 | Pendiente |

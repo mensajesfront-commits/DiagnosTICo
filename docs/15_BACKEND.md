@@ -12,13 +12,13 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 |---|---|---|---|---|---|
 | Acceso | `/login`, `/register`, `/forgot-password`, `/reset-password` | Fortify (`FortifyServiceProvider`, `CreateNewUser`) | Invitado + límite de intentos | L1–L4 | Hecho |
 | Ubicaciones | `/ubicaciones/{pais}` | `UbicacionesController` | Pública, 60 por minuto | L2, A6, E11 | Hecho |
-| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | A1 hecha (sin las acciones A1b–A1e); E1 en la semana 6 |
+| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | A1 hecha (Recordatorio y Reenviar aviso esperan A3.1e); E1 en la semana 6 |
 | Mi perfil | `/mi-perfil`, `/imagenes/{tipo}/{id}` | `PerfilController` | `auth` | A6, E11 | Hecho |
 | Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.2, A2.5, A2.7 | Hecho; editor A2.1 y vista previa A2.4 en semana 4 |
 | Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
 | Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho ("Ver como" en semana 6) |
 | Colaboradores | `/colaboradores` | `ColaboradoresController` | `role:Empresa` + cuenta principal | E12 | Hecho |
-| Empresas y mediciones | `/empresas` | `EmpresasController`, `MedicionesController` (por crear) | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1–A3.5 | Semanas 4–5 |
+| Empresas y mediciones | `/empresas`, `/mediciones` | `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion` | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1, A3.1b–A3.1d, A3.1f, A3.2 | Hecho; A3.1e (correo), A3.3–A3.5 con Resultados |
 | Responder medición | `/mediciones/{id}` | `ResponderController` (por crear) | `diagnostico.responder` + su empresa | E2–E4 | Semana 5 |
 | Resultados | `/resultados/{id}`, `/resultados/{id}/pdf` | `ResultadosController` (por crear) | `resultados.ver`, `resultados.pdf` + su empresa (o cualquier empresa si es interna) | E5, E6, A3.3 | Semana 5 |
 | Configuración de la IA | `/configuracion-ia` | `PromptsController` (por crear) | `ia.ver` / `ia.editar` | A4, A4.1–A4.4 | Semana 5 |
@@ -188,6 +188,31 @@ Reglas que valida el servidor:
 - Un colaborador de **otra empresa** da 404; la propia cuenta principal, 403.
 - Correo en minúsculas y único (RN-002); contraseña con `Password::default()` (RN-001), sin confirmación.
 - La contraseña nunca vuelve al navegador: E12.2 muestra lo que la empresa escribió.
+
+## Empresas y mediciones (A3, hecho)
+
+`EmpresasController` y `MedicionesController`; datos de `App\Support\DatosEmpresas` y la regla de asignar en `App\Services\Mediciones\AsignarMedicion`. Pruebas en `tests/Feature/EmpresasTest.php`.
+
+| Método | URL | Nombre | Permiso | Qué hace |
+|---|---|---|---|---|
+| GET | `/empresas` | `empresas.index` | `empresas.ver` | A3 · lista |
+| GET | `/empresas/{empresa}` | `empresas.ver` | `empresas.ver` | A3.1 · ficha |
+| GET | `/empresas/registrar` | `empresas.crear` | `empresas.registrar` | A3.2 |
+| POST | `/empresas` | `empresas.guardar` | `empresas.registrar` | Crea la empresa y su usuario principal (rol Empresa, sin contraseña) y le envía la invitación (`Invitaciones::enviar`, RN-006). Si se pide, asigna la primera medición en la misma transacción |
+| PUT | `/empresas/{empresa}` | `empresas.actualizar` | `empresas.registrar` | A3.1d · datos de la empresa y del usuario principal. Cambiar el sector no toca las mediciones; si cambia el correo, cierra sus sesiones |
+| POST | `/empresas/{empresa}/desactivar` | `empresas.desactivar` | `empresas.registrar` | A3.1f · empresa y cuenta principal inactivas, cierra las sesiones de todos sus usuarios; motivo y aviso (`EmpresaDesactivada`) opcionales |
+| POST | `/empresas/{empresa}/reactivar` | `empresas.reactivar` | `empresas.registrar` | Vuelve a activar empresa y cuenta principal |
+| GET | `/mediciones/asignar` | `mediciones.crear` | `mediciones.asignar` | A3.1b (`?empresa=`) |
+| POST | `/mediciones` | `mediciones.guardar` | `mediciones.asignar` | Asigna. Si hay una pendiente, sin `reemplazar` responde un error en `reemplazar`; con `reemplazar` la cancela y la nueva toma su número (A3.1c) |
+| POST | `/mediciones/{medicion}/cancelar` | `mediciones.cancelar` | `mediciones.asignar` | Cancela la pendiente (no enviada) |
+| PUT | `/mediciones/{medicion}/fecha` | `mediciones.fecha` | `mediciones.asignar` | Nueva fecha (HU-009); una vencida vuelve a en curso o no iniciada |
+
+Reglas de `AsignarMedicion` (RN-014):
+
+- Solo diagnósticos **publicados** del **sector de la empresa**, y solo a empresas activas.
+- Una pendiente por empresa (`no_iniciada`, `en_curso`, `enviada`, `vencida`). Reemplazar la marca `cancelada`, guarda `reemplazada_por` y da por atendidas sus solicitudes abiertas.
+- La medición nueva toma el número de la que reemplaza, o el siguiente.
+- Con `aviso`, notifica al usuario principal (`AvisoMedicion`). **[FUNCIONALIDAD POR DEFINIR]** Editar el correo (A3.1e) y mandarlo a la cola.
 
 ## Otras secciones del menú (rutas previstas)
 
