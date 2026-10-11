@@ -25,6 +25,9 @@ use Illuminate\Support\Carbon;
  * @property string|null $numero_empleados
  * @property string|null $logo_ruta
  * @property bool $activa
+ * @property Carbon|null $desactivada_en
+ * @property string|null $motivo_desactivacion
+ * @property int|null $registrada_por
  * @property Carbon|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at

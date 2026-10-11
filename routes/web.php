@@ -3,7 +3,9 @@
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ColaboradoresController;
 use App\Http\Controllers\DiagnosticosController;
+use App\Http\Controllers\EmpresasController;
 use App\Http\Controllers\InicioController;
+use App\Http\Controllers\MedicionesController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
@@ -56,6 +58,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('categorias/{categoria}/archivar', [CategoriasController::class, 'archivar'])->name('categorias.archivar');
         Route::post('categorias/{categoria}/restaurar', [CategoriasController::class, 'restaurar'])->name('categorias.restaurar');
         Route::delete('categorias/{categoria}', [CategoriasController::class, 'destroy'])->name('categorias.destroy');
+    });
+
+    // A3 · Empresas y mediciones (docs/15_BACKEND.md). Ver: empresas.ver;
+    // registrar, editar, desactivar: empresas.registrar; mediciones:
+    // mediciones.asignar (docs/17_SEGURIDAD.md).
+    Route::middleware('permission:empresas.registrar')->group(function () {
+        Route::get('empresas/registrar', [EmpresasController::class, 'crear'])->name('empresas.crear');
+        Route::post('empresas', [EmpresasController::class, 'guardar'])->name('empresas.guardar');
+        Route::put('empresas/{empresa}', [EmpresasController::class, 'actualizar'])->name('empresas.actualizar');
+        Route::post('empresas/{empresa}/desactivar', [EmpresasController::class, 'desactivar'])->name('empresas.desactivar');
+        Route::post('empresas/{empresa}/reactivar', [EmpresasController::class, 'reactivar'])->name('empresas.reactivar');
+    });
+
+    Route::middleware('permission:empresas.ver')->group(function () {
+        Route::get('empresas', [EmpresasController::class, 'index'])->name('empresas.index');
+        Route::get('empresas/{empresa}', [EmpresasController::class, 'ver'])->whereNumber('empresa')->name('empresas.ver');
+    });
+
+    Route::middleware('permission:mediciones.asignar')->group(function () {
+        Route::get('mediciones/asignar', [MedicionesController::class, 'crear'])->name('mediciones.crear');
+        Route::post('mediciones', [MedicionesController::class, 'guardar'])->name('mediciones.guardar');
+        Route::post('mediciones/{medicion}/cancelar', [MedicionesController::class, 'cancelar'])->name('mediciones.cancelar');
+        Route::put('mediciones/{medicion}/fecha', [MedicionesController::class, 'cambiarFecha'])->name('mediciones.fecha');
     });
 
     // A5 · Usuarios y roles (docs/15_BACKEND.md). Ver: usuarios.ver;

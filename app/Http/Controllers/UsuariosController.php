@@ -4,17 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Empresa;
 use App\Models\User;
-use App\Notifications\InvitacionCuenta;
 use App\Notifications\RolCambiado;
 use App\Support\DatosUsuarios;
 use App\Support\Fechas;
+use App\Support\Invitaciones;
 use Carbon\CarbonInterface;
-use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -290,11 +288,6 @@ class UsuariosController extends Controller
 
     private function enviarInvitacion(User $usuario, string $rol, ?string $mensaje, ?string $invitadaPor): void
     {
-        /** @var PasswordBroker $broker */
-        $broker = Password::broker();
-        $token = $broker->createToken($usuario);
-
-        $usuario->notify(new InvitacionCuenta($token, $rol, $mensaje, $invitadaPor));
-        $usuario->forceFill(['invitacion_enviada_en' => now()])->save();
+        Invitaciones::enviar($usuario, $rol, $mensaje, $invitadaPor);
     }
 }
