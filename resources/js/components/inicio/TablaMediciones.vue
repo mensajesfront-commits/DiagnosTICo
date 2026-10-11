@@ -6,16 +6,23 @@
  * Paginada con las filas que caben en su espacio (la página no se
  * desplaza). Vuelve a la página 1 al cambiar de pestaña.
  *
- * [FUNCIONALIDAD POR DEFINIR] Las acciones (Recordatorio, Reenviar aviso,
- * Nueva fecha, Cancelar, Ver resultado, Asignar nueva) abren sus modales
- * A1b–A1e, que llegan con Empresas (A3). Por ahora llevan a la ficha de la
- * empresa (A3.1), donde vivirán esas acciones.
+ * Acciones:
+ * - Vencida: "Nueva fecha" (A1d, HU-009) y "Cancelar" (A3.1c) abren su
+ *   modal aquí mismo; la medición conserva sus respuestas.
+ * - Terminada sin otra pendiente: "Asignar nueva" abre A3.1b con la empresa
+ *   elegida (A1e).
+ *
+ * [FUNCIONALIDAD POR DEFINIR] "Recordatorio" y "Reenviar aviso" (A1b, A1c)
+ * abren el correo de la medición (A3.1e, HU-037), y "Ver resultado" abre
+ * A3.3 (HU-038). Mientras llegan, llevan a la ficha de la empresa (A3.1).
  */
 import { Link } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import EtiquetaEstado from '@/components/base/EtiquetaEstado.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import Paginacion from '@/components/base/Paginacion.vue';
+import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
+import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
 import { diaYMes, fechaLocal, haceCuanto } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
@@ -45,27 +52,60 @@ const porcentaje = (f: FilaMedicion) =>
         ? Math.round((f.avance.hechas / f.avance.total) * 100)
         : 0;
 
-type Accion = { texto: string; peligro?: boolean };
+/** Con `href` es un enlace; sin él, abre el modal `modal`. */
+type Accion = {
+    texto: string;
+    peligro?: boolean;
+    href?: string;
+    modal?: 'fecha' | 'cancelar';
+};
 
 function acciones(f: FilaMedicion): Accion[] {
+    const ficha = rutas.empresas.ver(f.empresa_id);
+
     switch (f.estado) {
         case 'vencida':
             return [
-                { texto: 'Nueva fecha' },
-                { texto: 'Cancelar', peligro: true },
+                { texto: 'Nueva fecha', modal: 'fecha' },
+                { texto: 'Cancelar', peligro: true, modal: 'cancelar' },
             ];
         case 'en_curso':
-            return [{ texto: 'Recordatorio' }];
+            return [{ texto: 'Recordatorio', href: ficha }];
         case 'no_iniciada':
-            return [{ texto: 'Reenviar aviso' }];
+            return [{ texto: 'Reenviar aviso', href: ficha }];
         case 'terminada':
             return f.pendiente_numero
-                ? [{ texto: 'Ver resultado' }]
-                : [{ texto: 'Ver resultado' }, { texto: 'Asignar nueva' }];
+                ? [{ texto: 'Ver resultado', href: ficha }]
+                : [
+                      { texto: 'Ver resultado', href: ficha },
+                      {
+                          texto: 'Asignar nueva',
+                          href: rutas.mediciones.asignar(f.empresa_id),
+                      },
+                  ];
         default:
             return [];
     }
 }
+
+// --- Modales de la vencida -------------------------------------------------------
+const elegida = ref<FilaMedicion | null>(null);
+const modalFecha = ref(false);
+const modalCancelar = ref(false);
+
+function abrir(f: FilaMedicion, modal: 'fecha' | 'cancelar'): void {
+    elegida.value = f;
+    modalFecha.value = modal === 'fecha';
+    modalCancelar.value = modal === 'cancelar';
+}
+
+const claseAccion = (a: Accion) =>
+    cn(
+        'underline underline-offset-2',
+        a.peligro
+            ? 'text-tinta hover:text-aviso'
+            : 'text-marca hover:text-marca-hover',
+    );
 
 function nota(f: FilaMedicion): string | null {
     switch (f.estado) {
@@ -204,20 +244,20 @@ const columnas = ['Empresa', 'Asignada', 'Vence', 'Estado', 'Acción'];
                                         >·</span
                                     >
                                     <Link
-                                        :href="
-                                            rutas.empresas.ver(fila.empresa_id)
-                                        "
-                                        :class="
-                                            cn(
-                                                'underline underline-offset-2',
-                                                accion.peligro
-                                                    ? 'text-tinta hover:text-aviso'
-                                                    : 'text-marca hover:text-marca-hover',
-                                            )
-                                        "
+                                        v-if="accion.href"
+                                        :href="accion.href"
+                                        :class="claseAccion(accion)"
                                     >
                                         {{ accion.texto }}
                                     </Link>
+                                    <button
+                                        v-else-if="accion.modal"
+                                        type="button"
+                                        :class="claseAccion(accion)"
+                                        @click="abrir(fila, accion.modal)"
+                                    >
+                                        {{ accion.texto }}
+                                    </button>
                                 </template>
                             </p>
                             <p
@@ -239,5 +279,21 @@ const columnas = ['Empresa', 'Asignada', 'Vence', 'Estado', 'Acción'];
             :total="total"
             :paginas="paginas"
         />
+
+        <template v-if="elegida">
+            <ModalCambiarFecha
+                v-model:abierto="modalFecha"
+                :medicion="elegida"
+                :empresa="elegida.empresa"
+            />
+            <ModalCancelarMedicion
+                v-model:abierto="modalCancelar"
+                :medicion="{
+                    ...elegida,
+                    tiene_respuestas: elegida.ultimo_avance !== null,
+                }"
+                :empresa="elegida.empresa"
+            />
+        </template>
     </div>
 </template>

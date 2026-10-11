@@ -72,5 +72,19 @@ export const rutas = {
         lista: (sectorId?: number) =>
             sectorId ? `/empresas?sector=${sectorId}` : '/empresas',
         ver: (id: number) => `/empresas/${id}`,
+        crear: () => '/empresas/registrar',
+        guardar: () => '/empresas',
+        actualizar: (id: number) => `/empresas/${id}`,
+        desactivar: (id: number) => `/empresas/${id}/desactivar`,
+        reactivar: (id: number) => `/empresas/${id}/reactivar`,
+    },
+    mediciones: {
+        asignar: (empresaId?: number) =>
+            empresaId
+                ? `/mediciones/asignar?empresa=${empresaId}`
+                : '/mediciones/asignar',
+        guardar: () => '/mediciones',
+        cancelar: (id: number) => `/mediciones/${id}/cancelar`,
+        fecha: (id: number) => `/mediciones/${id}/fecha`,
     },
 };
