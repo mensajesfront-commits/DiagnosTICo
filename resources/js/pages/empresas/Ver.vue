@@ -25,9 +25,8 @@
  * La pendiente también tiene "Enviar recordatorio" o "Reenviar aviso" con su
  * último aviso (A3.1e, HU-008).
  *
- * "Ver resultado" abre A3.3 (HU-038).
- *
- * [FUNCIONALIDAD POR DEFINIR] "Ver historial completo" (A3.4, HU-039).
+ * "Ver resultado" abre A3.3 (HU-038) y "Ver historial completo", A3.4
+ * (HU-039).
  */
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
@@ -60,6 +59,7 @@ import {
 } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
+import { cn } from '@/lib/utils';
 import type { FichaEmpresa } from '@/types/empresas';
 
 const props = defineProps<FichaEmpresa>();
@@ -332,9 +332,17 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 <section
                     class="flex shrink-0 flex-col rounded-xl border border-linea bg-white px-5 py-4"
                 >
-                    <h2 class="text-sm font-semibold">
-                        Evolución del puntaje total
-                    </h2>
+                    <div class="flex items-baseline justify-between gap-2">
+                        <h2 class="text-sm font-semibold">
+                            Evolución del puntaje total
+                        </h2>
+                        <Link
+                            :href="rutas.historial.empresa(empresa.id)"
+                            :class="cn(enlace, 'text-xs')"
+                        >
+                            Ver historial completo
+                        </Link>
+                    </div>
                     <EvolucionPuntaje
                         v-if="evolucion.length > 0"
                         class="mt-2 h-44"

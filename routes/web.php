@@ -6,6 +6,7 @@ use App\Http\Controllers\ConfiguracionIaController;
 use App\Http\Controllers\DiagnosticosController;
 use App\Http\Controllers\EditorDiagnosticoController;
 use App\Http\Controllers\EmpresasController;
+use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MedicionesController;
 use App\Http\Controllers\ResponderController;
@@ -91,6 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:empresas.ver')->group(function () {
         Route::get('empresas', [EmpresasController::class, 'index'])->name('empresas.index');
         Route::get('empresas/{empresa}', [EmpresasController::class, 'ver'])->whereNumber('empresa')->name('empresas.ver');
+        Route::get('empresas/{empresa}/historial', [HistorialController::class, 'empresa'])->whereNumber('empresa')->name('empresas.historial');
     });
 
     Route::middleware('permission:mediciones.asignar')->group(function () {
@@ -171,6 +173,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:resultados.ver')->group(function () {
         Route::get('resultados/{medicion}', [ResultadosController::class, 'ver'])->name('resultados.ver');
         Route::get('resultados/{medicion}/respuestas', [ResultadosController::class, 'respuestas'])->name('resultados.respuestas');
+        // E8 · Mi historial: solo cuentas de una empresa (el controlador lo revisa).
+        Route::get('historial', [HistorialController::class, 'mio'])->name('historial.mio');
     });
     Route::get('resultados/{medicion}/pdf', [ResultadosController::class, 'pdf'])
         ->middleware(['permission:resultados.pdf', 'throttle:20,1'])->name('resultados.pdf');

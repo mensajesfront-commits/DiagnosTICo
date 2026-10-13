@@ -127,6 +127,10 @@ export const rutas = {
         vistaPrevia: () => '/configuracion-ia/vista-previa',
         probar: () => '/configuracion-ia/probar',
     },
+    historial: {
+        mio: () => '/historial',
+        empresa: (id: number) => `/empresas/${id}/historial`,
+    },
     resultados: {
         ver: (id: number) => `/resultados/${id}`,
         respuestas: (id: number, categoria?: string) =>

@@ -18,7 +18,7 @@
  *
  * "Ver resultado" abre E6 y "Ver informe PDF" descarga el PDF guardado.
  *
- * [FUNCIONALIDAD POR DEFINIR] "Ver historial completo" (E8, HU-067).
+ * "Ver historial completo" abre E8 (HU-067).
  */
 import { Head, Link, router } from '@inertiajs/vue3';
 import { CalendarDays, Mail } from '@lucide/vue';
@@ -99,8 +99,6 @@ function pedirNueva(): void {
     );
 }
 
-const enlaceInactivo =
-    'cursor-not-allowed text-tinta-suave underline underline-offset-2';
 const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
 </script>
 
@@ -537,12 +535,12 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
             <section v-else class="rounded-xl border border-linea bg-white">
                 <div class="flex items-baseline justify-between px-5 py-4">
                     <h2 class="text-sm font-semibold">Mis mediciones</h2>
-                    <span
-                        :class="cn(enlaceInactivo, 'text-xs')"
-                        title="Mi historial llega con Resultados (E8)"
+                    <Link
+                        :href="rutas.historial.mio()"
+                        :class="cn(enlace, 'text-xs')"
                     >
                         Ver historial completo
-                    </span>
+                    </Link>
                 </div>
                 <table class="w-full border-collapse text-sm">
                     <thead>
