@@ -1,0 +1,83 @@
+{
+    "componente": "diagnosticos/Index",
+    "props": {
+        "sectores": [
+            {
+                "id": 1,
+                "nombre": "Abogados",
+                "descripcion": "Bufetes, abogados independientes y notarías.",
+                "activo": true,
+                "diagnosticos": 3
+            },
+            {
+                "id": 2,
+                "nombre": "Inmobiliarias",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 2
+            },
+            {
+                "id": 3,
+                "nombre": "Médicos",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 2
+            },
+            {
+                "id": 4,
+                "nombre": "Comidas",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 4
+            },
+            {
+                "id": 5,
+                "nombre": "Alojamientos",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 1
+            },
+            {
+                "id": 6,
+                "nombre": "Turismo",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 1
+            },
+            {
+                "id": 7,
+                "nombre": "Talleres",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 0
+            }
+        ],
+        "sector": {
+            "id": 7,
+            "nombre": "Talleres",
+            "descripcion": null,
+            "activo": true,
+            "diagnosticos": 0
+        },
+        "resumen": {
+            "empresas": 0,
+            "mediciones": 0,
+            "publicados": 0,
+            "borradores": 0,
+            "ultima_medicion": {
+                "en_curso": 0,
+                "no_iniciada": 0,
+                "vencida": 0,
+                "terminada": 0
+            },
+            "mediciones_por_estado": {
+                "en_curso": 0,
+                "no_iniciada": 0,
+                "vencida": 0,
+                "terminada": 0
+            }
+        },
+        "diagnosticos": [],
+        "empresas": []
+    }
+}

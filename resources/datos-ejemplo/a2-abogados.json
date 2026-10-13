@@ -1,0 +1,196 @@
+{
+    "componente": "diagnosticos/Index",
+    "props": {
+        "sectores": [
+            {
+                "id": 1,
+                "nombre": "Abogados",
+                "descripcion": "Bufetes, abogados independientes y notarías.",
+                "activo": true,
+                "diagnosticos": 3
+            },
+            {
+                "id": 2,
+                "nombre": "Inmobiliarias",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 2
+            },
+            {
+                "id": 3,
+                "nombre": "Médicos",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 2
+            },
+            {
+                "id": 4,
+                "nombre": "Comidas",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 4
+            },
+            {
+                "id": 5,
+                "nombre": "Alojamientos",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 1
+            },
+            {
+                "id": 6,
+                "nombre": "Turismo",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 1
+            },
+            {
+                "id": 7,
+                "nombre": "Talleres",
+                "descripcion": null,
+                "activo": true,
+                "diagnosticos": 0
+            }
+        ],
+        "sector": {
+            "id": 1,
+            "nombre": "Abogados",
+            "descripcion": "Bufetes, abogados independientes y notarías.",
+            "activo": true,
+            "diagnosticos": 3
+        },
+        "resumen": {
+            "empresas": 9,
+            "mediciones": 37,
+            "publicados": 2,
+            "borradores": 1,
+            "ultima_medicion": {
+                "en_curso": 1,
+                "no_iniciada": 0,
+                "vencida": 0,
+                "terminada": 8
+            },
+            "mediciones_por_estado": {
+                "en_curso": 1,
+                "no_iniciada": 0,
+                "vencida": 0,
+                "terminada": 36
+            }
+        },
+        "diagnosticos": [
+            {
+                "id": 1,
+                "nombre": "Diagnóstico general de marketing digital",
+                "sector_id": 1,
+                "sector_nombre": "Abogados",
+                "categorias": 10,
+                "preguntas": 46,
+                "empresas": 6,
+                "mediciones": 31,
+                "estado": "publicado",
+                "version_publicada": 2,
+                "borrador_pendiente": 3,
+                "actualizado_en": "2026-10-03T10:00:00Z"
+            },
+            {
+                "id": 2,
+                "nombre": "Diagnóstico rápido",
+                "sector_id": 1,
+                "sector_nombre": "Abogados",
+                "categorias": 5,
+                "preguntas": 22,
+                "empresas": 3,
+                "mediciones": 6,
+                "estado": "publicado",
+                "version_publicada": 1,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-09-20T10:00:00Z"
+            },
+            {
+                "id": 3,
+                "nombre": "Diagnóstico de redes sociales",
+                "sector_id": 1,
+                "sector_nombre": "Abogados",
+                "categorias": 3,
+                "preguntas": 18,
+                "empresas": 0,
+                "mediciones": 0,
+                "estado": "borrador",
+                "version_publicada": null,
+                "borrador_pendiente": null,
+                "actualizado_en": "2026-10-04T10:00:00Z"
+            }
+        ],
+        "empresas": [
+            {
+                "id": 1,
+                "nombre": "Rojas & Asociados",
+                "diagnostico": "Diagnóstico general v2",
+                "medicion": {
+                    "numero": 5,
+                    "estado": "en_curso",
+                    "avance": {
+                        "hechas": 8,
+                        "total": 10
+                    }
+                },
+                "puntaje": 71
+            },
+            {
+                "id": 2,
+                "nombre": "Gómez Abogados",
+                "diagnostico": "Diagnóstico general v2",
+                "medicion": {
+                    "numero": 4,
+                    "estado": "terminada",
+                    "avance": null
+                },
+                "puntaje": 83
+            },
+            {
+                "id": 3,
+                "nombre": "Bufete Salazar",
+                "diagnostico": "Diagnóstico rápido v1",
+                "medicion": {
+                    "numero": 2,
+                    "estado": "terminada",
+                    "avance": null
+                },
+                "puntaje": 45
+            },
+            {
+                "id": 4,
+                "nombre": "Notaría 12 de Cali",
+                "diagnostico": "Diagnóstico general v2",
+                "medicion": {
+                    "numero": 3,
+                    "estado": "terminada",
+                    "avance": null
+                },
+                "puntaje": 57
+            },
+            {
+                "id": 5,
+                "nombre": "Legal Group SAS",
+                "diagnostico": "Diagnóstico general v2",
+                "medicion": {
+                    "numero": 3,
+                    "estado": "terminada",
+                    "avance": null
+                },
+                "puntaje": 68
+            },
+            {
+                "id": 6,
+                "nombre": "Asesores Jurídicos del Valle",
+                "diagnostico": "Diagnóstico rápido v1",
+                "medicion": {
+                    "numero": 2,
+                    "estado": "terminada",
+                    "avance": null
+                },
+                "puntaje": 58
+            }
+        ]
+    }
+}

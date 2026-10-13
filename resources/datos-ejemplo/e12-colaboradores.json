@@ -1,0 +1,40 @@
+{
+    "componente": "colaboradores/Index",
+    "props": {
+        "empresa": "Restaurante La Esquina",
+        "colaboradores": [
+            {
+                "id": 1,
+                "nombre": "Laura Gómez",
+                "correo": "laura@laesquina.co",
+                "es_principal": true,
+                "activo": true,
+                "cargo": "Gerencia general"
+            },
+            {
+                "id": 2,
+                "nombre": "Andrés Pérez",
+                "correo": "andres@laesquina.co",
+                "es_principal": false,
+                "activo": true,
+                "cargo": "Marketing"
+            },
+            {
+                "id": 3,
+                "nombre": "Camila Rojas",
+                "correo": "camila@laesquina.co",
+                "es_principal": false,
+                "activo": true,
+                "cargo": "Ventas"
+            },
+            {
+                "id": 4,
+                "nombre": "Diego Torres",
+                "correo": "diego@laesquina.co",
+                "es_principal": false,
+                "activo": false,
+                "cargo": "Producción"
+            }
+        ]
+    }
+}
