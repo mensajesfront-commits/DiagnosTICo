@@ -68,7 +68,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha y conectada (dos pasos, DEC-015 y DEC-016) |
 | L3 | ¿Olvidaste tu contraseña? | `pages/auth/ForgotPassword.vue` | Hecha |
 | L4 | Crea una contraseña nueva | `pages/auth/ResetPassword.vue` | Hecha |
-| A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada. "Nueva fecha", "Cancelar" y "Asignar nueva" conectadas; Recordatorio y Reenviar aviso esperan A3.1e |
+| A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada. todas las acciones conectadas menos "Ver resultado" (espera A3.3) |
 | A2 | Diagnósticos de un sector | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2·T | Todos los diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2b | Sector sin diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
@@ -85,7 +85,9 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha y conectada |
 | A3 | Empresas: búsqueda, filtros y tabla paginada | `pages/empresas/Index.vue` | Hecha y conectada |
 | A3.1 | Ficha de la empresa: Historial y gráfica de evolución | `pages/empresas/Ver.vue`, `components/graficas/EvolucionPuntaje.vue` | Hecha y conectada ("Ver resultado" espera A3.3) |
-| A3.1b | Asignar medición, con vista previa | `pages/mediciones/Asignar.vue`, `components/empresas/BuscadorEmpresa.vue` | Hecha y conectada ("Ver y editar el correo" espera A3.1e) |
+| A3.1b | Asignar medición, con vista previa | `pages/mediciones/Asignar.vue`, `components/empresas/BuscadorEmpresa.vue` | Hecha y conectada |
+| A3.1e | Correo de aviso: editar con variables, vista previa, prueba y enviar | `components/empresas/EditorCorreo.vue`, `ModalCorreoAviso.vue` | Hecha y conectada |
+| A1b, A1c | Recordatorio y Reenviar aviso | `components/empresas/ModalCorreoAviso.vue` | Hecha y conectada |
 | A3.1c | Reemplazar la medición pendiente | `components/empresas/ModalReemplazarMedicion.vue` | Hecha |
 | — | Cambiar fecha / Cancelar medición | `ModalCambiarFecha.vue`, `ModalCancelarMedicion.vue` | Hechas. Sin wireframe propio, salen de A3.1 y HU-009 |
 | A3.1d | Datos de la cuenta | `pages/empresas/Ver.vue`, `components/empresas/CamposEmpresa.vue` | Hecha y conectada |
@@ -146,3 +148,4 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A3.1b | Sin "unos 25 minutos" en cada diagnóstico. | **[INFORMACIÓN PENDIENTE]** No hay una regla para estimar el tiempo. |
 | A1d | "Nueva fecha" abre un modal en la misma tabla, en vez de llevar a A3.1b. La medición conserva sus respuestas. | Menos pasos. HU-009 CA-002 se cumple igual; A3.1b también ofrece "dale una nueva fecha". |
 | A3.1d | Al cambiar el correo no se envía enlace de verificación: se guarda y se cierran sus sesiones. | DEC-012 (verificación quitada). |
+| A3.1e | Es un modal sobre A3.1b y no una página aparte; en A1 y la ficha se abre igual para Recordatorio / Reenviar aviso, con el botón "Enviar". | Así A3.1b no pierde lo ya llenado, y HU-008 reutiliza el mismo editor. |

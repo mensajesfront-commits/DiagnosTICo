@@ -153,9 +153,9 @@ Ruta: `GET /inicio` (`InicioController@administrador`, datos de `App\Support\Dat
 
 - Pestañas Todas · En curso · No iniciadas · Vencidas · Terminadas con su contador (HU-007); "Enviada" cuenta como en curso.
 - Página fija en pantallas grandes; la tabla va paginada con las filas que caben (`useFilasQueCaben` en `lib/paginacion.ts`, que también usa A2).
-- Acciones: "Nueva fecha" (A1d) y "Cancelar" abren su modal en la misma tabla (`ModalCambiarFecha`, `ModalCancelarMedicion`); "Asignar nueva" (A1e) abre A3.1b con la empresa elegida.
-- **[FUNCIONALIDAD POR DEFINIR]** "Recordatorio" y "Reenviar aviso" (A1b, A1c) abren el correo de la medición (A3.1e, HU-037), y "Ver resultado" abre A3.3 (HU-038). Mientras llegan, llevan a la ficha de la empresa (`/empresas/{id}`).
-- **[FUNCIONALIDAD POR DEFINIR]** "Último aviso" muestra el aviso de la asignación: todavía no se registran los avisos reenviados (PA-004).
+- Acciones: "Nueva fecha" (A1d) y "Cancelar" abren su modal en la misma tabla (`ModalCambiarFecha`, `ModalCancelarMedicion`); "Recordatorio" (A1b) y "Reenviar aviso" (A1c) abren el correo de la medición (`ModalCorreoAviso`, A3.1e); "Asignar nueva" (A1e) abre A3.1b con la empresa elegida.
+- **[FUNCIONALIDAD POR DEFINIR]** "Ver resultado" abre A3.3 (HU-038). Mientras llega, lleva a la ficha de la empresa (`/empresas/{id}`).
+- "Último aviso" es `mediciones.ultimo_aviso_en`: al asignar con aviso, con Recordatorio o con Reenviar aviso.
 
 ### A2 / A2·T / A2b · Diagnósticos (`diagnosticos/Index`)
 
@@ -230,6 +230,7 @@ Ruta: `GET /empresas/{empresa}` (`EmpresasController@ver`, `DatosEmpresas::ficha
 - **Historial:** tarjetas Último puntaje, Variación (desde la 2.ª) y Medición pendiente; gráfica `graficas/EvolucionPuntaje.vue` (línea con las franjas de nivel y el puntaje sobre cada punto); tabla de mediciones paginada; a la derecha la pendiente con "Cambiar fecha" y "Cancelar medición", y "Asignar otra medición" (formulario corto; si hay pendiente, confirma el reemplazo con `ModalReemplazarMedicion`, A3.1c).
 - **Datos de la cuenta (A3.1d):** `components/empresas/CamposEmpresa.vue` (el mismo de A3.2), "Estado de la cuenta" (estado, registro, último acceso, mediciones y colaboradores en solo lectura) y "Acciones": Ver como, Asignar medición, Desactivar cuenta (`ModalDesactivarEmpresa`, A3.1f) o Reactivar. `?pestana=cuenta` abre esta pestaña.
 - **Consultores:** "Próximamente" (rol aplazado).
+- La pendiente muestra su último aviso y "Enviar recordatorio" (en curso) o "Reenviar aviso" (`ModalCorreoAviso`).
 - **[FUNCIONALIDAD POR DEFINIR]** "Ver resultado" (A3.3, HU-038) aparece sin enlace hasta que exista Resultados.
 
 ### A3.2 · Registrar empresa (`empresas/Registrar`)
@@ -253,7 +254,15 @@ Ruta: `GET /mediciones/asignar` (con `?empresa=` llega elegida); envía `POST /m
 - Buscador de empresa (`components/empresas/BuscadorEmpresa.vue`) con su sector y su pendiente.
 - "Así lo verá la empresa": la tarjeta de su inicio con el mensaje y la fecha (CA-005).
 - Con pendiente: aviso, y al asignar `ModalReemplazarMedicion` (A3.1c). Si está vencida, también "dale una nueva fecha" (HU-009).
-- **[FUNCIONALIDAD POR DEFINIR]** "Ver y editar el correo" (A3.1e, HU-037). Por ahora el aviso sale con el texto de `AvisoMedicion` y el mensaje escrito aquí.
+- "Ver y editar el correo" abre A3.1e en un modal; "Guardar correo" lo deja para esta medición (`correo_asunto`, `correo_cuerpo`, `guardar_plantilla` en el POST). Prop `plantilla: { asunto, cuerpo }` y `empresas[].principal` para "Para:" y `{nombre_usuario}`.
+
+### A3.1e · Correo de aviso de la medición (`components/empresas/EditorCorreo.vue`)
+
+- Para (bloqueado), Asunto y Mensaje con las variables `{nombre_usuario}`, `{empresa}`, `{diagnostico}`, `{numero_medicion}`, `{mensaje_admin}` y `{fecha_limite}`: los botones las insertan donde está el cursor.
+- "Así le llega a la empresa": vista previa con los datos reales; `lib/correo.ts` rellena igual que `App\Support\CorreoAviso` (con pruebas en `correo.test.ts`).
+- "Guardar como plantilla para las próximas mediciones" y "Enviarme un correo de prueba" (solo a quien lo pide).
+- Se usa en A3.1b (modal "Correo de aviso de la medición", con Volver y Guardar correo) y en `ModalCorreoAviso` (Recordatorio / Reenviar aviso desde A1 y la ficha, con Cancelar y Enviar). Este pide los datos a `GET /mediciones/{id}/correo`.
+- Se diferencia del wireframe en que es un modal y no una página aparte: así A3.1b no pierde lo que ya se llenó.
 
 ### A5 · Usuarios y roles: pestaña Usuarios (`usuarios/Index`)
 

@@ -283,7 +283,7 @@ Tablas que ya existen por el kit o por paquetes y que no se dibujan:
 
 ## Preguntas abiertas del modelo
 
-- **[INFORMACIÓN PENDIENTE]** ¿Se guarda un registro de cada recordatorio enviado y se muestra en la ficha de la empresa? (PA-004, HU-008). Si la respuesta es sí, hace falta una tabla `avisos_medicion`.
+- **PA-004, en parte:** se guarda la fecha del último aviso (`mediciones.ultimo_aviso_en`) y se muestra en A1 y en la ficha. **[INFORMACIÓN PENDIENTE]** Si se quiere el historial de cada aviso, hace falta una tabla `avisos_medicion`.
 - **Resuelto con A3.1e:** el correo de aviso es una plantilla general (`plantillas_correo`) que se puede editar para una medición (`mediciones.correo_asunto` y `correo_cuerpo`); "Guardar como plantilla" reemplaza la general.
 - **[FUNCIONALIDAD POR DEFINIR]** El bot de WhatsApp está aplazado. Si se retoma, sus tablas van separadas (conversaciones y resultados del bot) y no se relacionan con `empresas` ni con `mediciones` (RN-029).
 - Las respuestas y los análisis apuntan a preguntas y categorías por su identificador dentro del JSON de la versión (`pregunta_ref`, `categoria_ref`), no por llave foránea. Así siguen siendo válidos aunque el borrador cambie. Así quedó en las migraciones (T-045).
@@ -469,6 +469,7 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `mensaje` | text | No | `Por favor respondan antes del cierre de mes.` | Va en el correo de aviso |
 | `aviso_por_correo` | boolean | Sí (por defecto `true`) | `true` | A3.1b |
 | `correo_asunto`, `correo_cuerpo` | varchar(255), text | No | `null` | `null` = el de la plantilla (A3.1e) |
+| `ultimo_aviso_en` | timestamp | No | `2026-10-13 15:20:00` | Último correo de aviso enviado: al asignar, "Recordatorio" o "Reenviar aviso" (HU-008 CA-003) |
 | `reemplazada_por` | bigint → `mediciones.id` | No | `null` | La medición nueva que la reemplazó (A3.1c) |
 | `cancelada_en` | timestamp | No | `null` | |
 | `asignada_por` | bigint → `users.id` | No | `1` | |
@@ -551,7 +552,7 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `id` | bigint | Sí | `1` | |
 | `clave` | varchar(40) | Sí, única | `aviso_medicion` | |
 | `asunto` | varchar(255) | Sí | `Tienes una medición nueva` | |
-| `cuerpo` | text | Sí | `Hola {nombre_usuario}, {empresa} tiene…` | Con variables |
+| `cuerpo` | text | Sí | `Hola {nombre_usuario}, {empresa} tiene…` | Variables: `{nombre_usuario}`, `{empresa}`, `{diagnostico}`, `{numero_medicion}`, `{mensaje_admin}`, `{fecha_limite}`. Sin fila, se usa el texto de `App\Support\CorreoAviso` |
 | `actualizado_por` | bigint → `users.id` | No | `1` | |
 | `created_at`, `updated_at` | timestamp | No | | |
 

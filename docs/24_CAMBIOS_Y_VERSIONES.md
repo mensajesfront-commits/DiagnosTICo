@@ -27,6 +27,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Colaboradores de la empresa (E12, E12.1–E12.3): lista, agregar, datos para compartir, cambiar contraseña, desactivar y reactivar. Conectado al backend (`ColaboradoresController`): solo la cuenta principal entra; cambiar la contraseña o desactivar cierra las sesiones del colaborador.
 - Documentos 02 (visión y objetivos), 04 (stakeholders), 06 (requisitos no funcionales), 09 (flujos, con el diagrama de secuencia de la medición) y 10 (arquitectura).
 
+### Agregado (correo de aviso y vencidas, 13 de octubre)
+
+- **A3.1e · Correo de aviso:** asunto y mensaje con variables, vista previa con los datos reales, "Enviarme un correo de prueba" y "Guardar como plantilla". Se abre desde A3.1b.
+- **Recordatorio y Reenviar aviso** (A1b, A1c, HU-008) en el Inicio y en la ficha; se guarda y se muestra el último aviso (`mediciones.ultimo_aviso_en`).
+- El correo de aviso va en la cola (no bloquea la pantalla y se reintenta).
+- **Tarea diaria `mediciones:vencer`** (HU-070): las mediciones sin enviar que pasaron su fecha límite quedan vencidas.
+- Corregido: "Nueva fecha" desde el Inicio abría el modal sin la fecha actual.
+
 ### Agregado (Empresas, 11 de octubre)
 
 - **A3 · Empresas:** lista con búsqueda, filtros (sector, nivel, cuenta y medición) y paginado por filas que caben.

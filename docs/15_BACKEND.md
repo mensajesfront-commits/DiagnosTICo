@@ -206,13 +206,24 @@ Reglas que valida el servidor:
 | POST | `/mediciones` | `mediciones.guardar` | `mediciones.asignar` | Asigna. Si hay una pendiente, sin `reemplazar` responde un error en `reemplazar`; con `reemplazar` la cancela y la nueva toma su número (A3.1c) |
 | POST | `/mediciones/{medicion}/cancelar` | `mediciones.cancelar` | `mediciones.asignar` | Cancela la pendiente (no enviada) |
 | PUT | `/mediciones/{medicion}/fecha` | `mediciones.fecha` | `mediciones.asignar` | Nueva fecha (HU-009); una vencida vuelve a en curso o no iniciada |
+| GET | `/mediciones/{medicion}/correo` | `mediciones.correo` | `mediciones.asignar` | JSON para A3.1e: para, asunto, cuerpo, valores de las variables y último aviso |
+| POST | `/mediciones/{medicion}/correo` | `mediciones.correo.enviar` | `mediciones.asignar` | Recordatorio / Reenviar aviso (HU-008): guarda el texto en la medición (y, con `guardar_plantilla`, como plantilla) y lo envía |
+| POST | `/mediciones/correo/prueba` | `mediciones.correo.prueba` | `mediciones.asignar`, 10 por minuto | Correo de prueba solo a quien lo pide (HU-037 CA-003) |
 
 Reglas de `AsignarMedicion` (RN-014):
 
 - Solo diagnósticos **publicados** del **sector de la empresa**, y solo a empresas activas.
 - Una pendiente por empresa (`no_iniciada`, `en_curso`, `enviada`, `vencida`). Reemplazar la marca `cancelada`, guarda `reemplazada_por` y da por atendidas sus solicitudes abiertas.
 - La medición nueva toma el número de la que reemplaza, o el siguiente.
-- Con `aviso`, notifica al usuario principal (`AvisoMedicion`). **[FUNCIONALIDAD POR DEFINIR]** Editar el correo (A3.1e) y mandarlo a la cola.
+- Con `aviso`, envía el correo (`EnviarAviso`): si no sale, la medición queda asignada igual y la pantalla avisa que use "Reenviar aviso".
+
+Correo de aviso (A3.1e):
+
+- `App\Support\CorreoAviso`: plantilla general (`plantillas_correo`, clave `aviso_medicion`; sin fila, el texto del wireframe), el texto de cada medición y el relleno de variables.
+- `App\Services\Mediciones\EnviarAviso`: lo envía al usuario principal y guarda `ultimo_aviso_en`.
+- `AvisoMedicion` va en la **cola** (`ShouldQueue`, 3 intentos): la pantalla no espera al servidor de correo (HU-037 CA-004, CA-005). En local hay que tener corriendo `queue:work`.
+
+Tarea diaria (HU-070): `mediciones:vencer` a las 00:05 marca `vencida` las no iniciadas o en curso con fecha límite anterior a hoy (`schedule:work` en local). **[INFORMACIÓN PENDIENTE]** El día se cuenta con `APP_TIMEZONE` (UTC por defecto); falta decidir si es la hora de Colombia o la de cada empresa.
 
 ## Otras secciones del menú (rutas previstas)
 

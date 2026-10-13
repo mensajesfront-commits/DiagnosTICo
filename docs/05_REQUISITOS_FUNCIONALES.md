@@ -9780,7 +9780,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-005 — Cerrar sesión | RF-004 | Hecha |
 | HU-006 — Ver el inicio con indicadores | RF-005 | Hecha |
 | HU-007 — Filtrar las mediciones por estado | RF-005 | Hecha |
-| HU-008 — Recordar o reenviar el aviso | RF-006 | Pendiente |
+| HU-008 — Recordar o reenviar el aviso | RF-006 | Hecha (se guarda el último aviso y se muestra en A1 y en la ficha; PA-004 en parte) |
 | HU-009 — Dar una nueva fecha a una medición vencida | RF-007 | Hecha ("Nueva fecha" abre un modal en A1 y en la ficha; A3.1b también la ofrece) |
 | HU-010 — Ver los diagnósticos de un sector | RF-008 | Hecha |
 | HU-011 — Ver todos los diagnósticos | RF-008 | Hecha |
@@ -9808,8 +9808,8 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-033 — Ver la ficha e historial de una empresa | RF-016 | Hecha |
 | HU-034 — Editar los datos de la cuenta de una empresa | RF-017 | Hecha |
 | HU-035 — Desactivar o reactivar la cuenta de una empresa | RF-017 | Hecha |
-| HU-036 — Asignar una medición | RF-018 | Hecha (editar el correo, CA-006, llega con HU-037) |
-| HU-037 — Editar el correo de aviso de la medición | RF-006 | Pendiente |
+| HU-036 — Asignar una medición | RF-018 | Hecha |
+| HU-037 — Editar el correo de aviso de la medición | RF-006 | Hecha |
 | HU-038 — Ver el resultado de una empresa | RF-019 | Pendiente |
 | HU-039 — Ver el historial de una empresa | RF-019 | Pendiente |
 | HU-040 — Ver las respuestas de una empresa | RF-019 | Pendiente |
@@ -9842,7 +9842,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-067 — Ver mi historial | RF-033 | Pendiente |
 | HU-068 — Calcular los puntajes | RF-036 | Pendiente |
 | HU-069 — Analizar cada categoría con la IA | RF-037 | Pendiente |
-| HU-070 — Marcar mediciones vencidas | RF-007 | Pendiente |
+| HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003, no responder una vencida, llega con E2) |
 | HU-071 — Configurar las preguntas del bot | RF-039 | Aplazada |
 | HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Aplazada |
 | HU-073 — Responder las preguntas del bot | RF-040 | Aplazada |
