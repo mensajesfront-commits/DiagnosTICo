@@ -630,32 +630,41 @@ Lista de los `ref` de las opciones elegidas: una en opción única, varias en se
 
 ### `analisis_categoria.respuesta_ia`
 
-Lo que devuelve la IA para una categoría (etapa 1).
+Lo que devuelve la IA para una categoría (etapa única, RN-021), ya validado (`AnalizadorDeCategoria::esquema()`). `puntaje` solo en las abiertas; `null` en las cerradas. Las preguntas opcionales sin responder no se envían.
 
 ```json
 {
-  "observacion": "Tienen presencia constante, pero sin un plan de contenidos.",
-  "recomendacion": "Armen un calendario mensual con 3 publicaciones por semana.",
   "preguntas": [
-    { "ref": "p41", "puntaje": 60, "observacion": "Nombra un público, pero muy general." }
-  ]
+    { "id": "p41", "puntaje": null, "observacion": "Publica cada semana, pero sin un plan." },
+    { "id": "p42", "puntaje": 30, "observacion": "Decide qué publicar el mismo día." }
+  ],
+  "observacion_categoria": "Tienen presencia constante, pero sin un plan de contenidos.",
+  "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "Tres publicaciones por semana; revisa cada mes cuáles funcionan." }
 }
 ```
 
-**[INFORMACIÓN PENDIENTE]** La forma final sale de la prueba técnica de OpenAI (T-019), que espera la clave (DEC-013). El ejemplo es la forma propuesta.
+`analisis_categoria.prompt` guarda el texto exacto enviado (instrucciones por capas + preguntas con respuestas).
 
 ### `resultados.por_categoria`
 
-Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran A3.3, E5 y E6.
+Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 / A3.3, E9 / A3.5 y el PDF. Copia los textos de las preguntas y las respuestas para que el resultado no cambie aunque cambie el diagnóstico (RN-023). `anterior` y `variacion` son `null` en la primera medición (RN-020); el radar usa `anterior` para la línea punteada.
 
 ```json
 [
-  { "ref": "c3", "nombre": "Redes sociales", "importancia": 25.0, "puntaje": 70, "nivel": "camino", "variacion": 10 },
-  { "ref": "c5", "nombre": "Sitio web", "importancia": 20.0, "puntaje": 40, "nivel": "mejorar", "variacion": null }
+  {
+    "ref": "c3", "nombre": "Contenido y publicaciones", "importancia": 25.0,
+    "puntaje": 38, "nivel": "mejorar", "anterior": 33, "variacion": 5,
+    "observacion": "Publicas sin un plan…",
+    "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "…" },
+    "preguntas": [
+      { "ref": "p41", "texto": "¿Con qué frecuencia publicas?", "tipo": "opcion_unica", "respuesta": "Varias veces por semana", "puntaje": 60, "observacion": "…" },
+      { "ref": "p44", "texto": "¿Algo más?", "tipo": "abierta", "respuesta": null, "puntaje": null, "observacion": null }
+    ]
+  }
 ]
 ```
 
-**[INFORMACIÓN PENDIENTE]** Se confirma cuando se programe el cálculo del resultado (semana 5).
+`respuesta` son las opciones elegidas separadas por " · " o el texto; `null` si la opcional quedó sin responder (no cuenta en el promedio).
 
 ### `users.avisos`
 

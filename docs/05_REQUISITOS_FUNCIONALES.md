@@ -9810,7 +9810,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-035 — Desactivar o reactivar la cuenta de una empresa | RF-017 | Hecha |
 | HU-036 — Asignar una medición | RF-018 | Hecha |
 | HU-037 — Editar el correo de aviso de la medición | RF-006 | Hecha |
-| HU-038 — Ver el resultado de una empresa | RF-019 | Pendiente |
+| HU-038 — Ver el resultado de una empresa | RF-019 | Hecha (A3.3 usa la misma pantalla que E6) |
 | HU-039 — Ver el historial de una empresa | RF-019 | Pendiente |
 | HU-040 — Ver las respuestas de una empresa | RF-019 | Pendiente |
 | HU-041 — Editar las instrucciones generales de la IA | RF-020 | Pendiente |
@@ -9831,17 +9831,17 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-056 — Editar mi perfil (Empresa o Colaborador) | RF-026 | Hecha |
 | HU-057 — Ver mi inicio la primera vez | RF-027 | Hecha |
 | HU-058 — Ver mi medición pendiente | RF-027 | Hecha |
-| HU-059 — Ver mi inicio sin medición pendiente | RF-027 | Hecha (los enlaces al resultado, al historial y al PDF llegan con E6–E8) |
+| HU-059 — Ver mi inicio sin medición pendiente | RF-027 | Hecha ("Ver historial completo" llega con E8) |
 | HU-060 — Responder el diagnóstico | RF-028 | Hecha |
 | HU-061 — Revisar antes de enviar | RF-029 | Hecha |
-| HU-062 — Enviar el diagnóstico | RF-029 | Hecha (el análisis arranca con HU-068 y HU-069) |
-| HU-063 — Esperar el análisis | RF-030 | Hecha en parte: la pantalla de espera; el avance real, el correo y el reintento llegan con HU-069 |
-| HU-064 — Ver mi resultado | RF-031 | Pendiente |
-| HU-065 — Ver mis respuestas | RF-031 | Pendiente |
-| HU-066 — Descargar el informe en PDF | RF-032 | Pendiente |
+| HU-062 — Enviar el diagnóstico | RF-029 | Hecha |
+| HU-063 — Esperar el análisis | RF-030 | Hecha |
+| HU-064 — Ver mi resultado | RF-031 | Hecha |
+| HU-065 — Ver mis respuestas | RF-031 | Hecha |
+| HU-066 — Descargar el informe en PDF | RF-032 | Hecha |
 | HU-067 — Ver mi historial | RF-033 | Pendiente |
-| HU-068 — Calcular los puntajes | RF-036 | Pendiente |
-| HU-069 — Analizar cada categoría con la IA | RF-037 | Pendiente |
+| HU-068 — Calcular los puntajes | RF-036 | Hecha |
+| HU-069 — Analizar cada categoría con la IA | RF-037 | Hecha |
 | HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003, no responder una vencida, llega con E2) |
 | HU-071 — Configurar las preguntas del bot | RF-039 | Aplazada |
 | HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Aplazada |
@@ -9853,10 +9853,10 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-078 — Cambiar la contraseña de un colaborador | RF-035 | Hecha |
 | HU-079 — Desactivar o reactivar un colaborador | RF-035 | Hecha |
 | HU-080 — Entender cómo se arma el prompt final | RF-020 | Pendiente |
-| HU-081 — Armar el prompt de cada categoría | RF-037 | Pendiente |
+| HU-081 — Armar el prompt de cada categoría | RF-037 | Hecha (lee las capas de `prompts`; la pantalla A4 para editarlas está pendiente) |
 | HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Hecha (botón "Pedir una nueva fecha" en E1) |
 | HU-083 — Atender las solicitudes de nueva medición | RF-034 | Pendiente |
-| HU-084 — Publicar el resultado | RF-038 | Pendiente |
+| HU-084 — Publicar el resultado | RF-038 | Hecha |
 
 HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la semana 4; mientras tanto vuelven a A2 con un aviso. HU-078 también permite editar el nombre, el cargo y el correo del colaborador, y E12 permite eliminarlo (DEC-017).
 

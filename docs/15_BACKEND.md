@@ -12,15 +12,15 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 |---|---|---|---|---|---|
 | Acceso | `/login`, `/register`, `/forgot-password`, `/reset-password` | Fortify (`FortifyServiceProvider`, `CreateNewUser`) | Invitado + límite de intentos | L1–L4 | Hecho |
 | Ubicaciones | `/ubicaciones/{pais}` | `UbicacionesController` | Pública, 60 por minuto | L2, A6, E11 | Hecho |
-| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | A1 hecha (Recordatorio y Reenviar aviso esperan A3.1e); E1 en la semana 6 |
+| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio`, `DatosInicioEmpresa` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | Hecho |
 | Mi perfil | `/mi-perfil`, `/imagenes/{tipo}/{id}` | `PerfilController` | `auth` | A6, E11 | Hecho |
 | Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `EditorDiagnosticoController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.1, A2.1b–f, A2.1c, A2.2, A2.4, A2.5, A2.7 | Hecho; el resultado de ejemplo (A2.6) llega con Resultados |
 | Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
 | Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho ("Ver como" en semana 6) |
 | Colaboradores | `/colaboradores` | `ColaboradoresController` | `role:Empresa` + cuenta principal | E12 | Hecho |
 | Empresas y mediciones | `/empresas`, `/mediciones` | `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion` | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1, A3.1b–A3.1d, A3.1f, A3.2 | Hecho; A3.1e (correo), A3.3–A3.5 con Resultados |
-| Responder medición | `/mi-diagnostico/{id}` | `ResponderController`, `DatosResponder` | `diagnostico.responder` + su empresa | E2–E4 | Hecho (el análisis llega con HU-068/069) |
-| Resultados | `/resultados/{id}`, `/resultados/{id}/pdf` | `ResultadosController` (por crear) | `resultados.ver`, `resultados.pdf` + su empresa (o cualquier empresa si es interna) | E5, E6, A3.3 | Semana 5 |
+| Responder medición | `/mi-diagnostico/{id}` | `ResponderController`, `DatosResponder` | `diagnostico.responder` + su empresa | E2–E4 | Hecho |
+| Resultados | `/resultados/{id}`, `/resultados/{id}/respuestas`, `/resultados/{id}/pdf` | `ResultadosController`, `DatosResultado` | `resultados.ver`, `resultados.pdf` + su empresa (interna: además `empresas.ver`) | E6, E9, E10, A3.3, A3.5 | Hecho |
 | Configuración de la IA | `/configuracion-ia` | `PromptsController` (por crear) | `ia.ver` / `ia.editar` | A4, A4.1–A4.4 | Semana 5 |
 | Historial | `/historial` | `HistorialController` (por crear) | `resultados.ver` + su empresa | E8 | Semana 6 |
 | Webhook del bot de WhatsApp | `/webhook/whatsapp` | — | Firma del proveedor, sin sesión | — | **Aplazado** (EP-013). **[FUNCIONALIDAD POR DEFINIR]** Si se retoma, va separado de empresas y mediciones (RN-029) |
@@ -253,13 +253,36 @@ Tarea diaria (HU-070): `mediciones:vencer` a las 00:05 marca `vencida` las no in
 | GET | `/mi-diagnostico/{medicion}` | `responder.mostrar` | E2 (`?categoria=` índice). Sin puntajes ni "Ten en cuenta" (RN-013). Si ya se envió, va a E4; si venció o se canceló, al inicio |
 | PUT | `/mi-diagnostico/{medicion}/respuestas` | `responder.guardar` | JSON. Guarda una respuesta (`pregunta_ref`, `opciones[]` o `texto` máx. 1000); vacía la borra. Pasa la medición a `en_curso`. Devuelve `guardado_en` y el avance. 120 por minuto |
 | GET | `/mi-diagnostico/{medicion}/revisar` | `responder.revisar` | E3 |
-| POST | `/mi-diagnostico/{medicion}/enviar` | `responder.enviar` | Todas las obligatorias respondidas → `enviada` y `enviada_en`. Después no se cambia nada (RN-017) |
-| GET | `/mi-diagnostico/{medicion}/enviado` | `responder.enviado` | E4 |
+| POST | `/mi-diagnostico/{medicion}/enviar` | `responder.enviar` | Todas las obligatorias respondidas → `enviada` y `enviada_en`, y manda a la cola `AnalizarMedicion`. Después no se cambia nada (RN-017) |
+| GET | `/mi-diagnostico/{medicion}/enviado` | `responder.enviado` | E4 con `analisis` (total, terminadas, fallidas). Si ya terminó, va al resultado |
+| POST | `/mi-diagnostico/{medicion}/reintentar` | `responder.reintentar` | HU-063 CA-004: vuelve a mandar solo las categorías fallidas, con 3 intentos nuevos. 5 por minuto |
 | POST | `/mi-diagnostico/{medicion}/solicitud` | `responder.solicitar` | HU-082: solo si venció; una solicitud abierta por empresa; avisa por correo a los administradores (`NuevaMedicionSolicitada`). 5 por minuto |
 
 - **Se puede responder** si está no iniciada o en curso y no pasó la fecha límite (RN-016).
-- **[FUNCIONALIDAD POR DEFINIR]** Al enviar debe arrancar el cálculo y el análisis (HU-068, HU-069).
 - El correo de contacto de E1 sale de `SOPORTE_EMAIL` (**[INFORMACIÓN PENDIENTE]** la dirección real).
+
+## Análisis de la IA y resultado (HU-068, HU-069, HU-081, HU-084, hecho)
+
+Pruebas en `tests/Feature/ResultadosTest.php` y `tests/Feature/PruebaTecnica/AnalisisIaTest.php`.
+
+1. **`App\Jobs\AnalizarMedicion`** (al enviar): calcula el puntaje de las cerradas en `respuestas.puntaje` (`App\Services\Resultados\CalculadoraPuntajes`, RN-018), crea un `analisis_categoria` pendiente por categoría y manda cada uno a la cola.
+2. **`App\Jobs\AnalizarCategoria`** (una etapa por categoría, RN-021): arma el prompt (`App\Services\Ia\ArmadorPrompt`), lo guarda en `analisis_categoria.prompt`, llama al `Analizador` y guarda la respuesta, las observaciones y el puntaje de las abiertas. `tries = 3` con espera de 15 y 60 s. Tras el tercer fallo queda `fallido` y avisa a los administradores (`AnalisisFallido`); las demás categorías conservan su análisis.
+3. **`App\Services\Resultados\PublicarResultado`** (después de cada categoría): cuando todas están terminadas, con la fila de la medición bloqueada para publicar una sola vez, consolida puntajes, nivel (RN-019) y variación contra la medición anterior de la empresa (RN-020), guarda `resultados` (inmutable, RN-023), pasa la medición a `terminada`, avisa a las cuentas activas de la empresa (`ResultadoListo`) y manda `GenerarInformePdf`.
+4. **`App\Jobs\GenerarInformePdf`**: `App\Services\Resultados\InformePdf` arma `resources/views/pdf/informe.blade.php` (3 páginas, RN-024) y lo guarda en `storage/app/private/informes/{empresa}/informe_{empresa}_m{n}.pdf` (`resultados.pdf_ruta`). Si falla, el resultado queda publicado y se regenera al descargarlo.
+
+**Analizador.** `App\Services\Ia\Analizador` tiene dos implementaciones: `AnalizadorDeCategoria` (OpenAI con salida estructurada estricta; valida una entrada por pregunta y abiertas de 0 a 100) y `AnalizadorDePrueba` (`IA_DE_PRUEBA=true`, sin conexión; también en las pruebas).
+
+**Prompt por capas (RN-022).** General (fila `prompts` con `alcance = general`; si no existe, `ArmadorPrompt::GENERAL`), luego el ajuste del sector del diagnóstico y el de la empresa: en cada elemento (contexto, tarea, detalles, ejemplos) `usar` deja el anterior, `agregar` suma al final y `reemplazar` lo sustituye. Luego las preguntas respondidas con su respuesta, el puntaje de las cerradas, el "Ten en cuenta" solo de las opciones elegidas y el criterio de las abiertas (JSON, mensaje aparte), y el formato fijo.
+
+**Cálculo (RN-018).** Única: el puntaje de la opción; múltiple: la suma con tope 100; abierta: la IA. Categoría: promedio redondeado de sus preguntas respondidas. Total: promedio ponderado por importancia de los puntajes de categoría ya redondeados (los que ve la empresa). **[FUNCIONALIDAD POR DEFINIR]** Una opcional sin responder no entra al promedio (no cuenta como 0); una categoría sin ninguna respondida vale 0 y no llama a la IA.
+
+| Método | URL | Nombre | Qué hace |
+|---|---|---|---|
+| GET | `/resultados/{medicion}` | `resultados.ver` | E6 / A3.3. Si la medición está enviada, la empresa va a E4; si no hay resultado, 404 |
+| GET | `/resultados/{medicion}/respuestas` | `resultados.respuestas` | E9 / A3.5 (`?categoria=c3`) |
+| GET | `/resultados/{medicion}/pdf` | `resultados.pdf` | Descarga el PDF guardado; si falta, lo genera con lo guardado (no llama a la IA). Si no se puede, vuelve con un aviso. 20 por minuto |
+
+La empresa y su colaborador solo ven su empresa (de otra, 404). Una cuenta interna necesita además `empresas.ver`.
 
 ## Otras secciones del menú (rutas previstas)
 

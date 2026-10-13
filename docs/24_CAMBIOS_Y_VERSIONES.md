@@ -10,6 +10,18 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - En selección múltiple, una opción puede excluir a las demás ("Ninguna", "Nada"): al marcarla se desmarcan las otras, y el servidor no las acepta juntas. Columna `opciones.exclusiva`.
 
+### Agregado (análisis de la IA y resultados, 13 de octubre)
+
+- **Cálculo de puntajes** (HU-068): única, múltiple con tope 100, abiertas por la IA, promedio por categoría y total ponderado; nivel y variación contra la medición anterior.
+- **Análisis con la IA por categoría** (HU-069, HU-081): prompt por capas (general, sector, empresa), "Ten en cuenta" solo de lo elegido, recomendación con título y detalle, 3 intentos por categoría y correo a los administradores si falla.
+- **Publicar el resultado** (HU-084): inmutable, medición "Terminada", correo a la empresa y PDF de 3 páginas guardado.
+- **E4** con avance real y "Reintentar esas categorías"; **E6 / A3.3 · Resultado**, **E9 / A3.5 · Mis respuestas** y descarga del **PDF**. Enlaces desde E1, A1 y A3.1.
+- `IA_DE_PRUEBA` en `.env.example` para recorrer el flujo sin clave de OpenAI.
+
+### Cambiado
+
+- `recomendacion` de la IA pasa de texto a `{ titulo, detalle }`; los `id` de las preguntas son su `ref` ("p12").
+
 ### Agregado (la empresa responde, 13 de octubre)
 
 - **E1 · Inicio de la empresa** con la medición pendiente en cada estado, el último resultado, la evolución y las áreas a trabajar.

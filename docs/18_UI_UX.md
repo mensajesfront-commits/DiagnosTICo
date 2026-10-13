@@ -68,7 +68,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha y conectada (dos pasos, DEC-015 y DEC-016) |
 | L3 | ¿Olvidaste tu contraseña? | `pages/auth/ForgotPassword.vue` | Hecha |
 | L4 | Crea una contraseña nueva | `pages/auth/ResetPassword.vue` | Hecha |
-| A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada. todas las acciones conectadas menos "Ver resultado" (espera A3.3) |
+| A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada, con todas sus acciones |
 | A2 | Diagnósticos de un sector | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2·T | Todos los diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
 | A2b | Sector sin diagnósticos | `pages/diagnosticos/Index.vue` | Hecha y conectada |
@@ -91,7 +91,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.1c | Editar importancia | `pages/diagnosticos/Importancia.vue` | Hecha y conectada |
 | A2.4 | Vista previa y estado | `pages/diagnosticos/VistaPrevia.vue` | Hecha y conectada ("Resultado de ejemplo" espera A2.6) |
 | A3 | Empresas: búsqueda, filtros y tabla paginada | `pages/empresas/Index.vue` | Hecha y conectada |
-| A3.1 | Ficha de la empresa: Historial y gráfica de evolución | `pages/empresas/Ver.vue`, `components/graficas/EvolucionPuntaje.vue` | Hecha y conectada ("Ver resultado" espera A3.3) |
+| A3.1 | Ficha de la empresa: Historial y gráfica de evolución | `pages/empresas/Ver.vue`, `components/graficas/EvolucionPuntaje.vue` | Hecha y conectada ("Ver resultado" abre A3.3) |
 | A3.1b | Asignar medición, con vista previa | `pages/mediciones/Asignar.vue`, `components/empresas/BuscadorEmpresa.vue` | Hecha y conectada |
 | A3.1e | Correo de aviso: editar con variables, vista previa, prueba y enviar | `components/empresas/EditorCorreo.vue`, `ModalCorreoAviso.vue` | Hecha y conectada |
 | A1b, A1c | Recordatorio y Reenviar aviso | `components/empresas/ModalCorreoAviso.vue` | Hecha y conectada |
@@ -109,10 +109,13 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A5.5 | Cambiar o asignar rol | `ModalCambiarRol.vue`, `ModalAsignarRol.vue` | Hecha |
 | — | Invitar usuario interno | `components/usuarios/ModalInvitarUsuario.vue` | Hecha. El wireframe no le da código. |
 | A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
-| E1 | Inicio de la empresa: primera vez, pendiente, en curso, vencida, enviada y sin pendiente | `pages/inicio/Empresa.vue` | Hecha y conectada (los enlaces a resultado, historial y PDF esperan E6–E8) |
+| E1 | Inicio de la empresa: primera vez, pendiente, en curso, vencida, enviada y sin pendiente | `pages/inicio/Empresa.vue` | Hecha y conectada ("Ver historial completo" espera E8) |
 | E2 | Responder el diagnóstico | `pages/responder/Responder.vue` | Hecha y conectada |
 | E3 | Revisa antes de enviar (y confirmar el envío) | `pages/responder/Revisar.vue` | Hecha y conectada |
-| E4 | Diagnóstico enviado | `pages/responder/Enviado.vue` | Hecha (el avance real del análisis espera HU-069) |
+| E4 | Diagnóstico enviado: avance real y reintento de categorías fallidas | `pages/responder/Enviado.vue` | Hecha y conectada |
+| E6 / A3.3 | Resultado: resumen, categorías y recomendaciones | `pages/resultados/Resultado.vue`, `components/resultados/PreguntaResultado.vue` | Hecha y conectada |
+| E9 / A3.5 | Mis respuestas | `pages/resultados/Respuestas.vue` | Hecha y conectada |
+| E10 / E7 | Informe PDF de 3 páginas | `resources/views/pdf/informe.blade.php` | Hecho (se descarga desde E1, E6 y E9) |
 | E11 | Mi perfil de la empresa (y del colaborador) | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
 | E12 | Colaboradores de la empresa | `pages/colaboradores/Index.vue` | Hecha y conectada |
 | E12.1 | Agregar colaborador | `components/colaboradores/ModalAgregarColaborador.vue` | Hecha |
@@ -167,3 +170,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | E1 (vencida) | En vez de solo "Escribir a NuevasTIC", el botón "Pedir una nueva fecha" registra la solicitud y avisa a los administradores; el correo de soporte queda debajo. | HU-082 pide que la solicitud quede registrada y una a la vez. |
 | E2 | Sin la opción "Otro" con texto ("¿Cuál otro canal?"). | **[FUNCIONALIDAD POR DEFINIR]** Necesita un campo en las opciones (A2.1b). |
 | E2 | La descripción de la categoría es un texto general ("No hay respuestas buenas o malas…"). | **[INFORMACIÓN PENDIENTE]** La versión congelada no guarda la descripción de cada categoría. |
+| E6 | El resultado va en tres pestañas (Resumen, Categorías, Recomendaciones) y el detalle se abre eligiendo una fila de la tabla, en vez de una página larga con acordeones. | Las páginas del panel no tienen scroll de página (pedido del equipo). |
+| E6 | Sin "Mi historial ›" en la ruta de navegación: flecha a Inicio (o a la ficha A3.1 para el Administrador). | Se usan flechas y no migas de pan; E8 aún no existe. |
+| E6, PDF | La frase de cada nivel: la de "Se puede mejorar" es la del wireframe; las otras tres son propuesta. | **[INFORMACIÓN PENDIENTE]** NuevasTIC aprueba las frases (`App\Support\Niveles::FRASES`). |
+| PDF | La página 2 tiene el radar sobre la tabla; el wireframe E10 no lo dibuja. | HU-066 CA-002 pide el radar. **[INCONSISTENCIA DETECTADA]** entre el wireframe y la historia; manda la historia. |

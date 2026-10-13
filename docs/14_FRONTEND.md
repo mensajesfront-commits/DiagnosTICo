@@ -290,7 +290,7 @@ Ruta: `GET /mi-inicio`. Props en el tipo `InicioEmpresa` (`types/responder.ts`).
 
 - La medición pendiente según su estado: primera vez, no iniciada (mensaje del equipo, fecha límite y días que quedan), en curso (avance y "Continuar diagnóstico"), vencida ("Pedir una nueva fecha" y el correo de soporte; "Nueva medición solicitada" si ya la pidió) o enviada. Sin pendiente: "No tienes diagnósticos pendientes".
 - Primera vez: "Cómo funciona" en 3 pasos. Con resultados: el último (anillo `graficas/AnilloPuntaje.vue`, nivel, variación y `graficas/MiniEvolucion.vue`) y "Tus 3 áreas a trabajar" o "Mis mediciones".
-- **[FUNCIONALIDAD POR DEFINIR]** "Ver resultado", "Ver informe PDF" y "Ver historial completo" se ven sin enlace hasta E6–E8.
+- "Ver resultado" abre E6 y "Ver informe PDF" descarga el PDF. **[FUNCIONALIDAD POR DEFINIR]** "Ver historial completo" (E8).
 
 ### E2–E4 · Responder, revisar y enviado (`responder/Responder`, `responder/Revisar`, `responder/Enviado`)
 
@@ -299,8 +299,19 @@ Usan `layouts/ResponderLayout.vue` (sin menú lateral) y `components/responder/B
 - **Opción excluyente ("Ninguna"):** en E2 y A2.4, marcarla desmarca las demás y marcar otra la desmarca. En A2.1b se elige en "Opción que excluye a las demás"; si una opción se llama "Ninguna", "Ninguno" o "Nada", queda elegida sola.
 - **E2:** categorías a la izquierda (✓ completa, ● a medias, número si no empezó); preguntas con "Cómo responder", "Obligatoria" y el tipo. Cada respuesta se guarda al momento con `fetch` (PUT JSON con el token de la cookie `XSRF-TOKEN`); las escritas, al dejar de escribir. Abajo, anterior y siguiente; en la última, "Revisar antes de enviar". La URL guarda la categoría (`?categoria=`).
 - **E3:** con faltantes, la lista con "Completar" y el aviso; completo, "N/N categorías completas" y "Todo listo". "Enviar diagnóstico" pide confirmar.
-- **E4:** los pasos del análisis; se actualiza sola cada 15 s. **[FUNCIONALIDAD POR DEFINIR]** El avance real llega con HU-069.
+- **E4:** los dos pasos con su estado real ("2 de 10" categorías). Se recarga cada 5 s; cuando se publica el resultado, el servidor la lleva a E6. Si una categoría falló tras 3 intentos: "No pudimos terminar el análisis de algunas categorías" y "Reintentar esas categorías".
 - **[FUNCIONALIDAD POR DEFINIR]** La opción "Otro" con texto del wireframe necesita un campo en las opciones.
+
+### E6 / A3.3 · Resultado (`resultados/Resultado`)
+
+Ruta: `GET /resultados/{medicion}`. Props: `medicion` (`CabeceraResultado`), `resultado` (`Resultado`, en `types/resultados.ts`) e `interno` (lo abre el equipo de NuevasTIC: la flecha vuelve a la ficha A3.1 y no a Inicio).
+
+- Pestañas, para caber sin scroll: **Resumen** (anillo, nivel, frase, variación vs. la medición anterior, escala de niveles, las 3 recomendaciones de las categorías más débiles y el radar actual vs. anterior), **Categorías** (tabla con importancia, puntaje, nivel y "vs. anterior"; al elegir una fila, el detalle con cada pregunta en `components/resultados/PreguntaResultado.vue`, la observación y la recomendación de la categoría) y **Recomendaciones** (todas, de la más débil a la más fuerte).
+- "Ver mis respuestas" (E9) y "Ver informe PDF" (`Boton` con `archivo`: enlace normal, sin Inertia, para descargar).
+
+### E9 / A3.5 · Mis respuestas (`resultados/Respuestas`)
+
+Ruta: `GET /resultados/{medicion}/respuestas` (`?categoria=c3` abre esa). Categorías con su puntaje a la izquierda y, a la derecha, las preguntas con la respuesta, el puntaje ("· IA" en las abiertas) y la observación de la IA. Solo lectura.
 
 ### A5 · Usuarios y roles: pestaña Usuarios (`usuarios/Index`)
 
