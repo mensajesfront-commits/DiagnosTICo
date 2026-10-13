@@ -9812,12 +9812,12 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-037 — Editar el correo de aviso de la medición | RF-006 | Hecha |
 | HU-038 — Ver el resultado de una empresa | RF-019 | Hecha (A3.3 usa la misma pantalla que E6) |
 | HU-039 — Ver el historial de una empresa | RF-019 | Pendiente |
-| HU-040 — Ver las respuestas de una empresa | RF-019 | Pendiente |
-| HU-041 — Editar las instrucciones generales de la IA | RF-020 | Pendiente |
-| HU-042 — Ajustar el prompt para un sector | RF-021 | Pendiente |
-| HU-043 — Ajustar el prompt para una empresa | RF-021 | Pendiente |
-| HU-044 — Ver el prompt completo | RF-022 | Pendiente |
-| HU-045 — Probar el prompt con un ejemplo | RF-022 | Pendiente |
+| HU-040 — Ver las respuestas de una empresa | RF-019 | Hecha (A3.5 usa la misma pantalla que E9) |
+| HU-041 — Editar las instrucciones generales de la IA | RF-020 | Hecha |
+| HU-042 — Ajustar el prompt para un sector | RF-021 | Hecha |
+| HU-043 — Ajustar el prompt para una empresa | RF-021 | Hecha |
+| HU-044 — Ver el prompt completo | RF-022 | Hecha |
+| HU-045 — Probar el prompt con un ejemplo | RF-022 | Hecha (límite: 10 pruebas por minuto; el límite por día sigue **REQUIERE VALIDACIÓN**) |
 | HU-046 — Ver las cuentas del sistema | RF-023 | Hecha |
 | HU-047 — Desactivar o reactivar una cuenta | RF-023 | Hecha |
 | HU-048 — Ver los roles del sistema | RF-024 | Hecha |
@@ -9852,8 +9852,8 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-077 — Crear un colaborador | RF-035 | Hecha |
 | HU-078 — Cambiar la contraseña de un colaborador | RF-035 | Hecha |
 | HU-079 — Desactivar o reactivar un colaborador | RF-035 | Hecha |
-| HU-080 — Entender cómo se arma el prompt final | RF-020 | Pendiente |
-| HU-081 — Armar el prompt de cada categoría | RF-037 | Hecha (lee las capas de `prompts`; la pantalla A4 para editarlas está pendiente) |
+| HU-080 — Entender cómo se arma el prompt final | RF-020 | Hecha |
+| HU-081 — Armar el prompt de cada categoría | RF-037 | Hecha |
 | HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Hecha (botón "Pedir una nueva fecha" en E1) |
 | HU-083 — Atender las solicitudes de nueva medición | RF-034 | Pendiente |
 | HU-084 — Publicar el resultado | RF-038 | Hecha |

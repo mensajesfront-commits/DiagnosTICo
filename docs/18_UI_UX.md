@@ -112,6 +112,11 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | E1 | Inicio de la empresa: primera vez, pendiente, en curso, vencida, enviada y sin pendiente | `pages/inicio/Empresa.vue` | Hecha y conectada ("Ver historial completo" espera E8) |
 | E2 | Responder el diagnóstico | `pages/responder/Responder.vue` | Hecha y conectada |
 | E3 | Revisa antes de enviar (y confirmar el envío) | `pages/responder/Revisar.vue` | Hecha y conectada |
+| A4 | Configuración de la IA: instrucciones generales | `pages/configuracion-ia/Index.vue`, `components/ia/ElementoPrompt.vue` | Hecha y conectada |
+| A4.4 | Instrucciones completas | `components/ia/ModalPromptCompleto.vue` | Hecha |
+| A4.5 / A4.6 | Ajuste por sector y por empresa (y quitarlo) | `pages/configuracion-ia/Index.vue`, `components/ia/ModalQuitarAjuste.vue` | Hecha y conectada |
+| A4.7 | Probar con un ejemplo | `components/ia/ModalProbarPrompt.vue` | Hecha |
+| A4.9 | Cómo se arma el prompt final | `pages/configuracion-ia/ComoSeArma.vue` | Hecha |
 | E4 | Diagnóstico enviado: avance real y reintento de categorías fallidas | `pages/responder/Enviado.vue` | Hecha y conectada |
 | E6 / A3.3 | Resultado: resumen, categorías y recomendaciones | `pages/resultados/Resultado.vue`, `components/resultados/PreguntaResultado.vue` | Hecha y conectada |
 | E9 / A3.5 | Mis respuestas | `pages/resultados/Respuestas.vue` | Hecha y conectada |
@@ -174,3 +179,6 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | E6 | Sin "Mi historial ›" en la ruta de navegación: flecha a Inicio (o a la ficha A3.1 para el Administrador). | Se usan flechas y no migas de pan; E8 aún no existe. |
 | E6, PDF | La frase de cada nivel: la de "Se puede mejorar" es la del wireframe; las otras tres son propuesta. | **[INFORMACIÓN PENDIENTE]** NuevasTIC aprueba las frases (`App\Support\Niveles::FRASES`). |
 | PDF | La página 2 tiene el radar sobre la tabla; el wireframe E10 no lo dibuja. | HU-066 CA-002 pide el radar. **[INCONSISTENCIA DETECTADA]** entre el wireframe y la historia; manda la historia. |
+| A4 | Sin migas de pan: el título dice el alcance ("Personalizar por sector · Abogados"). | Se usan flechas y títulos, no migas de pan. |
+| A4.4 | Las marcas de origen son General, Sector y Empresa. No hay marca "[Pregunta]": el "Ten en cuenta" y el criterio se ven dentro de cada respuesta. | El sistema envía las indicaciones de pregunta con las respuestas (capa 4), no dentro de Detalles. |
+| A4.5 | "Reemplazar" sustituye el texto completo del elemento, no solo `{contexto_sector}`. | HU-042 CA-002: "Reemplazar lo sustituye". **[INCONSISTENCIA DETECTADA]** menor con el texto del wireframe ("ocupa el lugar del Contexto del sector"). |

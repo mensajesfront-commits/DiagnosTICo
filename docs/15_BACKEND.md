@@ -21,7 +21,7 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 | Empresas y mediciones | `/empresas`, `/mediciones` | `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion` | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1, A3.1b–A3.1d, A3.1f, A3.2 | Hecho; A3.1e (correo), A3.3–A3.5 con Resultados |
 | Responder medición | `/mi-diagnostico/{id}` | `ResponderController`, `DatosResponder` | `diagnostico.responder` + su empresa | E2–E4 | Hecho |
 | Resultados | `/resultados/{id}`, `/resultados/{id}/respuestas`, `/resultados/{id}/pdf` | `ResultadosController`, `DatosResultado` | `resultados.ver`, `resultados.pdf` + su empresa (interna: además `empresas.ver`) | E6, E9, E10, A3.3, A3.5 | Hecho |
-| Configuración de la IA | `/configuracion-ia` | `PromptsController` (por crear) | `ia.ver` / `ia.editar` | A4, A4.1–A4.4 | Semana 5 |
+| Configuración de la IA | `/configuracion-ia` | `ConfiguracionIaController`, `DatosConfiguracionIa` | `ia.ver` / `ia.editar` | A4, A4.4–A4.7, A4.9 | Hecho |
 | Historial | `/historial` | `HistorialController` (por crear) | `resultados.ver` + su empresa | E8 | Semana 6 |
 | Webhook del bot de WhatsApp | `/webhook/whatsapp` | — | Firma del proveedor, sin sesión | — | **Aplazado** (EP-013). **[FUNCIONALIDAD POR DEFINIR]** Si se retoma, va separado de empresas y mediciones (RN-029) |
 
@@ -260,6 +260,24 @@ Tarea diaria (HU-070): `mediciones:vencer` a las 00:05 marca `vencida` las no in
 
 - **Se puede responder** si está no iniciada o en curso y no pasó la fecha límite (RN-016).
 - El correo de contacto de E1 sale de `SOPORTE_EMAIL` (**[INFORMACIÓN PENDIENTE]** la dirección real).
+
+## Configuración de la IA (A4, HU-041 a HU-045, HU-080, hecho)
+
+`ConfiguracionIaController`; datos de la pantalla en `App\Support\DatosConfiguracionIa`; el armado en `App\Services\Ia\ArmadorPrompt`. Pruebas en `tests/Feature/ConfiguracionIaTest.php`.
+
+| Método | URL | Nombre | Permiso | Qué hace |
+|---|---|---|---|---|
+| GET | `/configuracion-ia` | `ia.index` | `ia.ver` | A4. `?alcance=sector&sector=3` (A4.5) o `?alcance=empresa&empresa=8` (A4.6) |
+| GET | `/configuracion-ia/como-se-arma` | `ia.como-se-arma` | `ia.ver` | A4.9, solo lectura |
+| POST | `/configuracion-ia/vista-previa` | `ia.vista-previa` | `ia.ver` | JSON. A4.4: el prompt final de un ejemplo (`medicion_id`, `categoria_ref`) con el `borrador` sin guardar; cada trozo con su origen (`general`, `sector`, `empresa`) y si es un dato insertado. 60 por minuto |
+| PUT | `/configuracion-ia` | `ia.guardar` | `ia.editar` | Guarda la capa: general (contexto y tarea obligatorios) o el ajuste de un sector o empresa (`modos` usar · agregar · reemplazar; texto obligatorio si no es "usar"). Máx. 4000 caracteres por elemento |
+| DELETE | `/configuracion-ia/ajuste` | `ia.quitar` | `ia.editar` | Quita el ajuste de un sector o una empresa |
+| POST | `/configuracion-ia/probar` | `ia.probar` | `ia.editar` | JSON. A4.7: analiza el ejemplo con el borrador y devuelve lo que diría la IA. No guarda nada; si la IA falla, 422 con el error. 10 por minuto |
+
+- **Datos que se insertan solos:** `{sector}`, `{contexto_sector}` (la descripción del sector), `{categoria}` y `{respuestas_categoria}` (en el texto queda "las preguntas con sus respuestas, que van en el mensaje siguiente"; las respuestas siempre se envían aparte, en JSON).
+- El sector que se usa es el del diagnóstico de la medición.
+- Los cambios aplican a los análisis que se hagan después de guardar; cada análisis guarda su prompt exacto en `analisis_categoria.prompt`.
+- **[INFORMACIÓN PENDIENTE]** El límite de pruebas por día (HU-045 "REQUIERE VALIDACIÓN"). Por ahora solo hay 10 por minuto.
 
 ## Análisis de la IA y resultado (HU-068, HU-069, HU-081, HU-084, hecho)
 

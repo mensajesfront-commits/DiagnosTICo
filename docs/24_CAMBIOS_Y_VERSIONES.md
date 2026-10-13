@@ -10,6 +10,13 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - En selección múltiple, una opción puede excluir a las demás ("Ninguna", "Nada"): al marcarla se desmarcan las otras, y el servidor no las acepta juntas. Columna `opciones.exclusiva`.
 
+### Agregado (configuración de la IA, 13 de octubre)
+
+- **A4 · Configuración de la IA** (HU-041 a HU-043): instrucciones generales con los datos que se insertan solos y "Restaurar texto original"; ajuste por sector y por empresa con usar, agregar o reemplazar; quitar ajuste.
+- **A4.4 · Instrucciones completas** (HU-044) con el origen de cada parte, y **A4.7 · Probar con un ejemplo** (HU-045) sin guardar nada.
+- **A4.9 · Cómo se arma el prompt final** (HU-080).
+- El prompt reemplaza `{sector}`, `{contexto_sector}`, `{categoria}` y `{respuestas_categoria}`.
+
 ### Agregado (análisis de la IA y resultados, 13 de octubre)
 
 - **Cálculo de puntajes** (HU-068): única, múltiple con tope 100, abiertas por la IA, promedio por categoría y total ponderado; nivel y variación contra la medición anterior.

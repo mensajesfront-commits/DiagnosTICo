@@ -302,6 +302,20 @@ Usan `layouts/ResponderLayout.vue` (sin menú lateral) y `components/responder/B
 - **E4:** los dos pasos con su estado real ("2 de 10" categorías). Se recarga cada 5 s; cuando se publica el resultado, el servidor la lleva a E6. Si una categoría falló tras 3 intentos: "No pudimos terminar el análisis de algunas categorías" y "Reintentar esas categorías".
 - **[FUNCIONALIDAD POR DEFINIR]** La opción "Otro" con texto del wireframe necesita un campo en las opciones.
 
+### A4 · Configuración de la IA (`configuracion-ia/Index`)
+
+Ruta: `GET /configuracion-ia`. Props en `ConfiguracionIa` (`types/configuracionIa.ts`).
+
+- Una sola página con los tres alcances de la etapa "Analizar categoría": **Todas las empresas** (instrucciones generales, A4), **Solo un sector** (A4.5) y **Solo una empresa** (A4.6, con buscador). Cambiar de alcance con cambios sin guardar pide confirmación.
+- Cada elemento (contexto, tarea, detalles, ejemplos) en `components/ia/ElementoPrompt.vue`: en lo general, el texto con "Restaurar texto original" y qué datos automáticos usa; en un ajuste, "Usar general / Usar sector", "Agregar" o "Reemplazar" con la vista de cómo lo leerá la IA. El formato de la respuesta se ve fijo, con "Ver detalle técnico".
+- Panel derecho: qué instrucciones se usan (y de qué capa sale cada elemento), "Probar con un ejemplo" (`ModalProbarPrompt`, A4.7), "Ver instrucciones completas" (`ModalPromptCompleto`, A4.4: Lectura con el origen marcado por color y Texto exacto con "Copiar"), cuándo aplica, última edición y "Quitar ajuste" (`ModalQuitarAjuste`).
+- Sin `ia.editar` todo se ve en solo lectura y no aparecen Guardar, Probar ni Quitar.
+- Las llamadas JSON usan `enviarJson` de `lib/ia.ts`.
+
+### A4.9 · Cómo se arma el prompt final (`configuracion-ia/ComoSeArma`)
+
+Las cinco capas con lo que aporta cada una, las indicaciones por pregunta y dónde pedir un FODA o PESTEL. Solo lectura.
+
 ### E6 / A3.3 · Resultado (`resultados/Resultado`)
 
 Ruta: `GET /resultados/{medicion}`. Props: `medicion` (`CabeceraResultado`), `resultado` (`Resultado`, en `types/resultados.ts`) e `interno` (lo abre el equipo de NuevasTIC: la flecha vuelve a la ficha A3.1 y no a Inicio).
