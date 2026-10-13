@@ -21,9 +21,7 @@ use Inertia\Response;
  * A2, A2·T, A2b · Diagnósticos por sector y "Todos" (T-050), A2.5 · Crear,
  * A2.7 · Duplicar, archivar y eliminar (HU-010, HU-011, HU-020 a HU-022).
  *
- * [FUNCIONALIDAD POR DEFINIR] El editor (A2.1) llega en la semana 4
- * (T-074, T-081). Mientras tanto, crear y duplicar vuelven a la lista con
- * el borrador nuevo.
+ * Crear y duplicar llevan al editor (A2.1, `EditorDiagnosticoController`).
  */
 class DiagnosticosController extends Controller
 {
@@ -99,9 +97,9 @@ class DiagnosticosController extends Controller
             return $diagnostico;
         });
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => "Borrador «{$diagnostico->nombre}» creado. El editor llega con la pantalla A2.1."]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Borrador «{$diagnostico->nombre}» creado. Agrega sus preguntas."]);
 
-        return to_route('diagnosticos.index', ['sector' => $diagnostico->sector_id]);
+        return to_route('diagnosticos.editar', $diagnostico);
     }
 
     /** A2.7 · Copia el contenido actual en un borrador v1 (HU-021). */
@@ -128,7 +126,7 @@ class DiagnosticosController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Copia creada como borrador: «{$copia->nombre}»."]);
 
-        return to_route('diagnosticos.index', ['sector' => $copia->sector_id]);
+        return to_route('diagnosticos.editar', $copia);
     }
 
     /** Archiva un diagnóstico publicado: no se asigna más; sus mediciones siguen (HU-022). */

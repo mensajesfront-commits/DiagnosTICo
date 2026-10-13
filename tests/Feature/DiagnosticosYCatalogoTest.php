@@ -78,7 +78,7 @@ it('crea un borrador en blanco con importancias que suman 100', function () {
         'sector_id' => $sector->id,
         'punto_partida' => 'blanco',
         'categorias' => $categorias->pluck('id')->all(),
-    ])->assertRedirect(route('diagnosticos.index', ['sector' => $sector->id]));
+    ])->assertRedirectContains('/editar');
 
     $diagnostico = Diagnostico::where('nombre', 'Diagnóstico de redes')->firstOrFail();
     expect($diagnostico->estado)->toBe(Diagnostico::BORRADOR)

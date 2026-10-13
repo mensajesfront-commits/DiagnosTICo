@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ColaboradoresController;
 use App\Http\Controllers\DiagnosticosController;
+use App\Http\Controllers\EditorDiagnosticoController;
 use App\Http\Controllers\EmpresasController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MedicionesController;
@@ -35,6 +36,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:diagnosticos.ver')->group(function () {
         Route::get('diagnosticos', [DiagnosticosController::class, 'index'])->name('diagnosticos.index');
         Route::get('categorias', [CategoriasController::class, 'index'])->name('categorias.index');
+        // A2.4 · vista previa del borrador o de una versión (?version=).
+        Route::get('diagnosticos/{diagnostico}/vista-previa', [EditorDiagnosticoController::class, 'vistaPrevia'])->name('diagnosticos.vista-previa');
     });
 
     Route::middleware('permission:diagnosticos.editar')->group(function () {
@@ -45,6 +48,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('diagnosticos', [DiagnosticosController::class, 'eliminarVarios'])->name('diagnosticos.eliminar-varios');
         Route::delete('diagnosticos/{diagnostico}/borrador', [DiagnosticosController::class, 'eliminarBorrador'])->name('diagnosticos.eliminar-borrador');
         Route::delete('diagnosticos/{diagnostico}', [DiagnosticosController::class, 'eliminar'])->name('diagnosticos.eliminar');
+
+        // A2.1 · Editor (HU-023 a HU-029).
+        Route::get('diagnosticos/{diagnostico}/editar', [EditorDiagnosticoController::class, 'editar'])->name('diagnosticos.editar');
+        Route::post('diagnosticos/{diagnostico}/preguntas', [EditorDiagnosticoController::class, 'guardarPregunta'])->name('diagnosticos.preguntas.guardar');
+        Route::put('diagnosticos/{diagnostico}/preguntas/{pregunta}', [EditorDiagnosticoController::class, 'actualizarPregunta'])->name('diagnosticos.preguntas.actualizar');
+        Route::delete('diagnosticos/{diagnostico}/preguntas/{pregunta}', [EditorDiagnosticoController::class, 'eliminarPregunta'])->name('diagnosticos.preguntas.eliminar');
+        Route::put('diagnosticos/{diagnostico}/categorias/{parte}/orden', [EditorDiagnosticoController::class, 'ordenarPreguntas'])->name('diagnosticos.preguntas.ordenar');
+        Route::post('diagnosticos/{diagnostico}/categorias', [EditorDiagnosticoController::class, 'agregarCategorias'])->name('diagnosticos.categorias.agregar');
+        Route::get('diagnosticos/{diagnostico}/importancia', [EditorDiagnosticoController::class, 'importancia'])->name('diagnosticos.importancia');
+        Route::put('diagnosticos/{diagnostico}/importancia', [EditorDiagnosticoController::class, 'guardarImportancia'])->name('diagnosticos.importancia.guardar');
+        Route::post('diagnosticos/{diagnostico}/publicar', [EditorDiagnosticoController::class, 'publicar'])->name('diagnosticos.publicar');
 
         Route::post('sectores', [SectoresController::class, 'store'])->name('sectores.store');
         Route::put('sectores/{sector}', [SectoresController::class, 'update'])->name('sectores.update');
