@@ -22,7 +22,7 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 | Responder medición | `/mi-diagnostico/{id}` | `ResponderController`, `DatosResponder` | `diagnostico.responder` + su empresa | E2–E4 | Hecho |
 | Resultados | `/resultados/{id}`, `/resultados/{id}/respuestas`, `/resultados/{id}/pdf` | `ResultadosController`, `DatosResultado` | `resultados.ver`, `resultados.pdf` + su empresa (interna: además `empresas.ver`) | E6, E9, E10, A3.3, A3.5 | Hecho |
 | Configuración de la IA | `/configuracion-ia` | `ConfiguracionIaController`, `DatosConfiguracionIa` | `ia.ver` / `ia.editar` | A4, A4.4–A4.7, A4.9 | Hecho |
-| Historial | `/historial` | `HistorialController` (por crear) | `resultados.ver` + su empresa | E8 | Semana 6 |
+| Historial | `/historial`, `/empresas/{id}/historial` | `HistorialController`, `DatosHistorial` | E8: `resultados.ver` + su empresa (una cuenta interna recibe 404); A3.4: `empresas.ver` | E8, A3.4 | Hecho. Sale de `DatosEmpresas::ficha` para que coincida con A3.1; lista solo las terminadas con resultado |
 | Webhook del bot de WhatsApp | `/webhook/whatsapp` | — | Firma del proveedor, sin sesión | — | **Aplazado** (EP-013). **[FUNCIONALIDAD POR DEFINIR]** Si se retoma, va separado de empresas y mediciones (RN-029) |
 
 Los permisos son los 15 de `RolesYPermisosSeeder`. **[INFORMACIÓN PENDIENTE]** Los nombres de los controladores "por crear" los confirma Luis al programar cada módulo.

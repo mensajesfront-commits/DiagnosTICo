@@ -9811,7 +9811,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-036 — Asignar una medición | RF-018 | Hecha |
 | HU-037 — Editar el correo de aviso de la medición | RF-006 | Hecha |
 | HU-038 — Ver el resultado de una empresa | RF-019 | Hecha (A3.3 usa la misma pantalla que E6) |
-| HU-039 — Ver el historial de una empresa | RF-019 | Pendiente |
+| HU-039 — Ver el historial de una empresa | RF-019 | Hecha (A3.4 usa la misma pantalla que E8) |
 | HU-040 — Ver las respuestas de una empresa | RF-019 | Hecha (A3.5 usa la misma pantalla que E9) |
 | HU-041 — Editar las instrucciones generales de la IA | RF-020 | Hecha |
 | HU-042 — Ajustar el prompt para un sector | RF-021 | Hecha |
@@ -9831,7 +9831,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-056 — Editar mi perfil (Empresa o Colaborador) | RF-026 | Hecha |
 | HU-057 — Ver mi inicio la primera vez | RF-027 | Hecha |
 | HU-058 — Ver mi medición pendiente | RF-027 | Hecha |
-| HU-059 — Ver mi inicio sin medición pendiente | RF-027 | Hecha ("Ver historial completo" llega con E8) |
+| HU-059 — Ver mi inicio sin medición pendiente | RF-027 | Hecha |
 | HU-060 — Responder el diagnóstico | RF-028 | Hecha |
 | HU-061 — Revisar antes de enviar | RF-029 | Hecha |
 | HU-062 — Enviar el diagnóstico | RF-029 | Hecha |
@@ -9839,7 +9839,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-064 — Ver mi resultado | RF-031 | Hecha |
 | HU-065 — Ver mis respuestas | RF-031 | Hecha |
 | HU-066 — Descargar el informe en PDF | RF-032 | Hecha |
-| HU-067 — Ver mi historial | RF-033 | Pendiente |
+| HU-067 — Ver mi historial | RF-033 | Hecha |
 | HU-068 — Calcular los puntajes | RF-036 | Hecha |
 | HU-069 — Analizar cada categoría con la IA | RF-037 | Hecha |
 | HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003, no responder una vencida, llega con E2) |

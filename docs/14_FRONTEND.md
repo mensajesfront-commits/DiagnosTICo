@@ -316,6 +316,15 @@ Ruta: `GET /configuracion-ia`. Props en `ConfiguracionIa` (`types/configuracionI
 
 Las cinco capas con lo que aporta cada una, las indicaciones por pregunta y dónde pedir un FODA o PESTEL. Solo lectura.
 
+### E8 / A3.4 · Historial (`historial/Historial`)
+
+Rutas: `GET /historial` (la empresa) y `GET /empresas/{id}/historial` (el Administrador, `interno`). Props en `Historial` (`types/historial.ts`).
+
+- La medición pendiente: la empresa la continúa si está en curso o ve el avance si se envió; no se inicia aquí (HU-067 CA-005). El Administrador puede cambiar la fecha o cancelarla (los mismos modales de A3.1) y "Asignar medición".
+- La gráfica de evolución (`graficas/EvolucionPuntaje.vue`) desde la 2.ª medición terminada.
+- La tabla de terminadas, paginada con las filas que caben, con "Ver resultado", "Ver mis respuestas" y "Ver informe PDF".
+- Se llega desde "Ver historial completo" en E1 y en A3.1, y desde "Mi historial" en el menú.
+
 ### E6 / A3.3 · Resultado (`resultados/Resultado`)
 
 Ruta: `GET /resultados/{medicion}`. Props: `medicion` (`CabeceraResultado`), `resultado` (`Resultado`, en `types/resultados.ts`) e `interno` (lo abre el equipo de NuevasTIC: la flecha vuelve a la ficha A3.1 y no a Inicio).
