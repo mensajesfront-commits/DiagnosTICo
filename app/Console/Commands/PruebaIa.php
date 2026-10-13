@@ -25,7 +25,12 @@ class PruebaIa extends Command
         $this->info('Enviando la categoría "'.$categoria['nombre'].'" a OpenAI…');
 
         try {
-            $resultado = $analizador->analizar(ArmadorPrompt::instrucciones(), $categoria);
+            $resultado = $analizador->analizar(ArmadorPrompt::instrucciones(datos: [
+                'sector' => $categoria['sector'],
+                'contexto_sector' => '',
+                'categoria' => $categoria['nombre'],
+                'respuestas_categoria' => ArmadorPrompt::RESPUESTAS_EN_TEXTO,
+            ]), $categoria);
         } catch (RespuestaIaInvalida $e) {
             $this->error($e->getMessage());
 

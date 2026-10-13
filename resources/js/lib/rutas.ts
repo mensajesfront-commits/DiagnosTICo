@@ -113,6 +113,20 @@ export const rutas = {
         solicitar: (id: number) => `/mi-diagnostico/${id}/solicitud`,
         reintentar: (id: number) => `/mi-diagnostico/${id}/reintentar`,
     },
+    ia: {
+        index: (
+            alcance: 'general' | 'sector' | 'empresa' = 'general',
+            id?: number,
+        ) =>
+            alcance === 'general'
+                ? '/configuracion-ia'
+                : `/configuracion-ia?alcance=${alcance}${id ? `&${alcance}=${id}` : ''}`,
+        comoSeArma: () => '/configuracion-ia/como-se-arma',
+        guardar: () => '/configuracion-ia',
+        quitar: () => '/configuracion-ia/ajuste',
+        vistaPrevia: () => '/configuracion-ia/vista-previa',
+        probar: () => '/configuracion-ia/probar',
+    },
     resultados: {
         ver: (id: number) => `/resultados/${id}`,
         respuestas: (id: number, categoria?: string) =>

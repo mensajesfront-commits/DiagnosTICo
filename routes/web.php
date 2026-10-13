@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ColaboradoresController;
+use App\Http\Controllers\ConfiguracionIaController;
 use App\Http\Controllers\DiagnosticosController;
 use App\Http\Controllers\EditorDiagnosticoController;
 use App\Http\Controllers\EmpresasController;
@@ -101,6 +102,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('mediciones/{medicion}/correo', [MedicionesController::class, 'correo'])->name('mediciones.correo');
         Route::post('mediciones/{medicion}/correo', [MedicionesController::class, 'enviarCorreo'])->name('mediciones.correo.enviar');
         Route::post('mediciones/correo/prueba', [MedicionesController::class, 'probarCorreo'])->middleware('throttle:10,1')->name('mediciones.correo.prueba');
+    });
+
+    // A4 · Configuración de la IA (HU-041 a HU-045, HU-080). Ver: ia.ver;
+    // guardar, quitar ajustes y probar (gasta una llamada): ia.editar.
+    Route::middleware('permission:ia.ver')->group(function () {
+        Route::get('configuracion-ia', [ConfiguracionIaController::class, 'index'])->name('ia.index');
+        Route::get('configuracion-ia/como-se-arma', [ConfiguracionIaController::class, 'comoSeArma'])->name('ia.como-se-arma');
+        Route::post('configuracion-ia/vista-previa', [ConfiguracionIaController::class, 'vistaPrevia'])->middleware('throttle:60,1')->name('ia.vista-previa');
+    });
+
+    Route::middleware('permission:ia.editar')->group(function () {
+        Route::put('configuracion-ia', [ConfiguracionIaController::class, 'guardar'])->name('ia.guardar');
+        Route::delete('configuracion-ia/ajuste', [ConfiguracionIaController::class, 'quitar'])->name('ia.quitar');
+        Route::post('configuracion-ia/probar', [ConfiguracionIaController::class, 'probar'])->middleware('throttle:10,1')->name('ia.probar');
     });
 
     // A5 · Usuarios y roles (docs/15_BACKEND.md). Ver: usuarios.ver;
