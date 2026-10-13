@@ -106,6 +106,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A5.1d | Eliminar rol | `components/usuarios/ModalEliminarRol.vue` | Hecha |
 | A5.2 | Crear rol | `components/usuarios/ModalCrearRol.vue` | Hecha |
 | A5.3b | Desactivar o eliminar cuenta | `components/usuarios/ModalDesactivarEliminar.vue` | Hecha y conectada |
+| A5.4 / A5.4b | "Ver como": franja de aviso y "Salir de Ver como" | `components/base/FranjaVerComo.vue`, `layouts/panel/PanelLayout.vue`, `layouts/ResponderLayout.vue`, `components/base/MenuLateral.vue` | Hecha y conectada |
 | A5.5 | Cambiar o asignar rol | `ModalCambiarRol.vue`, `ModalAsignarRol.vue` | Hecha |
 | — | Invitar usuario interno | `components/usuarios/ModalInvitarUsuario.vue` | Hecha. El wireframe no le da código. |
 | A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
@@ -185,3 +186,4 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A4.5 | "Reemplazar" sustituye el texto completo del elemento, no solo `{contexto_sector}`. | HU-042 CA-002: "Reemplazar lo sustituye". **[INCONSISTENCIA DETECTADA]** menor con el texto del wireframe ("ocupa el lugar del Contexto del sector"). |
 | E8 | Con la medición pendiente no iniciada o vencida, el botón es "Ir a mi inicio" y no "Continuar diagnóstico". | HU-067 CA-005: no se inicia desde el historial. |
 | A3.4 | "Asignar medición" va en el encabezado y no hay "Volver a la empresa": la flecha con el nombre de la empresa lleva a A3.1. | Se usan flechas, no migas de pan. |
+| A5.4 | Los botones que guardan no se apagan uno por uno (solo "Iniciar diagnóstico" y "Pedir una nueva fecha" en E1): al usarlos, el servidor no guarda nada y avisa. | El bloqueo está en el servidor para cubrir todas las pantallas (RN-026). |

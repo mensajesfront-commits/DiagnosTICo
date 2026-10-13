@@ -10,6 +10,10 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - En selección múltiple, una opción puede excluir a las demás ("Ninguna", "Nada"): al marcarla se desmarcan las otras, y el servidor no las acepta juntas. Columna `opciones.exclusiva`.
 
+### Agregado ("Ver como", 13 de octubre)
+
+- **A5.4 · "Ver como"** (HU-053, HU-054): desde Usuarios (A5) o la ficha de la empresa (A3.1), el Administrador ve el sistema como otra cuenta, con su menú y sus datos, en solo lectura, con la franja de aviso y "Salir de Ver como". Queda registrado quién lo usó y cuándo (RN-026).
+
 ### Agregado (historial, 13 de octubre)
 
 - **E8 · Mi historial** (HU-067) y **A3.4 · Historial de una empresa** (HU-039): la pendiente, la evolución desde la 2.ª medición y las mediciones terminadas con resultado, respuestas y PDF. "Ver historial completo" en E1 y A3.1.

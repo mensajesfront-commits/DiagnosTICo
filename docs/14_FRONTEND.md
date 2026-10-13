@@ -316,6 +316,12 @@ Ruta: `GET /configuracion-ia`. Props en `ConfiguracionIa` (`types/configuracionI
 
 Las cinco capas con lo que aporta cada una, las indicaciones por pregunta y dónde pedir un FODA o PESTEL. Solo lectura.
 
+### A5.4 · "Ver como" (`components/base/FranjaVerComo.vue`)
+
+- Con el dato compartido `verComo`, `PanelLayout` y `ResponderLayout` muestran arriba la franja "Estás viendo como … · Solo lectura" con "Salir de Ver como" (`POST /ver-como/salir`). En el menú lateral, "Cerrar sesión" pasa a ser "Salir de Ver como".
+- La franja pone la clase `ver-como` en `<html>`: `resources/css/app.css` descuenta su alto (`--alto-ver-como`) en las páginas de alto fijo y en el menú, para que no haya scroll de página.
+- E1 apaga "Iniciar diagnóstico" y "Pedir una nueva fecha" con "No disponible en Ver como". En el resto, el servidor rechaza cualquier cambio y avisa.
+
 ### E8 / A3.4 · Historial (`historial/Historial`)
 
 Rutas: `GET /historial` (la empresa) y `GET /empresas/{id}/historial` (el Administrador, `interno`). Props en `Historial` (`types/historial.ts`).

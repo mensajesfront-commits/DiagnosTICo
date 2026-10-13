@@ -9825,8 +9825,8 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-050 — Editar un rol | RF-024 | Hecha |
 | HU-051 — Eliminar un rol | RF-024 | Hecha |
 | HU-052 — Asignar o quitar un rol | RF-024 | Hecha |
-| HU-053 — Ver el sistema como una empresa | RF-025 | Pendiente |
-| HU-054 — Ver el sistema como otro administrador | RF-025 | Pendiente |
+| HU-053 — Ver el sistema como una empresa | RF-025 | Hecha |
+| HU-054 — Ver el sistema como otro administrador | RF-025 | Hecha para cuentas de otros roles; no sobre Administradores (respuesta del equipo, 6 oct; `17_SEGURIDAD.md`) |
 | HU-055 — Editar mi perfil (Administrador) | RF-026 | Hecha |
 | HU-056 — Editar mi perfil (Empresa o Colaborador) | RF-026 | Hecha |
 | HU-057 — Ver mi inicio la primera vez | RF-027 | Hecha |

@@ -16,7 +16,7 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 | Mi perfil | `/mi-perfil`, `/imagenes/{tipo}/{id}` | `PerfilController` | `auth` | A6, E11 | Hecho |
 | Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `EditorDiagnosticoController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.1, A2.1b–f, A2.1c, A2.2, A2.4, A2.5, A2.7 | Hecho; el resultado de ejemplo (A2.6) llega con Resultados |
 | Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
-| Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho ("Ver como" en semana 6) |
+| Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho |
 | Colaboradores | `/colaboradores` | `ColaboradoresController` | `role:Empresa` + cuenta principal | E12 | Hecho |
 | Empresas y mediciones | `/empresas`, `/mediciones` | `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion` | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1, A3.1b–A3.1d, A3.1f, A3.2 | Hecho; A3.1e (correo), A3.3–A3.5 con Resultados |
 | Responder medición | `/mi-diagnostico/{id}` | `ResponderController`, `DatosResponder` | `diagnostico.responder` + su empresa | E2–E4 | Hecho |
@@ -161,7 +161,8 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | POST | `/usuarios/{id}/recuperar` | `usuarios.gestionar` | Recupera una eliminada (90 días). La principal vuelve con su empresa y sus colaboradores; un colaborador eliminado con su empresa da error en `recuperar`. | — |
 | — | `php artisan cuentas:purgar` | Tarea diaria 03:10 | Borra para siempre lo eliminado hace más de 90 días (`config('diagnostico.eliminacion.dias')`). | — |
 | PUT | `/usuarios/{id}/rol` | `usuarios.gestionar` | A5.5: reemplaza el rol (RN-027). No sobre la propia cuenta; el rol debe estar activo | `rol_id`, `avisar` |
-| POST | `/usuarios/{id}/ver-como` | `usuarios.gestionar` | A5.4: por ahora solo avisa que llega con la pantalla A5.4 (semana 6). No sobre Administradores (403) | — |
+| POST | `/usuarios/{id}/ver-como` | `usuarios.gestionar` | A5.4: empieza "Ver como" (`VerComoController@iniciar`) y lleva al inicio de esa cuenta. No sobre Administradores ni sobre la propia (403) | — |
+| POST | `/ver-como/salir` | `auth` | Sale de "Ver como" y vuelve a donde empezó (A5 o A3.1) | — |
 | POST | `/roles` | `usuarios.gestionar` | A5.2: crea el rol | `nombre` (único, máx. 40), `descripcion`, `activo`, `permisos[]`, `cuentas[]` |
 | PUT | `/roles/{id}` | `usuarios.gestionar` | A5.1c: edita un rol creado (no los del sistema) | `nombre`, `descripcion`, `activo`, `permisos[]` |
 | DELETE | `/roles/{id}` | `usuarios.gestionar` | A5.1d: solo roles creados y sin cuentas | — |
@@ -301,6 +302,14 @@ Pruebas en `tests/Feature/ResultadosTest.php` y `tests/Feature/PruebaTecnica/Ana
 | GET | `/resultados/{medicion}/pdf` | `resultados.pdf` | Descarga el PDF guardado; si falta, lo genera con lo guardado (no llama a la IA). Si no se puede, vuelve con un aviso. 20 por minuto |
 
 La empresa y su colaborador solo ven su empresa (de otra, 404). Una cuenta interna necesita además `empresas.ver`.
+
+## "Ver como" (A5.4, HU-053, HU-054, hecho)
+
+- `App\Http\Middleware\VerComo` (grupo `web`, después de `CerrarSesionCuentaInactiva`): la sesión sigue siendo del Administrador; en cada petición, la cuenta vista pasa a ser el usuario (menú, permisos y datos de su rol).
+- **Solo lectura (RN-026):** toda petición que no sea GET o HEAD se rechaza, salvo salir y cerrar sesión. Inertia vuelve atrás con el aviso "Estás en \"Ver como\": es solo de lectura y no se guardó nada."; las llamadas JSON reciben 403 con ese mensaje.
+- **Registro (RN-026):** `registros_ver_como` guarda quién, a qué cuenta, el inicio y el fin. Se cierra al salir, al cerrar sesión o si el Administrador pierde `usuarios.gestionar` (la vista termina sola).
+- El estado vive en la sesión (`App\Support\SesionVerComo`) y se comparte con el frontend como `verComo` para la franja.
+- Pruebas en `tests/Feature/VerComoTest.php`.
 
 ## Otras secciones del menú (rutas previstas)
 
