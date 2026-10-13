@@ -4,7 +4,26 @@
 
 La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se agrupan por semana del cronograma.
 
-## Semana 3 · del 5 al 11 de octubre de 2026 (en curso)
+## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
+
+### Agregado (editor de diagnósticos, 13 de octubre)
+
+- **A2.1 · Editor:** categorías con su estado, preguntas que se ordenan arrastrando (o con el teclado), agregar, editar y eliminar preguntas (A2.1b, A2.1e, A2.1f) con opciones, puntajes, indicación y "Ten en cuenta" para la IA.
+- **Agregar categoría** del catálogo, manteniendo los pesos o repartiendo en partes iguales.
+- **A2.1c · Editar importancia:** total en vivo, guardar solo con 100%.
+- **A2.4 · Vista previa y estado:** los 5 requisitos para publicar, categorías por corregir con "Corregir" y el cuestionario como lo ve la empresa.
+- **Versiones y publicar (A2.1d):** historial, nota de cambios obligatoria y qué hacer con las mediciones pendientes. Cada cambio a un diagnóstico publicado abre el siguiente borrador.
+- Crear y duplicar un diagnóstico ahora abren el editor.
+
+### Agregado (correo de aviso y vencidas, 13 de octubre)
+
+- **A3.1e · Correo de aviso:** asunto y mensaje con variables, vista previa con los datos reales, "Enviarme un correo de prueba" y "Guardar como plantilla". Se abre desde A3.1b.
+- **Recordatorio y Reenviar aviso** (A1b, A1c, HU-008) en el Inicio y en la ficha; se guarda y se muestra el último aviso (`mediciones.ultimo_aviso_en`).
+- El correo de aviso va en la cola (no bloquea la pantalla y se reintenta).
+- **Tarea diaria `mediciones:vencer`** (HU-070): las mediciones sin enviar que pasaron su fecha límite quedan vencidas.
+- Corregido: "Nueva fecha" desde el Inicio abría el modal sin la fecha actual.
+
+## Semana 3 · del 5 al 11 de octubre de 2026
 
 ### Agregado
 
@@ -26,14 +45,6 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Usuarios y roles (A5, A5.1–A5.5): lista de cuentas con búsqueda y filtros, roles del sistema y creados, modales de invitar, desactivar, cambiar y asignar rol, crear y eliminar rol, conectados al backend (invitaciones por correo, desactivar, cambiar y asignar rol, CRUD de roles). "Ver como" llega con A5.4.
 - Colaboradores de la empresa (E12, E12.1–E12.3): lista, agregar, datos para compartir, cambiar contraseña, desactivar y reactivar. Conectado al backend (`ColaboradoresController`): solo la cuenta principal entra; cambiar la contraseña o desactivar cierra las sesiones del colaborador.
 - Documentos 02 (visión y objetivos), 04 (stakeholders), 06 (requisitos no funcionales), 09 (flujos, con el diagrama de secuencia de la medición) y 10 (arquitectura).
-
-### Agregado (correo de aviso y vencidas, 13 de octubre)
-
-- **A3.1e · Correo de aviso:** asunto y mensaje con variables, vista previa con los datos reales, "Enviarme un correo de prueba" y "Guardar como plantilla". Se abre desde A3.1b.
-- **Recordatorio y Reenviar aviso** (A1b, A1c, HU-008) en el Inicio y en la ficha; se guarda y se muestra el último aviso (`mediciones.ultimo_aviso_en`).
-- El correo de aviso va en la cola (no bloquea la pantalla y se reintenta).
-- **Tarea diaria `mediciones:vencer`** (HU-070): las mediciones sin enviar que pasaron su fecha límite quedan vencidas.
-- Corregido: "Nueva fecha" desde el Inicio abría el modal sin la fecha actual.
 
 ### Agregado (Empresas, 11 de octubre)
 

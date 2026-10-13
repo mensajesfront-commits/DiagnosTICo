@@ -207,7 +207,7 @@ Ruta prevista: `GET /diagnosticos/crear?sector={id}`.
 | `categorias` | `{ id, nombre }[]` | Categorías activas del catálogo. |
 | `publicados` | `DiagnosticoPublicado[]` | Última versión publicada de cada diagnóstico, de todos los sectores, con los nombres de sus categorías. |
 
-Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1; mientras no exista el editor (A2.1, semana 4) vuelve a A2 con un aviso.
+Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1 y abre el editor (A2.1).
 
 ### A3 · Empresas (`empresas/Index`)
 
@@ -263,6 +263,26 @@ Ruta: `GET /mediciones/asignar` (con `?empresa=` llega elegida); envía `POST /m
 - "Guardar como plantilla para las próximas mediciones" y "Enviarme un correo de prueba" (solo a quien lo pide).
 - Se usa en A3.1b (modal "Correo de aviso de la medición", con Volver y Guardar correo) y en `ModalCorreoAviso` (Recordatorio / Reenviar aviso desde A1 y la ficha, con Cancelar y Enviar). Este pide los datos a `GET /mediciones/{id}/correo`.
 - Se diferencia del wireframe en que es un modal y no una página aparte: así A3.1b no pierde lo que ya se llenó.
+
+### A2.1 · Editor del diagnóstico (`diagnosticos/Editor`)
+
+Ruta: `GET /diagnosticos/{id}/editar`. Props en el tipo `DatosEditor` (`types/editor.ts`).
+
+- Arriba: nombre, sector, "Borrador vN · Versiones" (abre `ModalVersiones`), el estado (enlace a A2.4), "Vista previa y estado" y "Publicar versión N".
+- Izquierda: categorías con ✓ o ⚠N, importancia y número de preguntas; total de importancia, "Editar importancia" (A2.1c) y "+ Agregar categoría" (`ModalAgregarCategoria`).
+- Derecha: las preguntas de la categoría (`components/editor/TarjetaPregunta.vue`). Se ordenan arrastrando ⋮⋮ o con flecha arriba/abajo sobre el asa; el orden se guarda al soltar.
+- `ModalPregunta` (A2.1b agregar, A2.1e editar): tipo, opciones con puntaje (subir, bajar, quitar), suma máxima en vivo, indicación, "Qué debe tener en cuenta la IA" por opción con "Así lo verá la IA", criterio de la abierta y "obligatoria". `ModalEliminarPregunta` (A2.1f).
+- `?categoria=` y `?pregunta=` (desde "Corregir") abren esa categoría y resaltan la pregunta.
+
+### A2.1c · Editar importancia (`diagnosticos/Importancia`)
+
+Ruta: `GET /diagnosticos/{id}/importancia`; envía `PUT` con `importancias{parte_id: valor}`. Total en vivo, "Guardar" solo con 100% exacto, cambios resaltados ("12 → 14") y "Repartir en partes iguales" (la última se lleva el redondeo, como el servidor).
+
+### A2.4 · Vista previa y estado (`diagnosticos/VistaPrevia`)
+
+Ruta: `GET /diagnosticos/{id}/vista-previa` (`?version=` para una publicada, en solo lectura). Izquierda: categorías completas, los 5 requisitos y las categorías por corregir con "Corregir". Derecha: el cuestionario como lo ve la empresa, una categoría a la vez; las respuestas no se guardan.
+
+- **[FUNCIONALIDAD POR DEFINIR]** La pestaña "Resultado de ejemplo" (A2.6, HU-030) llega con Resultados.
 
 ### A5 · Usuarios y roles: pestaña Usuarios (`usuarios/Index`)
 

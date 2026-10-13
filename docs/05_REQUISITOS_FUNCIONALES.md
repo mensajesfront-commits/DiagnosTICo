@@ -9795,13 +9795,13 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-020 — Crear un diagnóstico | RF-011 | Hecha |
 | HU-021 — Duplicar un diagnóstico | RF-011 | Hecha |
 | HU-022 — Archivar o eliminar un diagnóstico | RF-011 | Hecha |
-| HU-023 — Ver y ordenar el contenido del diagnóstico | RF-012 | Pendiente |
-| HU-024 — Agregar una pregunta | RF-013 | Pendiente |
-| HU-025 — Editar o eliminar una pregunta | RF-013 | Pendiente |
-| HU-026 — Agregar categorías al diagnóstico | RF-012 | Pendiente |
-| HU-027 — Editar la importancia de las categorías | RF-012 | Pendiente |
-| HU-028 — Ver la vista previa y el estado | RF-014 | Pendiente |
-| HU-029 — Publicar una versión | RF-014 | Pendiente |
+| HU-023 — Ver y ordenar el contenido del diagnóstico | RF-012 | Hecha |
+| HU-024 — Agregar una pregunta | RF-013 | Hecha |
+| HU-025 — Editar o eliminar una pregunta | RF-013 | Hecha |
+| HU-026 — Agregar categorías al diagnóstico | RF-012 | Hecha |
+| HU-027 — Editar la importancia de las categorías | RF-012 | Hecha |
+| HU-028 — Ver la vista previa y el estado | RF-014 | Hecha (el resultado de ejemplo, CA-005, llega con HU-030) |
+| HU-029 — Publicar una versión | RF-014 | Hecha |
 | HU-030 — Ver un resultado de ejemplo | RF-015 | Pendiente |
 | HU-031 — Ver la lista de empresas | RF-016 | Hecha |
 | HU-032 — Registrar una empresa | RF-017 | Hecha |

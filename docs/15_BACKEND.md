@@ -14,7 +14,7 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 | Ubicaciones | `/ubicaciones/{pais}` | `UbicacionesController` | Pública, 60 por minuto | L2, A6, E11 | Hecho |
 | Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | A1 hecha (Recordatorio y Reenviar aviso esperan A3.1e); E1 en la semana 6 |
 | Mi perfil | `/mi-perfil`, `/imagenes/{tipo}/{id}` | `PerfilController` | `auth` | A6, E11 | Hecho |
-| Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.2, A2.5, A2.7 | Hecho; editor A2.1 y vista previa A2.4 en semana 4 |
+| Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `EditorDiagnosticoController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.1, A2.1b–f, A2.1c, A2.2, A2.4, A2.5, A2.7 | Hecho; el resultado de ejemplo (A2.6) llega con Resultados |
 | Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
 | Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho ("Ver como" en semana 6) |
 | Colaboradores | `/colaboradores` | `ColaboradoresController` | `role:Empresa` + cuenta principal | E12 | Hecho |
@@ -100,10 +100,10 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | GET | `/diagnosticos` | `diagnosticos.ver` | A2·T: todos los diagnósticos | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos?sector={id}` | `diagnosticos.ver` | A2 / A2b: un sector | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos/crear?sector={id}` | `diagnosticos.editar` | A2.5 | Props de `diagnosticos/Crear` |
-| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1. Mientras no exista el editor A2.1 vuelve a A2 con un aviso | `nombre` (máx. 60, único en el sector), `sector_id`, `descripcion`, `punto_partida`, `categorias[]`, `copiar_de` |
-| GET | `/diagnosticos/{id}/editar` | `diagnosticos.editar` | A2.1 (semana 4) | |
-| GET | `/diagnosticos/{id}/vista-previa` | `diagnosticos.ver` | A2.4 (semana 4) | |
-| POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 (por ahora vuelve a A2 con un aviso) | `nombre` (máx. 60, único en el sector), `sector_id` |
+| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1 y abre el editor (A2.1) | `nombre` (máx. 60, único en el sector), `sector_id`, `descripcion`, `punto_partida`, `categorias[]`, `copiar_de` |
+| GET | `/diagnosticos/{id}/editar` | `diagnosticos.editar` | A2.1 · editor (`?categoria=` parte, `?pregunta=`) | Props de `diagnosticos/Editor` |
+| GET | `/diagnosticos/{id}/vista-previa` | `diagnosticos.ver` | A2.4 · vista previa del borrador o de una versión (`?version=`) | Props de `diagnosticos/VistaPrevia` |
+| POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 y abre el editor | `nombre` (máx. 60, único en el sector), `sector_id` |
 | POST | `/diagnosticos/{id}/archivar` | `diagnosticos.editar` | Archiva un diagnóstico publicado | — |
 | DELETE | `/diagnosticos` | `diagnosticos.editar` | Elimina varios a la vez (selección en la tabla). Solo los que nunca se publicaron; si alguno tiene versiones no se elimina ninguno y el error en `ids` dice cuáles archivar | `ids[]` |
 | DELETE | `/diagnosticos/{id}` | `diagnosticos.editar` | Elimina un borrador que nunca se publicó | — |
@@ -116,6 +116,25 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | DELETE | `/sectores/{id}` | `diagnosticos.editar` | A2.2e. Solo si no tiene empresas ni mediciones (RN-008). | — |
 
 **Nombre único por sector:** dentro de un mismo sector, dos diagnósticos no pueden llamarse igual, en ningún estado (un archivado también cuenta). En sectores distintos sí se puede repetir. No se miran mayúsculas ni espacios de más, y el nombre se guarda sin espacios de más (`app/Rules/NombreDiagnosticoUnico.php`). Error: "Este sector ya tiene un diagnóstico con ese nombre. Elige otro."
+
+## Editor del diagnóstico (A2.1, hecho)
+
+`EditorDiagnosticoController`; datos de `App\Support\DatosEditor` y estado de `App\Support\EstadoDiagnostico`. Pruebas en `tests/Feature/EditorDiagnosticoTest.php`. Todo con `diagnosticos.editar`, menos la vista previa.
+
+| Método | URL | Qué hace | Envía |
+|---|---|---|---|
+| POST | `/diagnosticos/{id}/preguntas` | HU-024 · agrega al final de la categoría | `parte_id`, `texto` (máx. 500), `tipo`, `indicacion` (obligatoria, máx. 500), `criterio_ia` (abierta, máx. 1000), `obligatoria`, `opciones[]` (2 a 10: `texto`, `puntaje` 0–100, `ten_en_cuenta` máx. 200) |
+| PUT | `/diagnosticos/{id}/preguntas/{pregunta}` | HU-025 · editar; las opciones con `id` conservan su id | Lo mismo, `opciones[].id` |
+| DELETE | `/diagnosticos/{id}/preguntas/{pregunta}` | HU-025 · eliminar y renumerar | — |
+| PUT | `/diagnosticos/{id}/categorias/{parte}/orden` | HU-023 · nuevo orden | `preguntas[]` (todos los id de la categoría) |
+| POST | `/diagnosticos/{id}/categorias` | HU-026 · agregar del catálogo (no archivadas) | `categorias[]`, `reparto` (`mantener`: las nuevas en 0% · `iguales`) |
+| GET | `/diagnosticos/{id}/importancia` | A2.1c | — |
+| PUT | `/diagnosticos/{id}/importancia` | HU-027 · solo si suma exactamente 100 (hasta 2 decimales) | `importancias{parte_id: valor}` |
+| POST | `/diagnosticos/{id}/publicar` | HU-029 · nueva versión congelada; el diagnóstico queda publicado y sin borrador | `nota` (obligatoria, máx. 500), `pendientes` (`dejar` · `pasar`: las no iniciadas o vencidas sin respuestas pasan a la nueva) |
+
+- **Borrador (RN-010):** cada cambio va al borrador. Si el diagnóstico está publicado y no tiene borrador, el primer cambio abre el siguiente (`version_borrador` = última + 1). Las versiones publicadas no se tocan. Uno archivado no se edita.
+- **Requisitos para publicar (RN-012):** cada categoría con al menos 1 pregunta; cada pregunta de opciones con al menos 2 opciones con puntaje; la importancia suma 100%; toda pregunta con indicación; cada selección múltiple puede llegar a 100. Si falta alguno, publicar responde un error en `nota`.
+- La pregunta, las preguntas de otro diagnóstico o una parte de otro diagnóstico dan 404.
 
 ## Catálogo de categorías (T-049)
 

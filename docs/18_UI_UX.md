@@ -83,6 +83,13 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.3b | Crear / editar categoría | `components/categorias/ModalCategoria.vue` | Hecha |
 | A2.3c | Archivar o eliminar categoría | `components/categorias/ModalRetirarCategoria.vue` | Hecha. Eliminar no tiene wireframe, sale de HU-019. |
 | A2.5 | Crear diagnóstico | `pages/diagnosticos/Crear.vue` | Hecha y conectada |
+| A2.1 | Editor del diagnóstico | `pages/diagnosticos/Editor.vue`, `components/editor/` | Hecha y conectada |
+| A2.1b / A2.1e | Agregar / editar pregunta | `components/editor/ModalPregunta.vue` | Hecha |
+| A2.1f | Eliminar pregunta | `components/editor/ModalEliminarPregunta.vue` | Hecha |
+| A2.1d | Versiones y publicar | `components/editor/ModalVersiones.vue` | Hecha |
+| A2.1d | Agregar categoría al diagnóstico | `components/editor/ModalAgregarCategoria.vue` | Hecha |
+| A2.1c | Editar importancia | `pages/diagnosticos/Importancia.vue` | Hecha y conectada |
+| A2.4 | Vista previa y estado | `pages/diagnosticos/VistaPrevia.vue` | Hecha y conectada ("Resultado de ejemplo" espera A2.6) |
 | A3 | Empresas: búsqueda, filtros y tabla paginada | `pages/empresas/Index.vue` | Hecha y conectada |
 | A3.1 | Ficha de la empresa: Historial y gráfica de evolución | `pages/empresas/Ver.vue`, `components/graficas/EvolucionPuntaje.vue` | Hecha y conectada ("Ver resultado" espera A3.3) |
 | A3.1b | Asignar medición, con vista previa | `pages/mediciones/Asignar.vue`, `components/empresas/BuscadorEmpresa.vue` | Hecha y conectada |
@@ -149,3 +156,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A1d | "Nueva fecha" abre un modal en la misma tabla, en vez de llevar a A3.1b. La medición conserva sus respuestas. | Menos pasos. HU-009 CA-002 se cumple igual; A3.1b también ofrece "dale una nueva fecha". |
 | A3.1d | Al cambiar el correo no se envía enlace de verificación: se guarda y se cierran sus sesiones. | DEC-012 (verificación quitada). |
 | A3.1e | Es un modal sobre A3.1b y no una página aparte; en A1 y la ficha se abre igual para Recordatorio / Reenviar aviso, con el botón "Enviar". | Así A3.1b no pierde lo ya llenado, y HU-008 reutiliza el mismo editor. |
+| A2.1, A2.1c, A2.4 | Sin migas "Diagnósticos › …": arriba va la flecha para volver. El estado ("⚠ Incompleto…") va bajo el título si no cabe. | Pedido del equipo para volver (A2). |
+| A2.1b | Los obligatorios llevan asterisco; la pregunta abierta tiene "Criterio para calificarla" (opcional). | Pedido del 8 de octubre y RN-013 ("la abierta tiene un único criterio"); el wireframe no dibuja la abierta. |
+| A2.1 | Las preguntas también se ordenan con el teclado (flecha arriba o abajo sobre ⋮⋮). | Accesibilidad: arrastrar no sirve sin ratón. |
+| A2.1b | La indicación para responder es obligatoria al guardar, pero el editor igual avisa "Falta la indicación" en preguntas copiadas sin ella. | HU-024 CA-003 la exige; el wireframe la muestra como algo por corregir. **[INCONSISTENCIA DETECTADA]** menor: las dos cosas quedan cubiertas. |
