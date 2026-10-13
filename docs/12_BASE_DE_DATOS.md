@@ -440,6 +440,7 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `texto` | varchar(255) | Sí | `Varias veces por semana` | |
 | `puntaje` | smallint | Sí | `75` | De 0 a 100 |
 | `ten_en_cuenta` | varchar(200) | No | `Si publican sin plan, no pasa de 50.` | Nota para la IA; la empresa no la ve |
+| `exclusiva` | boolean | Sí (por defecto `false`) | `true` | Solo en selección múltiple: "Ninguna" o "Nada". Al marcarla se desmarcan las demás; no se guarda junto con otras |
 | `orden` | smallint | Sí (por defecto `0`) | `3` | |
 | `created_at`, `updated_at` | timestamp | No | | |
 

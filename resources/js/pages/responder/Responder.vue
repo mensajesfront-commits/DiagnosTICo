@@ -112,11 +112,25 @@ function elegirUna(p: PreguntaResponder, opcion: string): void {
     void guardar(p);
 }
 
+/**
+ * Selección múltiple. Marcar "Ninguna" (exclusiva) desmarca las demás, y
+ * marcar otra desmarca "Ninguna".
+ */
 function marcar(p: PreguntaResponder, opcion: string): void {
     const lista = respuestas[p.ref].opciones;
-    respuestas[p.ref].opciones = lista.includes(opcion)
-        ? lista.filter((o) => o !== opcion)
-        : [...lista, opcion];
+    const exclusivas = p.opciones.filter((o) => o.exclusiva).map((o) => o.ref);
+
+    if (lista.includes(opcion)) {
+        respuestas[p.ref].opciones = lista.filter((o) => o !== opcion);
+    } else if (exclusivas.includes(opcion)) {
+        respuestas[p.ref].opciones = [opcion];
+    } else {
+        respuestas[p.ref].opciones = [
+            ...lista.filter((o) => !exclusivas.includes(o)),
+            opcion,
+        ];
+    }
+
     void guardar(p);
 }
 

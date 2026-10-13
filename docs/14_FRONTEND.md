@@ -296,6 +296,7 @@ Ruta: `GET /mi-inicio`. Props en el tipo `InicioEmpresa` (`types/responder.ts`).
 
 Usan `layouts/ResponderLayout.vue` (sin menú lateral) y `components/responder/BarraResponder.vue` (avance, "✓ Guardado 10:42" y "Guardar y salir").
 
+- **Opción excluyente ("Ninguna"):** en E2 y A2.4, marcarla desmarca las demás y marcar otra la desmarca. En A2.1b se elige en "Opción que excluye a las demás"; si una opción se llama "Ninguna", "Ninguno" o "Nada", queda elegida sola.
 - **E2:** categorías a la izquierda (✓ completa, ● a medias, número si no empezó); preguntas con "Cómo responder", "Obligatoria" y el tipo. Cada respuesta se guarda al momento con `fetch` (PUT JSON con el token de la cookie `XSRF-TOKEN`); las escritas, al dejar de escribir. Abajo, anterior y siguiente; en la última, "Revisar antes de enviar". La URL guarda la categoría (`?categoria=`).
 - **E3:** con faltantes, la lista con "Completar" y el aviso; completo, "N/N categorías completas" y "Todo listo". "Enviar diagnóstico" pide confirmar.
 - **E4:** los pasos del análisis; se actualiza sola cada 15 s. **[FUNCIONALIDAD POR DEFINIR]** El avance real llega con HU-069.

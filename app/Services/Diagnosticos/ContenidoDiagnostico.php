@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
  * Forma del arreglo:
  * { nombre, descripcion, categorias: [{ ref, categoria_id, nombre, importancia, orden,
  *   preguntas: [{ ref, texto, tipo, indicacion, criterio_ia, obligatoria, orden,
- *   opciones: [{ ref, texto, puntaje, ten_en_cuenta, orden }] }] }] }
+ *   opciones: [{ ref, texto, puntaje, ten_en_cuenta, exclusiva, orden }] }] }] }
  *
  * `ref` es el identificador estable que usan las respuestas y los análisis
  * (`pregunta_ref`, `categoria_ref`).
@@ -46,6 +46,7 @@ class ContenidoDiagnostico
                         'texto' => $opcion->texto,
                         'puntaje' => $opcion->puntaje,
                         'ten_en_cuenta' => $opcion->ten_en_cuenta,
+                        'exclusiva' => $opcion->exclusiva,
                         'orden' => $opcion->orden,
                     ];
                 }
@@ -129,6 +130,7 @@ class ContenidoDiagnostico
                             'texto' => $o['texto'],
                             'puntaje' => $o['puntaje'],
                             'ten_en_cuenta' => $o['ten_en_cuenta'] ?? null,
+                            'exclusiva' => (bool) ($o['exclusiva'] ?? false),
                             'orden' => $o['orden'] ?? 0,
                         ]);
                     }

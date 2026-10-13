@@ -6,6 +6,10 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Agregado (opción "Ninguna", 13 de octubre)
+
+- En selección múltiple, una opción puede excluir a las demás ("Ninguna", "Nada"): al marcarla se desmarcan las otras, y el servidor no las acepta juntas. Columna `opciones.exclusiva`.
+
 ### Agregado (la empresa responde, 13 de octubre)
 
 - **E1 · Inicio de la empresa** con la medición pendiente en cada estado, el último resultado, la evolución y las áreas a trabajar.

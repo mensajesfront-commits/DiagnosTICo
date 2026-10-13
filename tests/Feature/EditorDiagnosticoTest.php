@@ -243,3 +243,21 @@ it('no deja editar un diagnóstico archivado ni entrar a una empresa', function 
     $empresa = User::factory()->create()->assignRole('Empresa');
     $this->actingAs($empresa)->get(route('diagnosticos.editar', $this->diagnostico))->assertForbidden();
 });
+
+it('guarda una sola opción "Ninguna" que excluye a las demás, solo en selección múltiple', function () {
+    $pregunta = agregarPregunta($this, [
+        'tipo' => 'seleccion_multiple',
+        'opciones' => [
+            ['texto' => 'Instagram', 'puntaje' => 50],
+            ['texto' => 'Google', 'puntaje' => 50],
+            ['texto' => 'Ninguno', 'puntaje' => 0, 'exclusiva' => true],
+        ],
+    ]);
+    expect($pregunta->opciones->pluck('exclusiva')->all())->toBe([false, false, true]);
+
+    // En opción única no aplica.
+    $this->actingAs($this->admin)->put(route('diagnosticos.preguntas.actualizar', [$this->diagnostico, $pregunta]), preguntaUnica([
+        'opciones' => [['texto' => 'Sí', 'puntaje' => 100, 'exclusiva' => true], ['texto' => 'No', 'puntaje' => 0]],
+    ]))->assertSessionHasNoErrors();
+    expect($pregunta->refresh()->opciones->pluck('exclusiva')->all())->toBe([false, false]);
+});

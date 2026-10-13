@@ -127,7 +127,16 @@ function teclas(e: KeyboardEvent): void {
                         <dt class="text-xs text-tinta-suave">
                             {{ LETRAS[i] }}
                         </dt>
-                        <dd class="flex-1">{{ o.texto }}</dd>
+                        <dd class="flex-1">
+                            {{ o.texto }}
+                            <span
+                                v-if="o.exclusiva"
+                                class="text-xs text-tinta-suave"
+                                title="Al marcarla se desmarcan las demás"
+                            >
+                                · excluye las demás
+                            </span>
+                        </dd>
                         <dd class="font-mono text-xs">{{ o.puntaje }}</dd>
                     </div>
                 </dl>

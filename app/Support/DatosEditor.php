@@ -47,6 +47,7 @@ class DatosEditor
                         'texto' => $o->texto,
                         'puntaje' => $o->puntaje,
                         'ten_en_cuenta' => $o->ten_en_cuenta,
+                        'exclusiva' => $o->exclusiva,
                     ])->values()->all(),
                 ])->values()->all(),
             ])->values()->all(),

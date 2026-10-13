@@ -158,3 +158,23 @@ it('sin pendiente muestra el último resultado, la variación y las 3 áreas má
             ->where('areas.0.nivel', 'critico')
             ->has('areas', 3));
 });
+
+it('no deja marcar "Ninguna" junto con otras opciones', function () {
+    $contenido = $this->version->contenido;
+    $contenido['categorias'][0]['preguntas'][0] = [
+        'ref' => 'p900', 'texto' => '¿Qué canales usas?', 'tipo' => 'seleccion_multiple', 'indicacion' => 'Marca todos.', 'obligatoria' => true, 'orden' => 0,
+        'opciones' => [
+            ['ref' => 'o901', 'texto' => 'Instagram', 'puntaje' => 100, 'exclusiva' => false],
+            ['ref' => 'o902', 'texto' => 'Ninguno', 'puntaje' => 0, 'exclusiva' => true],
+        ],
+    ];
+    $this->version->forceFill(['contenido' => $contenido])->save();
+
+    $ruta = route('responder.guardar', $this->medicion);
+    $this->actingAs($this->laura)->putJson($ruta, ['pregunta_ref' => 'p900', 'opciones' => ['o901', 'o902']])->assertUnprocessable();
+    $this->actingAs($this->laura)->putJson($ruta, ['pregunta_ref' => 'p900', 'opciones' => ['o902']])->assertOk();
+
+    // La empresa recibe cuál es la excluyente.
+    $this->actingAs($this->laura)->get(route('responder.mostrar', $this->medicion))
+        ->assertInertia(fn (Assert $p) => $p->where('categorias.0.preguntas.0.opciones.1.exclusiva', true));
+});

@@ -49,19 +49,34 @@ const categoria = computed(() => props.categorias[indice.value] ?? null);
 /** Respuestas de prueba: no se guardan. */
 const respuestas = reactive<Record<string, string[] | string>>({});
 
-function elegir(pregunta: string, opcion: string, multiple: boolean): void {
+/** Como en E2: "Ninguna" (exclusiva) desmarca las demás y al revés. */
+function elegir(
+    pregunta: string,
+    opcion: { ref: string; exclusiva: boolean },
+    opciones: { ref: string; exclusiva: boolean }[],
+    multiple: boolean,
+): void {
     const actual = respuestas[pregunta];
 
     if (!multiple) {
-        respuestas[pregunta] = [opcion];
+        respuestas[pregunta] = [opcion.ref];
 
         return;
     }
 
     const lista = Array.isArray(actual) ? actual : [];
-    respuestas[pregunta] = lista.includes(opcion)
-        ? lista.filter((o) => o !== opcion)
-        : [...lista, opcion];
+    const exclusivas = opciones.filter((o) => o.exclusiva).map((o) => o.ref);
+
+    if (lista.includes(opcion.ref)) {
+        respuestas[pregunta] = lista.filter((o) => o !== opcion.ref);
+    } else if (opcion.exclusiva) {
+        respuestas[pregunta] = [opcion.ref];
+    } else {
+        respuestas[pregunta] = [
+            ...lista.filter((o) => !exclusivas.includes(o)),
+            opcion.ref,
+        ];
+    }
 }
 
 const marcada = (pregunta: string, opcion: string) => {
@@ -431,7 +446,8 @@ const nadaQuePublicar = computed(
                                     @click="
                                         elegir(
                                             p.ref,
-                                            o.ref,
+                                            o,
+                                            p.opciones,
                                             p.tipo === 'seleccion_multiple',
                                         )
                                     "

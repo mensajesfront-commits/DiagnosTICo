@@ -91,6 +91,12 @@ class ResponderController extends Controller
         ], ['texto.max' => 'La respuesta puede tener hasta 1000 caracteres.']);
 
         $opciones = $pregunta['tipo'] === 'abierta' ? [] : array_values(array_unique($datos['opciones'] ?? []));
+        $exclusivas = array_column(array_filter($pregunta['opciones'], fn (array $o) => $o['exclusiva']), 'ref');
+
+        // "Ninguna" no va con otras opciones.
+        if (count($opciones) > 1 && array_intersect($opciones, $exclusivas) !== []) {
+            throw ValidationException::withMessages(['opciones' => 'Esa opción no se puede marcar junto con otras.']);
+        }
         $texto = $pregunta['tipo'] === 'abierta' ? trim((string) ($datos['texto'] ?? '')) : '';
 
         DB::transaction(function () use ($medicion, $pregunta, $opciones, $texto, $request): void {

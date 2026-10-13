@@ -11,6 +11,8 @@ export type OpcionEditor = {
     texto: string;
     puntaje: number;
     ten_en_cuenta: string | null;
+    /** Selección múltiple: al marcarla se desmarcan las demás ("Ninguna"). */
+    exclusiva: boolean;
 };
 
 export type PreguntaEditor = {
@@ -109,6 +111,6 @@ export type CategoriaVistaPrevia = {
         indicacion: string;
         obligatoria: boolean;
         problemas: string[];
-        opciones: { ref: string; texto: string }[];
+        opciones: { ref: string; texto: string; exclusiva: boolean }[];
     }[];
 };

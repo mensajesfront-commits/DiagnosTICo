@@ -13,12 +13,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $texto
  * @property int $puntaje 0 a 100
  * @property string|null $ten_en_cuenta
+ * @property bool $exclusiva En selección múltiple, desmarca las demás ("Ninguna")
  * @property int $orden
  */
 #[Table('opciones')]
-#[Fillable(['pregunta_id', 'texto', 'puntaje', 'ten_en_cuenta', 'orden'])]
+#[Fillable(['pregunta_id', 'texto', 'puntaje', 'ten_en_cuenta', 'exclusiva', 'orden'])]
 class Opcion extends Model
 {
+    protected function casts(): array
+    {
+        return ['exclusiva' => 'boolean'];
+    }
+
     /** @return BelongsTo<Pregunta, $this> */
     public function pregunta(): BelongsTo
     {

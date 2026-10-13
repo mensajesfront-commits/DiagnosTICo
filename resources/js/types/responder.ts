@@ -21,7 +21,8 @@ export type PreguntaResponder = {
     tipo: 'abierta' | 'opcion_unica' | 'seleccion_multiple';
     indicacion: string;
     obligatoria: boolean;
-    opciones: { ref: string; texto: string }[];
+    /** `exclusiva`: "Ninguna"; al marcarla se desmarcan las demás. */
+    opciones: { ref: string; texto: string; exclusiva: boolean }[];
 };
 
 export type CategoriaResponder = {

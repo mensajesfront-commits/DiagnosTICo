@@ -58,7 +58,29 @@ const vacia = (): OpcionForm => ({
     texto: '',
     puntaje: 0,
     ten_en_cuenta: '',
+    exclusiva: false,
 });
+
+/** "Ninguna", "Ninguno", "Nada": se marcan solas como excluyentes. */
+const pareceNinguna = (texto: string) =>
+    /^(ningun[oa]?|nada)\b/i.test(texto.trim());
+
+/** Índice de la opción que excluye a las demás, o -1. */
+const exclusiva = computed({
+    get: () => form.opciones.findIndex((o) => o.exclusiva),
+    set: (i: number) =>
+        form.opciones.forEach((o, j) => (o.exclusiva = j === i)),
+});
+
+function revisarNinguna(i: number): void {
+    if (
+        form.tipo === 'seleccion_multiple' &&
+        exclusiva.value === -1 &&
+        pareceNinguna(form.opciones[i].texto)
+    ) {
+        exclusiva.value = i;
+    }
+}
 
 const form = useForm({
     parte_id: props.parte.id,
@@ -165,7 +187,13 @@ function guardar(): void {
     form.transform((d) => ({
         ...d,
         criterio_ia: d.tipo === 'abierta' ? d.criterio_ia.trim() || null : null,
-        opciones: d.tipo === 'abierta' ? [] : d.opciones,
+        opciones:
+            d.tipo === 'abierta'
+                ? []
+                : d.opciones.map((o) => ({
+                      ...o,
+                      exclusiva: d.tipo === 'seleccion_multiple' && o.exclusiva,
+                  })),
     }));
 
     if (props.pregunta) {
@@ -253,6 +281,7 @@ const botonIcono =
                             <Entrada
                                 v-model="opcion.texto"
                                 maxlength="255"
+                                @blur="revisarNinguna(i)"
                                 :aria-label="`Opción ${LETRAS[i]}`"
                                 :invalida="!!errores[`opciones.${i}.texto`]"
                             />
@@ -330,6 +359,30 @@ const botonIcono =
                     <p v-if="errores.opciones" class="text-xs text-aviso">
                         {{ errores.opciones }}
                     </p>
+
+                    <label
+                        v-if="form.tipo === 'seleccion_multiple'"
+                        class="flex flex-wrap items-center gap-2 text-xs"
+                    >
+                        Opción que excluye a las demás
+                        <select
+                            v-model.number="exclusiva"
+                            class="h-8 rounded-md border border-linea-fuerte bg-white px-2 text-xs"
+                        >
+                            <option :value="-1">Ninguna</option>
+                            <option
+                                v-for="(o, i) in form.opciones"
+                                :key="i"
+                                :value="i"
+                            >
+                                {{ LETRAS[i] }} · {{ o.texto || 'sin texto' }}
+                            </option>
+                        </select>
+                        <span class="w-full text-tinta-suave">
+                            Como «Ninguna» o «Nada»: si la empresa la marca, se
+                            desmarcan las otras.
+                        </span>
+                    </label>
 
                     <div
                         v-if="form.tipo === 'seleccion_multiple'"
