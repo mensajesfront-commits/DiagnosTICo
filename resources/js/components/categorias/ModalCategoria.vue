@@ -5,7 +5,7 @@
  * Envía: nombre (obligatorio, máx. 40, único; RN-009), descripcion (la lee la
  * empresa al iniciar la categoría) y diagnosticos[] (borradores donde
  * agregarla; quedan incompletos hasta escribirle preguntas).
- * Editar se hace en el panel lateral de A2.3 (PanelEditarCategoria).
+ * Editar se hace en otro modal (ModalEditarCategoria).
  */
 import { useForm } from '@inertiajs/vue3';
 import { watch } from 'vue';
@@ -70,6 +70,7 @@ const textoBorrador = (b: DiagnosticoBorrador) =>
             @submit.prevent="crear"
         >
             <Campo
+                obligatorio
                 etiqueta="Nombre"
                 para="categoria-nombre"
                 ayuda="No puede repetirse en el catálogo."

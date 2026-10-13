@@ -64,6 +64,7 @@ function duplicar(): void {
             @submit.prevent="duplicar"
         >
             <Campo
+                obligatorio
                 etiqueta="Nombre de la copia"
                 para="copia-nombre"
                 ayuda="Máximo 60 caracteres. Puedes cambiarlo después."
@@ -80,6 +81,7 @@ function duplicar(): void {
             </Campo>
 
             <Campo
+                obligatorio
                 etiqueta="Sector de la copia"
                 para="copia-sector"
                 :error="form.errors.sector_id"

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Perfil\ActualizarPerfilRequest;
 use App\Http\Requests\Perfil\CambiarContrasenaRequest;
+use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Support\OpcionesPerfil;
+use App\Support\Ubicaciones;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +35,7 @@ class PerfilController extends Controller
                 'cargo' => $usuario->cargo,
                 'telefono' => $usuario->telefono,
                 'ciudad' => $usuario->ciudad,
+                'departamento' => $usuario->departamento,
                 'pais' => $usuario->pais,
                 'zona_horaria' => $usuario->zona_horaria,
                 'idioma' => $usuario->idioma,
@@ -46,17 +49,28 @@ class PerfilController extends Controller
             'empresa' => $empresa ? [
                 'nombre' => $empresa->nombre,
                 'sector' => $empresa->sector?->nombre,
+                'actividad_economica_id' => $empresa->actividad_economica_id,
+                'descripcion' => $empresa->descripcion,
                 'ciudad' => $empresa->ciudad,
+                'departamento' => $empresa->departamento,
                 'pais' => $empresa->pais,
                 'sitio_web' => $empresa->sitio_web,
                 'numero_empleados' => $empresa->numero_empleados,
             ] : null,
             'editaEmpresa' => $empresa !== null && $rol === 'Empresa',
             'opciones' => [
-                'paises' => OpcionesPerfil::PAISES,
-                'zonas' => OpcionesPerfil::ZONAS_HORARIAS,
+                'paises' => Ubicaciones::paises(),
+                'zonas' => OpcionesPerfil::zonasHorarias($usuario->zona_horaria),
                 'idiomas' => OpcionesPerfil::IDIOMAS,
                 'empleados' => OpcionesPerfil::RANGOS_EMPLEADOS,
+                // Actividades (CIIU) del sector de la empresa; la actual va
+                // aunque esté inactiva, para que se siga viendo (DEC-015).
+                'actividades' => $empresa === null ? [] : ActividadEconomica::query()
+                    ->where('sector_id', $empresa->sector_id)
+                    ->where(fn ($q) => $q->where('activo', true)->orWhere('id', $empresa->actividad_economica_id))
+                    ->orderBy('codigo')
+                    ->get(['id', 'codigo', 'nombre'])
+                    ->toArray(),
                 'avisos' => array_map(fn (array $aviso) => $aviso[0], OpcionesPerfil::avisosPara($usuario)),
             ],
         ]);
@@ -74,6 +88,7 @@ class PerfilController extends Controller
             'cargo' => $datos['cargo'] ?? null,
             'telefono' => $datos['telefono'] ?? null,
             'ciudad' => $datos['ciudad'] ?? null,
+            'departamento' => $datos['departamento'] ?? null,
             'pais' => $datos['pais'] ?? null,
             'zona_horaria' => $datos['zona_horaria'],
             'idioma' => $datos['idioma'],
@@ -91,7 +106,10 @@ class PerfilController extends Controller
         if ($request->editaEmpresa() && $usuario->empresa) {
             $usuario->empresa->update([
                 'nombre' => $datos['empresa']['nombre'],
+                'actividad_economica_id' => $datos['empresa']['actividad_economica_id'] ?? null,
+                'descripcion' => $datos['empresa']['descripcion'],
                 'ciudad' => $datos['empresa']['ciudad'],
+                'departamento' => $datos['empresa']['departamento'],
                 'pais' => $datos['empresa']['pais'],
                 'sitio_web' => $datos['empresa']['sitio_web'] ?? null,
                 'numero_empleados' => $datos['empresa']['numero_empleados'] ?? null,

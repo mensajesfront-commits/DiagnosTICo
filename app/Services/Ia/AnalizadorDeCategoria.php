@@ -11,13 +11,12 @@ use OpenAI\Laravel\Facades\OpenAI;
  * La IA devuelve, con un formato JSON fijo (salida estructurada):
  * - una observación por pregunta,
  * - el puntaje 0–100 de cada pregunta abierta (las cerradas ya vienen
- *   calculadas por el sistema y aquí llegan con puntaje null),
- * - una observación de la categoría y una recomendación.
+ *   calculadas por el sistema y aquí llegan con su puntaje),
+ * - una observación de la categoría y una recomendación con título y detalle.
  *
- * Prueba técnica T-019. El armado completo del prompt por capas (RN-022) se
- * hace en la semana 5 (T-099); aquí el prompt es fijo.
+ * Las instrucciones las arma ArmadorPrompt por capas (RN-022).
  */
-class AnalizadorDeCategoria
+class AnalizadorDeCategoria implements Analizador
 {
     /**
      * Esquema JSON que la IA debe respetar. Con "strict" la API rechaza
@@ -39,7 +38,7 @@ class AnalizadorDeCategoria
                         'additionalProperties' => false,
                         'required' => ['id', 'puntaje', 'observacion'],
                         'properties' => [
-                            'id' => ['type' => 'integer'],
+                            'id' => ['type' => 'string'],
                             'puntaje' => [
                                 'type' => ['integer', 'null'],
                                 'description' => 'Solo para preguntas abiertas: 0 a 100. Null en las cerradas.',
@@ -49,16 +48,20 @@ class AnalizadorDeCategoria
                     ],
                 ],
                 'observacion_categoria' => ['type' => 'string'],
-                'recomendacion' => ['type' => 'string'],
+                'recomendacion' => [
+                    'type' => 'object',
+                    'additionalProperties' => false,
+                    'required' => ['titulo', 'detalle'],
+                    'properties' => [
+                        'titulo' => ['type' => 'string', 'description' => 'Acción en imperativo, máximo 8 palabras.'],
+                        'detalle' => ['type' => 'string', 'description' => 'Cómo hacerla, en una o dos frases.'],
+                    ],
+                ],
             ],
         ];
     }
 
-    /**
-     * @param  array{nombre: string, sector: string, preguntas: list<array{id: int, tipo: string, texto: string, respuesta: string, puntaje: int|null, criterio?: string}>}  $categoria
-     * @return array{preguntas: list<array{id: int, puntaje: int|null, observacion: string}>, observacion_categoria: string, recomendacion: string}
-     */
-    public function analizar(array $categoria): array
+    public function analizar(string $instrucciones, array $categoria): array
     {
         $modelo = config('openai.model');
 
@@ -69,7 +72,7 @@ class AnalizadorDeCategoria
         $respuesta = OpenAI::chat()->create([
             'model' => $modelo,
             'messages' => [
-                ['role' => 'system', 'content' => $this->instrucciones()],
+                ['role' => 'system', 'content' => $instrucciones],
                 ['role' => 'user', 'content' => json_encode($categoria, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)],
             ],
             'response_format' => [
@@ -82,22 +85,7 @@ class AnalizadorDeCategoria
             ],
         ]);
 
-        return $this->validar($respuesta->choices[0]->message->content ?? '', $categoria);
-    }
-
-    private function instrucciones(): string
-    {
-        return <<<'TXT'
-        Eres consultor de marketing digital de NuevasTIC. Analizas una categoría
-        del diagnóstico de una empresa. Recibes sus preguntas con la respuesta
-        de la empresa.
-
-        - Para cada pregunta escribe una observación breve y concreta.
-        - Califica de 0 a 100 solo las preguntas de tipo "abierta", según su
-          criterio de calificación. En las demás devuelve puntaje null.
-        - Escribe una observación de la categoría y una recomendación accionable.
-        - Escribe en español, en segunda persona, sin palabras técnicas.
-        TXT;
+        return self::validar($respuesta->choices[0]->message->content ?? '', $categoria);
     }
 
     /**
@@ -105,36 +93,57 @@ class AnalizadorDeCategoria
      * de las abiertas estén entre 0 y 100. Si no, lanza RespuestaIaInvalida para
      * que el trabajo en cola reintente esa categoría (RN-021).
      *
-     * @param  array{preguntas: list<array{id: int, tipo: string}>}  $categoria
-     * @return array{preguntas: list<array{id: int, puntaje: int|null, observacion: string}>, observacion_categoria: string, recomendacion: string}
+     * @param  array{preguntas: list<array<string, mixed>>}  $categoria
+     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, observacion_categoria: string, recomendacion: array{titulo: string, detalle: string}}
      */
-    private function validar(string $contenido, array $categoria): array
+    public static function validar(string $contenido, array $categoria): array
     {
         $datos = json_decode($contenido, true);
 
-        if (! is_array($datos) || ! isset($datos['preguntas'], $datos['observacion_categoria'], $datos['recomendacion'])) {
+        if (! is_array($datos) || ! isset($datos['preguntas'], $datos['observacion_categoria'], $datos['recomendacion'])
+            || ! is_array($datos['preguntas']) || ! is_array($datos['recomendacion'])
+            || ! isset($datos['recomendacion']['titulo'], $datos['recomendacion']['detalle'])) {
             throw new RespuestaIaInvalida('La IA no devolvió el formato esperado.');
         }
 
-        /** @var array<int, array{id: int, puntaje: int|null, observacion: string}> $porId */
-        $porId = array_column($datos['preguntas'], null, 'id');
+        $porId = [];
 
-        foreach ($categoria['preguntas'] as $pregunta) {
-            $analisis = $porId[$pregunta['id']] ?? null;
-
-            if ($analisis === null) {
-                throw new RespuestaIaInvalida("Falta el análisis de la pregunta {$pregunta['id']}.");
-            }
-
-            if ($pregunta['tipo'] === 'abierta') {
-                $puntaje = $analisis['puntaje'];
-
-                if (! is_int($puntaje) || $puntaje < 0 || $puntaje > 100) {
-                    throw new RespuestaIaInvalida("Puntaje fuera de rango en la pregunta {$pregunta['id']}.");
-                }
+        foreach ($datos['preguntas'] as $p) {
+            if (is_array($p) && isset($p['id'])) {
+                $porId[(string) $p['id']] = $p;
             }
         }
 
-        return $datos;
+        $preguntas = [];
+
+        foreach ($categoria['preguntas'] as $pregunta) {
+            $id = (string) $pregunta['id'];
+            $analisis = $porId[$id] ?? null;
+
+            if ($analisis === null) {
+                throw new RespuestaIaInvalida("Falta el análisis de la pregunta {$id}.");
+            }
+
+            $puntaje = null;
+
+            if ($pregunta['tipo'] === 'abierta') {
+                $puntaje = $analisis['puntaje'] ?? null;
+
+                if (! is_int($puntaje) || $puntaje < 0 || $puntaje > 100) {
+                    throw new RespuestaIaInvalida("Puntaje fuera de rango en la pregunta {$id}.");
+                }
+            }
+
+            $preguntas[] = ['id' => $id, 'puntaje' => $puntaje, 'observacion' => trim((string) ($analisis['observacion'] ?? ''))];
+        }
+
+        return [
+            'preguntas' => $preguntas,
+            'observacion_categoria' => trim((string) $datos['observacion_categoria']),
+            'recomendacion' => [
+                'titulo' => trim((string) $datos['recomendacion']['titulo']),
+                'detalle' => trim((string) $datos['recomendacion']['detalle']),
+            ],
+        ];
     }
 }

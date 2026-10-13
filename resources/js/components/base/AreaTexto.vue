@@ -16,7 +16,7 @@ const modelo = defineModel<string>();
         :aria-invalid="invalida || undefined"
         :class="
             cn(
-                'min-h-20 w-full rounded-md border border-linea-fuerte bg-white px-3 py-2 text-sm text-tinta placeholder:text-tinta-suave/70 focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none',
+                'min-h-20 w-full rounded-md border border-linea-fuerte bg-white px-3 py-2 text-sm text-tinta placeholder:text-tinta-suave/70 focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none disabled:bg-lienzo disabled:text-tinta-suave',
                 invalida && 'border-aviso',
                 $props.class,
             )

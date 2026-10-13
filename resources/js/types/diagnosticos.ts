@@ -8,8 +8,20 @@ export type Sector = {
     nombre: string;
     descripcion: string | null;
     activo: boolean;
+    /** División CIIU de la que salen sus subsectores (DEC-018); null si no tiene. */
+    ciiu_division: string | null;
+    /** Subsectores activos (actividades CIIU que se ofrecen al registrarse). */
+    subsectores: number;
     /** Diagnósticos activos (no archivados) del sector. */
     diagnosticos: number;
+};
+
+/** División del catálogo CIIU Rev. 5 A.C. (DEC-018). */
+export type DivisionCiiu = {
+    codigo: string;
+    nombre: string;
+    /** Cuántas clases (subsectores) tiene. */
+    clases: number;
 };
 
 export type MedicionesPorEstado = {

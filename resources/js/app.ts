@@ -1,6 +1,7 @@
 import { createInertiaApp } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+import ResponderLayout from '@/layouts/ResponderLayout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Captter';
@@ -11,6 +12,8 @@ void createInertiaApp({
         switch (true) {
             case name.startsWith('auth/'):
                 return AuthLayout;
+            case name.startsWith('responder/'):
+                return ResponderLayout;
             default:
                 return AppLayout;
         }

@@ -40,7 +40,7 @@ const correo = ref('');
         v-slot="{ errors, processing, submit }"
         class="flex flex-col gap-4"
     >
-        <Campo etiqueta="Correo" para="email" :error="errors.email">
+        <Campo obligatorio etiqueta="Correo" para="email" :error="errors.email">
             <Entrada
                 id="email"
                 v-model="correo"

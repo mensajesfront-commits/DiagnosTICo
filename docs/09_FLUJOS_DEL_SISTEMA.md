@@ -106,11 +106,13 @@ sequenceDiagram
     U->>L: Correo y contraseña
     L->>L: ¿Más de 5 intentos en 1 minuto?
     alt Bloqueado
-        L-->>U: "Demasiados intentos…" (429)
+        L-->>U: Modal "Demasiados intentos" con la cuenta regresiva
     else
         L->>BD: Busca la cuenta (correo en minúsculas)
-        alt No existe, contraseña errónea, cuenta o empresa desactivada
-            L-->>U: "El correo o la contraseña no son correctos." (RN-004, RN-005, RN-025)
+        alt No existe o contraseña errónea
+            L-->>U: "El correo o la contraseña no son correctos." (RN-005)
+        else Contraseña correcta, pero cuenta o empresa desactivada
+            L-->>U: Modal "Su cuenta ha sido desactivada…" (RN-004, RN-025)
         else Todo bien
             L->>BD: ultimo_acceso_en = ahora
             L-->>U: Inicio de su cuenta
@@ -159,6 +161,7 @@ sequenceDiagram
 | Tarea | Cuándo | Qué hace |
 |---|---|---|
 | Marcar vencidas (HU-070) | Cada día | Pasa a "Vencida" las mediciones sin enviar cuya fecha límite ya pasó |
+| Borrar cuentas eliminadas (`cuentas:purgar`, DEC-017) | Cada día, 03:10 | Borra para siempre las cuentas y empresas eliminadas hace más de 90 días |
 | Resumen semanal | Cada semana | Envía al Administrador las mediciones pendientes, si lo activó en Mi perfil (A6) |
 
 **[INFORMACIÓN PENDIENTE]** La hora de la tarea diaria y el día del resumen semanal.

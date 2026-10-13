@@ -3,8 +3,9 @@
  * Ventana sobre la vista (A2.1c, A2.2a–e, A2.3b, A5.3…): título, texto de
  * ayuda, contenido y pie con botones. Se abre con v-model:abierto.
  *
- * Slots: default (contenido), `pie` (botones; a la izquierda queda el slot
- * `nota`, como "Elige un sector destino").
+ * Slots: default (contenido), `descripcion` (en lugar de la prop, si lleva
+ * enlaces), `pie` (botones; a la izquierda queda el slot `nota`, como "Elige
+ * un sector destino").
  */
 import { X } from '@lucide/vue';
 import {
@@ -78,10 +79,10 @@ const anchos: Record<Ancho, string> = {
                             {{ titulo }}
                         </DialogTitle>
                         <DialogDescription
-                            v-if="descripcion"
+                            v-if="descripcion || $slots.descripcion"
                             class="mt-1 text-sm text-tinta-suave"
                         >
-                            {{ descripcion }}
+                            <slot name="descripcion">{{ descripcion }}</slot>
                         </DialogDescription>
                     </div>
                     <DialogClose

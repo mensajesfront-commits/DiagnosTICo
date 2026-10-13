@@ -24,6 +24,8 @@ const props = withDefaults(
         type?: 'button' | 'submit' | 'reset';
         disabled?: boolean;
         cargando?: boolean;
+        /** Con `href`: enlace normal (sin Inertia), para descargar un archivo. */
+        archivo?: boolean;
         class?: string;
     }>(),
     {
@@ -33,6 +35,7 @@ const props = withDefaults(
         type: 'button',
         disabled: false,
         cargando: false,
+        archivo: false,
         class: undefined,
     },
 );
@@ -41,7 +44,7 @@ const variantes: Record<Variante, string> = {
     primario:
         'bg-marca text-white hover:bg-marca-hover disabled:bg-linea-fuerte disabled:text-white',
     secundario:
-        'border border-tinta/25 bg-white text-tinta hover:bg-lienzo disabled:text-tinta-suave',
+        'border border-tinta/25 bg-white text-tinta hover:bg-lienzo disabled:border-linea disabled:bg-lienzo-oscuro disabled:text-tinta-suave disabled:hover:bg-lienzo-oscuro',
     enlace: 'px-0 text-marca underline underline-offset-2 hover:text-marca-hover',
     peligro: 'bg-aviso text-white hover:bg-[#8f2c25]',
 };
@@ -62,7 +65,14 @@ const clases = computed(() =>
 </script>
 
 <template>
-    <Link v-if="href && !disabled" :href="href" :class="clases">
+    <a
+        v-if="href && archivo && !disabled"
+        :href="typeof href === 'string' ? href : href.url"
+        :class="clases"
+    >
+        <slot />
+    </a>
+    <Link v-else-if="href && !disabled" :href="href" :class="clases">
         <slot />
     </Link>
     <button

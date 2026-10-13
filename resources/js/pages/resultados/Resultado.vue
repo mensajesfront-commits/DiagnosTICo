@@ -1,0 +1,471 @@
+<script setup lang="ts">
+/**
+ * E6 · Resultado del diagnóstico (HU-064) y A3.3 · el mismo resultado visto
+ * por el Administrador desde la ficha de la empresa (HU-038).
+ *
+ * Tres pestañas, para que la página quepa sin scroll:
+ * - Resumen: puntaje total con su nivel, la frase que lo explica y la
+ *   variación (RN-020; no hay en la primera medición), las 3 recomendaciones
+ *   de las categorías más débiles y el radar actual vs. anterior.
+ * - Categorías: la tabla con importancia, puntaje, nivel y "vs. anterior";
+ *   al elegir una fila se ve su detalle: cada pregunta con la respuesta y la
+ *   observación de la IA, la observación y la recomendación de la categoría.
+ * - Recomendaciones: las de todas las categorías, de la más débil a la más
+ *   fuerte.
+ *
+ * Todo llega calculado y no cambia (RN-023). Sin FODA ni comparación con
+ * promedios (RN-028).
+ */
+import { Head, Link } from '@inertiajs/vue3';
+import { ArrowLeft } from '@lucide/vue';
+import { computed, ref } from 'vue';
+import Boton from '@/components/base/Boton.vue';
+import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
+import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
+import Variacion from '@/components/empresas/Variacion.vue';
+import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
+import RadarCategorias from '@/components/graficas/RadarCategorias.vue';
+import PreguntaResultado from '@/components/resultados/PreguntaResultado.vue';
+import { diaYMes, fechaLocal, mesYAnio } from '@/lib/fechas';
+import { niveles, ordenNiveles } from '@/lib/niveles';
+import { rutas } from '@/lib/rutas';
+import { cn } from '@/lib/utils';
+import { empresa as inicioEmpresa } from '@/routes/inicio';
+import type { CabeceraResultado, Resultado } from '@/types/resultados';
+
+const props = defineProps<{
+    medicion: CabeceraResultado;
+    resultado: Resultado;
+    /** Lo abre el equipo de NuevasTIC (A3.3): vuelve a la ficha de la empresa. */
+    interno: boolean;
+}>();
+
+type Pestana = 'resumen' | 'categorias' | 'recomendaciones';
+
+const pestanas = [
+    { valor: 'resumen' as const, etiqueta: 'Resumen' },
+    { valor: 'categorias' as const, etiqueta: 'Categorías' },
+    { valor: 'recomendaciones' as const, etiqueta: 'Recomendaciones' },
+];
+
+const pestana = ref<Pestana>('resumen');
+
+const volver = computed(() =>
+    props.interno
+        ? {
+              href: rutas.empresas.ver(props.medicion.empresa.id),
+              texto: props.medicion.empresa.nombre,
+          }
+        : { href: inicioEmpresa(), texto: 'Inicio' },
+);
+
+const fechaEnvio = computed(() =>
+    props.medicion.enviada_en
+        ? diaYMes(new Date(props.medicion.enviada_en))
+        : null,
+);
+
+const subtitulo = computed(() =>
+    [
+        props.medicion.empresa.nombre,
+        props.medicion.sector,
+        fechaEnvio.value,
+        `${props.medicion.diagnostico} v${props.medicion.version}`,
+    ]
+        .filter(Boolean)
+        .join(' · '),
+);
+
+const radar = computed(() => ({
+    etiquetas: props.resultado.categorias.map((c) => c.nombre),
+    actual: {
+        nombre: `Medición ${props.medicion.numero}`,
+        puntajes: props.resultado.categorias.map((c) => c.puntaje),
+    },
+    anterior: props.resultado.anterior
+        ? {
+              nombre: `Medición ${props.resultado.anterior.numero}`,
+              puntajes: props.resultado.categorias.map((c) => c.anterior ?? 0),
+          }
+        : null,
+}));
+
+// Recomendaciones de todas las categorías, de la más débil a la más fuerte.
+const ordenadas = computed(() =>
+    [...props.resultado.categorias].sort(
+        (a, b) => a.puntaje - b.puntaje || b.importancia - a.importancia,
+    ),
+);
+
+// Pestaña Categorías: abre la más débil.
+const elegida = ref(ordenadas.value[0]?.ref ?? '');
+const categoria = computed(
+    () =>
+        props.resultado.categorias.find((c) => c.ref === elegida.value) ??
+        props.resultado.categorias[0],
+);
+
+function abrirCategoria(ref: string): void {
+    elegida.value = ref;
+    pestana.value = 'categorias';
+}
+
+const porcentaje = (n: number) =>
+    `${Number.isInteger(n) ? n : n.toFixed(2).replace(/\.?0+$/, '')}%`;
+
+const numero = (i: number) => String(i + 1).padStart(2, '0');
+</script>
+
+<template>
+    <Head :title="`Resultado · Medición ${medicion.numero}`" />
+
+    <div class="flex flex-col gap-4 p-6 lg:h-dvh lg:overflow-hidden">
+        <header class="flex shrink-0 flex-wrap items-end justify-between gap-4">
+            <div>
+                <Link
+                    :href="volver.href"
+                    class="mb-2 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-tinta-suave hover:text-marca"
+                >
+                    <ArrowLeft class="size-4" aria-hidden="true" />
+                    {{ volver.texto }}
+                </Link>
+                <h1 class="text-2xl font-semibold">
+                    Resultado del diagnóstico · Medición {{ medicion.numero }}
+                </h1>
+                <p class="mt-0.5 text-sm text-tinta-suave">{{ subtitulo }}</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <Boton
+                    variante="secundario"
+                    :href="rutas.resultados.respuestas(medicion.id)"
+                >
+                    {{ interno ? 'Ver respuestas' : 'Ver mis respuestas' }}
+                </Boton>
+                <Boton archivo :href="rutas.resultados.pdf(medicion.id)">
+                    Ver informe PDF
+                </Boton>
+            </div>
+        </header>
+
+        <SelectorCompacto
+            v-model="pestana"
+            :opciones="pestanas"
+            etiqueta-accesible="Secciones del resultado"
+            class="shrink-0 self-start"
+        />
+
+        <!-- Resumen -->
+        <div
+            v-if="pestana === 'resumen'"
+            class="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[320px_1fr] lg:grid-rows-[minmax(0,1fr)]"
+        >
+            <section
+                class="flex flex-col rounded-xl border border-linea bg-white p-5 lg:min-h-0 lg:overflow-y-auto"
+            >
+                <h2 class="text-xs text-tinta-suave">Puntaje total</h2>
+                <div class="mt-3 flex flex-col items-center text-center">
+                    <AnilloPuntaje
+                        :puntaje="resultado.puntaje"
+                        :nivel="resultado.nivel"
+                        :tamano="148"
+                    />
+                    <p class="-mt-1 text-xs text-tinta-suave">de 100</p>
+                    <EtiquetaNivel :nivel="resultado.nivel" class="mt-3" />
+                    <p class="mt-3 text-sm leading-relaxed">
+                        {{ resultado.frase }}
+                    </p>
+                    <template v-if="resultado.anterior">
+                        <p class="mt-3 text-sm font-medium">
+                            <Variacion :valor="resultado.variacion" />
+                            vs. medición anterior
+                        </p>
+                        <p class="text-xs text-tinta-suave">
+                            Medición {{ resultado.anterior.numero }} ·
+                            {{ mesYAnio(resultado.anterior.fecha) }} ·
+                            {{ resultado.anterior.puntaje }} pts
+                        </p>
+                    </template>
+                    <p v-else class="mt-3 text-xs text-tinta-suave">
+                        Es tu primera medición: será tu punto de partida.
+                    </p>
+                </div>
+                <ul class="mt-auto grid grid-cols-4 gap-1 pt-5 text-[11px]">
+                    <li
+                        v-for="n in ordenNiveles.filter((n) => n !== 'sin')"
+                        :key="n"
+                        class="text-tinta-suave"
+                    >
+                        <span
+                            :class="
+                                cn(
+                                    'mb-1 block h-1.5 rounded-full',
+                                    niveles[n].barra,
+                                )
+                            "
+                        />
+                        {{ niveles[n].nombre }}<br />{{ niveles[n].rango }}
+                    </li>
+                </ul>
+            </section>
+
+            <div class="flex flex-col gap-4 lg:min-h-0">
+                <section class="shrink-0">
+                    <div class="flex flex-wrap items-baseline justify-between">
+                        <h2 class="font-semibold">
+                            Qué hacer ahora: recomendaciones priorizadas
+                        </h2>
+                        <span class="text-xs text-tinta-suave">
+                            De la categoría más débil a la más fuerte
+                        </span>
+                    </div>
+                    <ol class="mt-2 grid gap-2 xl:grid-cols-3">
+                        <li
+                            v-for="(p, i) in resultado.prioridades"
+                            :key="p.ref"
+                        >
+                            <button
+                                type="button"
+                                class="h-full w-full rounded-xl border border-linea bg-white px-4 py-3 text-left hover:border-marca/40"
+                                @click="abrirCategoria(p.ref)"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span class="font-mono text-marca">{{
+                                        numero(i)
+                                    }}</span>
+                                    <span
+                                        :class="
+                                            cn(
+                                                'rounded px-1.5 py-0.5 text-[11px] font-medium',
+                                                niveles[p.nivel].etiqueta,
+                                            )
+                                        "
+                                    >
+                                        {{ p.nombre }} · {{ p.puntaje }}
+                                    </span>
+                                </span>
+                                <span
+                                    class="mt-1.5 block text-sm font-semibold"
+                                >
+                                    {{ p.recomendacion.titulo }}
+                                </span>
+                                <span
+                                    class="mt-0.5 line-clamp-3 block text-xs text-tinta-suave"
+                                >
+                                    {{ p.recomendacion.detalle }}
+                                </span>
+                            </button>
+                        </li>
+                    </ol>
+                </section>
+
+                <section
+                    class="flex min-h-72 flex-col rounded-xl border border-linea bg-white p-5 lg:min-h-0 lg:flex-1"
+                >
+                    <h2 class="font-semibold">
+                        Mapa de las {{ resultado.categorias.length }}
+                        categorías
+                    </h2>
+                    <RadarCategorias
+                        class="min-h-0 flex-1"
+                        alto="h-72 lg:h-full lg:min-h-48"
+                        :etiquetas="radar.etiquetas"
+                        :actual="radar.actual"
+                        :anterior="radar.anterior"
+                    />
+                </section>
+            </div>
+        </div>
+
+        <!-- Categorías: tabla y detalle -->
+        <div
+            v-else-if="pestana === 'categorias'"
+            class="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)]"
+        >
+            <section
+                class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0"
+            >
+                <header
+                    class="flex flex-wrap items-baseline justify-between gap-2 px-5 pt-4"
+                >
+                    <h2 class="font-semibold">Puntaje por categoría</h2>
+                    <span class="text-xs text-tinta-suave">
+                        La importancia indica cuánto aporta cada categoría al
+                        total
+                    </span>
+                </header>
+                <div class="mt-2 overflow-x-auto lg:min-h-0 lg:overflow-y-auto">
+                    <table class="w-full text-sm">
+                        <thead
+                            class="sticky top-0 bg-white text-left text-xs text-tinta-suave"
+                        >
+                            <tr class="border-b border-linea">
+                                <th class="py-2 pl-5 font-normal">Categoría</th>
+                                <th class="px-2 py-2 font-normal">Import.</th>
+                                <th class="px-2 py-2 font-normal">Puntaje</th>
+                                <th class="px-2 py-2 font-normal">Nivel</th>
+                                <th
+                                    class="py-2 pr-5 pl-2 font-normal whitespace-nowrap"
+                                >
+                                    vs. anterior
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="c in resultado.categorias"
+                                :key="c.ref"
+                                :class="
+                                    cn(
+                                        'cursor-pointer border-b border-lienzo-oscuro hover:bg-lienzo',
+                                        c.ref === elegida &&
+                                            'bg-marca-suave/60',
+                                    )
+                                "
+                                :aria-selected="c.ref === elegida"
+                                @click="elegida = c.ref"
+                            >
+                                <td class="py-2.5 pl-5">
+                                    <button
+                                        type="button"
+                                        class="text-left hover:text-marca"
+                                        @click.stop="elegida = c.ref"
+                                    >
+                                        {{ c.nombre }}
+                                    </button>
+                                </td>
+                                <td class="px-2 font-mono text-xs">
+                                    {{ porcentaje(c.importancia) }}
+                                </td>
+                                <td class="px-2">
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="hidden h-1.5 w-20 overflow-hidden rounded-full bg-lienzo-oscuro sm:block"
+                                        >
+                                            <span
+                                                :class="
+                                                    cn(
+                                                        'block h-full rounded-full',
+                                                        niveles[c.nivel].barra,
+                                                    )
+                                                "
+                                                :style="{
+                                                    width: `${c.puntaje}%`,
+                                                }"
+                                            />
+                                        </span>
+                                        <span class="font-mono font-semibold">
+                                            {{ c.puntaje }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-2">
+                                    <EtiquetaNivel :nivel="c.nivel" />
+                                </td>
+                                <td class="pr-5 pl-2 font-mono text-xs">
+                                    <Variacion :valor="c.variacion" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section
+                v-if="categoria"
+                class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0"
+            >
+                <header
+                    class="flex items-center justify-between gap-3 border-b border-linea px-5 py-3"
+                >
+                    <h2 class="font-semibold">{{ categoria.nombre }}</h2>
+                    <span class="flex items-center gap-2">
+                        <span class="font-mono font-semibold">{{
+                            categoria.puntaje
+                        }}</span>
+                        <EtiquetaNivel :nivel="categoria.nivel" />
+                    </span>
+                </header>
+                <div
+                    class="flex flex-col gap-4 p-5 lg:min-h-0 lg:overflow-y-auto"
+                >
+                    <PreguntaResultado
+                        v-for="p in categoria.preguntas"
+                        :key="p.ref"
+                        :pregunta="p"
+                        :interno="interno"
+                    />
+                    <div class="rounded-lg bg-lienzo px-4 py-3 text-sm">
+                        <span
+                            class="mr-2 rounded border border-linea bg-white px-1 font-mono text-[10px]"
+                            >IA</span
+                        >
+                        <strong>Observación de la categoría:</strong>
+                        {{ categoria.observacion }}
+                    </div>
+                    <div
+                        class="rounded-lg border-l-4 border-marca bg-lienzo px-4 py-3 text-sm"
+                    >
+                        <strong>Recomendación:</strong>
+                        {{ categoria.recomendacion.titulo }}.
+                        {{ categoria.recomendacion.detalle }}
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Recomendaciones de todas las categorías -->
+        <section v-else class="flex flex-col gap-2 lg:min-h-0 lg:flex-1">
+            <p class="shrink-0 text-sm text-tinta-suave">
+                Una recomendación por categoría, de la más débil a la más
+                fuerte. Las redacta la IA a partir de
+                {{
+                    interno ? 'las respuestas de la empresa' : 'tus respuestas'
+                }}.
+            </p>
+            <ol
+                class="grid content-start gap-2 lg:min-h-0 lg:grid-cols-2 lg:overflow-y-auto"
+            >
+                <li
+                    v-for="(c, i) in ordenadas"
+                    :key="c.ref"
+                    class="rounded-xl border border-linea bg-white px-4 py-3"
+                >
+                    <span class="flex items-center gap-2">
+                        <span class="font-mono text-marca">{{
+                            numero(i)
+                        }}</span>
+                        <span
+                            :class="
+                                cn(
+                                    'rounded px-1.5 py-0.5 text-[11px] font-medium',
+                                    niveles[c.nivel].etiqueta,
+                                )
+                            "
+                        >
+                            {{ c.nombre }} · {{ c.puntaje }}
+                        </span>
+                    </span>
+                    <p class="mt-1.5 text-sm font-semibold">
+                        {{ c.recomendacion.titulo }}
+                    </p>
+                    <p class="mt-0.5 text-xs text-tinta-suave">
+                        {{ c.recomendacion.detalle }}
+                    </p>
+                    <button
+                        type="button"
+                        class="mt-1 text-xs text-marca underline underline-offset-2"
+                        @click="abrirCategoria(c.ref)"
+                    >
+                        Ver el detalle
+                    </button>
+                </li>
+            </ol>
+        </section>
+
+        <p class="shrink-0 text-xs text-tinta-suave">
+            Publicado el
+            {{ diaYMes(fechaLocal(resultado.publicado_en.slice(0, 10))) }}. El
+            resultado ya no cambia.
+        </p>
+    </div>
+</template>

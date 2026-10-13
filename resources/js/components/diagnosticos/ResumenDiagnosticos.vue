@@ -2,10 +2,13 @@
 /**
  * "Resumen del sector" (A2, HU-010 CA-003) o "Resumen general" (A2·T,
  * HU-011 CA-003): totales, estado del sector y la última medición de cada
- * empresa por estado.
+ * empresa por estado. Con sector, "Ver en Empresas" lleva a la lista de
+ * empresas filtrada por ese sector (A3).
  */
+import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
+import { rutas } from '@/lib/rutas';
 import type { ResumenDiagnosticos, Sector } from '@/types/diagnosticos';
 
 const props = defineProps<{
@@ -58,6 +61,14 @@ const estados = computed(() => {
                 <dd class="mt-1 text-xs text-tinta-suave">{{ cifra.texto }}</dd>
             </div>
         </dl>
+
+        <Link
+            v-if="sector && resumen.empresas > 0"
+            :href="rutas.empresas.lista(sector.id)"
+            class="mt-3 inline-block text-xs text-marca underline"
+        >
+            Ver las {{ resumen.empresas }} empresas en Empresas
+        </Link>
 
         <div class="mt-3">
             <Etiqueta v-if="sector && sector.activo" tono="exito">

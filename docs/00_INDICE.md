@@ -23,11 +23,11 @@ Lista de los documentos del proyecto con su estado. Cada documento se escribe en
 | 05 | [Requisitos funcionales](05_REQUISITOS_FUNCIONALES.md) | REQUIERE VALIDACIÓN | 2 | T-003, T-061 |
 | 06 | [Requisitos no funcionales](06_REQUISITOS_NO_FUNCIONALES.md) | REQUIERE VALIDACIÓN | 3 | T-062 |
 | 07 | Reglas de negocio (`07_REGLAS_DE_NEGOCIO.md`) | PENDIENTE | 4–6 | T-086 |
-| 08 | Casos de uso (`08_CASOS_DE_USO.md`) | PENDIENTE | 3 | T-041 |
+| 08 | [Casos de uso](08_CASOS_DE_USO.md) | REQUIERE VALIDACIÓN | 3 | T-041 |
 | 09 | [Flujos del sistema](09_FLUJOS_DEL_SISTEMA.md) | EN CURSO | 3 | T-042 |
 | 10 | [Arquitectura](10_ARQUITECTURA.md) | EN CURSO | 3 | T-063 |
 | 11 | Diseño técnico (`11_DISENO_TECNICO.md`) | PENDIENTE | 4–6 | T-071 |
-| 12 | [Base de datos](12_BASE_DE_DATOS.md) | EN CURSO | 2–3 | T-007, T-040 |
+| 12 | [Base de datos](12_BASE_DE_DATOS.md) | REQUIERE VALIDACIÓN | 2–3 | T-007, T-040, T-064 |
 | 13 | API e integraciones (`13_API_E_INTEGRACIONES.md`) | PENDIENTE | 5 | T-113 |
 | 14 | [Frontend](14_FRONTEND.md) | EN CURSO | 3–6 | T-088 |
 | 15 | [Backend](15_BACKEND.md) | REQUIERE VALIDACIÓN | 3 | T-043 |
@@ -45,7 +45,7 @@ Lista de los documentos del proyecto con su estado. Cada documento se escribe en
 | 27 | [Entornos](27_ENTORNOS.md) | EN CURSO | 2 | T-032 |
 | 28 | [Convenciones de desarrollo](28_CONVENCIONES_DESARROLLO.md) | EN CURSO | 2 | T-005, T-033 |
 | 29 | Funcionalidades (`29_FUNCIONALIDADES.md`) | PENDIENTE | 4 | T-087 |
-| 30 | Riesgos (`30_RIESGOS.md`) | PENDIENTE | 3 | T-067 |
+| 30 | [Riesgos](30_RIESGOS.md) | EN CURSO | 3 | T-067 |
 | 31 | Manual de usuario (`31_MANUAL_DE_USUARIO.md`) | PENDIENTE | 6–7 | T-142, T-163 |
 
 Los documentos PENDIENTE no tienen archivo todavía, por eso no llevan enlace. Se crean en la semana indicada.

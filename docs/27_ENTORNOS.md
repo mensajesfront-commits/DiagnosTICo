@@ -40,6 +40,7 @@ Todas están explicadas en `.env.example`.
 | `MAIL_MAILER` | `smtp` hacia `mailpit:1025` | `array` (no envía) |
 | `QUEUE_CONNECTION` | `database` | `sync` |
 | `OPENAI_API_KEY` | La de cada desarrollador | No se usa: las pruebas simulan OpenAI (`OpenAI::fake()`) |
+| `IA_DE_PRUEBA` | `false` con clave; `true` para analizar sin OpenAI | `true`: el análisis usa `AnalizadorDePrueba` |
 | `LARAVEL_PDF_CHROME_PATH` | `/usr/local/bin/chromium` | No se usa: las pruebas simulan el PDF (`Pdf::fake()`) |
 
 ## Correo
@@ -51,6 +52,8 @@ Todas están explicadas en `.env.example`.
 
 - Cada desarrollador pone su clave en `OPENAI_API_KEY` y el modelo en `OPENAI_MODEL`.
 - `php artisan prueba:ia` hace una llamada real para comprobar que todo funciona (gasta una llamada).
+- Sin clave, `IA_DE_PRUEBA=true` analiza con textos y puntajes de prueba (`App\Services\Ia\AnalizadorDePrueba`) para recorrer todo el flujo. Nunca en producción.
+- El análisis corre en la cola: hace falta `queue:work` para que una medición enviada pase a "Terminada".
 - **[INFORMACIÓN PENDIENTE]** Falta saber quién aporta la clave y el saldo para el desarrollo (propuesta técnica, sección 5).
 
 ## WhatsApp (aplazado)

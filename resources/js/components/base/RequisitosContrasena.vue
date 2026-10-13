@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Lista de requisitos de la contraseña que se marca en vivo (L2, L4).
+ * Lista de requisitos de la contraseña que se marca en vivo (L2, L4, A6, E11, E12.1, E12.3).
  * Muestra "✓" en verde lo cumplido y "○" lo pendiente, y el contador "2 de 5".
  */
 import { computed } from 'vue';
@@ -10,15 +10,18 @@ import { cn } from '@/lib/utils';
 const props = withDefaults(
     defineProps<{
         contrasena: string;
-        confirmacion: string;
+        /** Sin ella (E12.1, E12.3) no se muestra "Las dos contraseñas coinciden". */
+        confirmacion?: string;
         /** Dos columnas, como en el registro (L2). */
         columnas?: boolean;
     }>(),
-    { columnas: false },
+    { confirmacion: undefined, columnas: false },
 );
 
 const estado = computed(() =>
-    revisarContrasena(props.contrasena, props.confirmacion),
+    revisarContrasena(props.contrasena, props.confirmacion ?? '', {
+        conConfirmacion: props.confirmacion !== undefined,
+    }),
 );
 </script>
 

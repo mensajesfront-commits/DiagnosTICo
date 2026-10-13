@@ -38,15 +38,6 @@ const props = withDefaults(
     { sectorId: null },
 );
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            { title: 'Diagnósticos', href: rutas.diagnosticos.todos() },
-            { title: 'Crear diagnóstico', href: rutas.diagnosticos.crear() },
-        ],
-    },
-});
-
 const form = useForm<{
     nombre: string;
     sector_id: number | '';
@@ -111,7 +102,15 @@ function crear(): void {
     <Head title="Crear diagnóstico" />
 
     <div class="flex flex-col gap-5 p-6">
-        <EncabezadoPagina titulo="Crear diagnóstico" />
+        <EncabezadoPagina
+            titulo="Crear diagnóstico"
+            :volver="{
+                href: sectorId
+                    ? rutas.diagnosticos.sector(sectorId)
+                    : rutas.diagnosticos.todos(),
+                texto: 'Diagnósticos',
+            }"
+        />
 
         <div class="grid items-start gap-5 xl:grid-cols-[1fr_300px]">
             <form
@@ -132,6 +131,7 @@ function crear(): void {
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <Campo
+                        obligatorio
                         etiqueta="Nombre del diagnóstico"
                         para="nombre"
                         ayuda="Máximo 60 caracteres. Puedes cambiarlo después."
@@ -148,6 +148,7 @@ function crear(): void {
                     </Campo>
 
                     <Campo
+                        obligatorio
                         etiqueta="Sector"
                         para="sector"
                         :error="form.errors.sector_id"
@@ -261,6 +262,7 @@ function crear(): void {
                         class="ml-6 flex flex-col gap-3"
                     >
                         <Campo
+                            obligatorio
                             etiqueta="Copiar de"
                             para="copiar-de"
                             ayuda="Agrupados por sector. Solo aparecen diagnósticos publicados."

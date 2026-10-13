@@ -77,12 +77,12 @@ Cada épica de `05_REQUISITOS_FUNCIONALES.md` es un módulo. Un módulo tiene su
 |---|---|---|---|---|
 | Acceso | EP-001 | L1–L4 | `pages/auth` | Fortify, `app/Actions/Fortify`, `FortifyServiceProvider` |
 | Mi perfil | EP-009 | A6, E11 | `pages/perfil` | `PerfilController` |
-| Sectores, categorías y diagnósticos | EP-003 a EP-005 | A2–A2.7 | `pages/diagnosticos`, `pages/categorias` | Por crear (T-049, T-050) |
-| Inicio del Administrador | EP-002 | A1 | Por crear | Por crear |
+| Sectores, categorías y diagnósticos | EP-003 a EP-005 | A2–A2.7 | `pages/diagnosticos`, `pages/categorias` | `DiagnosticosController`, `SectoresController`, `CategoriasController`, `app/Services/Diagnosticos` |
+| Inicio del Administrador | EP-002 | A1 | `pages/inicio/Administrador.vue` (bienvenida) | `InicioController` (redirección por rol, T-048) |
 | Empresas y mediciones | EP-006 | A3 | Por crear | Por crear |
 | Configuración de la IA | EP-007 | A4 | Por crear | `app/Services/Ia` (prueba técnica) |
-| Usuarios y roles | EP-008 | A5 | Por crear | `RolesYPermisosSeeder` |
-| Experiencia de la empresa | EP-010, EP-011 | E1–E12 | Por crear | Por crear |
+| Usuarios y roles | EP-008 | A5 | `pages/usuarios` | `UsuariosController`, `RolesController`, `RolesYPermisosSeeder` |
+| Experiencia de la empresa | EP-010, EP-011 | E1–E12 | `pages/inicio/Empresa.vue` (bienvenida), `pages/colaboradores` (E12) | `InicioController`, `ColaboradoresController`; el resto por crear |
 | Cálculo, IA y tareas | EP-012 | — | — | Trabajos y tareas programadas (semana 5) |
 
 ## Mapa de carpetas

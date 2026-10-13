@@ -64,6 +64,7 @@ function reasignar(): void {
             @submit.prevent="reasignar"
         >
             <Campo
+                obligatorio
                 etiqueta="Sector destino"
                 para="sector-destino"
                 :error="form.errors.sector_destino_id"

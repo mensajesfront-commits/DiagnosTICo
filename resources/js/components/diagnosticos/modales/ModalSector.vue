@@ -2,29 +2,45 @@
 /**
  * A2.2a · Crear sector (HU-012) y A2.2 · Editar sector (HU-013).
  *
- * Envía: nombre (máx. 40, único), descripcion (opcional) y, al crear, activo.
+ * Envía: nombre (máx. 60, único), descripcion (opcional), ciiu_division
+ * (opcional) y, al crear, activo.
+ *
+ * Subsectores (DEC-018): al elegir una división CIIU, todas sus clases pasan
+ * a ser los subsectores del sector. Si el nombre escrito es exactamente el de
+ * una división (sin mirar tildes ni mayúsculas), se elige sola.
  * Al editar, "Otras opciones" abre reasignar, desactivar o eliminar; esas
  * opciones no guardan los cambios del formulario.
  */
 import { useForm } from '@inertiajs/vue3';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
+import Combobox from '@/components/base/Combobox.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
 import Modal from '@/components/base/Modal.vue';
 import TarjetaOpcion from '@/components/base/TarjetaOpcion.vue';
 import { rutas } from '@/lib/rutas';
-import type { ResumenDiagnosticos, Sector } from '@/types/diagnosticos';
+import { normalizar } from '@/lib/texto';
+import type {
+    DivisionCiiu,
+    ResumenDiagnosticos,
+    Sector,
+} from '@/types/diagnosticos';
 
-const MAXIMO_NOMBRE = 40;
+const MAXIMO_NOMBRE = 60;
 
-const props = defineProps<{
-    /** Sin sector se crea uno nuevo. */
-    sector?: Sector | null;
-    resumen?: ResumenDiagnosticos | null;
-}>();
+const props = withDefaults(
+    defineProps<{
+        /** Sin sector se crea uno nuevo. */
+        sector?: Sector | null;
+        resumen?: ResumenDiagnosticos | null;
+        /** Catálogo CIIU para elegir de dónde salen los subsectores. */
+        divisiones?: DivisionCiiu[];
+    }>(),
+    { sector: null, resumen: null, divisiones: () => [] },
+);
 
 const emit = defineEmits<{
     reasignar: [];
@@ -36,7 +52,59 @@ const abierto = defineModel<boolean>('abierto', { default: false });
 
 const editando = computed(() => !!props.sector);
 
-const form = useForm({ nombre: '', descripcion: '', activo: true });
+const form = useForm({
+    nombre: '',
+    descripcion: '',
+    ciiu_division: '',
+    activo: true,
+});
+
+// --- División CIIU ----------------------------------------------------------
+const etiquetaDivision = (d: DivisionCiiu) => `${d.codigo} · ${d.nombre}`;
+const opcionesDivision = computed(() => props.divisiones.map(etiquetaDivision));
+const divisionElegida = computed(
+    () => props.divisiones.find((d) => d.codigo === form.ciiu_division) ?? null,
+);
+/** Se eligió en la lista: el nombre ya no la cambia. */
+const elegidaAMano = ref(false);
+
+const textoDivision = computed({
+    get: () =>
+        divisionElegida.value ? etiquetaDivision(divisionElegida.value) : '',
+    set: (texto: string) => {
+        const division = props.divisiones.find(
+            (d) => etiquetaDivision(d) === texto,
+        );
+        form.ciiu_division = division?.codigo ?? '';
+        elegidaAMano.value = true;
+    },
+});
+
+function quitarDivision(): void {
+    form.ciiu_division = '';
+    elegidaAMano.value = true;
+}
+
+// Si el nombre es exactamente el de una división, se elige sola.
+watch(
+    () => form.nombre,
+    (nombre) => {
+        if (elegidaAMano.value || props.sector?.ciiu_division) {
+            return;
+        }
+
+        const buscado = normalizar(nombre);
+        form.ciiu_division =
+            props.divisiones.find((d) => normalizar(d.nombre) === buscado)
+                ?.codigo ?? '';
+    },
+);
+
+const cambiaDivision = computed(
+    () =>
+        editando.value &&
+        form.ciiu_division !== (props.sector?.ciiu_division ?? ''),
+);
 
 watch(
     abierto,
@@ -45,8 +113,10 @@ watch(
             form.defaults({
                 nombre: props.sector?.nombre ?? '',
                 descripcion: props.sector?.descripcion ?? '',
+                ciiu_division: props.sector?.ciiu_division ?? '',
                 activo: props.sector?.activo ?? true,
             });
+            elegidaAMano.value = false;
             form.reset();
             form.clearErrors();
         }
@@ -105,6 +175,7 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
             @submit.prevent="guardar"
         >
             <Campo
+                obligatorio
                 etiqueta="Nombre del sector"
                 para="sector-nombre"
                 :error="form.errors.nombre"
@@ -155,6 +226,54 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
             </div>
 
             <Campo
+                etiqueta="Subsectores · división CIIU"
+                para="sector-division"
+                opcional
+                :error="form.errors.ciiu_division"
+                ayuda="Busca por código o nombre (CIIU Rev. 5 A.C. del DANE). Sus clases serán las actividades económicas que elige la empresa al registrarse."
+            >
+                <div class="flex items-center gap-2">
+                    <Combobox
+                        id="sector-division"
+                        v-model="textoDivision"
+                        class="flex-1"
+                        :opciones="opcionesDivision"
+                        placeholder="Ej.: 56 o comidas"
+                        :invalida="!!form.errors.ciiu_division"
+                    />
+                    <Boton
+                        v-if="form.ciiu_division"
+                        tamano="sm"
+                        variante="secundario"
+                        @click="quitarDivision"
+                    >
+                        Quitar
+                    </Boton>
+                </div>
+            </Campo>
+
+            <p
+                v-if="divisionElegida && (!editando || cambiaDivision)"
+                class="-mt-2 rounded-md bg-marca-suave px-3 py-2 text-xs"
+            >
+                Se agregarán sus
+                <strong>{{ divisionElegida.clases }} subsectores</strong>.
+                <template v-if="editando">
+                    Los subsectores que no sean de esta división se desactivan;
+                    las empresas que ya los tienen los conservan.
+                </template>
+            </p>
+            <p
+                v-else-if="editando && sector"
+                class="-mt-2 text-xs text-tinta-suave"
+            >
+                Tiene {{ sector.subsectores }} subsectores activos.
+                <template v-if="!form.ciiu_division && sector.ciiu_division">
+                    Al quitar la división se conservan.
+                </template>
+            </p>
+
+            <Campo
                 etiqueta="Descripción"
                 para="sector-descripcion"
                 opcional
@@ -184,8 +303,8 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
                 v-if="!editando"
                 class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
             >
-                Al crearlo queda vacío. Después puedes crear su primer
-                diagnóstico o duplicar uno de otro sector.
+                Al crearlo queda sin diagnósticos. Después puedes crear su
+                primer diagnóstico o duplicar uno de otro sector.
             </p>
 
             <template v-if="editando && sector && resumen">

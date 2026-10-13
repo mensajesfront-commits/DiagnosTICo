@@ -1,0 +1,16 @@
+{
+    "componente": "colaboradores/Index",
+    "props": {
+        "empresa": "Restaurante La Esquina",
+        "colaboradores": [
+            {
+                "id": 1,
+                "nombre": "Laura Gómez",
+                "correo": "laura@laesquina.co",
+                "es_principal": true,
+                "activo": true,
+                "cargo": "Gerencia general"
+            }
+        ]
+    }
+}

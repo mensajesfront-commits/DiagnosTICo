@@ -1,0 +1,313 @@
+<script setup lang="ts">
+/**
+ * Tabla "Mediciones" de A1 (HU-006 CA-002, HU-007): empresa y sector,
+ * fechas, estado con su avance por categorías y la acción de cada estado.
+ *
+ * Paginada con las filas que caben en su espacio (la página no se
+ * desplaza). Vuelve a la página 1 al cambiar de pestaña.
+ *
+ * Acciones:
+ * - Vencida: "Nueva fecha" (A1d, HU-009) y "Cancelar" (A3.1c) abren su
+ *   modal aquí mismo; la medición conserva sus respuestas.
+ * - Terminada sin otra pendiente: "Asignar nueva" abre A3.1b con la empresa
+ *   elegida (A1e).
+ *
+ * - En curso: "Recordatorio" (A1b); no iniciada: "Reenviar aviso" (A1c).
+ *   Abren el correo de la medición (A3.1e, HU-008) en `ModalCorreoAviso`.
+ *
+ * "Ver resultado" abre A3.3 (HU-038).
+ */
+import { Link } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
+import EtiquetaEstado from '@/components/base/EtiquetaEstado.vue';
+import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
+import Paginacion from '@/components/base/Paginacion.vue';
+import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
+import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
+import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
+import { diaYMes, fechaLocal, haceCuanto } from '@/lib/fechas';
+import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
+import { rutas } from '@/lib/rutas';
+import { cn } from '@/lib/utils';
+import type { FilaMedicion } from '@/types/inicio';
+
+const props = defineProps<{ filas: FilaMedicion[] }>();
+
+const contenedor = ref<HTMLElement | null>(null);
+const { porPagina, medir, ajustar } = useFilasQueCaben(contenedor);
+const { pagina, paginas, total, desde, visibles } = usePaginacion(
+    () => props.filas,
+    porPagina,
+);
+
+watch(
+    () => props.filas.length > 0,
+    () => medir(),
+);
+watch(visibles, ajustar);
+
+const fecha = (texto: string) => diaYMes(fechaLocal(texto));
+
+/** Ancho de la barra de avance, de 0 a 100. */
+const porcentaje = (f: FilaMedicion) =>
+    f.avance && f.avance.total > 0
+        ? Math.round((f.avance.hechas / f.avance.total) * 100)
+        : 0;
+
+/** Con `href` es un enlace; sin él, abre el modal `modal`. */
+type Accion = {
+    texto: string;
+    peligro?: boolean;
+    href?: string;
+    modal?: 'fecha' | 'cancelar' | 'correo';
+};
+
+function acciones(f: FilaMedicion): Accion[] {
+    const resultado = rutas.resultados.ver(f.id);
+
+    switch (f.estado) {
+        case 'vencida':
+            return [
+                { texto: 'Nueva fecha', modal: 'fecha' },
+                { texto: 'Cancelar', peligro: true, modal: 'cancelar' },
+            ];
+        case 'en_curso':
+            return [{ texto: 'Recordatorio', modal: 'correo' }];
+        case 'no_iniciada':
+            return [{ texto: 'Reenviar aviso', modal: 'correo' }];
+        case 'terminada':
+            return f.pendiente_numero
+                ? [{ texto: 'Ver resultado', href: resultado }]
+                : [
+                      { texto: 'Ver resultado', href: resultado },
+                      {
+                          texto: 'Asignar nueva',
+                          href: rutas.mediciones.asignar(f.empresa_id),
+                      },
+                  ];
+        default:
+            return [];
+    }
+}
+
+// --- Modales de la vencida -------------------------------------------------------
+const elegida = ref<FilaMedicion | null>(null);
+const modalFecha = ref(false);
+const modalCancelar = ref(false);
+const modalCorreo = ref(false);
+
+function abrir(f: FilaMedicion, modal: 'fecha' | 'cancelar' | 'correo'): void {
+    elegida.value = f;
+    modalFecha.value = modal === 'fecha';
+    modalCancelar.value = modal === 'cancelar';
+    modalCorreo.value = modal === 'correo';
+}
+
+const claseAccion = (a: Accion) =>
+    cn(
+        'underline underline-offset-2',
+        a.peligro
+            ? 'text-tinta hover:text-aviso'
+            : 'text-marca hover:text-marca-hover',
+    );
+
+function nota(f: FilaMedicion): string | null {
+    switch (f.estado) {
+        case 'vencida':
+        case 'en_curso':
+            return f.ultimo_avance
+                ? `Último avance: ${haceCuanto(f.ultimo_avance)}`
+                : 'Sin respuestas todavía';
+        case 'enviada':
+            return 'La IA está analizando sus respuestas';
+        case 'no_iniciada':
+            return f.ultimo_aviso
+                ? `Último aviso: ${haceCuanto(f.ultimo_aviso)}`
+                : 'Sin aviso por correo';
+        case 'terminada':
+            return f.pendiente_numero
+                ? `Tiene la medición ${f.pendiente_numero} en curso`
+                : null;
+        default:
+            return null;
+    }
+}
+
+const columnas = ['Empresa', 'Asignada', 'Vence', 'Estado', 'Acción'];
+</script>
+
+<template>
+    <div class="flex flex-col">
+        <div
+            ref="contenedor"
+            class="min-h-0 flex-1 overflow-x-auto overflow-y-hidden"
+        >
+            <table class="w-full border-collapse text-sm">
+                <thead>
+                    <tr class="border-y border-linea bg-[#f9f8f4] text-left">
+                        <th
+                            v-for="columna in columnas"
+                            :key="columna"
+                            scope="col"
+                            :class="
+                                cn(
+                                    'px-4 py-2.5 text-xs font-normal text-tinta-suave',
+                                    columna === 'Acción' && 'text-right',
+                                )
+                            "
+                        >
+                            {{ columna }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="fila in visibles"
+                        :key="fila.id"
+                        class="border-b border-linea last:border-b-0"
+                    >
+                        <td class="px-4 py-2.5">
+                            <Link
+                                :href="rutas.empresas.ver(fila.empresa_id)"
+                                class="font-medium hover:text-marca hover:underline"
+                            >
+                                {{ fila.empresa }}
+                            </Link>
+                            <p class="text-xs text-tinta-suave">
+                                {{ fila.sector }}
+                            </p>
+                        </td>
+                        <td class="px-4 py-2.5 whitespace-nowrap">
+                            {{ fecha(fila.asignada) }}
+                        </td>
+                        <td
+                            :class="
+                                cn(
+                                    'px-4 py-2.5 whitespace-nowrap',
+                                    fila.estado === 'vencida' &&
+                                        'font-medium text-aviso',
+                                    !fila.vence && 'text-xs text-tinta-suave',
+                                )
+                            "
+                        >
+                            {{
+                                fila.vence
+                                    ? fecha(fila.vence)
+                                    : 'Sin fecha límite'
+                            }}
+                        </td>
+                        <td class="px-4 py-2.5">
+                            <span
+                                v-if="
+                                    fila.estado === 'terminada' &&
+                                    fila.resultado
+                                "
+                                class="flex items-center gap-2"
+                            >
+                                <strong class="font-mono text-base">
+                                    {{ fila.resultado.puntaje }}
+                                </strong>
+                                <EtiquetaNivel :nivel="fila.resultado.nivel" />
+                            </span>
+                            <span v-else class="flex items-center gap-2">
+                                <EtiquetaEstado
+                                    :estado="fila.estado"
+                                    :avance="fila.avance ?? undefined"
+                                />
+                                <span
+                                    v-if="fila.avance"
+                                    class="h-1.5 w-10 shrink-0 rounded-full bg-lienzo-oscuro"
+                                    aria-hidden="true"
+                                >
+                                    <span
+                                        :class="
+                                            cn(
+                                                'block h-1.5 rounded-full',
+                                                fila.estado === 'vencida'
+                                                    ? 'bg-aviso'
+                                                    : 'bg-marca',
+                                            )
+                                        "
+                                        :style="{
+                                            width: `${porcentaje(fila)}%`,
+                                        }"
+                                    />
+                                </span>
+                            </span>
+                        </td>
+                        <td class="px-4 py-2.5 text-right">
+                            <p class="text-sm whitespace-nowrap">
+                                <template
+                                    v-for="(accion, i) in acciones(fila)"
+                                    :key="accion.texto"
+                                >
+                                    <span
+                                        v-if="i > 0"
+                                        class="mx-1 text-tinta-suave"
+                                        aria-hidden="true"
+                                        >·</span
+                                    >
+                                    <Link
+                                        v-if="accion.href"
+                                        :href="accion.href"
+                                        :class="claseAccion(accion)"
+                                    >
+                                        {{ accion.texto }}
+                                    </Link>
+                                    <button
+                                        v-else-if="accion.modal"
+                                        type="button"
+                                        :class="claseAccion(accion)"
+                                        @click="abrir(fila, accion.modal)"
+                                    >
+                                        {{ accion.texto }}
+                                    </button>
+                                </template>
+                            </p>
+                            <p
+                                v-if="nota(fila)"
+                                class="text-xs text-tinta-suave"
+                            >
+                                {{ nota(fila) }}
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <Paginacion
+            v-model:pagina="pagina"
+            class="shrink-0"
+            :desde="desde"
+            :cantidad="visibles.length"
+            :total="total"
+            :paginas="paginas"
+        />
+
+        <template v-if="elegida">
+            <ModalCambiarFecha
+                v-model:abierto="modalFecha"
+                :medicion="elegida"
+                :empresa="elegida.empresa"
+            />
+            <ModalCancelarMedicion
+                v-model:abierto="modalCancelar"
+                :medicion="{
+                    ...elegida,
+                    tiene_respuestas: elegida.ultimo_avance !== null,
+                }"
+                :empresa="elegida.empresa"
+            />
+            <ModalCorreoAviso
+                v-model:abierto="modalCorreo"
+                :medicion="elegida"
+                :accion="
+                    elegida.estado === 'en_curso'
+                        ? 'Recordatorio'
+                        : 'Reenviar aviso'
+                "
+                :empresa="elegida.empresa"
+            />
+        </template>
+    </div>
+</template>

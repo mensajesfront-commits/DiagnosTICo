@@ -47,15 +47,22 @@ export const requisitosContrasena: RequisitoContrasena[] = [
 
 export type EstadoRequisito = { id: string; texto: string; cumple: boolean };
 
+/**
+ * Sin confirmación (E12.1, E12.3: la empresa escribe la contraseña de un
+ * colaborador una sola vez), se omite el requisito "coinciden".
+ */
 export function revisarContrasena(
     contrasena: string,
     confirmacion: string,
+    { conConfirmacion = true }: { conConfirmacion?: boolean } = {},
 ): { requisitos: EstadoRequisito[]; cumplidos: number; completa: boolean } {
-    const requisitos = requisitosContrasena.map((r) => ({
-        id: r.id,
-        texto: r.texto,
-        cumple: r.cumple(contrasena, confirmacion),
-    }));
+    const requisitos = requisitosContrasena
+        .filter((r) => conConfirmacion || r.id !== 'coinciden')
+        .map((r) => ({
+            id: r.id,
+            texto: r.texto,
+            cumple: r.cumple(contrasena, confirmacion),
+        }));
     const cumplidos = requisitos.filter((r) => r.cumple).length;
 
     return {

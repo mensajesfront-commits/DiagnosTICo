@@ -3,6 +3,9 @@
  * Lista de sectores a la izquierda de A2 (HU-010 CA-002): "Todos" con el total
  * de diagnósticos y cada sector con los suyos. Un sector inactivo se marca
  * "○ Inactivo".
+ *
+ * Si hay muchos sectores, solo la lista baja y sube; el título y
+ * "+ Crear sector" quedan fijos.
  */
 import { Link } from '@inertiajs/vue3';
 import { rutas } from '@/lib/rutas';
@@ -29,11 +32,11 @@ const claseItem = (activo: boolean) =>
 
 <template>
     <nav
-        class="rounded-xl border border-linea bg-white p-3"
+        class="flex flex-col rounded-xl border border-linea bg-white p-3"
         aria-label="Sectores"
     >
-        <p class="px-3 pt-1 pb-2 text-xs text-tinta-suave">Sectores</p>
-        <ul class="flex flex-col gap-0.5">
+        <p class="shrink-0 px-3 pt-1 pb-2 text-xs text-tinta-suave">Sectores</p>
+        <ul class="flex min-h-0 flex-col gap-0.5 overflow-y-auto">
             <li>
                 <Link
                     :href="rutas.diagnosticos.todos()"
@@ -68,7 +71,7 @@ const claseItem = (activo: boolean) =>
         </ul>
         <button
             type="button"
-            class="mt-3 w-full rounded-md border border-dashed border-linea-fuerte py-2 text-xs text-tinta hover:border-marca hover:text-marca"
+            class="mt-3 w-full shrink-0 rounded-md border border-dashed border-linea-fuerte py-2 text-xs text-tinta hover:border-marca hover:text-marca"
             @click="$emit('crear')"
         >
             + Crear sector

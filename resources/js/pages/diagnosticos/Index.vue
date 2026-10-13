@@ -6,17 +6,24 @@
  * Una sola pantalla: con `sector` muestra ese sector; sin `sector` muestra
  * "Todos", agrupados por sector, con orden y filtro por estado.
  * Props completas en docs/14_FRONTEND.md.
+ *
+ * En pantallas grandes la página no se desplaza: ocupa el alto de la ventana.
+ * La tabla de diagnósticos va paginada con las filas que caben; la lista de
+ * sectores baja y sube en su espacio. Las empresas del sector se ven en
+ * Empresas (A3), con "Ver en Empresas" desde el resumen. La búsqueda filtra por nombre, sin mirar
+ * tildes ni mayúsculas.
  */
 import { Head } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
+import Entrada from '@/components/base/Entrada.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
-import EmpresasDelSector from '@/components/diagnosticos/EmpresasDelSector.vue';
 import ListaSectores from '@/components/diagnosticos/ListaSectores.vue';
 import ModalArchivarDiagnostico from '@/components/diagnosticos/modales/ModalArchivarDiagnostico.vue';
 import ModalDuplicarDiagnostico from '@/components/diagnosticos/modales/ModalDuplicarDiagnostico.vue';
 import ModalEliminarDiagnostico from '@/components/diagnosticos/modales/ModalEliminarDiagnostico.vue';
+import ModalEliminarVarios from '@/components/diagnosticos/modales/ModalEliminarVarios.vue';
 import ModalEliminarSector from '@/components/diagnosticos/modales/ModalEliminarSector.vue';
 import ModalEstadoSector from '@/components/diagnosticos/modales/ModalEstadoSector.vue';
 import ModalReasignarSector from '@/components/diagnosticos/modales/ModalReasignarSector.vue';
@@ -24,8 +31,9 @@ import ModalSector from '@/components/diagnosticos/modales/ModalSector.vue';
 import ResumenDiagnosticos from '@/components/diagnosticos/ResumenDiagnosticos.vue';
 import TablaDiagnosticos from '@/components/diagnosticos/TablaDiagnosticos.vue';
 import { rutas } from '@/lib/rutas';
+import { normalizar } from '@/lib/texto';
 import type {
-    EmpresaDelSector,
+    DivisionCiiu,
     FilaDiagnostico,
     MedicionesPorEstado,
     ResumenDiagnosticos as Resumen,
@@ -39,10 +47,10 @@ const props = withDefaults(
         sector?: Sector | null;
         resumen: Resumen & { mediciones_por_estado?: MedicionesPorEstado };
         diagnosticos: FilaDiagnostico[];
-        /** Solo con sector: primeras empresas del sector. */
-        empresas?: EmpresaDelSector[];
+        /** Catálogo CIIU para elegir los subsectores de un sector (DEC-018). */
+        divisionesCiiu?: DivisionCiiu[];
     }>(),
-    { sector: null, empresas: () => [] },
+    { sector: null, divisionesCiiu: () => [] },
 );
 
 const totalDiagnosticos = computed(() =>
@@ -55,9 +63,16 @@ type FiltroEstado = 'todos' | 'publicado' | 'borrador';
 
 const orden = ref<Orden>('sector');
 const filtro = ref<FiltroEstado>('todos');
+const busqueda = ref('');
+const buscando = computed(() => normalizar(busqueda.value) !== '');
 
 const filas = computed(() => {
     let lista = [...props.diagnosticos];
+    const buscado = normalizar(busqueda.value);
+
+    if (buscado !== '') {
+        lista = lista.filter((d) => normalizar(d.nombre).includes(buscado));
+    }
 
     if (filtro.value === 'publicado') {
         lista = lista.filter((d) => d.version_publicada !== null);
@@ -90,8 +105,22 @@ const filas = computed(() => {
     );
 });
 
-const sePuedeEliminar = computed(
-    () => props.resumen.empresas === 0 && props.resumen.mediciones === 0,
+// --- Eliminar varios a la vez ------------------------------------------------
+const seleccion = ref<number[]>([]);
+const modalEliminarVarios = ref(false);
+const elegidos = computed(() =>
+    props.diagnosticos.filter((d) => seleccion.value.includes(d.id)),
+);
+
+// Después de eliminar o de cambiar de sector, se quitan los que ya no están.
+watch(
+    () => props.diagnosticos,
+    (lista) => {
+        const ids = new Set(
+            lista.filter((d) => d.version_publicada === null).map((d) => d.id),
+        );
+        seleccion.value = seleccion.value.filter((id) => ids.has(id));
+    },
 );
 
 // --- Modales ------------------------------------------------------------------
@@ -139,7 +168,7 @@ function elegir(
         :title="sector ? `Diagnósticos de ${sector.nombre}` : 'Diagnósticos'"
     />
 
-    <div class="flex flex-col gap-5 p-6">
+    <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
         <EncabezadoPagina
             titulo="Diagnósticos"
             descripcion="Cada sector puede tener varios diagnósticos. Aquí también se administran los sectores y el catálogo de categorías."
@@ -152,19 +181,28 @@ function elegir(
             </Boton>
         </EncabezadoPagina>
 
-        <div class="grid items-start gap-5 lg:grid-cols-[240px_1fr]">
-            <div class="flex flex-col gap-4">
+        <div
+            class="grid items-start gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[240px_1fr] lg:grid-rows-[minmax(0,1fr)] lg:items-stretch"
+        >
+            <div class="flex flex-col gap-4 lg:min-h-0">
                 <ListaSectores
+                    class="lg:min-h-0"
                     :sectores="sectores"
                     :sector-actual-id="sector?.id ?? null"
                     :total-diagnosticos="totalDiagnosticos"
                     @crear="crearSector"
                 />
-                <ResumenDiagnosticos :resumen="resumen" :sector="sector" />
+                <ResumenDiagnosticos
+                    class="shrink-0"
+                    :resumen="resumen"
+                    :sector="sector"
+                />
             </div>
 
-            <div class="flex min-w-0 flex-col gap-5">
-                <section class="rounded-xl border border-linea bg-white">
+            <div class="flex min-w-0 flex-col gap-5 lg:min-h-0">
+                <section
+                    class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0 lg:flex-1"
+                >
                     <header
                         class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3"
                     >
@@ -239,10 +277,27 @@ function elegir(
                         </div>
                     </header>
 
+                    <div
+                        v-if="diagnosticos.length > 0"
+                        class="shrink-0 px-5 pb-3"
+                    >
+                        <label for="buscar-diagnostico" class="sr-only">
+                            Buscar diagnóstico
+                        </label>
+                        <Entrada
+                            id="buscar-diagnostico"
+                            v-model="busqueda"
+                            type="search"
+                            placeholder="Buscar diagnóstico por nombre"
+                            autocomplete="off"
+                            class="h-9"
+                        />
+                    </div>
+
                     <!-- A2b · sector sin diagnósticos -->
                     <div
                         v-if="sector && diagnosticos.length === 0"
-                        class="border-t border-linea px-5 py-8 text-center"
+                        class="flex flex-1 flex-col items-center justify-center border-t border-linea px-5 py-8 text-center"
                     >
                         <p class="font-semibold">
                             Este sector todavía no tiene diagnósticos
@@ -269,32 +324,32 @@ function elegir(
 
                     <p
                         v-else-if="filas.length === 0"
-                        class="border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
+                        class="flex flex-1 items-center justify-center border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
                     >
-                        No hay diagnósticos con ese estado.
+                        <template v-if="diagnosticos.length === 0">
+                            Todavía no hay diagnósticos.
+                        </template>
+                        <template v-else-if="buscando">
+                            Ningún diagnóstico se llama «{{ busqueda.trim() }}».
+                        </template>
+                        <template v-else>
+                            No hay diagnósticos con ese estado.
+                        </template>
                     </p>
 
                     <TablaDiagnosticos
                         v-else
+                        v-model:seleccion="seleccion"
+                        class="min-h-0 flex-1"
                         :filas="filas"
-                        :agrupar="!sector && orden === 'sector'"
-                        :mostrar-sector="!sector && orden !== 'sector'"
-                        :sectores="filtro === 'todos' ? sectores : []"
+                        :mostrar-sector="!sector"
                         @duplicar="elegir($event, 'duplicar')"
                         @archivar="elegir($event, 'archivar')"
                         @eliminar="elegir($event, 'eliminar')"
                         @eliminar-borrador="elegir($event, 'borrador')"
+                        @eliminar-seleccion="modalEliminarVarios = true"
                     />
                 </section>
-
-                <EmpresasDelSector
-                    v-if="sector"
-                    :sector="sector"
-                    :empresas="empresas"
-                    :total="resumen.empresas"
-                    :se-puede-eliminar="sePuedeEliminar"
-                    @desactivar="modalEstado = true"
-                />
             </div>
         </div>
     </div>
@@ -303,6 +358,7 @@ function elegir(
         v-model:abierto="modalSector"
         :sector="editandoSector ? sector : null"
         :resumen="resumen"
+        :divisiones="divisionesCiiu"
         @reasignar="modalReasignar = true"
         @desactivar="modalEstado = true"
         @eliminar="modalEliminarSector = true"
@@ -328,6 +384,12 @@ function elegir(
             @desactivar="modalEstado = true"
         />
     </template>
+
+    <ModalEliminarVarios
+        v-model:abierto="modalEliminarVarios"
+        :diagnosticos="elegidos"
+        @eliminados="seleccion = []"
+    />
 
     <template v-if="diagnosticoElegido">
         <ModalDuplicarDiagnostico
