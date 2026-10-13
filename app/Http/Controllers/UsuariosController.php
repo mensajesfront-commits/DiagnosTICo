@@ -251,21 +251,6 @@ class UsuariosController extends Controller
     }
 
     /**
-     * A5.4 · "Ver como".
-     *
-     * [FUNCIONALIDAD POR DEFINIR] Se construye con la pantalla A5.4 (semana
-     * 6): solo lectura, con registro (RN-026) y nunca sobre un Administrador.
-     */
-    public function verComo(User $usuario): RedirectResponse
-    {
-        abort_if($usuario->hasRole('Administrador'), 403, '"Ver como" no se usa sobre cuentas de Administrador.');
-
-        Inertia::flash('toast', ['type' => 'info', 'message' => '"Ver como" llega con la pantalla A5.4.']);
-
-        return back();
-    }
-
-    /**
      * Reglas comunes al cambiar o asignar un rol (A5.5).
      *
      * @throws ValidationException

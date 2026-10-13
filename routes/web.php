@@ -15,6 +15,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
 use App\Http\Controllers\UsuariosController;
+use App\Http\Controllers\VerComoController;
 use Illuminate\Support\Facades\Route;
 
 // Al abrir el sistema se entra directo al inicio de sesión; con sesión
@@ -30,6 +31,9 @@ Route::get('ubicaciones/{pais}', [UbicacionesController::class, 'show'])
     ->name('ubicaciones.pais');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // A5.4 · Salir de "Ver como" (el middleware VerComo la deja pasar).
+    Route::post('ver-como/salir', [VerComoController::class, 'salir'])->name('ver-como.salir');
+
     // T-048: /dashboard es la entrada después del login; cada cuenta va a su inicio.
     Route::get('dashboard', [InicioController::class, 'redirigir'])->name('dashboard');
     Route::get('inicio', [InicioController::class, 'administrador'])->name('inicio.administrador');
@@ -135,7 +139,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('usuarios/{usuario}', [UsuariosController::class, 'eliminar'])->name('usuarios.eliminar');
         Route::post('usuarios/{usuario}/recuperar', [UsuariosController::class, 'recuperar'])->withTrashed()->name('usuarios.recuperar');
         Route::put('usuarios/{usuario}/rol', [UsuariosController::class, 'cambiarRol'])->name('usuarios.cambiar-rol');
-        Route::post('usuarios/{usuario}/ver-como', [UsuariosController::class, 'verComo'])->name('usuarios.ver-como');
+        Route::post('usuarios/{usuario}/ver-como', [VerComoController::class, 'iniciar'])->name('usuarios.ver-como');
 
         Route::post('roles', [RolesController::class, 'store'])->name('roles.store');
         Route::put('roles/{rol}', [RolesController::class, 'update'])->name('roles.update');

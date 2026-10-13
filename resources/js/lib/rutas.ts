@@ -127,6 +127,9 @@ export const rutas = {
         vistaPrevia: () => '/configuracion-ia/vista-previa',
         probar: () => '/configuracion-ia/probar',
     },
+    verComo: {
+        salir: () => '/ver-como/salir',
+    },
     historial: {
         mio: () => '/historial',
         empresa: (id: number) => `/empresas/${id}/historial`,

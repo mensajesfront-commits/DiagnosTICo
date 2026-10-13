@@ -3,6 +3,7 @@
 use App\Http\Middleware\CerrarSesionCuentaInactiva;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LimitarIntentosAcceso;
+use App\Http\Middleware\VerComo;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -27,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             CerrarSesionCuentaInactiva::class,
+            // Después de revisar la cuenta real y antes de compartir los datos.
+            VerComo::class,
             LimitarIntentosAcceso::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
