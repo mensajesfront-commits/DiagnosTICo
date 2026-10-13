@@ -14,8 +14,11 @@ import { rutas } from '@/lib/rutas';
 const page = usePage();
 const verComo = computed(() => page.props.verComo);
 
+// Solo en el navegador: con SSR, esta parte se arma en Node, sin `document`.
 watchEffect(() => {
-    document.documentElement.classList.toggle('ver-como', !!verComo.value);
+    if (typeof document !== 'undefined') {
+        document.documentElement.classList.toggle('ver-como', !!verComo.value);
+    }
 });
 
 const quien = computed(() => {

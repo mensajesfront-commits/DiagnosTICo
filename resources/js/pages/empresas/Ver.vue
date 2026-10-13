@@ -28,7 +28,7 @@
  * "Ver resultado" abre A3.3 (HU-038) y "Ver historial completo", A3.4
  * (HU-039).
  */
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
@@ -66,8 +66,10 @@ const props = defineProps<FichaEmpresa>();
 
 type Pestana = 'historial' | 'cuenta';
 
+// Sale de la URL de Inertia y no de `window`: con SSR se arma en Node.
 const pestana = ref<Pestana>(
-    new URLSearchParams(window.location.search).get('pestana') === 'cuenta'
+    new URLSearchParams(usePage().url.split('?')[1] ?? '').get('pestana') ===
+        'cuenta'
         ? 'cuenta'
         : 'historial',
 );
