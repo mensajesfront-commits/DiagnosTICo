@@ -13,23 +13,29 @@
  *   pendiente está vencida, también se puede solo darle una nueva fecha y
  *   conservar sus respuestas (HU-009).
  *
- * [FUNCIONALIDAD POR DEFINIR] Editar el texto del correo antes de enviarlo
- * (A3.1e, HU-037). Por ahora se envía el aviso con el mensaje escrito aquí.
+ * - "Ver y editar el correo" abre A3.1e (`EditorCorreo`) con la plantilla
+ *   general y los datos de esta asignación; "Guardar correo" lo deja para
+ *   esta medición (y, si se marca, como plantilla).
  *
  * Envía: POST /mediciones con empresa_id, diagnostico_id, fecha_limite,
- * mensaje, aviso y reemplazar.
+ * mensaje, aviso, reemplazar y, si se editó el correo, correo_asunto,
+ * correo_cuerpo y guardar_plantilla.
  */
-import { Head, useForm } from '@inertiajs/vue3';
-import { computed, ref, watch } from 'vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { computed, reactive, ref, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import EtiquetaEstado from '@/components/base/EtiquetaEstado.vue';
+import Modal from '@/components/base/Modal.vue';
 import BuscadorEmpresa from '@/components/empresas/BuscadorEmpresa.vue';
+import EditorCorreo from '@/components/empresas/EditorCorreo.vue';
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
+import { fechaCorreo } from '@/lib/correo';
+import type { ValoresCorreo } from '@/lib/correo';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
@@ -40,6 +46,8 @@ const props = defineProps<{
     /** Por sector: publicados y borradores. */
     diagnosticos: Record<string, DiagnosticosDelSector>;
     empresaInicial: number | null;
+    /** Plantilla general del correo de aviso (A3.1e). */
+    plantilla: { asunto: string; cuerpo: string };
 }>();
 
 const MAX_MENSAJE = 500;
@@ -54,6 +62,9 @@ const form = useForm({
     mensaje: '',
     aviso: true,
     reemplazar: false,
+    correo_asunto: '',
+    correo_cuerpo: '',
+    guardar_plantilla: false,
 });
 
 const empresa = computed(
@@ -110,6 +121,11 @@ function asignar(reemplazar = false): void {
         ...d,
         fecha_limite: d.fecha_limite || null,
         mensaje: d.mensaje.trim() || null,
+        // Sin editar, el servidor usa la plantilla general.
+        correo_asunto: d.aviso && correoEditado.value ? d.correo_asunto : null,
+        correo_cuerpo: d.aviso && correoEditado.value ? d.correo_cuerpo : null,
+        guardar_plantilla:
+            d.aviso && correoEditado.value && d.guardar_plantilla,
     })).post(rutas.mediciones.guardar(), {
         onSuccess: () => (modalReemplazar.value = false),
         onError: (errores) => {
@@ -117,6 +133,67 @@ function asignar(reemplazar = false): void {
             modalReemplazar.value = !!errores.reemplazar;
         },
     });
+}
+
+// --- Correo de aviso (A3.1e) ------------------------------------------------
+const modalCorreo = ref(false);
+const correoEditado = ref(false);
+/** Copia que se edita en el modal; "Guardar correo" la pasa al formulario. */
+const borrador = reactive({ asunto: '', cuerpo: '', guardar: false });
+
+function abrirCorreo(): void {
+    borrador.asunto = correoEditado.value
+        ? form.correo_asunto
+        : props.plantilla.asunto;
+    borrador.cuerpo = correoEditado.value
+        ? form.correo_cuerpo
+        : props.plantilla.cuerpo;
+    borrador.guardar = form.guardar_plantilla;
+    modalCorreo.value = true;
+}
+
+function guardarCorreo(): void {
+    form.correo_asunto = borrador.asunto;
+    form.correo_cuerpo = borrador.cuerpo;
+    form.guardar_plantilla = borrador.guardar;
+    correoEditado.value =
+        borrador.asunto !== props.plantilla.asunto ||
+        borrador.cuerpo !== props.plantilla.cuerpo;
+    modalCorreo.value = false;
+}
+
+const para = computed(() =>
+    empresa.value?.principal
+        ? `${empresa.value.principal.email} (${empresa.value.principal.name} · usuario principal)`
+        : 'La empresa no tiene usuario principal',
+);
+
+const valoresCorreo = computed<ValoresCorreo>(() => ({
+    nombre_usuario: empresa.value?.principal?.name ?? '',
+    empresa: empresa.value?.nombre ?? '',
+    diagnostico: diagnostico.value?.nombre ?? '',
+    numero_medicion: String(numero.value ?? ''),
+    mensaje_admin: form.mensaje.trim(),
+    fecha_limite: fechaCorreo(form.fecha_limite),
+}));
+
+const probando = ref(false);
+
+function probarCorreo(): void {
+    router.post(
+        rutas.mediciones.probarCorreo(),
+        {
+            asunto: borrador.asunto,
+            cuerpo: borrador.cuerpo,
+            variables: valoresCorreo.value,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onStart: () => (probando.value = true),
+            onFinish: () => (probando.value = false),
+        },
+    );
 }
 
 const numero = computed(() =>
@@ -282,20 +359,42 @@ const estadoPendiente: Record<string, string> = {
                     </Campo>
                 </div>
 
-                <label class="flex items-center gap-2 text-sm">
-                    <input
-                        v-model="form.aviso"
-                        type="checkbox"
-                        class="size-4 accent-marca"
-                    />
-                    Enviar también aviso por correo
-                    <span
-                        class="text-xs text-tinta-suave"
-                        title="Editar el correo (A3.1e) llega más adelante"
+                <div
+                    class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
+                >
+                    <label class="flex items-center gap-2">
+                        <input
+                            v-model="form.aviso"
+                            type="checkbox"
+                            class="size-4 accent-marca"
+                        />
+                        Enviar también aviso por correo
+                    </label>
+                    <button
+                        v-if="form.aviso"
+                        type="button"
+                        class="text-marca underline underline-offset-2 hover:text-marca-hover disabled:text-tinta-suave disabled:no-underline"
+                        :disabled="!empresa || !diagnostico"
+                        :title="
+                            !empresa || !diagnostico
+                                ? 'Elige la empresa y el diagnóstico'
+                                : undefined
+                        "
+                        @click="abrirCorreo"
                     >
-                        · con el diagnóstico, la fecha límite y tu mensaje
+                        Ver y editar el correo
+                    </button>
+                    <span
+                        v-if="form.aviso && correoEditado"
+                        class="text-xs text-tinta-suave"
+                    >
+                        · editado para esta medición<template
+                            v-if="form.guardar_plantilla"
+                        >
+                            y como plantilla</template
+                        >
                     </span>
-                </label>
+                </div>
 
                 <p
                     v-if="empresa?.pendiente"
@@ -417,6 +516,40 @@ const estadoPendiente: Record<string, string> = {
         :procesando="form.processing"
         @confirmar="asignar(true)"
     />
+
+    <Modal
+        v-model:abierto="modalCorreo"
+        ancho="xl"
+        titulo="Correo de aviso de la medición"
+    >
+        <EditorCorreo
+            v-model:asunto="borrador.asunto"
+            v-model:cuerpo="borrador.cuerpo"
+            v-model:guardar-plantilla="borrador.guardar"
+            :para="para"
+            :valores="valoresCorreo"
+        />
+        <template #pie>
+            <Boton
+                variante="secundario"
+                class="mr-auto"
+                :disabled="!borrador.asunto || !borrador.cuerpo"
+                :cargando="probando"
+                @click="probarCorreo"
+            >
+                Enviarme un correo de prueba
+            </Boton>
+            <Boton variante="secundario" @click="modalCorreo = false">
+                Volver
+            </Boton>
+            <Boton
+                :disabled="!borrador.asunto.trim() || !borrador.cuerpo.trim()"
+                @click="guardarCorreo"
+            >
+                Guardar correo
+            </Boton>
+        </template>
+    </Modal>
 
     <ModalCambiarFecha
         v-if="empresa?.pendiente"

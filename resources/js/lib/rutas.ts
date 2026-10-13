@@ -86,5 +86,8 @@ export const rutas = {
         guardar: () => '/mediciones',
         cancelar: (id: number) => `/mediciones/${id}/cancelar`,
         fecha: (id: number) => `/mediciones/${id}/fecha`,
+        correo: (id: number) => `/mediciones/${id}/correo`,
+        enviarCorreo: (id: number) => `/mediciones/${id}/correo`,
+        probarCorreo: () => '/mediciones/correo/prueba',
     },
 };

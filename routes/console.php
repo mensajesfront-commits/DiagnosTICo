@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Cuentas eliminadas hace más de 90 días: se borran para siempre (DEC-017).
 Schedule::command('cuentas:purgar')->dailyAt('03:10');
+
+// HU-070: las mediciones sin enviar que pasaron su fecha límite quedan vencidas.
+Schedule::command('mediciones:vencer')->dailyAt('00:05');

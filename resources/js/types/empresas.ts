@@ -95,6 +95,8 @@ export type PendienteFicha = PendienteResumen & {
     asignada: string | null;
     vence: string | null;
     tiene_respuestas: boolean;
+    /** ISO del último aviso por correo. */
+    ultimo_aviso: string | null;
 };
 
 export type MedicionFicha = {
@@ -156,6 +158,8 @@ export type EmpresaAsignable = {
     } | null;
     /** Número que tendrá la nueva medición. */
     siguiente: number;
+    /** Usuario principal: "Para:" y {nombre_usuario} del correo. */
+    principal: { name: string; email: string } | null;
 };
 
 export type DiagnosticosDelSector = {

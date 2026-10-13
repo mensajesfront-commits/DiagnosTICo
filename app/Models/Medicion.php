@@ -21,6 +21,10 @@ use Illuminate\Support\Carbon;
  * @property int $numero
  * @property string $estado
  * @property Carbon|null $fecha_limite
+ * @property string|null $mensaje
+ * @property string|null $correo_asunto
+ * @property string|null $correo_cuerpo
+ * @property Carbon|null $ultimo_aviso_en
  * @property Carbon|null $enviada_en
  * @property Carbon|null $terminada_en
  * @property Carbon|null $created_at
@@ -29,7 +33,7 @@ use Illuminate\Support\Carbon;
 #[Table('mediciones')]
 #[Fillable([
     'empresa_id', 'version_diagnostico_id', 'numero', 'estado', 'fecha_limite', 'mensaje',
-    'aviso_por_correo', 'correo_asunto', 'correo_cuerpo', 'asignada_por',
+    'aviso_por_correo', 'correo_asunto', 'correo_cuerpo', 'ultimo_aviso_en', 'asignada_por',
 ])]
 class Medicion extends Model
 {
@@ -44,6 +48,7 @@ class Medicion extends Model
             'fecha_limite' => 'date',
             'aviso_por_correo' => 'boolean',
             'cancelada_en' => 'datetime',
+            'ultimo_aviso_en' => 'datetime',
             'enviada_en' => 'datetime',
             'terminada_en' => 'datetime',
         ];

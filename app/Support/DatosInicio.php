@@ -122,9 +122,8 @@ class DatosInicio
                     ? self::avance($m->version->contenido, $respondidas)
                     : null,
                 'ultimo_avance' => $ultimoAvance ? Carbon::parse((string) $ultimoAvance)->toIso8601String() : null,
-                // [FUNCIONALIDAD POR DEFINIR] Aún no se registran los avisos
-                // reenviados (PA-004): se muestra el aviso de la asignación.
-                'ultimo_aviso' => $m->aviso_por_correo ? $m->created_at?->toIso8601String() : null,
+                // Al asignar con aviso, "Recordatorio" o "Reenviar aviso" (HU-008).
+                'ultimo_aviso' => $m->ultimo_aviso_en?->toIso8601String(),
                 'resultado' => $m->resultado ? ['puntaje' => $m->resultado->puntaje_total, 'nivel' => $m->resultado->nivel] : null,
                 'pendiente_numero' => $estado === 'terminada' ? $pendientePorEmpresa->get($m->empresa_id) : null,
             ];

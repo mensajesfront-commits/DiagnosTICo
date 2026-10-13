@@ -147,6 +147,7 @@ class DatosEmpresas
                 'asignada' => $pendiente->created_at?->toDateString(),
                 'vence' => $pendiente->fecha_limite?->toDateString(),
                 'tiene_respuestas' => $respuestas->has($pendiente->id),
+                'ultimo_aviso' => $pendiente->ultimo_aviso_en?->toIso8601String(),
             ] : null,
             'mediciones' => array_reverse($filas),
             'evolucion' => array_values(array_filter(array_map(fn (array $f) => $f['puntaje'] === null ? null : [

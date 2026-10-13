@@ -2,23 +2,28 @@
 
 namespace App\Notifications;
 
-use App\Models\Medicion;
-use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
- * Correo de aviso de una medición nueva (HU-036 CA-006, A3.1e) para el
- * usuario principal de la empresa.
- *
- * [FUNCIONALIDAD POR DEFINIR] Editar el asunto y el cuerpo antes de enviar y
- * la plantilla general (A3.1e, `plantillas_correo`) llegan con esa pantalla;
- * por ahora se usa este texto. Se envía al momento, como los demás correos;
- * pasar a la cola con el resto (RNF-004).
+ * Correo de aviso de una medición (A3.1e, HU-036 CA-006, HU-008): el asunto
+ * y el cuerpo llegan ya rellenados (`CorreoAviso::rellenar`). Va a la cola
+ * para no bloquear la pantalla (HU-037 CA-004) y se reintenta hasta 3 veces
+ * si falla (CA-005). `prueba` es el que el Administrador se envía a sí mismo.
  */
-class AvisoMedicion extends Notification
+class AvisoMedicion extends Notification implements ShouldQueue
 {
-    public function __construct(public Medicion $medicion) {}
+    use Queueable;
+
+    public int $tries = 3;
+
+    public function __construct(
+        public string $asunto,
+        public string $cuerpo,
+        public bool $prueba = false,
+    ) {}
 
     /**
      * @return list<string>
@@ -28,27 +33,20 @@ class AvisoMedicion extends Notification
         return ['mail'];
     }
 
-    public function toMail(User $usuario): MailMessage
+    public function toMail(object $notifiable): MailMessage
     {
-        $m = $this->medicion;
-        $diagnostico = $m->version->diagnostico->nombre ?? 'Diagnóstico';
-
         $correo = (new MailMessage)
-            ->subject("Tienes una nueva medición: {$diagnostico}")
-            ->greeting("Hola, {$usuario->name}:")
-            ->line("NuevasTIC te asignó la medición {$m->numero} con el {$diagnostico}.");
+            ->subject(($this->prueba ? '[Prueba] ' : '').$this->asunto)
+            ->greeting(' ');
 
-        if ($m->mensaje) {
-            $correo->line('“'.$m->mensaje.'”');
-        }
-
-        if ($m->fecha_limite) {
-            $correo->line('Fecha límite: '.$m->fecha_limite->format('d/m/Y').'.');
+        // Cada párrafo del cuerpo es una línea del correo.
+        foreach (preg_split("/\n\s*\n/", $this->cuerpo) ?: [] as $parrafo) {
+            $correo->line(trim($parrafo));
         }
 
         return $correo
-            ->action('Ir a mi diagnóstico', url('/mi-inicio'))
-            ->line('Puedes responder a tu ritmo: tus respuestas se guardan solas.')
-            ->salutation('El equipo de NuevasTIC');
+            ->action('Entrar e iniciar el diagnóstico', route('inicio.empresa'))
+            ->line('Recibes este correo porque tu empresa está registrada en '.config('app.name').'. Si tienes dudas, responde a tu administrador.')
+            ->salutation(' ');
     }
 }

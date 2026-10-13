@@ -22,6 +22,9 @@
  * cuenta" (A3.1f) o "Reactivar cuenta". No existe "restablecer contraseña"
  * (RN-006).
  *
+ * La pendiente también tiene "Enviar recordatorio" o "Reenviar aviso" con su
+ * último aviso (A3.1e, HU-008).
+ *
  * [FUNCIONALIDAD POR DEFINIR] "Ver resultado" (A3.3, HU-038) y "Ver historial
  * completo" (A3.4, HU-039) llegan con Resultados.
  */
@@ -42,11 +45,18 @@ import CamposEmpresa from '@/components/empresas/CamposEmpresa.vue';
 import type { FormularioEmpresa } from '@/components/empresas/CamposEmpresa.vue';
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
+import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
 import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
-import { diaYMes, fechaLocal, mesYAnio, momento } from '@/lib/fechas';
+import {
+    diaYMes,
+    fechaLocal,
+    haceCuanto,
+    mesYAnio,
+    momento,
+} from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import type { FichaEmpresa } from '@/types/empresas';
@@ -100,6 +110,7 @@ const modalFecha = ref(false);
 const modalCancelar = ref(false);
 const modalDesactivar = ref(false);
 const modalReemplazar = ref(false);
+const modalCorreo = ref(false);
 
 function reactivar(): void {
     router.post(
@@ -520,6 +531,29 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             Cancelar medición
                         </Boton>
                     </div>
+                    <p
+                        v-if="pendiente.estado !== 'enviada'"
+                        class="mt-3 flex flex-wrap items-center justify-between gap-x-2 text-xs text-tinta-suave"
+                    >
+                        <span>
+                            {{
+                                pendiente.ultimo_aviso
+                                    ? `Último aviso: ${haceCuanto(pendiente.ultimo_aviso)}`
+                                    : 'Sin aviso por correo'
+                            }}
+                        </span>
+                        <button
+                            type="button"
+                            :class="enlace"
+                            @click="modalCorreo = true"
+                        >
+                            {{
+                                pendiente.estado === 'en_curso'
+                                    ? 'Enviar recordatorio'
+                                    : 'Reenviar aviso'
+                            }}
+                        </button>
+                    </p>
                 </section>
 
                 <section
@@ -857,6 +891,16 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
         <ModalCambiarFecha
             v-model:abierto="modalFecha"
             :medicion="pendiente"
+            :empresa="empresa.nombre"
+        />
+        <ModalCorreoAviso
+            v-model:abierto="modalCorreo"
+            :medicion="pendiente"
+            :accion="
+                pendiente.estado === 'en_curso'
+                    ? 'Recordatorio'
+                    : 'Reenviar aviso'
+            "
             :empresa="empresa.nombre"
         />
         <ModalCancelarMedicion

@@ -12,9 +12,11 @@
  * - Terminada sin otra pendiente: "Asignar nueva" abre A3.1b con la empresa
  *   elegida (A1e).
  *
- * [FUNCIONALIDAD POR DEFINIR] "Recordatorio" y "Reenviar aviso" (A1b, A1c)
- * abren el correo de la medición (A3.1e, HU-037), y "Ver resultado" abre
- * A3.3 (HU-038). Mientras llegan, llevan a la ficha de la empresa (A3.1).
+ * - En curso: "Recordatorio" (A1b); no iniciada: "Reenviar aviso" (A1c).
+ *   Abren el correo de la medición (A3.1e, HU-008) en `ModalCorreoAviso`.
+ *
+ * [FUNCIONALIDAD POR DEFINIR] "Ver resultado" abre A3.3 (HU-038). Mientras
+ * llega, lleva a la ficha de la empresa (A3.1).
  */
 import { Link } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
@@ -23,6 +25,7 @@ import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import Paginacion from '@/components/base/Paginacion.vue';
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
+import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
 import { diaYMes, fechaLocal, haceCuanto } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
@@ -57,7 +60,7 @@ type Accion = {
     texto: string;
     peligro?: boolean;
     href?: string;
-    modal?: 'fecha' | 'cancelar';
+    modal?: 'fecha' | 'cancelar' | 'correo';
 };
 
 function acciones(f: FilaMedicion): Accion[] {
@@ -70,9 +73,9 @@ function acciones(f: FilaMedicion): Accion[] {
                 { texto: 'Cancelar', peligro: true, modal: 'cancelar' },
             ];
         case 'en_curso':
-            return [{ texto: 'Recordatorio', href: ficha }];
+            return [{ texto: 'Recordatorio', modal: 'correo' }];
         case 'no_iniciada':
-            return [{ texto: 'Reenviar aviso', href: ficha }];
+            return [{ texto: 'Reenviar aviso', modal: 'correo' }];
         case 'terminada':
             return f.pendiente_numero
                 ? [{ texto: 'Ver resultado', href: ficha }]
@@ -92,11 +95,13 @@ function acciones(f: FilaMedicion): Accion[] {
 const elegida = ref<FilaMedicion | null>(null);
 const modalFecha = ref(false);
 const modalCancelar = ref(false);
+const modalCorreo = ref(false);
 
-function abrir(f: FilaMedicion, modal: 'fecha' | 'cancelar'): void {
+function abrir(f: FilaMedicion, modal: 'fecha' | 'cancelar' | 'correo'): void {
     elegida.value = f;
     modalFecha.value = modal === 'fecha';
     modalCancelar.value = modal === 'cancelar';
+    modalCorreo.value = modal === 'correo';
 }
 
 const claseAccion = (a: Accion) =>
@@ -292,6 +297,16 @@ const columnas = ['Empresa', 'Asignada', 'Vence', 'Estado', 'Acción'];
                     ...elegida,
                     tiene_respuestas: elegida.ultimo_avance !== null,
                 }"
+                :empresa="elegida.empresa"
+            />
+            <ModalCorreoAviso
+                v-model:abierto="modalCorreo"
+                :medicion="elegida"
+                :accion="
+                    elegida.estado === 'en_curso'
+                        ? 'Recordatorio'
+                        : 'Reenviar aviso'
+                "
                 :empresa="elegida.empresa"
             />
         </template>

@@ -81,6 +81,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('mediciones', [MedicionesController::class, 'guardar'])->name('mediciones.guardar');
         Route::post('mediciones/{medicion}/cancelar', [MedicionesController::class, 'cancelar'])->name('mediciones.cancelar');
         Route::put('mediciones/{medicion}/fecha', [MedicionesController::class, 'cambiarFecha'])->name('mediciones.fecha');
+        // A3.1e · correo de aviso (HU-037) y Recordatorio / Reenviar aviso (HU-008).
+        Route::get('mediciones/{medicion}/correo', [MedicionesController::class, 'correo'])->name('mediciones.correo');
+        Route::post('mediciones/{medicion}/correo', [MedicionesController::class, 'enviarCorreo'])->name('mediciones.correo.enviar');
+        Route::post('mediciones/correo/prueba', [MedicionesController::class, 'probarCorreo'])->middleware('throttle:10,1')->name('mediciones.correo.prueba');
     });
 
     // A5 · Usuarios y roles (docs/15_BACKEND.md). Ver: usuarios.ver;

@@ -6,7 +6,6 @@ use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
 use App\Models\User;
-use App\Notifications\AvisoMedicion;
 use App\Support\DatosEmpresas;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -20,10 +19,17 @@ use Illuminate\Validation\ValidationException;
  * - Una sola medición pendiente por empresa (RN-014). Si ya hay una, solo se
  *   asigna con `reemplazar`: la anterior queda cancelada y la nueva ocupa su
  *   número ("la nueva reemplaza a la medición 4", A3.1c).
- * - Con `aviso`, se envía el correo de aviso al usuario principal.
+ * - Con `aviso`, se envía el correo de aviso al usuario principal
+ *   (`EnviarAviso`). `correo` trae el asunto y el cuerpo editados para esta
+ *   medición (A3.1e); sin él, se usa la plantilla general.
  */
 class AsignarMedicion
 {
+    public function __construct(private readonly EnviarAviso $enviarAviso) {}
+
+    /**
+     * @param  array{asunto: string, cuerpo: string}|null  $correo
+     */
     public function asignar(
         Empresa $empresa,
         Diagnostico $diagnostico,
@@ -32,6 +38,7 @@ class AsignarMedicion
         bool $aviso,
         ?User $por,
         bool $reemplazar = false,
+        ?array $correo = null,
     ): Medicion {
         $diagnostico->loadMissing('ultimaVersion');
 
@@ -43,7 +50,7 @@ class AsignarMedicion
             throw ValidationException::withMessages(['empresa_id' => 'La empresa está desactivada: reactívala para asignarle una medición.']);
         }
 
-        $medicion = DB::transaction(function () use ($empresa, $diagnostico, $fechaLimite, $mensaje, $aviso, $por, $reemplazar): Medicion {
+        $medicion = DB::transaction(function () use ($empresa, $diagnostico, $fechaLimite, $mensaje, $aviso, $por, $reemplazar, $correo): Medicion {
             $pendiente = $empresa->mediciones()->whereIn('estado', DatosEmpresas::PENDIENTES)->lockForUpdate()->first();
 
             if ($pendiente && ! $reemplazar) {
@@ -67,6 +74,8 @@ class AsignarMedicion
                 'fecha_limite' => $fechaLimite,
                 'mensaje' => $mensaje,
                 'aviso_por_correo' => $aviso,
+                'correo_asunto' => $correo['asunto'] ?? null,
+                'correo_cuerpo' => $correo['cuerpo'] ?? null,
                 'asignada_por' => $por?->id,
             ]);
 
@@ -79,8 +88,13 @@ class AsignarMedicion
             return $medicion;
         });
 
+        // Si el correo no sale, la medición queda asignada igual: sin
+        // `ultimo_aviso_en`, y la pantalla ofrece "Reenviar aviso".
         if ($aviso) {
-            DatosEmpresas::principal($empresa)?->notify(new AvisoMedicion($medicion->load('version.diagnostico')));
+            try {
+                $this->enviarAviso->enviar($medicion);
+            } catch (ValidationException) {
+            }
         }
 
         return $medicion;

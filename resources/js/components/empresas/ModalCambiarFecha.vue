@@ -29,15 +29,19 @@ const errorMedicion = computed(
     () => (form.errors as Record<string, string | undefined>).medicion,
 );
 
-watch(abierto, (valor) => {
-    if (valor) {
-        form.fecha_limite =
-            props.medicion.vence && props.medicion.vence >= hoy
-                ? props.medicion.vence
-                : '';
-        form.clearErrors();
-    }
-});
+watch(
+    abierto,
+    (valor) => {
+        if (valor) {
+            form.fecha_limite =
+                props.medicion.vence && props.medicion.vence >= hoy
+                    ? props.medicion.vence
+                    : '';
+            form.clearErrors();
+        }
+    },
+    { immediate: true },
+);
 
 function guardar(): void {
     form.transform((d) => ({ fecha_limite: d.fecha_limite || null })).put(
