@@ -24,6 +24,8 @@ const props = withDefaults(
         type?: 'button' | 'submit' | 'reset';
         disabled?: boolean;
         cargando?: boolean;
+        /** Con `href`: enlace normal (sin Inertia), para descargar un archivo. */
+        archivo?: boolean;
         class?: string;
     }>(),
     {
@@ -33,6 +35,7 @@ const props = withDefaults(
         type: 'button',
         disabled: false,
         cargando: false,
+        archivo: false,
         class: undefined,
     },
 );
@@ -62,7 +65,14 @@ const clases = computed(() =>
 </script>
 
 <template>
-    <Link v-if="href && !disabled" :href="href" :class="clases">
+    <a
+        v-if="href && archivo && !disabled"
+        :href="typeof href === 'string' ? href : href.url"
+        :class="clases"
+    >
+        <slot />
+    </a>
+    <Link v-else-if="href && !disabled" :href="href" :class="clases">
         <slot />
     </Link>
     <button

@@ -8,6 +8,7 @@
 
 use App\Console\Commands\PruebaIa;
 use App\Services\Ia\AnalizadorDeCategoria;
+use App\Services\Ia\ArmadorPrompt;
 use App\Services\Ia\RespuestaIaInvalida;
 use OpenAI\Laravel\Facades\OpenAI;
 use OpenAI\Resources\Chat;
@@ -28,12 +29,12 @@ function analisisValido(int $puntajeAbierta = 45): array
 {
     return [
         'preguntas' => [
-            ['id' => 1, 'puntaje' => null, 'observacion' => 'Los pedidos dependen de WhatsApp personal y llamadas.'],
-            ['id' => 2, 'puntaje' => null, 'observacion' => 'Cada cliente espera una respuesta manual.'],
-            ['id' => 3, 'puntaje' => $puntajeAbierta, 'observacion' => 'Responde, pero con demoras de hasta un día.'],
+            ['id' => 'p1', 'puntaje' => null, 'observacion' => 'Los pedidos dependen de WhatsApp personal y llamadas.'],
+            ['id' => 'p2', 'puntaje' => null, 'observacion' => 'Cada cliente espera una respuesta manual.'],
+            ['id' => 'p3', 'puntaje' => $puntajeAbierta, 'observacion' => 'Responde, pero con demoras de hasta un día.'],
         ],
         'observacion_categoria' => 'Hoy tomas pedidos y reservas a mano por WhatsApp.',
-        'recomendacion' => 'Activa pedidos y respuestas automáticas.',
+        'recomendacion' => ['titulo' => 'Activa pedidos y respuestas automáticas', 'detalle' => 'Un menú digital con pedidos en WhatsApp Business.'],
     ];
 }
 
@@ -44,16 +45,16 @@ beforeEach(function () {
 it('devuelve el análisis con el puntaje de la pregunta abierta', function () {
     OpenAI::fake([respuestaIa(analisisValido())]);
 
-    $resultado = app(AnalizadorDeCategoria::class)->analizar(PruebaIa::categoriaDeEjemplo());
+    $resultado = app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
 
     expect($resultado['preguntas'][2]['puntaje'])->toBe(45)
-        ->and($resultado['recomendacion'])->toBe('Activa pedidos y respuestas automáticas.');
+        ->and($resultado['recomendacion']['titulo'])->toBe('Activa pedidos y respuestas automáticas');
 });
 
 it('pide la salida estructurada con el esquema fijo', function () {
     $fake = OpenAI::fake([respuestaIa(analisisValido())]);
 
-    app(AnalizadorDeCategoria::class)->analizar(PruebaIa::categoriaDeEjemplo());
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
 
     $fake->assertSent(Chat::class, function (string $metodo, array $parametros): bool {
         return $metodo === 'create'
@@ -67,27 +68,27 @@ it('pide la salida estructurada con el esquema fijo', function () {
 it('rechaza un puntaje fuera de 0 a 100', function () {
     OpenAI::fake([respuestaIa(analisisValido(puntajeAbierta: 140))]);
 
-    app(AnalizadorDeCategoria::class)->analizar(PruebaIa::categoriaDeEjemplo());
-})->throws(RespuestaIaInvalida::class, 'Puntaje fuera de rango en la pregunta 3.');
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+})->throws(RespuestaIaInvalida::class, 'Puntaje fuera de rango en la pregunta p3.');
 
 it('rechaza una respuesta a la que le falta una pregunta', function () {
     $analisis = analisisValido();
     array_pop($analisis['preguntas']);
     OpenAI::fake([respuestaIa($analisis)]);
 
-    app(AnalizadorDeCategoria::class)->analizar(PruebaIa::categoriaDeEjemplo());
-})->throws(RespuestaIaInvalida::class, 'Falta el análisis de la pregunta 3.');
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+})->throws(RespuestaIaInvalida::class, 'Falta el análisis de la pregunta p3.');
 
 it('rechaza un texto que no es JSON', function () {
     OpenAI::fake([CreateResponse::fake()]);
 
-    app(AnalizadorDeCategoria::class)->analizar(PruebaIa::categoriaDeEjemplo());
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
 })->throws(RespuestaIaInvalida::class, 'La IA no devolvió el formato esperado.');
 
 it('avisa si falta el modelo en el .env', function () {
     config(['openai.model' => null]);
 
-    app(AnalizadorDeCategoria::class)->analizar(PruebaIa::categoriaDeEjemplo());
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
 })->throws(RespuestaIaInvalida::class, 'Falta OPENAI_MODEL');
 
 it('muestra el JSON con el comando prueba:ia', function () {

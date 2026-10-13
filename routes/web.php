@@ -8,6 +8,7 @@ use App\Http\Controllers\EmpresasController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MedicionesController;
 use App\Http\Controllers\ResponderController;
+use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
@@ -147,7 +148,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('mi-diagnostico/{medicion}/enviar', [ResponderController::class, 'enviar'])->name('responder.enviar');
         Route::get('mi-diagnostico/{medicion}/enviado', [ResponderController::class, 'enviado'])->name('responder.enviado');
         Route::post('mi-diagnostico/{medicion}/solicitud', [ResponderController::class, 'solicitar'])->middleware('throttle:5,1')->name('responder.solicitar');
+        Route::post('mi-diagnostico/{medicion}/reintentar', [ResponderController::class, 'reintentar'])->middleware('throttle:5,1')->name('responder.reintentar');
     });
+
+    // E6 / A3.3 · Resultado, E9 / A3.5 · Mis respuestas y E10 · PDF (HU-064
+    // a HU-066). La empresa solo ve la suya (el controlador lo revisa).
+    Route::middleware('permission:resultados.ver')->group(function () {
+        Route::get('resultados/{medicion}', [ResultadosController::class, 'ver'])->name('resultados.ver');
+        Route::get('resultados/{medicion}/respuestas', [ResultadosController::class, 'respuestas'])->name('resultados.respuestas');
+    });
+    Route::get('resultados/{medicion}/pdf', [ResultadosController::class, 'pdf'])
+        ->middleware(['permission:resultados.pdf', 'throttle:20,1'])->name('resultados.pdf');
 });
 
 require __DIR__.'/settings.php';

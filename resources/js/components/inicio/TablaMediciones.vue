@@ -15,8 +15,7 @@
  * - En curso: "Recordatorio" (A1b); no iniciada: "Reenviar aviso" (A1c).
  *   Abren el correo de la medición (A3.1e, HU-008) en `ModalCorreoAviso`.
  *
- * [FUNCIONALIDAD POR DEFINIR] "Ver resultado" abre A3.3 (HU-038). Mientras
- * llega, lleva a la ficha de la empresa (A3.1).
+ * "Ver resultado" abre A3.3 (HU-038).
  */
 import { Link } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
@@ -64,7 +63,7 @@ type Accion = {
 };
 
 function acciones(f: FilaMedicion): Accion[] {
-    const ficha = rutas.empresas.ver(f.empresa_id);
+    const resultado = rutas.resultados.ver(f.id);
 
     switch (f.estado) {
         case 'vencida':
@@ -78,9 +77,9 @@ function acciones(f: FilaMedicion): Accion[] {
             return [{ texto: 'Reenviar aviso', modal: 'correo' }];
         case 'terminada':
             return f.pendiente_numero
-                ? [{ texto: 'Ver resultado', href: ficha }]
+                ? [{ texto: 'Ver resultado', href: resultado }]
                 : [
-                      { texto: 'Ver resultado', href: ficha },
+                      { texto: 'Ver resultado', href: resultado },
                       {
                           texto: 'Asignar nueva',
                           href: rutas.mediciones.asignar(f.empresa_id),

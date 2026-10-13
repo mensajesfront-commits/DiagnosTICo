@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\LaravelPdf\Facades\Pdf;
 use Tests\TestCase;
 
 /*
@@ -16,6 +17,9 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    // Al publicar un resultado se genera el PDF con Chromium (RN-024): en las
+    // pruebas se simula siempre.
+    ->beforeEach(fn () => Pdf::fake())
     ->in('Feature');
 
 /*

@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Rules\TieneMayuscula;
+use App\Services\Ia\Analizador;
+use App\Services\Ia\AnalizadorDeCategoria;
+use App\Services\Ia\AnalizadorDePrueba;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Date;
@@ -19,7 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Análisis de la IA (RN-021): OpenAI, o el de prueba sin conexión con
+        // IA_DE_PRUEBA=true (para programar sin clave y en las pruebas).
+        $this->app->bind(Analizador::class, fn () => config('diagnostico.ia_de_prueba')
+            ? new AnalizadorDePrueba
+            : new AnalizadorDeCategoria);
     }
 
     /**

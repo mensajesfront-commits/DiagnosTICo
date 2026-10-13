@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\AnalizarCategoria;
+use App\Jobs\AnalizarMedicion;
 use App\Models\Medicion;
 use App\Models\Respuesta;
 use App\Models\SolicitudMedicion;
@@ -138,10 +140,8 @@ class ResponderController extends Controller
 
     /**
      * HU-062 · Envía: todas las obligatorias respondidas; después no se
-     * cambian (RN-017). Queda "Enviada" mientras se analiza.
-     *
-     * [FUNCIONALIDAD POR DEFINIR] El cálculo de puntajes y el análisis de la
-     * IA (HU-068, HU-069) arrancan aquí cuando existan (semana 5).
+     * cambian (RN-017). Queda "Enviada" mientras se analiza: aquí arrancan
+     * el cálculo de puntajes y el análisis de la IA (HU-068, HU-069).
      */
     public function enviar(Request $request, Medicion $medicion): RedirectResponse
     {
@@ -160,6 +160,8 @@ class ResponderController extends Controller
 
         $medicion->forceFill(['estado' => 'enviada', 'enviada_en' => now()])->save();
 
+        AnalizarMedicion::dispatch($medicion->id);
+
         return to_route('responder.enviado', $medicion);
     }
 
@@ -172,11 +174,67 @@ class ResponderController extends Controller
             return to_route('responder.mostrar', $medicion);
         }
 
+        // CA-002: si ya terminó, directo al resultado.
+        if ($medicion->estado === 'terminada') {
+            return to_route('resultados.ver', $medicion);
+        }
+
+        if ($medicion->estado !== 'enviada') {
+            return to_route('inicio.empresa');
+        }
+
         return Inertia::render('responder/Enviado', [
             'medicion' => $this->cabecera($medicion),
             'estado' => $medicion->estado,
             'enviadaEn' => $medicion->enviada_en?->toIso8601String(),
+            'analisis' => fn () => $this->avanceAnalisis($medicion),
         ]);
+    }
+
+    /**
+     * HU-063 CA-004 · Reintenta solo las categorías que fallaron tras los 3
+     * intentos (RN-021). Cada una vuelve a tener 3 intentos.
+     */
+    public function reintentar(Request $request, Medicion $medicion): RedirectResponse
+    {
+        $this->deMiEmpresa($request, $medicion);
+
+        $fallidas = $medicion->estado === 'enviada'
+            ? $medicion->analisis()->where('estado', 'fallido')->get()
+            : collect();
+
+        foreach ($fallidas as $analisis) {
+            $analisis->forceFill(['estado' => 'pendiente', 'intentos' => 0])->save();
+            AnalizarCategoria::dispatch($analisis->id);
+        }
+
+        if ($fallidas->isNotEmpty()) {
+            Inertia::flash('toast', ['type' => 'info', 'message' => 'Volvimos a intentar el análisis de esas categorías.']);
+        }
+
+        return to_route('responder.enviado', $medicion);
+    }
+
+    /**
+     * Paso 1 (puntajes) listo cuando existen los análisis; paso 2, cuántas
+     * categorías terminó la IA y cuáles fallaron.
+     *
+     * @return array{total: int, terminadas: int, puntajes_listos: bool, fallidas: array<int, string>}
+     */
+    private function avanceAnalisis(Medicion $medicion): array
+    {
+        $medicion->loadMissing('version');
+        /** @var list<array<string, mixed>> $categorias */
+        $categorias = $medicion->version->contenido['categorias'] ?? [];
+        $nombres = array_column($categorias, 'nombre', 'ref');
+        $analisis = $medicion->analisis()->get(['categoria_ref', 'estado']);
+
+        return [
+            'total' => count($categorias),
+            'terminadas' => $analisis->where('estado', 'terminado')->count(),
+            'puntajes_listos' => $analisis->isNotEmpty(),
+            'fallidas' => $analisis->where('estado', 'fallido')->map(fn ($a) => (string) ($nombres[$a->categoria_ref] ?? $a->categoria_ref))->values()->all(),
+        ];
     }
 
     /**

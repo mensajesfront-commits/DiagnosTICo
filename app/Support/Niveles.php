@@ -21,6 +21,22 @@ class Niveles
         'sigue' => ['Sigue así', 80, 100],
     ];
 
+    /**
+     * Frase que explica el nivel en el resultado (HU-064 CA-001) y en el PDF.
+     * La de "mejorar" es la del wireframe E6.
+     *
+     * [INFORMACIÓN PENDIENTE] NuevasTIC aprueba las frases de los otros tres
+     * niveles; estas son una propuesta del equipo.
+     *
+     * @var array<string, string>
+     */
+    public const array FRASES = [
+        'critico' => 'Tu marketing digital está empezando. Elige una categoría en nivel Crítico y trabaja en ella primero: pequeños cambios ya se notan.',
+        'mejorar' => 'Tienes bases, pero algunas áreas frenan tu crecimiento. Empieza por las categorías en nivel Crítico y Se puede mejorar.',
+        'camino' => 'Tu marketing digital funciona. Refuerza las categorías más bajas para dar el siguiente paso.',
+        'sigue' => 'Tu marketing digital está sólido. Mantén lo que haces y mide cada mes para no perder terreno.',
+    ];
+
     /** Clave del nivel de un puntaje de 0 a 100. */
     public static function de(int|float $puntaje): string
     {
@@ -33,6 +49,11 @@ class Niveles
         }
 
         return 'critico';
+    }
+
+    public static function frase(string $clave): string
+    {
+        return self::FRASES[$clave] ?? '';
     }
 
     public static function nombre(string $clave): string

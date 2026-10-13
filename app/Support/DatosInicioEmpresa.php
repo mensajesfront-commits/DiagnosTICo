@@ -93,8 +93,8 @@ class DatosInicioEmpresa
     }
 
     /**
-     * "Tus 3 áreas a trabajar": las 3 categorías con menor puntaje del último
-     * resultado, con su primera recomendación si la hay.
+     * "Tus 3 áreas a trabajar": las mismas 3 prioridades del resultado (E6),
+     * con el título de su recomendación.
      *
      * @return list<array<string, mixed>>
      */
@@ -102,13 +102,12 @@ class DatosInicioEmpresa
     {
         /** @var list<array<string, mixed>> $categorias */
         $categorias = $m->resultado->por_categoria ?? [];
-        usort($categorias, fn (array $a, array $b) => ($a['puntaje'] ?? 0) <=> ($b['puntaje'] ?? 0));
 
         return array_map(fn (array $c) => [
-            'nombre' => $c['nombre'] ?? '',
-            'puntaje' => (int) ($c['puntaje'] ?? 0),
-            'nivel' => $c['nivel'] ?? Niveles::de((int) ($c['puntaje'] ?? 0)),
-            'recomendacion' => $c['recomendacion'] ?? null,
-        ], array_slice($categorias, 0, 3));
+            'nombre' => $c['nombre'],
+            'puntaje' => (int) $c['puntaje'],
+            'nivel' => $c['nivel'],
+            'recomendacion' => $c['recomendacion']['titulo'] ?? null,
+        ], DatosResultado::prioridades($categorias));
     }
 }

@@ -27,6 +27,8 @@ const props = defineProps<{
     etiquetas: string[];
     actual: SerieRadar;
     anterior?: SerieRadar | null;
+    /** Alto del área de la gráfica (clases de Tailwind). */
+    alto?: string;
 }>();
 
 const datos = computed<ChartData<'radar'>>(() => ({
@@ -103,7 +105,7 @@ const opciones: ChartOptions<'radar'> = {
                 {{ anterior.nombre }}
             </span>
         </div>
-        <div class="relative h-80">
+        <div :class="['relative', alto ?? 'h-80']">
             <Radar v-if="fuentesListas" :data="datos" :options="opciones" />
         </div>
     </div>

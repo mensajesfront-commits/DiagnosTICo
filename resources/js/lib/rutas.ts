@@ -111,5 +111,12 @@ export const rutas = {
         enviar: (id: number) => `/mi-diagnostico/${id}/enviar`,
         enviado: (id: number) => `/mi-diagnostico/${id}/enviado`,
         solicitar: (id: number) => `/mi-diagnostico/${id}/solicitud`,
+        reintentar: (id: number) => `/mi-diagnostico/${id}/reintentar`,
+    },
+    resultados: {
+        ver: (id: number) => `/resultados/${id}`,
+        respuestas: (id: number, categoria?: string) =>
+            `/resultados/${id}/respuestas${categoria ? `?categoria=${categoria}` : ''}`,
+        pdf: (id: number) => `/resultados/${id}/pdf`,
     },
 };

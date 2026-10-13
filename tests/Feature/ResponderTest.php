@@ -9,8 +9,10 @@ use App\Models\Sector;
 use App\Models\SolicitudMedicion;
 use App\Models\User;
 use App\Notifications\NuevaMedicionSolicitada;
+use App\Support\Niveles;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /*
@@ -100,6 +102,7 @@ it('no envía con preguntas obligatorias sin responder; completo, queda enviada 
     $this->actingAs($this->laura)->get(route('responder.revisar', $this->medicion))
         ->assertInertia(fn (Assert $p) => $p->component('responder/Revisar')->where('avance.completo', true));
 
+    Queue::fake();
     $this->actingAs($this->laura)->post(route('responder.enviar', $this->medicion))
         ->assertRedirect(route('responder.enviado', $this->medicion));
 
@@ -145,7 +148,8 @@ it('sin pendiente muestra el último resultado, la variación y las 3 áreas má
     Resultado::create(['medicion_id' => $this->medicion->id, 'puntaje_total' => 41, 'nivel' => 'mejorar', 'por_categoria' => [], 'publicado_en' => now()]);
     $segunda = Medicion::factory()->create(['empresa_id' => $this->empresa->id, 'version_diagnostico_id' => $this->version->id, 'numero' => 2, 'estado' => 'terminada', 'terminada_en' => now()]);
     Resultado::create(['medicion_id' => $segunda->id, 'puntaje_total' => 57, 'nivel' => 'mejorar', 'publicado_en' => now(), 'por_categoria' => [
-        ['nombre' => 'KPIs', 'puntaje' => 45], ['nombre' => 'Automatización', 'puntaje' => 22], ['nombre' => 'Contenido', 'puntaje' => 38], ['nombre' => 'Cliente', 'puntaje' => 81],
+        ...array_map(fn (array $c) => ['ref' => 'c'.$c[1], 'nombre' => $c[0], 'puntaje' => $c[1], 'importancia' => 25.0, 'nivel' => Niveles::de($c[1]), 'recomendacion' => ['titulo' => 'Haz algo', 'detalle' => '…']],
+            [['KPIs', 45], ['Automatización', 22], ['Contenido', 38], ['Cliente', 81]]),
     ]]);
 
     $this->actingAs($this->laura)->get(route('inicio.empresa'))
@@ -156,6 +160,7 @@ it('sin pendiente muestra el último resultado, la variación y las 3 áreas má
             ->has('mediciones', 2)
             ->where('areas.0.nombre', 'Automatización')
             ->where('areas.0.nivel', 'critico')
+            ->where('areas.0.recomendacion', 'Haz algo')
             ->has('areas', 3));
 });
 

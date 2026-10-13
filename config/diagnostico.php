@@ -25,4 +25,11 @@ return [
     */
     'soporte_email' => env('SOPORTE_EMAIL', 'soporte@nuevastic.co'),
 
+    /*
+    | Análisis de la IA sin conexión (App\Services\Ia\AnalizadorDePrueba):
+    | puntajes y textos de prueba, sin gastar llamadas a OpenAI. Solo para
+    | programar y para las pruebas automáticas; en producción va en false.
+    */
+    'ia_de_prueba' => (bool) env('IA_DE_PRUEBA', false),
+
 ];

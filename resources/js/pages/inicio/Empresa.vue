@@ -16,10 +16,11 @@
  * Abajo, el último resultado con su variación y evolución, y las 3 áreas a
  * trabajar o la lista de mediciones.
  *
- * [FUNCIONALIDAD POR DEFINIR] "Ver resultado" (E6) y "Ver informe PDF" (E7)
- * llegan con Resultados (semana 5): por ahora se ven sin enlace.
+ * "Ver resultado" abre E6 y "Ver informe PDF" descarga el PDF guardado.
+ *
+ * [FUNCIONALIDAD POR DEFINIR] "Ver historial completo" (E8, HU-067).
  */
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { CalendarDays, Mail } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -100,6 +101,7 @@ function pedirNueva(): void {
 
 const enlaceInactivo =
     'cursor-not-allowed text-tinta-suave underline underline-offset-2';
+const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
 </script>
 
 <template>
@@ -380,13 +382,13 @@ const enlaceInactivo =
                     >
                 </p>
             </div>
-            <span
+            <Boton
                 v-if="ultima"
-                class="rounded-md border border-linea-fuerte px-4 py-2 text-sm text-tinta-suave"
-                title="El resultado completo llega con Resultados (E6)"
+                variante="secundario"
+                :href="rutas.resultados.ver(ultima.id)"
             >
                 Ver resultado de la medición {{ ultima.numero }}
-            </span>
+            </Boton>
         </section>
 
         <!-- Primera vez: cómo funciona -->
@@ -467,12 +469,12 @@ const enlaceInactivo =
                         <span v-else class="text-xs text-tinta-suave">
                             Primera medición
                         </span>
-                        <span
-                            :class="enlaceInactivo"
-                            title="El resultado completo llega con Resultados (E6)"
+                        <Link
+                            :href="rutas.resultados.ver(ultima.id)"
+                            :class="enlace"
                         >
                             Ver resultado completo
-                        </span>
+                        </Link>
                     </div>
                 </div>
                 <div class="mt-4 border-t border-linea pt-3">
@@ -599,18 +601,18 @@ const enlaceInactivo =
                             <td
                                 class="px-5 py-2 text-right text-xs whitespace-nowrap"
                             >
-                                <span
-                                    :class="enlaceInactivo"
-                                    title="Llega con Resultados (E6)"
+                                <Link
+                                    :href="rutas.resultados.ver(m.id)"
+                                    :class="enlace"
                                 >
                                     Ver resultado
-                                </span>
-                                <span
-                                    :class="cn(enlaceInactivo, 'ml-3')"
-                                    title="Llega con Resultados (E7)"
+                                </Link>
+                                <a
+                                    :href="rutas.resultados.pdf(m.id)"
+                                    :class="cn(enlace, 'ml-3')"
                                 >
                                     Ver informe PDF
-                                </span>
+                                </a>
                             </td>
                         </tr>
                     </tbody>

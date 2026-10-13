@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\Ia\AnalizadorDeCategoria;
+use App\Services\Ia\ArmadorPrompt;
 use App\Services\Ia\RespuestaIaInvalida;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -24,7 +25,7 @@ class PruebaIa extends Command
         $this->info('Enviando la categoría "'.$categoria['nombre'].'" a OpenAI…');
 
         try {
-            $resultado = $analizador->analizar($categoria);
+            $resultado = $analizador->analizar(ArmadorPrompt::instrucciones(), $categoria);
         } catch (RespuestaIaInvalida $e) {
             $this->error($e->getMessage());
 
@@ -39,7 +40,7 @@ class PruebaIa extends Command
     /**
      * Categoría de ejemplo tomada del wireframe E6 (Restaurante La Esquina).
      *
-     * @return array{nombre: string, sector: string, preguntas: list<array{id: int, tipo: string, texto: string, respuesta: string, puntaje: int|null, criterio?: string}>}
+     * @return array{nombre: string, sector: string, preguntas: list<array{id: string, tipo: string, texto: string, respuesta: string, puntaje: int|null, criterio?: string}>}
      */
     public static function categoriaDeEjemplo(): array
     {
@@ -48,21 +49,21 @@ class PruebaIa extends Command
             'sector' => 'Comidas',
             'preguntas' => [
                 [
-                    'id' => 1,
+                    'id' => 'p1',
                     'tipo' => 'opcion_unica',
                     'texto' => '¿Qué herramientas usas para recibir pedidos o reservas?',
                     'respuesta' => 'WhatsApp personal y llamadas',
                     'puntaje' => 20,
                 ],
                 [
-                    'id' => 2,
+                    'id' => 'p2',
                     'tipo' => 'opcion_unica',
                     'texto' => '¿Automatizas algún mensaje a tus clientes?',
                     'respuesta' => 'No',
                     'puntaje' => 0,
                 ],
                 [
-                    'id' => 3,
+                    'id' => 'p3',
                     'tipo' => 'abierta',
                     'texto' => 'Describe cómo respondes los mensajes que llegan por redes sociales.',
                     'respuesta' => 'Los contesto yo cuando tengo tiempo, a veces al día siguiente.',

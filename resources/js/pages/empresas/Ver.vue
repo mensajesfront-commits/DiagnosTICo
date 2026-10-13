@@ -25,8 +25,9 @@
  * La pendiente también tiene "Enviar recordatorio" o "Reenviar aviso" con su
  * último aviso (A3.1e, HU-008).
  *
- * [FUNCIONALIDAD POR DEFINIR] "Ver resultado" (A3.3, HU-038) y "Ver historial
- * completo" (A3.4, HU-039) llegan con Resultados.
+ * "Ver resultado" abre A3.3 (HU-038).
+ *
+ * [FUNCIONALIDAD POR DEFINIR] "Ver historial completo" (A3.4, HU-039).
  */
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
@@ -446,15 +447,17 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                             >
                                                 Cambiar fecha
                                             </button>
-                                            <span
+                                            <Link
                                                 v-else-if="
                                                     m.estado === 'terminada'
                                                 "
-                                                class="text-tinta-suave"
-                                                title="El resultado (A3.3) llega con Resultados"
+                                                :href="
+                                                    rutas.resultados.ver(m.id)
+                                                "
+                                                :class="enlace"
                                             >
                                                 Ver resultado
-                                            </span>
+                                            </Link>
                                         </td>
                                     </tr>
                                 </tbody>
