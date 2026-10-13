@@ -7,6 +7,7 @@ use App\Http\Controllers\EditorDiagnosticoController;
 use App\Http\Controllers\EmpresasController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MedicionesController;
+use App\Http\Controllers\ResponderController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
@@ -134,6 +135,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('colaboradores/{colaborador}/desactivar', [ColaboradoresController::class, 'desactivar'])->name('colaboradores.desactivar');
         Route::post('colaboradores/{colaborador}/reactivar', [ColaboradoresController::class, 'reactivar'])->name('colaboradores.reactivar');
         Route::delete('colaboradores/{colaborador}', [ColaboradoresController::class, 'eliminar'])->name('colaboradores.eliminar');
+    });
+
+    // E2–E4 · Responder el diagnóstico (HU-060 a HU-063) y pedir una
+    // medición nueva si venció (HU-082). Solo la empresa dueña (el
+    // controlador lo revisa; de otra empresa, 404).
+    Route::middleware('permission:diagnostico.responder')->group(function () {
+        Route::get('mi-diagnostico/{medicion}', [ResponderController::class, 'responder'])->name('responder.mostrar');
+        Route::put('mi-diagnostico/{medicion}/respuestas', [ResponderController::class, 'guardar'])->middleware('throttle:120,1')->name('responder.guardar');
+        Route::get('mi-diagnostico/{medicion}/revisar', [ResponderController::class, 'revisar'])->name('responder.revisar');
+        Route::post('mi-diagnostico/{medicion}/enviar', [ResponderController::class, 'enviar'])->name('responder.enviar');
+        Route::get('mi-diagnostico/{medicion}/enviado', [ResponderController::class, 'enviado'])->name('responder.enviado');
+        Route::post('mi-diagnostico/{medicion}/solicitud', [ResponderController::class, 'solicitar'])->middleware('throttle:5,1')->name('responder.solicitar');
     });
 });
 

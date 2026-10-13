@@ -35,7 +35,7 @@ it('lleva al Administrador a A1', function () {
 });
 
 it('lleva a la Empresa y al Colaborador a E1', function (string $rol) {
-    $cuenta = User::factory()->create()->assignRole($rol);
+    $cuenta = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole($rol);
 
     $this->actingAs($cuenta)->get(route('dashboard'))->assertRedirect(route('inicio.empresa'));
     $this->actingAs($cuenta)->get(route('inicio.empresa'))

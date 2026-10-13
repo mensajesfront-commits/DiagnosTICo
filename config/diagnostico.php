@@ -19,4 +19,10 @@ return [
         'dias' => (int) env('DIAS_PARA_RECUPERAR_CUENTA', 90),
     ],
 
+    /*
+    | Correo de contacto que ve la empresa (E1, medición vencida).
+    | [INFORMACIÓN PENDIENTE] NuevasTIC confirma la dirección real.
+    */
+    'soporte_email' => env('SOPORTE_EMAIL', 'soporte@nuevastic.co'),
+
 ];
