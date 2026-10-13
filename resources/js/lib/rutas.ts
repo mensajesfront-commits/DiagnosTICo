@@ -16,8 +16,21 @@ export const rutas = {
                 ? `/diagnosticos/crear?sector=${sectorId}`
                 : '/diagnosticos/crear',
         guardar: () => '/diagnosticos',
-        editar: (id: number) => `/diagnosticos/${id}/editar`,
-        vistaPrevia: (id: number) => `/diagnosticos/${id}/vista-previa`,
+        editar: (id: number, parte?: number, pregunta?: number) =>
+            `/diagnosticos/${id}/editar` +
+            (parte
+                ? `?categoria=${parte}${pregunta ? `&pregunta=${pregunta}` : ''}`
+                : ''),
+        vistaPrevia: (id: number, version?: number) =>
+            `/diagnosticos/${id}/vista-previa${version ? `?version=${version}` : ''}`,
+        preguntas: (id: number) => `/diagnosticos/${id}/preguntas`,
+        pregunta: (id: number, pregunta: number) =>
+            `/diagnosticos/${id}/preguntas/${pregunta}`,
+        ordenar: (id: number, parte: number) =>
+            `/diagnosticos/${id}/categorias/${parte}/orden`,
+        agregarCategorias: (id: number) => `/diagnosticos/${id}/categorias`,
+        importancia: (id: number) => `/diagnosticos/${id}/importancia`,
+        publicar: (id: number) => `/diagnosticos/${id}/publicar`,
         duplicar: (id: number) => `/diagnosticos/${id}/duplicar`,
         archivar: (id: number) => `/diagnosticos/${id}/archivar`,
         eliminar: (id: number) => `/diagnosticos/${id}`,

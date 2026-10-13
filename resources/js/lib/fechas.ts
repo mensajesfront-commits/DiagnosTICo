@@ -132,3 +132,16 @@ export function fechaLocal(texto: string): Date {
 
     return new Date(anio, (mes ?? 1) - 1, dia ?? 1);
 }
+
+/** "hace un momento", "hace 5 min" o, si pasó más de una hora, "hoy 15:24". */
+export function guardadoHace(iso: string, ahora: Date = new Date()): string {
+    const minutos = Math.floor(
+        (ahora.getTime() - new Date(iso).getTime()) / 60000,
+    );
+
+    if (minutos < 1) {
+        return 'hace un momento';
+    }
+
+    return minutos < 60 ? `hace ${minutos} min` : momento(iso, ahora);
+}

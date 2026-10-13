@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 import {
     fechaLocal,
+    guardadoHace,
     haceCuanto,
     mesYAnio,
     momento,
@@ -63,5 +64,24 @@ describe('fechas', () => {
             fecha.getMonth(),
             fecha.getDate(),
         ]).toEqual([2026, 9, 9]);
+    });
+});
+
+describe('guardadoHace', () => {
+    const ahora = new Date(2026, 9, 13, 15, 30);
+
+    it('cuenta los minutos y después muestra la hora', () => {
+        expect(
+            guardadoHace(
+                new Date(2026, 9, 13, 15, 29, 40).toISOString(),
+                ahora,
+            ),
+        ).toBe('hace un momento');
+        expect(
+            guardadoHace(new Date(2026, 9, 13, 15, 25).toISOString(), ahora),
+        ).toBe('hace 5 min');
+        expect(
+            guardadoHace(new Date(2026, 9, 13, 9, 12).toISOString(), ahora),
+        ).toBe('hoy 9:12');
     });
 });
