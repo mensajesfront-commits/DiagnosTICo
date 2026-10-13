@@ -103,4 +103,13 @@ export const rutas = {
         enviarCorreo: (id: number) => `/mediciones/${id}/correo`,
         probarCorreo: () => '/mediciones/correo/prueba',
     },
+    responder: {
+        mostrar: (id: number, categoria?: number) =>
+            `/mi-diagnostico/${id}${categoria !== undefined ? `?categoria=${categoria}` : ''}`,
+        guardar: (id: number) => `/mi-diagnostico/${id}/respuestas`,
+        revisar: (id: number) => `/mi-diagnostico/${id}/revisar`,
+        enviar: (id: number) => `/mi-diagnostico/${id}/enviar`,
+        enviado: (id: number) => `/mi-diagnostico/${id}/enviado`,
+        solicitar: (id: number) => `/mi-diagnostico/${id}/solicitud`,
+    },
 };
