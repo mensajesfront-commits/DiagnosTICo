@@ -284,6 +284,23 @@ Ruta: `GET /diagnosticos/{id}/vista-previa` (`?version=` para una publicada, en 
 
 - **[FUNCIONALIDAD POR DEFINIR]** La pestaña "Resultado de ejemplo" (A2.6, HU-030) llega con Resultados.
 
+### E1 · Inicio de la empresa (`inicio/Empresa`)
+
+Ruta: `GET /mi-inicio`. Props en el tipo `InicioEmpresa` (`types/responder.ts`).
+
+- La medición pendiente según su estado: primera vez, no iniciada (mensaje del equipo, fecha límite y días que quedan), en curso (avance y "Continuar diagnóstico"), vencida ("Pedir una nueva fecha" y el correo de soporte; "Nueva medición solicitada" si ya la pidió) o enviada. Sin pendiente: "No tienes diagnósticos pendientes".
+- Primera vez: "Cómo funciona" en 3 pasos. Con resultados: el último (anillo `graficas/AnilloPuntaje.vue`, nivel, variación y `graficas/MiniEvolucion.vue`) y "Tus 3 áreas a trabajar" o "Mis mediciones".
+- **[FUNCIONALIDAD POR DEFINIR]** "Ver resultado", "Ver informe PDF" y "Ver historial completo" se ven sin enlace hasta E6–E8.
+
+### E2–E4 · Responder, revisar y enviado (`responder/Responder`, `responder/Revisar`, `responder/Enviado`)
+
+Usan `layouts/ResponderLayout.vue` (sin menú lateral) y `components/responder/BarraResponder.vue` (avance, "✓ Guardado 10:42" y "Guardar y salir").
+
+- **E2:** categorías a la izquierda (✓ completa, ● a medias, número si no empezó); preguntas con "Cómo responder", "Obligatoria" y el tipo. Cada respuesta se guarda al momento con `fetch` (PUT JSON con el token de la cookie `XSRF-TOKEN`); las escritas, al dejar de escribir. Abajo, anterior y siguiente; en la última, "Revisar antes de enviar". La URL guarda la categoría (`?categoria=`).
+- **E3:** con faltantes, la lista con "Completar" y el aviso; completo, "N/N categorías completas" y "Todo listo". "Enviar diagnóstico" pide confirmar.
+- **E4:** los pasos del análisis; se actualiza sola cada 15 s. **[FUNCIONALIDAD POR DEFINIR]** El avance real llega con HU-069.
+- **[FUNCIONALIDAD POR DEFINIR]** La opción "Otro" con texto del wireframe necesita un campo en las opciones.
+
 ### A5 · Usuarios y roles: pestaña Usuarios (`usuarios/Index`)
 
 Ruta: `GET /usuarios` (ya existe, `UsuariosController`; permiso `usuarios.ver`). Admite `?rol=Empresa` para entrar ya filtrado.

@@ -19,7 +19,7 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 | Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho ("Ver como" en semana 6) |
 | Colaboradores | `/colaboradores` | `ColaboradoresController` | `role:Empresa` + cuenta principal | E12 | Hecho |
 | Empresas y mediciones | `/empresas`, `/mediciones` | `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion` | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1, A3.1b–A3.1d, A3.1f, A3.2 | Hecho; A3.1e (correo), A3.3–A3.5 con Resultados |
-| Responder medición | `/mediciones/{id}` | `ResponderController` (por crear) | `diagnostico.responder` + su empresa | E2–E4 | Semana 5 |
+| Responder medición | `/mi-diagnostico/{id}` | `ResponderController`, `DatosResponder` | `diagnostico.responder` + su empresa | E2–E4 | Hecho (el análisis llega con HU-068/069) |
 | Resultados | `/resultados/{id}`, `/resultados/{id}/pdf` | `ResultadosController` (por crear) | `resultados.ver`, `resultados.pdf` + su empresa (o cualquier empresa si es interna) | E5, E6, A3.3 | Semana 5 |
 | Configuración de la IA | `/configuracion-ia` | `PromptsController` (por crear) | `ia.ver` / `ia.editar` | A4, A4.1–A4.4 | Semana 5 |
 | Historial | `/historial` | `HistorialController` (por crear) | `resultados.ver` + su empresa | E8 | Semana 6 |
@@ -243,6 +243,23 @@ Correo de aviso (A3.1e):
 - `AvisoMedicion` va en la **cola** (`ShouldQueue`, 3 intentos): la pantalla no espera al servidor de correo (HU-037 CA-004, CA-005). En local hay que tener corriendo `queue:work`.
 
 Tarea diaria (HU-070): `mediciones:vencer` a las 00:05 marca `vencida` las no iniciadas o en curso con fecha límite anterior a hoy (`schedule:work` en local). **[INFORMACIÓN PENDIENTE]** El día se cuenta con `APP_TIMEZONE` (UTC por defecto); falta decidir si es la hora de Colombia o la de cada empresa.
+
+## Responder el diagnóstico (E1–E4, hecho)
+
+`ResponderController`; cuestionario y avance en `App\Support\DatosResponder`; inicio de la empresa en `App\Support\DatosInicioEmpresa` (`InicioController@empresa`). Pruebas en `tests/Feature/ResponderTest.php`. Todo con `diagnostico.responder` y solo para la empresa dueña de la medición (de otra empresa, 404).
+
+| Método | URL | Nombre | Qué hace |
+|---|---|---|---|
+| GET | `/mi-diagnostico/{medicion}` | `responder.mostrar` | E2 (`?categoria=` índice). Sin puntajes ni "Ten en cuenta" (RN-013). Si ya se envió, va a E4; si venció o se canceló, al inicio |
+| PUT | `/mi-diagnostico/{medicion}/respuestas` | `responder.guardar` | JSON. Guarda una respuesta (`pregunta_ref`, `opciones[]` o `texto` máx. 1000); vacía la borra. Pasa la medición a `en_curso`. Devuelve `guardado_en` y el avance. 120 por minuto |
+| GET | `/mi-diagnostico/{medicion}/revisar` | `responder.revisar` | E3 |
+| POST | `/mi-diagnostico/{medicion}/enviar` | `responder.enviar` | Todas las obligatorias respondidas → `enviada` y `enviada_en`. Después no se cambia nada (RN-017) |
+| GET | `/mi-diagnostico/{medicion}/enviado` | `responder.enviado` | E4 |
+| POST | `/mi-diagnostico/{medicion}/solicitud` | `responder.solicitar` | HU-082: solo si venció; una solicitud abierta por empresa; avisa por correo a los administradores (`NuevaMedicionSolicitada`). 5 por minuto |
+
+- **Se puede responder** si está no iniciada o en curso y no pasó la fecha límite (RN-016).
+- **[FUNCIONALIDAD POR DEFINIR]** Al enviar debe arrancar el cálculo y el análisis (HU-068, HU-069).
+- El correo de contacto de E1 sale de `SOPORTE_EMAIL` (**[INFORMACIÓN PENDIENTE]** la dirección real).
 
 ## Otras secciones del menú (rutas previstas)
 

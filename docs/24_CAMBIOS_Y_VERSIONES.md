@@ -6,6 +6,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Agregado (la empresa responde, 13 de octubre)
+
+- **E1 · Inicio de la empresa** con la medición pendiente en cada estado, el último resultado, la evolución y las áreas a trabajar.
+- **E2 · Responder:** categorías, preguntas, guardado automático de cada respuesta y "Guardar y salir"; al volver sigue donde iba.
+- **E3 · Revisar antes de enviar** y **E4 · Enviado**.
+- **Pedir una nueva fecha** cuando la medición venció (HU-082): una solicitud a la vez, con aviso por correo a los administradores.
+- `SOPORTE_EMAIL` en `.env.example`.
+
 ### Agregado (editor de diagnósticos, 13 de octubre)
 
 - **A2.1 · Editor:** categorías con su estado, preguntas que se ordenan arrastrando (o con el teclado), agregar, editar y eliminar preguntas (A2.1b, A2.1e, A2.1f) con opciones, puntajes, indicación y "Ten en cuenta" para la IA.

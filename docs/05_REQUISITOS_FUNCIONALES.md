@@ -9829,13 +9829,13 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-054 — Ver el sistema como otro administrador | RF-025 | Pendiente |
 | HU-055 — Editar mi perfil (Administrador) | RF-026 | Hecha |
 | HU-056 — Editar mi perfil (Empresa o Colaborador) | RF-026 | Hecha |
-| HU-057 — Ver mi inicio la primera vez | RF-027 | Pendiente |
-| HU-058 — Ver mi medición pendiente | RF-027 | Pendiente |
-| HU-059 — Ver mi inicio sin medición pendiente | RF-027 | Pendiente |
-| HU-060 — Responder el diagnóstico | RF-028 | Pendiente |
-| HU-061 — Revisar antes de enviar | RF-029 | Pendiente |
-| HU-062 — Enviar el diagnóstico | RF-029 | Pendiente |
-| HU-063 — Esperar el análisis | RF-030 | Pendiente |
+| HU-057 — Ver mi inicio la primera vez | RF-027 | Hecha |
+| HU-058 — Ver mi medición pendiente | RF-027 | Hecha |
+| HU-059 — Ver mi inicio sin medición pendiente | RF-027 | Hecha (los enlaces al resultado, al historial y al PDF llegan con E6–E8) |
+| HU-060 — Responder el diagnóstico | RF-028 | Hecha |
+| HU-061 — Revisar antes de enviar | RF-029 | Hecha |
+| HU-062 — Enviar el diagnóstico | RF-029 | Hecha (el análisis arranca con HU-068 y HU-069) |
+| HU-063 — Esperar el análisis | RF-030 | Hecha en parte: la pantalla de espera; el avance real, el correo y el reintento llegan con HU-069 |
 | HU-064 — Ver mi resultado | RF-031 | Pendiente |
 | HU-065 — Ver mis respuestas | RF-031 | Pendiente |
 | HU-066 — Descargar el informe en PDF | RF-032 | Pendiente |
@@ -9854,7 +9854,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-079 — Desactivar o reactivar un colaborador | RF-035 | Hecha |
 | HU-080 — Entender cómo se arma el prompt final | RF-020 | Pendiente |
 | HU-081 — Armar el prompt de cada categoría | RF-037 | Pendiente |
-| HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Pendiente |
+| HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Hecha (botón "Pedir una nueva fecha" en E1) |
 | HU-083 — Atender las solicitudes de nueva medición | RF-034 | Pendiente |
 | HU-084 — Publicar el resultado | RF-038 | Pendiente |
 

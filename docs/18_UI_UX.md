@@ -109,7 +109,10 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A5.5 | Cambiar o asignar rol | `ModalCambiarRol.vue`, `ModalAsignarRol.vue` | Hecha |
 | — | Invitar usuario interno | `components/usuarios/ModalInvitarUsuario.vue` | Hecha. El wireframe no le da código. |
 | A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
-| E1 | Inicio de la empresa | `pages/inicio/Empresa.vue` | Bienvenida provisional; la pantalla completa es de la semana 6 (T-048 ya redirige aquí) |
+| E1 | Inicio de la empresa: primera vez, pendiente, en curso, vencida, enviada y sin pendiente | `pages/inicio/Empresa.vue` | Hecha y conectada (los enlaces a resultado, historial y PDF esperan E6–E8) |
+| E2 | Responder el diagnóstico | `pages/responder/Responder.vue` | Hecha y conectada |
+| E3 | Revisa antes de enviar (y confirmar el envío) | `pages/responder/Revisar.vue` | Hecha y conectada |
+| E4 | Diagnóstico enviado | `pages/responder/Enviado.vue` | Hecha (el avance real del análisis espera HU-069) |
 | E11 | Mi perfil de la empresa (y del colaborador) | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
 | E12 | Colaboradores de la empresa | `pages/colaboradores/Index.vue` | Hecha y conectada |
 | E12.1 | Agregar colaborador | `components/colaboradores/ModalAgregarColaborador.vue` | Hecha |
@@ -160,3 +163,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.1b | Los obligatorios llevan asterisco; la pregunta abierta tiene "Criterio para calificarla" (opcional). | Pedido del 8 de octubre y RN-013 ("la abierta tiene un único criterio"); el wireframe no dibuja la abierta. |
 | A2.1 | Las preguntas también se ordenan con el teclado (flecha arriba o abajo sobre ⋮⋮). | Accesibilidad: arrastrar no sirve sin ratón. |
 | A2.1b | La indicación para responder es obligatoria al guardar, pero el editor igual avisa "Falta la indicación" en preguntas copiadas sin ella. | HU-024 CA-003 la exige; el wireframe la muestra como algo por corregir. **[INCONSISTENCIA DETECTADA]** menor: las dos cosas quedan cubiertas. |
+| E1 | No muestra "Unos 25 minutos". | **[INFORMACIÓN PENDIENTE]** No hay una regla para estimar el tiempo. |
+| E1 (vencida) | En vez de solo "Escribir a NuevasTIC", el botón "Pedir una nueva fecha" registra la solicitud y avisa a los administradores; el correo de soporte queda debajo. | HU-082 pide que la solicitud quede registrada y una a la vez. |
+| E2 | Sin la opción "Otro" con texto ("¿Cuál otro canal?"). | **[FUNCIONALIDAD POR DEFINIR]** Necesita un campo en las opciones (A2.1b). |
+| E2 | La descripción de la categoría es un texto general ("No hay respuestas buenas o malas…"). | **[INFORMACIÓN PENDIENTE]** La versión congelada no guarda la descripción de cada categoría. |
