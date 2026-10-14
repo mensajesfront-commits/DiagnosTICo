@@ -201,3 +201,11 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - En la Rev. 5 algunos códigos cambiaron de significado. Por ejemplo, 8691 era "apoyo diagnóstico" y ahora es "intermediación para los servicios de salud". Una empresa que ya tenía uno de esos códigos queda con el nombre nuevo.
   - **[INFORMACIÓN PENDIENTE]** Confirmar con NuevasTIC si el RUT de la DIAN ya usa la Rev. 5 o sigue con la Rev. 4.
 
+### DEC-019 — La IA elige el método de análisis según las respuestas
+
+- **Decisión:**
+  - En cada categoría, la IA elige **un** método según lo que respondió la empresa y lo usa para la observación de la categoría y la recomendación: **PESTEL** (entorno), **5 Fuerzas de Porter** (competencia), **VRIO** (recursos propios), **DOFA** (interno y externo a la vez) o **CAME** (convertir un problema claro en acciones). Si un "Ten en cuenta" pide un método, usa ese.
+  - La respuesta de la IA trae `metodo` (una de las cinco claves; la salida estructurada no acepta otra) y `metodo_motivo` (por qué encaja). El resultado lo guarda en `por_categoria[].metodo` y lo muestra en E6 ("Analizado con …"), en las recomendaciones y en el PDF.
+  - La guía de cuándo usar cada uno está en las instrucciones generales por defecto (`ArmadorPrompt::GENERAL`, "Detalles y restricciones") y en el formato fijo, que se envía siempre aunque el Administrador cambie las instrucciones. Los métodos están en `App\Support\MetodosAnalisis`.
+- **Por qué:** lo pidió el equipo (14 de octubre de 2026): el análisis no puede ser siempre DOFA; depende de las respuestas.
+- **Ojo:** **[INCONSISTENCIA DETECTADA]** RN-028 dice que el resultado no incluye análisis FODA. No se muestra una matriz FODA, solo el nombre del método que guió el análisis y por qué. Falta que NuevasTIC confirme que esto no choca con RN-028.

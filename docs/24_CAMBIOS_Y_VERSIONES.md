@@ -6,6 +6,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Agregado (métodos de análisis y resultado de ejemplo, 14 de octubre)
+
+- **La IA elige el método** de cada categoría según las respuestas (PESTEL, 5 Fuerzas de Porter, VRIO, DOFA o CAME) y el resultado y el PDF muestran cuál usó y por qué (DEC-019).
+- **A2.6 · Resultado de ejemplo** (HU-030): mejor caso, caso medio y peor caso con el mismo cálculo que un resultado real, y el formato del PDF.
+- La IA acepta el puntaje de las abiertas como `45.0` o `"45"` y el error dice qué devolvió si no la califica.
+
 ### Agregado (opción "Ninguna", 13 de octubre)
 
 - En selección múltiple, una opción puede excluir a las demás ("Ninguna", "Nada"): al marcarla se desmarcan las otras, y el servidor no las acepta juntas. Columna `opciones.exclusiva`.

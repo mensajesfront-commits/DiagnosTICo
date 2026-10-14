@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Medicion;
 use App\Models\Resultado;
 use App\Services\Resultados\PublicarResultado;
+use Carbon\CarbonInterface;
 
 /**
  * El resultado publicado como lo muestran E6 / A3.3 (HU-064), E9 / A3.5
@@ -33,23 +34,42 @@ class DatosResultado
     /** @return array<string, mixed> */
     public static function resultado(Resultado $resultado): array
     {
-        /** @var list<array<string, mixed>> $categorias */
-        $categorias = $resultado->por_categoria;
         $anterior = PublicarResultado::anterior($resultado->medicion);
         $anterior?->load('medicion:id,numero,terminada_en,enviada_en');
 
-        return [
-            'puntaje' => $resultado->puntaje_total,
-            'nivel' => $resultado->nivel,
-            'frase' => Niveles::frase($resultado->nivel),
-            'variacion' => $resultado->variacion,
-            'anterior' => $anterior === null ? null : [
+        return self::pagina(
+            ['puntaje_total' => $resultado->puntaje_total, 'nivel' => $resultado->nivel, 'variacion' => $resultado->variacion, 'por_categoria' => $resultado->por_categoria],
+            $anterior === null ? null : [
                 'numero' => $anterior->medicion->numero,
                 'fecha' => ($anterior->medicion->enviada_en ?? $anterior->publicado_en)->toIso8601String(),
                 'puntaje' => $anterior->puntaje_total,
             ],
-            'publicado_en' => $resultado->publicado_en->toIso8601String(),
-            'tiene_pdf' => $resultado->pdf_ruta !== null,
+            $resultado->publicado_en,
+            $resultado->pdf_ruta !== null,
+        );
+    }
+
+    /**
+     * El resultado con la forma de E6, a partir de lo calculado (también el
+     * resultado de ejemplo de HU-030, que no se guarda).
+     *
+     * @param  array{puntaje_total: int, nivel: string, variacion: int|null, por_categoria: array<int|string, mixed>}  $datos
+     * @param  array{numero: int, fecha: string, puntaje: int}|null  $anterior
+     * @return array<string, mixed>
+     */
+    public static function pagina(array $datos, ?array $anterior, CarbonInterface $publicado, bool $tienePdf): array
+    {
+        /** @var list<array<string, mixed>> $categorias */
+        $categorias = array_values($datos['por_categoria']);
+
+        return [
+            'puntaje' => $datos['puntaje_total'],
+            'nivel' => $datos['nivel'],
+            'frase' => Niveles::frase($datos['nivel']),
+            'variacion' => $datos['variacion'],
+            'anterior' => $anterior,
+            'publicado_en' => $publicado->toIso8601String(),
+            'tiene_pdf' => $tienePdf,
             'categorias' => $categorias,
             'prioridades' => self::prioridades($categorias),
         ];
@@ -81,6 +101,7 @@ class DatosResultado
             'puntaje' => $c['puntaje'],
             'nivel' => $c['nivel'],
             'recomendacion' => $c['recomendacion'],
+            'metodo' => $c['metodo'] ?? null,
         ], $categorias);
     }
 
@@ -92,26 +113,40 @@ class DatosResultado
     public static function informe(Resultado $resultado): array
     {
         $resultado->loadMissing('medicion');
-        $datos = self::resultado($resultado);
+
+        return self::informeDe(
+            self::cabecera($resultado->medicion),
+            self::resultado($resultado),
+            $resultado->medicion->enviada_en,
+            $resultado->publicado_en,
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $cabecera  como `cabecera()`
+     * @param  array<string, mixed>  $datos  como `pagina()`
+     * @return array<string, mixed>
+     */
+    public static function informeDe(array $cabecera, array $datos, ?CarbonInterface $enviada, CarbonInterface $generado): array
+    {
         /** @var list<array<string, mixed>> $categorias */
         $categorias = $datos['categorias'];
         $orden = self::ordenadas($categorias);
-        $enviada = $resultado->medicion->enviada_en;
 
         return [
-            ...self::cabecera($resultado->medicion),
+            ...$cabecera,
             ...$datos,
-            'nivel_nombre' => Niveles::nombre($resultado->nivel),
+            'nivel_nombre' => Niveles::nombre((string) $datos['nivel']),
             'niveles' => collect(Niveles::NIVELES)->map(fn (array $n, string $clave) => ['clave' => $clave, 'nombre' => $n[0], 'rango' => "{$n[1]}–{$n[2]}"])->values()->all(),
             'fecha_respuesta' => $enviada ? CorreoAviso::fecha($enviada) : null,
-            'fecha_generado' => CorreoAviso::fecha($resultado->publicado_en),
+            'fecha_generado' => CorreoAviso::fecha($generado),
             // Hasta 2 y 2, sin repetir una categoría en las dos listas.
             'fuertes' => array_slice(array_reverse($orden), 0, min(2, intdiv(count($orden), 2))),
             'debiles' => array_slice($orden, 0, min(2, intdiv(count($orden), 2))),
             'radar' => [
                 'etiquetas' => array_column($categorias, 'nombre'),
                 'actual' => array_column($categorias, 'puntaje'),
-                'anterior' => $resultado->variacion === null ? null : array_map(fn (array $c) => $c['anterior'], $categorias),
+                'anterior' => $datos['variacion'] === null ? null : array_map(fn (array $c) => $c['anterior'], $categorias),
             ],
         ];
     }

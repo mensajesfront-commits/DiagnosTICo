@@ -30,6 +30,8 @@ export const rutas = {
             `/diagnosticos/${id}/categorias/${parte}/orden`,
         agregarCategorias: (id: number) => `/diagnosticos/${id}/categorias`,
         importancia: (id: number) => `/diagnosticos/${id}/importancia`,
+        resultadoEjemplo: (id: number, version?: number) =>
+            `/diagnosticos/${id}/resultado-ejemplo${version ? `?version=${version}` : ''}`,
         publicar: (id: number) => `/diagnosticos/${id}/publicar`,
         duplicar: (id: number) => `/diagnosticos/${id}/duplicar`,
         archivar: (id: number) => `/diagnosticos/${id}/archivar`,

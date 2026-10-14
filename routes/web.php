@@ -10,6 +10,7 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MedicionesController;
 use App\Http\Controllers\ResponderController;
+use App\Http\Controllers\ResultadoEjemploController;
 use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
@@ -46,6 +47,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('categorias', [CategoriasController::class, 'index'])->name('categorias.index');
         // A2.4 · vista previa del borrador o de una versión (?version=).
         Route::get('diagnosticos/{diagnostico}/vista-previa', [EditorDiagnosticoController::class, 'vistaPrevia'])->name('diagnosticos.vista-previa');
+        // A2.6 · Resultado de ejemplo (HU-030) y su PDF.
+        Route::get('diagnosticos/{diagnostico}/resultado-ejemplo', [ResultadoEjemploController::class, 'ver'])->name('diagnosticos.resultado-ejemplo');
+        Route::get('diagnosticos/{diagnostico}/resultado-ejemplo/pdf', [ResultadoEjemploController::class, 'pdf'])
+            ->middleware('throttle:20,1')->name('diagnosticos.resultado-ejemplo.pdf');
     });
 
     Route::middleware('permission:diagnosticos.editar')->group(function () {

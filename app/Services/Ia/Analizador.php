@@ -17,7 +17,7 @@ interface Analizador
 {
     /**
      * @param  array{nombre: string, preguntas: list<array<string, mixed>>}  $categoria
-     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, observacion_categoria: string, recomendacion: array{titulo: string, detalle: string}}
+     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, metodo: string, metodo_motivo: string, observacion_categoria: string, recomendacion: array{titulo: string, detalle: string}}
      */
     public function analizar(string $instrucciones, array $categoria): array;
 }

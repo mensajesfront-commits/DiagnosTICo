@@ -8,6 +8,7 @@ use App\Models\Medicion;
 use App\Models\Resultado;
 use App\Models\User;
 use App\Notifications\ResultadoListo;
+use App\Support\MetodosAnalisis;
 use App\Support\Niveles;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -72,8 +73,26 @@ class PublicarResultado
      */
     public static function consolidar(Medicion $medicion, array $categorias, array $analisis): array
     {
-        $respuestas = $medicion->respuestas()->get()->keyBy('pregunta_ref');
-        $anterior = self::anterior($medicion);
+        $respuestas = [];
+
+        foreach ($medicion->respuestas()->get() as $r) {
+            $respuestas[$r->pregunta_ref] = ['opciones' => array_map('strval', $r->opciones_elegidas ?? []), 'texto' => (string) $r->texto];
+        }
+
+        return self::calcular($categorias, $respuestas, $analisis, self::anterior($medicion));
+    }
+
+    /**
+     * El cálculo sin la medición: también lo usa el resultado de ejemplo
+     * (HU-030), para que dé lo mismo que daría un resultado real.
+     *
+     * @param  list<array<string, mixed>>  $categorias  de la versión
+     * @param  array<string, array{opciones: list<string>, texto: string}>  $respuestas  por referencia de pregunta
+     * @param  array<string, array<string, mixed>>  $analisis  respuesta de la IA por categoría
+     * @return array{puntaje_total: int, nivel: string, variacion: int|null, por_categoria: list<array<string, mixed>>}
+     */
+    public static function calcular(array $categorias, array $respuestas, array $analisis, ?Resultado $anterior = null): array
+    {
         /** @var list<array<string, mixed>> $porCategoriaAnterior */
         $porCategoriaAnterior = $anterior->por_categoria ?? [];
         $previas = array_column($porCategoriaAnterior, null, 'ref');
@@ -90,13 +109,13 @@ class PublicarResultado
 
             foreach ($preguntasVersion as $p) {
                 $r = $respuestas[$p['ref']] ?? null;
-                $texto = CalculadoraPuntajes::textoRespuesta($p, $r?->opciones_elegidas, $r?->texto);
+                $texto = CalculadoraPuntajes::textoRespuesta($p, $r['opciones'] ?? null, $r['texto'] ?? null);
                 $puntaje = null;
 
                 if ($texto !== null) {
                     $puntaje = $p['tipo'] === 'abierta'
                         ? ($iaPreguntas[$p['ref']]['puntaje'] ?? null)
-                        : CalculadoraPuntajes::cerrada($p, $r->opciones_elegidas ?? []);
+                        : CalculadoraPuntajes::cerrada($p, $r['opciones'] ?? []);
                 }
 
                 $preguntas[] = [
@@ -121,6 +140,13 @@ class PublicarResultado
                 'anterior' => $previa,
                 'variacion' => $previa === null ? null : $puntaje - (int) $previa,
                 'observacion' => (string) ($ia['observacion_categoria'] ?? ''),
+                // Método con el que la IA analizó la categoría; null en
+                // resultados anteriores a este campo.
+                'metodo' => isset($ia['metodo']) ? [
+                    'clave' => (string) $ia['metodo'],
+                    'nombre' => MetodosAnalisis::nombre((string) $ia['metodo']),
+                    'motivo' => (string) ($ia['metodo_motivo'] ?? ''),
+                ] : null,
                 'recomendacion' => [
                     'titulo' => (string) ($ia['recomendacion']['titulo'] ?? ''),
                     'detalle' => (string) ($ia['recomendacion']['detalle'] ?? ''),

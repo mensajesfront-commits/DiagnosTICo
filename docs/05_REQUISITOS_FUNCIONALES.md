@@ -9802,7 +9802,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-027 — Editar la importancia de las categorías | RF-012 | Hecha |
 | HU-028 — Ver la vista previa y el estado | RF-014 | Hecha (el resultado de ejemplo, CA-005, llega con HU-030) |
 | HU-029 — Publicar una versión | RF-014 | Hecha |
-| HU-030 — Ver un resultado de ejemplo | RF-015 | Pendiente |
+| HU-030 — Ver un resultado de ejemplo | RF-015 | Hecha |
 | HU-031 — Ver la lista de empresas | RF-016 | Hecha |
 | HU-032 — Registrar una empresa | RF-017 | Hecha |
 | HU-033 — Ver la ficha e historial de una empresa | RF-016 | Hecha |

@@ -293,10 +293,14 @@ Pruebas en `tests/Feature/ResultadosTest.php` y `tests/Feature/PruebaTecnica/Ana
 
 **Prompt por capas (RN-022).** General (fila `prompts` con `alcance = general`; si no existe, `ArmadorPrompt::GENERAL`), luego el ajuste del sector del diagnóstico y el de la empresa: en cada elemento (contexto, tarea, detalles, ejemplos) `usar` deja el anterior, `agregar` suma al final y `reemplazar` lo sustituye. Luego las preguntas respondidas con su respuesta, el puntaje de las cerradas, el "Ten en cuenta" solo de las opciones elegidas y el criterio de las abiertas (JSON, mensaje aparte), y el formato fijo.
 
+**Método de análisis (DEC-019).** La IA elige PESTEL, PORTER, VRIO, DOFA o CAME según las respuestas y lo devuelve en `metodo` y `metodo_motivo`; se guarda en `por_categoria[].metodo`.
+
 **Cálculo (RN-018).** Única: el puntaje de la opción; múltiple: la suma con tope 100; abierta: la IA. Categoría: promedio redondeado de sus preguntas respondidas. Total: promedio ponderado por importancia de los puntajes de categoría ya redondeados (los que ve la empresa). **[FUNCIONALIDAD POR DEFINIR]** Una opcional sin responder no entra al promedio (no cuenta como 0); una categoría sin ninguna respondida vale 0 y no llama a la IA.
 
 | Método | URL | Nombre | Qué hace |
 |---|---|---|---|
+| GET | `/diagnosticos/{id}/resultado-ejemplo` | `diagnosticos.resultado-ejemplo` | A2.6 (HU-030), permiso `diagnosticos.ver`: `?caso=` (mejor, medio o peor) y `?version=N` (sin ella, el borrador). Respuestas de muestra calculadas con `PublicarResultado::calcular`; no llama a la IA ni guarda nada (`ResultadoEjemploController`, `ResultadoEjemplo`) |
+| GET | `/diagnosticos/{id}/resultado-ejemplo/pdf` | `diagnosticos.resultado-ejemplo.pdf` | "Ver formato del PDF": el mismo informe con los datos de ejemplo, en el navegador. 20 por minuto |
 | GET | `/resultados/{medicion}` | `resultados.ver` | E6 / A3.3. Si la medición está enviada, la empresa va a E4; si no hay resultado, 404 |
 | GET | `/resultados/{medicion}/respuestas` | `resultados.respuestas` | E9 / A3.5 (`?categoria=c3`) |
 | GET | `/resultados/{medicion}/pdf` | `resultados.pdf` | Descarga el PDF guardado; si falta, lo genera con lo guardado (no llama a la IA). Si no se puede, vuelve con un aviso. 20 por minuto |

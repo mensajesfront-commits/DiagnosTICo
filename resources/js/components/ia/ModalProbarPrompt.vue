@@ -171,6 +171,15 @@ const resultadoDe = computed(
                         </li>
                     </ol>
                     <h3 class="mt-3 text-xs font-semibold">
+                        Método de análisis
+                    </h3>
+                    <p>
+                        <strong>{{ prueba.resultado.metodo }}</strong>
+                        <span class="text-tinta-suave">
+                            · {{ prueba.resultado.metodo_motivo }}</span
+                        >
+                    </p>
+                    <h3 class="mt-3 text-xs font-semibold">
                         Observación de la categoría
                     </h3>
                     <p>{{ prueba.resultado.observacion_categoria }}</p>

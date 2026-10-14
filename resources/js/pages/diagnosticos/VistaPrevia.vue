@@ -9,8 +9,8 @@
  *   Se puede responder para probar, pero nada se guarda (CA-004).
  * - Con `?version=` muestra una versión publicada en solo lectura.
  *
- * [FUNCIONALIDAD POR DEFINIR] "Resultado de ejemplo" (A2.6, HU-030) llega con
- * Resultados (semana 5).
+ * "Resultado de ejemplo" abre A2.6 (HU-030) con el mismo contenido (borrador o
+ * versión).
  */
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
@@ -324,12 +324,17 @@ const nadaQuePublicar = computed(
                         >
                             Cuestionario
                         </span>
-                        <span
-                            class="px-3 py-1 text-tinta-suave"
-                            title="Llega con Resultados (HU-030)"
+                        <Link
+                            :href="
+                                rutas.diagnosticos.resultadoEjemplo(
+                                    diagnostico.id,
+                                    version?.numero,
+                                )
+                            "
+                            class="rounded-md px-3 py-1 text-tinta-suave hover:text-marca"
                         >
-                            Resultado de ejemplo · Próximamente
-                        </span>
+                            Resultado de ejemplo
+                        </Link>
                     </div>
                     <label
                         v-if="categorias.length"

@@ -338,6 +338,9 @@ Ruta: `GET /resultados/{medicion}`. Props: `medicion` (`CabeceraResultado`), `re
 - Pestañas, para caber sin scroll: **Resumen** (anillo, nivel, frase, variación vs. la medición anterior, escala de niveles, las 3 recomendaciones de las categorías más débiles y el radar actual vs. anterior), **Categorías** (tabla con importancia, puntaje, nivel y "vs. anterior"; al elegir una fila, el detalle con cada pregunta en `components/resultados/PreguntaResultado.vue`, la observación y la recomendación de la categoría) y **Recomendaciones** (todas, de la más débil a la más fuerte).
 - "Ver mis respuestas" (E9) y "Ver informe PDF" (`Boton` con `archivo`: enlace normal, sin Inertia, para descargar).
 
+- El método con el que la IA analizó cada categoría se ve con `components/resultados/EtiquetaMetodo.vue` (en las prioridades, el detalle y las recomendaciones; el motivo, al pasar el cursor).
+- **A2.6 · Resultado de ejemplo (HU-030):** la misma página con la prop `ejemplo` (`caso`, `etiqueta`, `volver`, `pdf`): "Así se vería el resultado", el selector Mejor caso / Caso medio / Peor caso junto a las pestañas, "Volver a la vista previa" y "Ver formato del PDF" (otra pestaña). Se abre desde "Resultado de ejemplo" en A2.4.
+
 ### E9 / A3.5 · Mis respuestas (`resultados/Respuestas`)
 
 Ruta: `GET /resultados/{medicion}/respuestas` (`?categoria=c3` abre esa). Categorías con su puntaje a la izquierda y, a la derecha, las preguntas con la respuesta, el puntaje ("· IA" en las abiertas) y la observación de la IA. Solo lectura.

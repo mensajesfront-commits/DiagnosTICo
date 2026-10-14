@@ -89,7 +89,8 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.1d | Versiones y publicar | `components/editor/ModalVersiones.vue` | Hecha |
 | A2.1d | Agregar categoría al diagnóstico | `components/editor/ModalAgregarCategoria.vue` | Hecha |
 | A2.1c | Editar importancia | `pages/diagnosticos/Importancia.vue` | Hecha y conectada |
-| A2.4 | Vista previa y estado | `pages/diagnosticos/VistaPrevia.vue` | Hecha y conectada ("Resultado de ejemplo" espera A2.6) |
+| A2.4 | Vista previa y estado | `pages/diagnosticos/VistaPrevia.vue` | Hecha y conectada |
+| A2.6 / A2.6b / A2.6c | Resultado de ejemplo: caso medio, mejor y peor, y el formato del PDF | `pages/resultados/Resultado.vue` (con `ejemplo`) | Hecha y conectada |
 | A3 | Empresas: búsqueda, filtros y tabla paginada | `pages/empresas/Index.vue` | Hecha y conectada |
 | A3.1 | Ficha de la empresa: Historial y gráfica de evolución | `pages/empresas/Ver.vue`, `components/graficas/EvolucionPuntaje.vue` | Hecha y conectada ("Ver resultado" abre A3.3) |
 | A3.1b | Asignar medición, con vista previa | `pages/mediciones/Asignar.vue`, `components/empresas/BuscadorEmpresa.vue` | Hecha y conectada |
@@ -187,3 +188,6 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | E8 | Con la medición pendiente no iniciada o vencida, el botón es "Ir a mi inicio" y no "Continuar diagnóstico". | HU-067 CA-005: no se inicia desde el historial. |
 | A3.4 | "Asignar medición" va en el encabezado y no hay "Volver a la empresa": la flecha con el nombre de la empresa lleva a A3.1. | Se usan flechas, no migas de pan. |
 | A5.4 | Los botones que guardan no se apagan uno por uno (solo "Iniciar diagnóstico" y "Pedir una nueva fecha" en E1): al usarlos, el servidor no guarda nada y avisa. | El bloqueo está en el servidor para cubrir todas las pantallas (RN-026). |
+| A2.6 | El selector de caso va junto a las pestañas y la pantalla usa las tres pestañas de E6, en vez de una página larga. | Es la misma pantalla que E6 (CA-003) y las páginas del panel no tienen scroll. |
+| A2.6 | Las observaciones y recomendaciones son textos de muestra ("Recomendación de ejemplo para …"). | Generarlas con la IA costaría una llamada por categoría en cada vista; los puntajes sí son los reales del cálculo. **[FUNCIONALIDAD POR DEFINIR]** si se quiere un botón "Generar con la IA". |
+| E6, PDF | Cada categoría muestra el método con el que la IA la analizó (PESTEL, 5 Fuerzas de Porter, VRIO, DOFA o CAME). | Pedido del equipo (14 oct, DEC-019). **[INCONSISTENCIA DETECTADA]** con RN-028. |

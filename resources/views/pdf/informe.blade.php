@@ -67,6 +67,7 @@
         .reco .cab { display: flex; gap: 8px; align-items: center; color: #5f6470; font-size: 10px; }
         .reco b { display: block; font-size: 11.5px; font-weight: 600; margin: 6px 0 3px; }
         .reco p { margin: 0; line-height: 1.5; color: #1e2533; }
+        .reco .metodo { margin-top: 4px; font-size: 9.5px; color: #5f6470; }
         .siguiente { margin-top: auto; background: #f5f4f0; border-radius: 6px; padding: 10px 12px; font-size: 10px; line-height: 1.5; }
         .cuerpo.columna { display: flex; flex-direction: column; }
     </style>
@@ -176,9 +177,16 @@
             @foreach ($i['prioridades'] as $n => $p)
                 <div class="reco">
                     <div class="cab"><span class="mono">{{ str_pad((string) ($n + 1), 2, '0', STR_PAD_LEFT) }}</span>
-                        <span class="etiqueta" style="background: {{ $colores[$p['nivel']][1] }}; color: {{ $colores[$p['nivel']][2] }}">{{ $p['nombre'] }} · {{ $p['puntaje'] }}</span></div>
+                        <span class="etiqueta" style="background: {{ $colores[$p['nivel']][1] }}; color: {{ $colores[$p['nivel']][2] }}">{{ $p['nombre'] }} · {{ $p['puntaje'] }}</span>
+                        @if (! empty($p['metodo']))
+                            <span class="etiqueta" style="background: #e5eff9; color: #2d4a7a">{{ $p['metodo']['nombre'] }}</span>
+                        @endif
+                    </div>
                     <b>{{ $p['recomendacion']['titulo'] }}</b>
                     <p>{{ $p['recomendacion']['detalle'] }}</p>
+                    @if (! empty($p['metodo']['motivo']))
+                        <p class="metodo">Analizado con {{ $p['metodo']['nombre'] }}: {{ $p['metodo']['motivo'] }}</p>
+                    @endif
                 </div>
             @endforeach
 

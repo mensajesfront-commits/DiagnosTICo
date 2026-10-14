@@ -638,6 +638,8 @@ Lo que devuelve la IA para una categoría (etapa única, RN-021), ya validado (`
     { "id": "p41", "puntaje": null, "observacion": "Publica cada semana, pero sin un plan." },
     { "id": "p42", "puntaje": 30, "observacion": "Decide qué publicar el mismo día." }
   ],
+  "metodo": "VRIO",
+  "metodo_motivo": "Las respuestas hablan de lo que la empresa tiene: contenido y equipo.",
   "observacion_categoria": "Tienen presencia constante, pero sin un plan de contenidos.",
   "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "Tres publicaciones por semana; revisa cada mes cuáles funcionan." }
 }
@@ -655,6 +657,7 @@ Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 
     "ref": "c3", "nombre": "Contenido y publicaciones", "importancia": 25.0,
     "puntaje": 38, "nivel": "mejorar", "anterior": 33, "variacion": 5,
     "observacion": "Publicas sin un plan…",
+    "metodo": { "clave": "VRIO", "nombre": "VRIO", "motivo": "…" },
     "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "…" },
     "preguntas": [
       { "ref": "p41", "texto": "¿Con qué frecuencia publicas?", "tipo": "opcion_unica", "respuesta": "Varias veces por semana", "puntaje": 60, "observacion": "…" },

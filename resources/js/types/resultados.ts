@@ -19,6 +19,20 @@ export type CabeceraResultado = {
 
 export type Recomendacion = { titulo: string; detalle: string };
 
+/** A2.6 · Resultado de ejemplo de un diagnóstico (HU-030). */
+export type EjemploResultado = {
+    caso: 'mejor' | 'medio' | 'peor';
+    /** "Borrador v3" o "Versión 2". */
+    etiqueta: string;
+    /** URL de la vista previa. */
+    volver: string;
+    /** URL del PDF de ejemplo (se abre en otra pestaña). */
+    pdf: string;
+};
+
+/** Método con el que la IA analizó la categoría; null en resultados viejos. */
+export type MetodoAnalisis = { clave: string; nombre: string; motivo: string };
+
 export type PreguntaResultado = {
     ref: string;
     texto: string;
@@ -39,6 +53,7 @@ export type CategoriaResultado = {
     anterior: number | null;
     variacion: number | null;
     observacion: string;
+    metodo: MetodoAnalisis | null;
     recomendacion: Recomendacion;
     preguntas: PreguntaResultado[];
 };
@@ -49,6 +64,7 @@ export type Prioridad = {
     puntaje: number;
     nivel: Exclude<Nivel, 'sin'>;
     recomendacion: Recomendacion;
+    metodo: MetodoAnalisis | null;
 };
 
 export type Resultado = {
