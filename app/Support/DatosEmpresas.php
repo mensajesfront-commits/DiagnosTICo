@@ -162,12 +162,51 @@ class DatosEmpresas
                 'fecha' => $f['terminada'] ?? $f['asignada'],
                 'puntaje' => $f['puntaje'],
             ], $filas))),
+            // "Ver:" de la gráfica: la evolución de cada categoría (por nombre).
+            'evolucion_categorias' => self::evolucionCategorias($mediciones),
             'colaboradores' => $usuarios
                 ->filter(fn (User $u) => $u->hasRole('Colaborador'))
                 ->map(fn (User $u) => ['id' => $u->id, 'name' => $u->name, 'email' => $u->email, 'cargo' => $u->cargo, 'activo' => $u->activo])
                 ->values()->all(),
             'diagnosticos' => self::diagnosticosPublicados($empresa->sector_id),
         ];
+    }
+
+    /**
+     * Puntaje de cada categoría medición por medición, en el orden en que
+     * aparecen. Solo las mediciones con resultado.
+     *
+     * @param  Collection<int, Medicion>  $mediciones  ordenadas por número
+     * @return list<array{nombre: string, puntos: list<array{numero: int, fecha: string|null, puntaje: int}>}>
+     */
+    private static function evolucionCategorias(Collection $mediciones): array
+    {
+        $series = [];
+
+        foreach ($mediciones as $m) {
+            /** @var list<array{nombre?: string, puntaje?: int|float}> $categorias */
+            $categorias = $m->resultado->por_categoria ?? [];
+
+            foreach ($categorias as $c) {
+                $nombre = (string) ($c['nombre'] ?? '');
+
+                if ($nombre === '' || ! isset($c['puntaje'])) {
+                    continue;
+                }
+
+                $series[$nombre][] = [
+                    'numero' => $m->numero,
+                    'fecha' => ($m->terminada_en ?? $m->created_at)?->toDateString(),
+                    'puntaje' => (int) $c['puntaje'],
+                ];
+            }
+        }
+
+        return array_map(
+            fn (string $nombre, array $puntos) => ['nombre' => $nombre, 'puntos' => $puntos],
+            array_keys($series),
+            array_values($series),
+        );
     }
 
     /**

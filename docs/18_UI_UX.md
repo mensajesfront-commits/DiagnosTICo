@@ -165,7 +165,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A3.1, A3.1b, A3.2 | Sin migas "Empresas › …": arriba va la flecha "← Empresas" (o "← Ficha de la empresa"). | Pedido del equipo para volver (A2). Así la página no se desplaza. |
 | A3.1d, A3.2 | Agregan actividad económica (subsector CIIU), departamento y descripción corta. Los obligatorios llevan asterisco. | DEC-015, DEC-016 y el pedido del 8 de octubre. |
 | A3.1 | Los colaboradores se ven en Datos de la cuenta, al pulsar "N activos" en Estado de la cuenta. "Ver historial completo" no aparece. | HU-033 CA-003 pide verlos; el wireframe solo muestra el número. A3.4 llega con Resultados. |
-| A3.1 | La gráfica no tiene el selector "Ver: Puntaje total". | **[FUNCIONALIDAD POR DEFINIR]** Ver por categoría necesita los resultados por categoría (semana 5). |
+| A3.1 | El selector "Ver: Puntaje total". | Resuelto: "Ver:" elige el puntaje total o una categoría (por su nombre) en A3.1, A3.4 y E8. |
 | A3.1b | Sin "unos 25 minutos" en cada diagnóstico. | **[INFORMACIÓN PENDIENTE]** No hay una regla para estimar el tiempo. |
 | A1d | "Nueva fecha" abre un modal en la misma tabla, en vez de llevar a A3.1b. La medición conserva sus respuestas. | Menos pasos. HU-009 CA-002 se cumple igual; A3.1b también ofrece "dale una nueva fecha". |
 | A3.1d | Al cambiar el correo no se envía enlace de verificación: se guarda y se cierran sus sesiones. | DEC-012 (verificación quitada). |

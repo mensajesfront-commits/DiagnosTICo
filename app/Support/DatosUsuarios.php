@@ -2,7 +2,9 @@
 
 namespace App\Support;
 
+use App\Models\Medicion;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
@@ -66,10 +68,23 @@ class DatosUsuarios
             ->groupBy('empresa_id')
             ->pluck('total', 'empresa_id');
 
+        // Medición pendiente de cada empresa, para el aviso al desactivar o
+        // cambiar el rol de su cuenta principal.
+        $pendientes = Medicion::query()
+            ->whereIn('estado', DatosEmpresas::PENDIENTES)
+            ->whereIn('empresa_id', $usuarios->pluck('empresa_id')->filter()->unique()->values())
+            ->get()
+            ->keyBy('empresa_id');
+
         $cuentas = [];
 
         foreach ($usuarios as $u) {
-            $cuentas[] = self::cuenta($u, $yo, (int) ($colaboradoresActivos[$u->empresa_id] ?? 0));
+            $cuentas[] = self::cuenta(
+                $u,
+                $yo,
+                (int) ($colaboradoresActivos[$u->empresa_id] ?? 0),
+                $u->empresa_id !== null ? $pendientes->get($u->empresa_id) : null,
+            );
         }
 
         return $cuentas;
@@ -78,7 +93,7 @@ class DatosUsuarios
     /**
      * @return array<string, mixed>
      */
-    public static function cuenta(User $u, User $yo, int $colaboradoresActivos = 0): array
+    public static function cuenta(User $u, User $yo, int $colaboradoresActivos = 0, ?Medicion $pendiente = null): array
     {
         /** @var Role|null $primero */
         $primero = $u->roles->first();
@@ -92,9 +107,8 @@ class DatosUsuarios
             'empresa' => $u->empresa?->nombre,
             'es_principal' => $rol === 'Empresa' && $u->empresa_id !== null,
             'colaboradores_activos' => $rol === 'Empresa' ? $colaboradoresActivos : 0,
-            // [FUNCIONALIDAD POR DEFINIR] Se llena cuando exista la tabla de
-            // mediciones (semana 4).
-            'medicion_pendiente' => null,
+            // "medición 4 no iniciada (vence el 20 de octubre)".
+            'medicion_pendiente' => $rol === 'Empresa' && $pendiente ? self::pendiente($pendiente) : null,
             'estado' => match (true) {
                 $u->trashed() => 'eliminada',
                 $u->invitacionPendiente() => 'invitacion',
@@ -193,5 +207,28 @@ class DatosUsuarios
         }
 
         return $bloques;
+    }
+
+    private static function pendiente(Medicion $m): string
+    {
+        $estado = DatosEmpresas::estadoVisible($m);
+        $texto = match ($estado) {
+            'no_iniciada' => 'no iniciada',
+            'en_curso' => 'en curso',
+            'enviada' => 'en análisis',
+            default => 'vencida',
+        };
+        $fecha = $m->fecha_limite ? self::diaYMes($m->fecha_limite) : null;
+
+        return "medición {$m->numero} {$texto}".match (true) {
+            $fecha === null => '',
+            $estado === 'vencida' => " (venció el {$fecha})",
+            default => " (vence el {$fecha})",
+        };
+    }
+
+    private static function diaYMes(CarbonInterface $fecha): string
+    {
+        return $fecha->locale('es')->translatedFormat('j \\d\\e F');
     }
 }

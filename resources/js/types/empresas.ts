@@ -117,6 +117,9 @@ export type MedicionFicha = {
 
 export type PuntoEvolucion = { numero: number; fecha: string; puntaje: number };
 
+/** Evolución de una categoría, para "Ver:" de la gráfica. */
+export type EvolucionCategoria = { nombre: string; puntos: PuntoEvolucion[] };
+
 export type Colaborador = {
     id: number;
     name: string;
@@ -138,6 +141,7 @@ export type FichaEmpresa = {
     pendiente: PendienteFicha | null;
     mediciones: MedicionFicha[];
     evolucion: PuntoEvolucion[];
+    evolucion_categorias: EvolucionCategoria[];
     colaboradores: Colaborador[];
     diagnosticos: DiagnosticoAsignable[];
     opciones: OpcionesEmpresa;

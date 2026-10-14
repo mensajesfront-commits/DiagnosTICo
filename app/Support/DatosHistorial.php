@@ -33,6 +33,7 @@ class DatosHistorial
             ])),
             'mediciones' => array_values(array_filter($mediciones, fn (array $m) => $m['puntaje'] !== null)),
             'evolucion' => $ficha['evolucion'],
+            'evolucion_categorias' => $ficha['evolucion_categorias'],
         ];
     }
 }

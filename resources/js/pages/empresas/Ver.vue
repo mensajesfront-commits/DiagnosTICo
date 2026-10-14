@@ -50,6 +50,7 @@ import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
+import SelectorEvolucion from '@/components/graficas/SelectorEvolucion.vue';
 import {
     diaYMes,
     fechaLocal,
@@ -63,6 +64,14 @@ import { cn } from '@/lib/utils';
 import type { FichaEmpresa } from '@/types/empresas';
 
 const props = defineProps<FichaEmpresa>();
+
+// "Ver:" de la gráfica: el puntaje total o el de una categoría.
+const verCategoria = ref('');
+const puntosEvolucion = computed(
+    () =>
+        props.evolucion_categorias.find((c) => c.nombre === verCategoria.value)
+            ?.puntos ?? props.evolucion,
+);
 
 type Pestana = 'historial' | 'cuenta';
 
@@ -334,10 +343,21 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 <section
                     class="flex shrink-0 flex-col rounded-xl border border-linea bg-white px-5 py-4"
                 >
-                    <div class="flex items-baseline justify-between gap-2">
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-2"
+                    >
                         <h2 class="text-sm font-semibold">
-                            Evolución del puntaje total
+                            {{
+                                verCategoria
+                                    ? `Evolución de ${verCategoria}`
+                                    : 'Evolución del puntaje total'
+                            }}
                         </h2>
+                        <SelectorEvolucion
+                            v-model="verCategoria"
+                            class="ml-auto"
+                            :categorias="evolucion_categorias"
+                        />
                         <Link
                             :href="rutas.historial.empresa(empresa.id)"
                             :class="cn(enlace, 'text-xs')"
@@ -347,8 +367,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     </div>
                     <EvolucionPuntaje
                         v-if="evolucion.length > 0"
+                        :key="verCategoria"
                         class="mt-2 h-44"
-                        :puntos="evolucion"
+                        :puntos="puntosEvolucion"
                     />
                     <p
                         v-else

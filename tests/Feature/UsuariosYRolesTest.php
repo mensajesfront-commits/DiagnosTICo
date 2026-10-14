@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Diagnostico;
 use App\Models\Empresa;
+use App\Models\Medicion;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\InvitacionCuenta;
@@ -52,7 +54,24 @@ it('muestra la lista de cuentas al Administrador', function () {
     $principal = $cuentas->firstWhere('id', $laura->id);
     expect($principal['es_principal'])->toBeTrue()
         ->and($principal['colaboradores_activos'])->toBe(1)
-        ->and($principal['empresa'])->toBe('Restaurante La Esquina');
+        ->and($principal['empresa'])->toBe('Restaurante La Esquina')
+        ->and($principal['medicion_pendiente'])->toBeNull();
+});
+
+it('dice qué medición pendiente tiene la cuenta principal de una empresa', function () {
+    $laura = cuentaPrincipal();
+    $diagnostico = Diagnostico::factory()->publicado()->create(['sector_id' => $laura->empresa->sector_id]);
+    Medicion::factory()->create([
+        'empresa_id' => $laura->empresa_id,
+        'version_diagnostico_id' => $diagnostico->versiones()->firstOrFail()->id,
+        'numero' => 4,
+        'estado' => 'no_iniciada',
+        'fecha_limite' => '2099-10-20',
+    ]);
+
+    $cuentas = collect($this->actingAs($this->admin)->get(route('usuarios.index'))->viewData('page')['props']['cuentas']);
+    expect($cuentas->firstWhere('id', $laura->id)['medicion_pendiente'])->toBe('medición 4 no iniciada (vence el 20 de octubre)')
+        ->and($cuentas->firstWhere('id', $this->admin->id)['medicion_pendiente'])->toBeNull();
 });
 
 it('no deja entrar a una cuenta de empresa (RN-007)', function () {
