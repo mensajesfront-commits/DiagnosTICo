@@ -343,6 +343,8 @@ class ArmadorPrompt
 
             if ($p['tipo'] === 'abierta') {
                 $item['criterio'] = (string) ($p['criterio_ia'] ?? '');
+                // Los modelos pequeños a veces dejan la abierta sin calificar.
+                $item['calificar'] = 'Califica esta respuesta con un entero de 0 a 100 según el criterio.';
             } else {
                 /** @var list<array<string, mixed>> $opciones */
                 $opciones = $p['opciones'] ?? [];

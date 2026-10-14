@@ -41,7 +41,7 @@ class AnalizadorDeCategoria implements Analizador
                             'id' => ['type' => 'string'],
                             'puntaje' => [
                                 'type' => ['integer', 'null'],
-                                'description' => 'Solo para preguntas abiertas: 0 a 100. Null en las cerradas.',
+                                'description' => 'Obligatorio en las preguntas de tipo "abierta": un entero de 0 a 100. Null en las demás.',
                             ],
                             'observacion' => ['type' => 'string'],
                         ],
@@ -127,9 +127,16 @@ class AnalizadorDeCategoria implements Analizador
             $puntaje = null;
 
             if ($pregunta['tipo'] === 'abierta') {
-                $puntaje = $analisis['puntaje'] ?? null;
+                $valor = $analisis['puntaje'] ?? null;
 
-                if (! is_int($puntaje) || $puntaje < 0 || $puntaje > 100) {
+                // Algunos modelos devuelven 45.0 o "45": se aceptan si son un número.
+                if (! is_numeric($valor)) {
+                    throw new RespuestaIaInvalida("La IA no calificó la pregunta abierta {$id} (devolvió ".json_encode($valor).').');
+                }
+
+                $puntaje = (int) round((float) $valor);
+
+                if ($puntaje < 0 || $puntaje > 100) {
                     throw new RespuestaIaInvalida("Puntaje fuera de rango en la pregunta {$id}.");
                 }
             }

@@ -25,7 +25,7 @@ function respuestaIa(array $contenido): CreateResponse
     ]);
 }
 
-function analisisValido(int $puntajeAbierta = 45): array
+function analisisValido(int|float|string|null $puntajeAbierta = 45): array
 {
     return [
         'preguntas' => [
@@ -98,3 +98,17 @@ it('muestra el JSON con el comando prueba:ia', function () {
         ->expectsOutputToContain('"observacion_categoria"')
         ->assertSuccessful();
 });
+
+it('acepta el puntaje de la abierta como 45.0 o "45"', function (float|string $valor) {
+    OpenAI::fake([respuestaIa(analisisValido(puntajeAbierta: $valor))]);
+
+    $resultado = app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+
+    expect($resultado['preguntas'][2]['puntaje'])->toBe(45);
+})->with([45.0, '45']);
+
+it('dice qué devolvió la IA si no calificó la abierta', function () {
+    OpenAI::fake([respuestaIa(analisisValido(puntajeAbierta: null))]);
+
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+})->throws(RespuestaIaInvalida::class, 'La IA no calificó la pregunta abierta p3 (devolvió null).');
