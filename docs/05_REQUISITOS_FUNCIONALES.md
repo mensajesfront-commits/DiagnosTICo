@@ -9807,7 +9807,7 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-025 — Editar o eliminar una pregunta | RF-013 | Hecha |
 | HU-026 — Agregar categorías al diagnóstico | RF-012 | Hecha |
 | HU-027 — Editar la importancia de las categorías | RF-012 | Hecha |
-| HU-028 — Ver la vista previa y el estado | RF-014 | Hecha (el resultado de ejemplo, CA-005, llega con HU-030) |
+| HU-028 — Ver la vista previa y el estado | RF-014 | Hecha (con el resultado de ejemplo, CA-005, de HU-030) |
 | HU-029 — Publicar una versión | RF-014 | Hecha |
 | HU-030 — Ver un resultado de ejemplo | RF-015 | Hecha |
 | HU-031 — Ver la lista de empresas | RF-016 | Hecha |
@@ -9849,7 +9849,7 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-067 — Ver mi historial | RF-033 | Hecha |
 | HU-068 — Calcular los puntajes | RF-036 | Hecha |
 | HU-069 — Analizar cada categoría con la IA | RF-037 | Hecha |
-| HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003, no responder una vencida, llega con E2) |
+| HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003: una vencida no se responde en E2) |
 | HU-071 — Configurar las preguntas del bot | RF-039 | Aplazada |
 | HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Aplazada |
 | HU-073 — Responder las preguntas del bot | RF-040 | Aplazada |

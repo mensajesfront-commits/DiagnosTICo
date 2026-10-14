@@ -1,111 +1,83 @@
 # Estado actual
 
-**Estado:** EN CURSO (T-037). Se actualiza al cerrar cada semana.
+**Estado:** EN CURSO (T-037). Se actualiza al cerrar cada semana. El detalle de cada cambio está en `24_CAMBIOS_Y_VERSIONES.md`.
 
-**Última actualización:** 8 de octubre de 2026, al cerrar las tareas "En curso" de la semana 3.
+**Última actualización:** 14 de octubre de 2026 (semana 4).
 
 ## Resumen
 
-El repositorio tiene:
+**El sistema está completo en funcionalidad.** De las 84 historias, 79 están hechas y las 5 del bot de WhatsApp (HU-071 a HU-075) están aplazadas (`05_REQUISITOS_FUNCIONALES.md`).
 
-- el proyecto base (Laravel 13 con el kit de Vue), Sail y las librerías del stack;
-- la prueba técnica (permisos, gráficas y PDF; la llamada real a OpenAI espera la clave);
-- los estilos del wireframe y los componentes base;
-- **el modelo de datos completo**: todas las tablas del MER con migración, modelo y fábrica;
-- **pantallas conectadas al backend**:
-  - acceso (L1–L4);
-  - Mi perfil (A6, E11);
-  - diagnósticos, sectores y categorías (A2);
-  - usuarios y roles (A5);
-  - colaboradores (E12);
-- la redirección al inicio de cada rol (A1 y E1 todavía son pantallas de bienvenida);
-- la documentación de las semanas 2 y 3.
+Lo construido, de punta a punta:
 
-Pruebas: 140 de Pest, más las de Vitest. Todo pasa.
+- **Acceso:** iniciar sesión, registrarse, recuperar la contraseña y Mi perfil (L1–L4, A6, E11).
+- **Inicio del Administrador:** indicadores, mediciones por estado con sus acciones y solicitudes de nueva medición (A1, HU-083).
+- **Diagnósticos:**
+  - sectores y catálogo de categorías;
+  - editor con versiones;
+  - importancia, vista previa y resultado de ejemplo (A2–A2.7).
+- **Empresas y mediciones:** lista, ficha, registrar, asignar con correo editable, historial, resultado y respuestas (A3–A3.5).
+- **Configuración de la IA** por capas, con prueba real y "Cómo se arma" (A4–A4.9).
+- **Usuarios y roles** con "Ver como" de solo lectura (A5–A5.5).
+- **Experiencia de la empresa:**
+  - inicio, responder con guardado automático, revisar y enviar;
+  - avance del análisis;
+  - resultado con el método de análisis;
+  - respuestas, PDF, historial y colaboradores (E1–E12).
+- **Automático:**
+  - cálculo de puntajes y análisis de la IA por categoría con 3 intentos;
+  - resultado inmutable y PDF de 3 páginas;
+  - avisos por correo según Mi perfil;
+  - tareas diarias y resumen semanal.
+
+**Pruebas:** 245 de Pest y 35 de Vitest. Todo pasa, igual que Pint, PHPStan, el lint y los tipos del frontend.
+
+**Documentación:** todos los documentos del índice tienen archivo. Los que dicen REQUIERE VALIDACIÓN esperan la revisión de NuevasTIC o del equipo (`00_INDICE.md`).
 
 ## Reparto del trabajo
 
-- **Cristian:** frontend y documentación.
-- **Luis:** backend (migraciones, modelos, rutas, controladores). Las props y los campos que espera cada pantalla están en `14_FRONTEND.md`, y las rutas en `15_BACKEND.md`.
+- **Cristian:** frontend y documentación. Revisa cada pantalla contra el wireframe.
+- **Luis:** backend. Revisa en el *pull request* el backend que se hizo desde el frontend para conectar las pantallas.
 
-Parte del backend de la semana 3 se hizo desde el frontend para conectar las pantallas. **Luis lo revisa en el pull request.**
+## Qué falta hasta la entrega (6 de noviembre)
 
-## Semana 3: tareas "En curso" del cronograma
-
-| Tarea | Qué quedó | Estado |
+| Qué | Quién | Notas |
 |---|---|---|
-| T-040 Diccionario de datos | Todas las tablas en `12_BASE_DE_DATOS.md`: tipo, si es obligatorio y un ejemplo | Hecho |
-| T-041 Casos de uso | `08_CASOS_DE_USO.md`: publicar, asignar, responder, IA con fallas, Ver como y bot | Hecho; se aprueba en T-044 |
-| T-042 Diagrama de secuencia | `09_FLUJOS_DEL_SISTEMA.md` (responder → enviar → cola → IA → resultado) | Hecho |
-| T-043 Rutas por módulo | `15_BACKEND.md`: módulo, controlador, permiso, pantalla y estado; incluye el webhook (aplazado) | Hecho; Luis lo valida |
-| T-045 Migraciones | Todas las tablas del MER (`2026_10_08_000004` a `000006`) | Hecho |
-| T-046 Datos iniciales | 10 categorías del wireframe, niveles (`App\Support\Niveles`), sectores y CIIU | Hecho |
-| T-048 Redirección por rol | `/dashboard` → A1 (`/inicio`) o E1 (`/mi-inicio`) | Hecho |
-| T-049 / T-050 Backend de A2 | Diagnósticos, sectores y categorías conectados | Hecho; el editor A2.1 es de la semana 4 |
-| T-058 Fábricas | Empresa, categoría, diagnóstico (con categorías y publicado) y medición | Hecho |
-| T-061 Requisitos ↔ historias | Matriz RF → HU y tabla HU → RF con estado en `05_REQUISITOS_FUNCIONALES.md` | Hecho |
-| T-064 Tablas con ejemplo y JSONB | `12_BASE_DE_DATOS.md` | Hecho; el formato de `respuesta_ia` se confirma con la clave de OpenAI |
-| T-067 Riesgos | `30_RIESGOS.md` (R-001 a R-012) | Hecho |
-| T-068 Glosario | Migración, seeder, factory, modelo, rol, permiso, middleware, ruta, controlador, componente, soft delete, cola | Hecho |
-| T-069 Estado y cambios | Este documento y `24_CAMBIOS_Y_VERSIONES.md` | Hecho |
-| T-019 Prueba de OpenAI | Servicio y pruebas con la API simulada | **Bloqueado:** falta la clave (DEC-013, R-002) |
-| T-038 Hito: prueba técnica aprobada | Todo menos la llamada real a OpenAI y WhatsApp (aplazado) | Lo aprueba el equipo |
-| T-044 Hito: MER y casos de uso aprobados | MER migrado y casos de uso escritos | Lo aprueba el equipo |
-| T-070 Hito: base documental inicial | Contexto, alcance, requisitos, arquitectura y los documentos de la semana 3 | Lo aprueba el equipo |
+| Revisión pantalla por pantalla (diseño, textos y funciones) | Cristian | Los ajustes se anotan en `18_UI_UX.md` |
+| Unir a `develop` los cambios de la rama de trabajo | Luis revisa el PR | CI en verde |
+| Instalar desde cero con el README en un equipo limpio (T-021) | Equipo | Con Sail |
+| PR de `develop` a `main` y etiqueta `v1.0.0` (T-152) | Equipo | `20_DESPLIEGUE.md` |
+| Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160) | Equipo y NuevasTIC | `00_INDICE.md` |
 
-Los hitos (T-038, T-044, T-070) no son código: se marcan como hechos cuando el equipo revisa y aprueba en la reunión.
+## Decisiones pendientes con NuevasTIC
 
-## Semana 3: pantallas (frontend)
-
-| Tarea | Qué quedó |
-|---|---|
-| T-051 Pantallas de acceso | L1, L2 (dos pasos, CIIU, ubicación en cascada), L3 y L4, con modales de cuenta desactivada o eliminada y de demasiados intentos |
-| T-052 Menú por rol | `MenuLateral` oculta lo que no tiene permiso; el servidor también lo protege |
-| T-053 a T-056 Diagnósticos | A2, A2·T, A2b, sectores (A2.2–A2.2e), categorías (A2.3–A2.3c), crear (A2.5) y duplicar (A2.7) |
-| A5 Usuarios y roles | Lista, roles, invitar, desactivar o eliminar (con 90 días para recuperar), cambiar y asignar rol |
-| E12 Colaboradores | Agregar con cargo, editar (con contraseña), desactivar, reactivar y eliminar |
-| T-042, T-059, T-060, T-062, T-063 Documentos | 09, 02, 04, 06 y 10 |
-| T-066 / T-088 UI/UX y frontend | `18_UI_UX.md` y `14_FRONTEND.md`, se completan cada semana |
-
-## Semana 2: tareas "En curso"
-
-| Tarea | Qué quedó | Pendiente |
-|---|---|---|
-| T-005 Definición de terminado | `28_CONVENCIONES_DESARROLLO.md` | Que el equipo la apruebe |
-| T-006 Matriz de roles y permisos | `17_SEGURIDAD.md` y el seeder con los 15 permisos de A5.2 | — (quedan por validar «Ver como» y el rol Consultor) |
-| T-007 MER | `12_BASE_DE_DATOS.md`, revisado contra todos los wireframes (T-039) | Aprobación del equipo (T-044) |
-| T-015 Repositorio | Repositorio en GitHub con el código | Crear `develop` y proteger `main` y `develop` en GitHub |
-| T-016 Proyecto y Sail | Kit de Vue + Sail (PHP 8.4, PostgreSQL 18, Mailpit, Chromium) | Construir la imagen en los equipos (ISSUE-009) |
-| T-017 Versiones fijas | `composer.lock`, `package-lock.json`, `.nvmrc` (24) | — |
-| T-018 Prueba de permisos | Rol, ruta bloqueada y pruebas | — |
-| T-019 Prueba de OpenAI | Servicio, comando `prueba:ia` y pruebas con la API simulada | — (la llamada real queda para la semana 5, DEC-013) |
-| T-020 WhatsApp | No se hizo: el bot está aplazado | Decidir si se saca del cronograma |
-| T-021 Instalar desde el README | README escrito; instalación desde cero probada fuera de Sail | Que Cristian la repita en su equipo con Sail |
-| T-022 Tailwind del wireframe | Colores, niveles e IBM Plex en `resources/css/app.css` | — |
-| T-023 Componentes base | Menú lateral, layout, modal, selector, botones, etiquetas, tarjetas y tablas | Revisarlos contra el prototipo en `/prueba-tecnica/componentes` |
-| T-024 Radar de prueba | `RadarCategorias.vue` en `/prueba-tecnica/graficas` | — |
-| T-025 PDF de prueba | PDF con el radar (`prueba:pdf` y `/prueba-tecnica/pdf`) | — |
-| T-026 a T-037 Documentación | `CLAUDE.md`, `README.md`, `.env.example` y los documentos de `docs/` del índice | Notas de la reunión T-008 en `03_ALCANCE.md` |
-| T-038 Prueba técnica aprobada | Todo menos WhatsApp (aplazado); la llamada real a OpenAI se hace en la semana 5 (DEC-013) | Aprobar el hito |
+- **[INCONSISTENCIA DETECTADA]** RN-028 (sin FODA) frente a DEC-019, que deja que la IA use DOFA y otros métodos.
+- **[INFORMACIÓN PENDIENTE]** Para que NuevasTIC lo confirme:
+  - las frases de cada nivel;
+  - las preguntas opcionales sin responder, que no cuentan en el promedio;
+  - el límite diario de "Probar con un ejemplo" (PA-003);
+  - el correo de soporte (`SOPORTE_EMAIL`);
+  - el día y la hora del resumen semanal.
+- **[INFORMACIÓN PENDIENTE]** Para que NuevasTIC lo entregue:
+  - los diagnósticos reales de cada sector (T-072);
+  - quién paga OpenAI y con qué modelo.
+- **Bot de WhatsApp:** sigue aplazado. Hay que decidir si se saca del cronograma (`03_ALCANCE.md`).
+- **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Lo vigente es una etapa por categoría y un PDF de 3 páginas.
 
 ## Cómo verificar lo hecho
 
 ```bash
-./vendor/bin/sail artisan test        # 140 pruebas de Pest
-./vendor/bin/sail npm test            # pruebas de Vitest
-./vendor/bin/sail artisan prueba:pdf  # PDF real en storage/app/private/pruebas/
+./vendor/bin/sail artisan test        # 245 pruebas de Pest
+./vendor/bin/sail npm test            # 35 pruebas de Vitest
+./vendor/bin/sail composer ci:check   # todo lo que corre CI
 ```
 
-Para ver las pantallas de la prueba técnica, entra como un usuario con rol Administrador a:
+**Para recorrer el flujo completo sin clave de OpenAI**, pon `IA_DE_PRUEBA=true` en `.env` y deja corriendo `./vendor/bin/sail artisan queue:work`.
 
-- `/prueba-tecnica/componentes`
-- `/prueba-tecnica/graficas`
+## Semanas anteriores
 
-## Bloqueos y decisiones pendientes
-
-- **Bot de WhatsApp:** aplazado. El cronograma todavía lo tiene en las semanas 2, 6 y 7 (`03_ALCANCE.md`).
-- **Clave de OpenAI y modelo por defecto:** sin definir; bloquean T-019 y se necesitan en la semana 5 (DEC-013, R-002).
-- **Datos de NuevasTIC:** lista real de sectores y códigos CIIU, y confirmar la eliminación de cuentas con 90 días (DEC-017).
-- T-046 habla de 6 sectores: el equipo quitó «Talleres» (9 de octubre) y el seeder queda con 6 (Abogados, Alojamientos, Comidas, Inmobiliarias, Médicos y Turismo). El wireframe todavía muestra Talleres en sus ejemplos.
-- **Contraseña:** RN-001 pide un carácter especial que los wireframes L2 y L4 no muestran (`17_SEGURIDAD.md`).
-- **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Los requisitos vigentes dicen una sola etapa y un PDF de 3 páginas, sin FODA.
+| Semana | Qué quedó |
+|---|---|
+| 1–2 (21 sep–4 oct) | Proyecto base, Sail, versiones fijas, prueba técnica (permisos, gráficas, PDF), estilos y componentes base, documentación inicial |
+| 3 (5–11 oct) | MER migrado completo, datos iniciales, acceso, Mi perfil, diagnósticos, sectores y categorías (A2), usuarios y roles (A5), colaboradores (E12) |
+| 4 (12–18 oct) | A1, empresas y mediciones (A3), editor de diagnósticos, la empresa responde (E1–E4), IA y resultados, configuración de la IA, historial, "Ver como", métodos de análisis, resultado de ejemplo, HU-083, opción "Otro", avisos de Mi perfil y los documentos que faltaban |

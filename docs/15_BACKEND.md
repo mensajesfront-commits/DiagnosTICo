@@ -1,6 +1,6 @@
 # Backend
 
-**Estado:** REQUIERE VALIDACIÓN (T-043). Las rutas de acceso, Mi perfil, inicio, A2, A5 y E12 ya existen; las demás son la propuesta para las semanas 4 a 6.
+**Estado:** REQUIERE VALIDACIÓN (T-043). Todas las rutas existen y tienen pruebas (14 de octubre de 2026). Falta la revisión de Luis.
 
 Todas las rutas con sesión van con `auth` y con el rol o permiso indicado (matriz en `17_SEGURIDAD.md`). El frontend usa las funciones de Wayfinder (`@/routes/...`); si cambia una URL, se regenera con `php artisan wayfinder:generate --with-form`.
 
@@ -14,18 +14,18 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 | Ubicaciones | `/ubicaciones/{pais}` | `UbicacionesController` | Pública, 60 por minuto | L2, A6, E11 | Hecho |
 | Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio`, `DatosInicioEmpresa` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | Hecho |
 | Mi perfil | `/mi-perfil`, `/imagenes/{tipo}/{id}` | `PerfilController` | `auth` | A6, E11 | Hecho |
-| Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `EditorDiagnosticoController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.1, A2.1b–f, A2.1c, A2.2, A2.4, A2.5, A2.7 | Hecho; el resultado de ejemplo (A2.6) llega con Resultados |
+| Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `EditorDiagnosticoController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.1, A2.1b–f, A2.1c, A2.2, A2.4, A2.5, A2.7 | Hecho, con el resultado de ejemplo (A2.6) |
 | Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
 | Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho |
 | Colaboradores | `/colaboradores` | `ColaboradoresController` | `role:Empresa` + cuenta principal | E12 | Hecho |
-| Empresas y mediciones | `/empresas`, `/mediciones` | `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion` | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1, A3.1b–A3.1d, A3.1f, A3.2 | Hecho; A3.1e (correo), A3.3–A3.5 con Resultados |
+| Empresas y mediciones | `/empresas`, `/mediciones` | `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion` | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1, A3.1b–A3.1d, A3.1f, A3.2 | Hecho, con A3.1e (correo), A3.3–A3.5 y las solicitudes de nueva medición (HU-083) |
 | Responder medición | `/mi-diagnostico/{id}` | `ResponderController`, `DatosResponder` | `diagnostico.responder` + su empresa | E2–E4 | Hecho |
 | Resultados | `/resultados/{id}`, `/resultados/{id}/respuestas`, `/resultados/{id}/pdf` | `ResultadosController`, `DatosResultado` | `resultados.ver`, `resultados.pdf` + su empresa (interna: además `empresas.ver`) | E6, E9, E10, A3.3, A3.5 | Hecho |
 | Configuración de la IA | `/configuracion-ia` | `ConfiguracionIaController`, `DatosConfiguracionIa` | `ia.ver` / `ia.editar` | A4, A4.4–A4.7, A4.9 | Hecho |
 | Historial | `/historial`, `/empresas/{id}/historial` | `HistorialController`, `DatosHistorial` | E8: `resultados.ver` + su empresa (una cuenta interna recibe 404); A3.4: `empresas.ver` | E8, A3.4 | Hecho. Sale de `DatosEmpresas::ficha` para que coincida con A3.1; lista solo las terminadas con resultado |
 | Webhook del bot de WhatsApp | `/webhook/whatsapp` | — | Firma del proveedor, sin sesión | — | **Aplazado** (EP-013). **[FUNCIONALIDAD POR DEFINIR]** Si se retoma, va separado de empresas y mediciones (RN-029) |
 
-Los permisos son los 15 de `RolesYPermisosSeeder`. **[INFORMACIÓN PENDIENTE]** Los nombres de los controladores "por crear" los confirma Luis al programar cada módulo.
+Los permisos son los 15 de `RolesYPermisosSeeder`. Todos los módulos están construidos; el bot de WhatsApp sigue aplazado.
 
 ## Acceso (Fortify, ya existen)
 
@@ -79,7 +79,6 @@ Fortify redirige a `/dashboard` después del login y del registro. `InicioContro
 | GET | `/inicio` | `inicio.administrador` | A1: indicadores, mediciones, empresas por nivel y diagnósticos por sector (`DatosInicio`). Una cuenta de empresa que entra aquí vuelve a `/mi-inicio` |
 | GET | `/mi-inicio` | `inicio.empresa` | E1. Una cuenta interna que entra aquí vuelve a `/inicio` |
 
-**[FUNCIONALIDAD POR DEFINIR]** E1 es una pantalla de bienvenida hasta la semana 6.
 
 ## Mi perfil (ya existe)
 
@@ -189,7 +188,7 @@ Reglas que valida el servidor:
   - un rol inactivo no se asigna.
 - **Roles del sistema:** no se editan ni se eliminan (403). Un rol con cuentas no se elimina ni se desactiva.
 - **Desactivar la cuenta principal:** también desactiva su empresa, y reactivarla la reactiva (RN-025).
-- **Correos:** se envían al momento, no en cola, para que se vean en Mailpit sin un *worker*. **[FUNCIONALIDAD POR DEFINIR]** Pasarlos a la cola con el resto de correos (RNF-004, semana 5).
+- **Correos:** la invitación y el aviso de cambio de rol se envían al momento, no en cola: son pocos y la pantalla confirma que salieron.
 
 ## E12 · Colaboradores (hecho)
 
@@ -315,9 +314,26 @@ La empresa y su colaborador solo ven su empresa (de otra, 404). Una cuenta inter
 - El estado vive en la sesión (`App\Support\SesionVerComo`) y se comparte con el frontend como `verComo` para la franja.
 - Pruebas en `tests/Feature/VerComoTest.php`.
 
-## Otras secciones del menú (rutas previstas)
+## Solicitudes de nueva medición (HU-082, HU-083, hecho)
 
-Están en la tabla «Rutas por módulo». Las tablas que usan ya tienen migración y modelo (T-045): `mediciones`, `respuestas`, `analisis_categoria`, `resultados`, `solicitudes_medicion`, `prompts`, `plantillas_correo` y `registros_ver_como`.
+- `POST /mi-diagnostico/{medicion}/solicitud` (`responder.solicitar`, 5 por minuto): la empresa pide otra medición cuando la suya venció. Una abierta a la vez (`solicitudes_medicion`); llega `NuevaMedicionSolicitada` a los administradores.
+- `SolicitudMedicion::abiertasDe()` alimenta los avisos de A1 (`solicitudes` y `solicitud` en cada vencida), A3, la ficha, A3.4 y A3.1b.
+- `SolicitudMedicion::atender()` la cierra al asignar otra medición (`AsignarMedicion`), al darle nueva fecha o al cancelar la vencida (`MedicionesController`).
+- Pruebas en `tests/Feature/SolicitudesMedicionTest.php`.
+
+## Avisos por correo de Mi perfil (hecho)
+
+Cada notificación mira la preferencia de quien la recibe con `User::quiereAviso($clave)` (`OpcionesPerfil::AVISOS_INTERNOS` y `AVISOS_EMPRESA`):
+
+| Clave | Correo | Dónde se mira |
+|---|---|---|
+| `empresa_envia` | `DiagnosticoEnviado` | `via()` de la notificación |
+| `ia_falla` | `AnalisisFallido` | `via()` de la notificación |
+| `resumen_semanal` | `ResumenSemanal` (comando `mediciones:resumen`, lunes 07:50) | El comando y `via()` |
+| `medicion_asignada` | `AvisoMedicion` al asignar | `EnviarAviso::enviar(alAsignar: true)`; los recordatorios salen siempre |
+| `resultado_listo` | `ResultadoListo` | `via()` de la notificación |
+
+Pruebas en `tests/Feature/AvisosPerfilTest.php`.
 
 ## Respuestas después de una acción
 

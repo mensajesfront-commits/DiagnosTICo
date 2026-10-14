@@ -1,8 +1,8 @@
 # Flujos del sistema
 
-**Estado:** EN CURSO (T-042). El flujo de la medición (sección 1) es el **diseño** que se implementa en la semana 5; los flujos de acceso (sección 3) ya están construidos.
+**Estado:** COMPLETO (T-042). Todos los flujos están construidos y probados (14 de octubre de 2026).
 
-Los diagramas están en Mermaid; GitHub los dibuja solos. Los nombres de clases y trabajos (`AnalizarCategoria`, `PublicarResultado`…) son una **propuesta** para el backend.
+Los diagramas están en Mermaid; GitHub los dibuja solos. Los nombres de clases y trabajos (`AnalizarMedicion`, `AnalizarCategoria`, `PublicarResultado`…) son los del código (`11_DISENO_TECNICO.md`).
 
 ## 1. De responder a ver el resultado
 
@@ -71,7 +71,7 @@ Puntos clave:
 - **Nada bloquea la pantalla (RNF-004).** El envío solo cambia el estado y encola trabajos; la empresa puede salir de E5.
 - **Cada categoría es independiente.** Si una falla, las demás conservan su análisis (HU-069 CA-004).
 - **El PDF se genera una sola vez** con lo guardado, sin volver a llamar a la IA (RN-024).
-- **[FUNCIONALIDAD POR DEFINIR]** Qué ve la empresa si una categoría queda fallida tras 3 intentos. El wireframe A4 dice: "la categoría queda 'pendiente de análisis' y el resultado se recalcula al reintentar". Falta decidir si el resultado se publica sin esa categoría o espera a que el Administrador la reintente.
+- **Categoría fallida tras 3 intentos:** el resultado espera. La empresa ve en E4 qué categoría falló y "Reintentar"; los administradores reciben el correo `AnalisisFallido`. Al reintentar, solo esa categoría vuelve a la cola y, cuando termina, se publica el resultado completo.
 
 ## 2. Estados de la medición
 

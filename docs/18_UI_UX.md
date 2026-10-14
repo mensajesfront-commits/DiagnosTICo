@@ -1,6 +1,6 @@
 # UI/UX
 
-**Estado:** EN CURSO (T-066, T-089). Se agregan las pantallas de cada semana.
+**Estado:** REQUIERE VALIDACIÓN (T-066, T-089). Todas las pantallas están construidas; falta la revisión pantalla por pantalla contra el wireframe.
 
 **[INFORMACIÓN PENDIENTE]** Falta el enlace al prototipo navegable. Los wireframes recibidos son 5 PDF parciales:
 
@@ -164,7 +164,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A5 | "Quitar rol" (HU-052) no está. | Cada cuenta tiene un solo rol (RN-027); se cambia con "Cambiar rol". **[FUNCIONALIDAD POR DEFINIR]** qué rol queda al "quitar". |
 | A3.1, A3.1b, A3.2 | Sin migas "Empresas › …": arriba va la flecha "← Empresas" (o "← Ficha de la empresa"). | Pedido del equipo para volver (A2). Así la página no se desplaza. |
 | A3.1d, A3.2 | Agregan actividad económica (subsector CIIU), departamento y descripción corta. Los obligatorios llevan asterisco. | DEC-015, DEC-016 y el pedido del 8 de octubre. |
-| A3.1 | Los colaboradores se ven en Datos de la cuenta, al pulsar "N activos" en Estado de la cuenta. "Ver historial completo" no aparece. | HU-033 CA-003 pide verlos; el wireframe solo muestra el número. A3.4 llega con Resultados. |
+| A3.1 | Los colaboradores se ven en Datos de la cuenta, al pulsar "N activos" en Estado de la cuenta. | HU-033 CA-003 pide verlos; el wireframe solo muestra el número. "Ver historial completo" abre A3.4. |
 | A3.1 | El selector "Ver: Puntaje total". | Resuelto: "Ver:" elige el puntaje total o una categoría (por su nombre) en A3.1, A3.4 y E8. |
 | A3.1b | Sin "unos 25 minutos" en cada diagnóstico. | **[INFORMACIÓN PENDIENTE]** No hay una regla para estimar el tiempo. |
 | A1d | "Nueva fecha" abre un modal en la misma tabla, en vez de llevar a A3.1b. La medición conserva sus respuestas. | Menos pasos. HU-009 CA-002 se cumple igual; A3.1b también ofrece "dale una nueva fecha". |
