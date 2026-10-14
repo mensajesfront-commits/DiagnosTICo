@@ -244,7 +244,7 @@ class EditorDiagnosticoController extends Controller
                     'indicacion' => $p['indicacion'],
                     'obligatoria' => $p['obligatoria'],
                     'problemas' => $estado['preguntas'][$p['ref']] ?? [],
-                    'opciones' => array_map(fn (array $o) => ['ref' => $o['ref'], 'texto' => $o['texto'], 'exclusiva' => (bool) ($o['exclusiva'] ?? false)], $p['opciones']),
+                    'opciones' => array_map(fn (array $o) => ['ref' => $o['ref'], 'texto' => $o['texto'], 'exclusiva' => (bool) ($o['exclusiva'] ?? false), 'con_texto' => (bool) ($o['con_texto'] ?? false)], $p['opciones']),
                 ], $c['preguntas']),
             ], $contenido['categorias'] ?? []),
             'estado' => DatosEditor::estado($estado),
@@ -363,6 +363,7 @@ class EditorDiagnosticoController extends Controller
             'opciones.*.puntaje' => $conOpciones ? ['required', 'integer', 'min:0', 'max:100'] : ['nullable'],
             'opciones.*.ten_en_cuenta' => ['nullable', 'string', 'max:200'],
             'opciones.*.exclusiva' => ['boolean'],
+            'opciones.*.con_texto' => ['boolean'],
         ], [
             'indicacion.required' => 'Escribe la indicación para responder: la empresa la ve debajo de la pregunta.',
             'opciones.required' => 'Agrega al menos 2 opciones con su puntaje.',
@@ -407,6 +408,8 @@ class EditorDiagnosticoController extends Controller
         $exclusiva = $datos['tipo'] === 'seleccion_multiple'
             ? collect($opciones)->search(fn (array $o) => (bool) ($o['exclusiva'] ?? false))
             : false;
+        // "Otro" que pide escribir cuál: una sola por pregunta.
+        $conTexto = collect($opciones)->search(fn (array $o) => (bool) ($o['con_texto'] ?? false));
         $actuales = $pregunta->opciones()->get()->keyBy('id');
         $quedan = [];
 
@@ -416,6 +419,7 @@ class EditorDiagnosticoController extends Controller
                 'puntaje' => (int) $o['puntaje'],
                 'ten_en_cuenta' => isset($o['ten_en_cuenta']) && trim((string) $o['ten_en_cuenta']) !== '' ? trim((string) $o['ten_en_cuenta']) : null,
                 'exclusiva' => $exclusiva === $orden,
+                'con_texto' => $conTexto === $orden,
                 'orden' => $orden,
             ];
             $id = isset($o['id']) ? (int) $o['id'] : null;

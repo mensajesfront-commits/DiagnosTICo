@@ -465,8 +465,23 @@ const nadaQuePublicar = computed(
                                     {{ o.texto }}
                                 </button>
                             </div>
+                            <input
+                                v-if="
+                                    p.tipo !== 'abierta' &&
+                                    p.opciones.some(
+                                        (o) =>
+                                            o.con_texto &&
+                                            marcada(p.ref, o.ref),
+                                    )
+                                "
+                                type="text"
+                                maxlength="255"
+                                placeholder="¿Cuál?"
+                                :aria-label="`¿Cuál? Pregunta ${i + 1}`"
+                                class="mt-2 h-9 w-full max-w-md rounded-md border border-linea-fuerte px-3 text-sm focus-visible:border-marca focus-visible:outline-none"
+                            />
                             <textarea
-                                v-else
+                                v-if="p.tipo === 'abierta'"
                                 v-model="respuestas[p.ref] as string"
                                 rows="2"
                                 maxlength="1000"

@@ -9,6 +9,7 @@ use App\Models\Pregunta;
 use App\Models\Respuesta;
 use App\Models\Sector;
 use App\Models\User;
+use App\Services\Diagnosticos\ContenidoDiagnostico;
 use App\Support\EstadoDiagnostico;
 use Database\Seeders\RolesYPermisosSeeder;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -260,4 +261,21 @@ it('guarda una sola opción "Ninguna" que excluye a las demás, solo en selecci�
         'opciones' => [['texto' => 'Sí', 'puntaje' => 100, 'exclusiva' => true], ['texto' => 'No', 'puntaje' => 0]],
     ]))->assertSessionHasNoErrors();
     expect($pregunta->refresh()->opciones->pluck('exclusiva')->all())->toBe([false, false]);
+});
+
+it('guarda una sola opción "Otro" que pide escribir cuál y la congela al publicar', function () {
+    $pregunta = agregarPregunta($this, [
+        'tipo' => 'opcion_unica',
+        'opciones' => [
+            ['texto' => 'Instagram', 'puntaje' => 100],
+            ['texto' => 'Otro', 'puntaje' => 50, 'con_texto' => true],
+            ['texto' => 'Otra más', 'puntaje' => 0, 'con_texto' => true],
+        ],
+    ]);
+
+    expect($pregunta->opciones->pluck('con_texto')->all())->toBe([false, true, false]);
+
+    $congelada = collect(app(ContenidoDiagnostico::class)->congelar($this->diagnostico->fresh())['categorias'])
+        ->flatMap(fn ($c) => $c['preguntas'])->firstWhere('ref', 'p'.$pregunta->id);
+    expect(array_column($congelada['opciones'], 'con_texto'))->toBe([false, true, false]);
 });

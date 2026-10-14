@@ -176,7 +176,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.1b | La indicación para responder es obligatoria al guardar, pero el editor igual avisa "Falta la indicación" en preguntas copiadas sin ella. | HU-024 CA-003 la exige; el wireframe la muestra como algo por corregir. **[INCONSISTENCIA DETECTADA]** menor: las dos cosas quedan cubiertas. |
 | E1 | No muestra "Unos 25 minutos". | **[INFORMACIÓN PENDIENTE]** No hay una regla para estimar el tiempo. |
 | E1 (vencida) | En vez de solo "Escribir a NuevasTIC", el botón "Pedir una nueva fecha" registra la solicitud y avisa a los administradores; el correo de soporte queda debajo. | HU-082 pide que la solicitud quede registrada y una a la vez. |
-| E2 | Sin la opción "Otro" con texto ("¿Cuál otro canal?"). | **[FUNCIONALIDAD POR DEFINIR]** Necesita un campo en las opciones (A2.1b). |
+| E2 | La opción "Otro" con texto ("¿Cuál otro canal?"). | Resuelto: en A2.1b se elige la "Opción que pide escribir cuál" (se marca sola si empieza por "Otro"); en E2, al elegirla aparece "¿Cuál?" (máx. 255) y la IA lee "Otro: lo que escribió". |
 | E2 | La descripción de la categoría es un texto general ("No hay respuestas buenas o malas…"). | **[INFORMACIÓN PENDIENTE]** La versión congelada no guarda la descripción de cada categoría. |
 | E6 | El resultado va en tres pestañas (Resumen, Categorías, Recomendaciones) y el detalle se abre eligiendo una fila de la tabla, en vez de una página larga con acordeones. | Las páginas del panel no tienen scroll de página (pedido del equipo). |
 | E6 | Sin "Mi historial ›" en la ruta de navegación: flecha a Inicio (o a la ficha A3.1 para el Administrador). | Se usan flechas y no migas de pan; E8 aún no existe. |

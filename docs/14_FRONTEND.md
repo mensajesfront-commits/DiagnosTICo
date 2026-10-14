@@ -300,7 +300,7 @@ Usan `layouts/ResponderLayout.vue` (sin menú lateral) y `components/responder/B
 - **E2:** categorías a la izquierda (✓ completa, ● a medias, número si no empezó); preguntas con "Cómo responder", "Obligatoria" y el tipo. Cada respuesta se guarda al momento con `fetch` (PUT JSON con el token de la cookie `XSRF-TOKEN`); las escritas, al dejar de escribir. Abajo, anterior y siguiente; en la última, "Revisar antes de enviar". La URL guarda la categoría (`?categoria=`).
 - **E3:** con faltantes, la lista con "Completar" y el aviso; completo, "N/N categorías completas" y "Todo listo". "Enviar diagnóstico" pide confirmar.
 - **E4:** los dos pasos con su estado real ("2 de 10" categorías). Se recarga cada 5 s; cuando se publica el resultado, el servidor la lleva a E6. Si una categoría falló tras 3 intentos: "No pudimos terminar el análisis de algunas categorías" y "Reintentar esas categorías".
-- **[FUNCIONALIDAD POR DEFINIR]** La opción "Otro" con texto del wireframe necesita un campo en las opciones.
+- La opción "Otro" (`con_texto`): al elegirla aparece "¿Cuál?" (máx. 255), que se guarda al dejar de escribir; si se cambia de opción, el texto se borra.
 
 ### A4 · Configuración de la IA (`configuracion-ia/Index`)
 

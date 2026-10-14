@@ -99,7 +99,12 @@ class ResponderController extends Controller
         if (count($opciones) > 1 && array_intersect($opciones, $exclusivas) !== []) {
             throw ValidationException::withMessages(['opciones' => 'Esa opción no se puede marcar junto con otras.']);
         }
-        $texto = $pregunta['tipo'] === 'abierta' ? trim((string) ($datos['texto'] ?? '')) : '';
+        // Abierta: el texto es la respuesta. Cerrada: solo si se eligió la
+        // opción "Otro" que pide escribir cuál (`con_texto`).
+        $conTexto = array_column(array_filter($pregunta['opciones'], fn (array $o) => $o['con_texto']), 'ref');
+        $texto = $pregunta['tipo'] === 'abierta' || array_intersect($opciones, $conTexto) !== []
+            ? trim((string) ($datos['texto'] ?? ''))
+            : '';
 
         DB::transaction(function () use ($medicion, $pregunta, $opciones, $texto, $request): void {
             if ($opciones === [] && $texto === '') {
