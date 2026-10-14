@@ -13,3 +13,6 @@ Schedule::command('cuentas:purgar')->dailyAt('03:10');
 
 // HU-070: las mediciones sin enviar que pasaron su fecha límite quedan vencidas.
 Schedule::command('mediciones:vencer')->dailyAt('00:05');
+
+// Resumen semanal de mediciones pendientes para quien lo encendió en Mi perfil (A6).
+Schedule::command('mediciones:resumen')->weeklyOn(1, '07:50');

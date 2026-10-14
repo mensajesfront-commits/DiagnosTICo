@@ -156,12 +156,12 @@ sequenceDiagram
     L-->>U: Vuelve a L1 con "Tu contraseña se actualizó"
 ```
 
-## 4. Tareas programadas (semana 5)
+## 4. Tareas programadas (`routes/console.php`)
 
 | Tarea | Cuándo | Qué hace |
 |---|---|---|
-| Marcar vencidas (HU-070) | Cada día | Pasa a "Vencida" las mediciones sin enviar cuya fecha límite ya pasó |
+| Marcar vencidas (`mediciones:vencer`, HU-070) | Cada día, 00:05 | Pasa a "Vencida" las mediciones sin enviar cuya fecha límite ya pasó |
 | Borrar cuentas eliminadas (`cuentas:purgar`, DEC-017) | Cada día, 03:10 | Borra para siempre las cuentas y empresas eliminadas hace más de 90 días |
-| Resumen semanal | Cada semana | Envía al Administrador las mediciones pendientes, si lo activó en Mi perfil (A6) |
+| Resumen semanal (`mediciones:resumen`) | Lunes, 07:50 | Envía a los administradores que lo activaron en Mi perfil (A6) las mediciones pendientes, las vencidas y las solicitudes abiertas |
 
-**[INFORMACIÓN PENDIENTE]** La hora de la tarea diaria y el día del resumen semanal.
+**[INFORMACIÓN PENDIENTE]** NuevasTIC confirma el día y la hora del resumen semanal.

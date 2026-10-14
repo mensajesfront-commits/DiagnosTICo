@@ -8,6 +8,7 @@ use App\Models\Medicion;
 use App\Models\Respuesta;
 use App\Models\SolicitudMedicion;
 use App\Models\User;
+use App\Notifications\DiagnosticoEnviado;
 use App\Notifications\NuevaMedicionSolicitada;
 use App\Support\DatosResponder;
 use Illuminate\Http\JsonResponse;
@@ -166,6 +167,9 @@ class ResponderController extends Controller
         $medicion->forceFill(['estado' => 'enviada', 'enviada_en' => now()])->save();
 
         AnalizarMedicion::dispatch($medicion->id);
+
+        $admins = User::role('Administrador')->where('activo', true)->get();
+        Notification::send($admins, new DiagnosticoEnviado($medicion));
 
         return to_route('responder.enviado', $medicion);
     }

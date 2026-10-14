@@ -6,6 +6,36 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Agregado (cierre funcional, 14 de octubre)
+
+- **HU-083 · Atender las solicitudes de nueva medición:**
+  - aviso en A1 ("N empresas pidieron una medición nueva"), con esas filas primero en Vencidas y "Asignar nueva";
+  - aviso en A3, en la ficha, en A3.4 y en Asignar medición.
+  - Asignar otra medición, darle nueva fecha a la vencida o cancelarla deja la solicitud atendida.
+- **Opción "Otro" que pide escribir cuál:** se elige en A2.1b (se marca sola si empieza por "Otro"). En E2 aparece "¿Cuál?" y la IA lee "Otro: lo que escribió". Columna `opciones.con_texto`.
+- **"Ver:" en la gráfica de evolución** (A3.1, A3.4, E8): puntaje total o una categoría.
+- **A5:** la cuenta principal de una empresa dice qué medición pendiente tiene, para el aviso al desactivarla o cambiarle el rol.
+- **Avisos de Mi perfil (A6, E11):**
+  - cada correo respeta lo que eligió quien lo recibe;
+  - correo nuevo "Una empresa envió su diagnóstico";
+  - resumen semanal de mediciones pendientes (`mediciones:resumen`, lunes 07:50).
+- **Documentos nuevos:**
+  - 07 Reglas de negocio;
+  - 11 Diseño técnico;
+  - 13 API e integraciones;
+  - 16 Infraestructura;
+  - 19 Pruebas;
+  - 20 Despliegue;
+  - 21 Mantenimiento;
+  - 25 Roadmap;
+  - 29 Funcionalidades;
+  - 31 Manual de usuario.
+- Estado de cada historia actualizado en `05_REQUISITOS_FUNCIONALES.md`.
+
+### Corregido
+
+- A1 decía "Tiene la medición N en curso" aunque la pendiente no estuviera iniciada.
+
 ### Agregado (métodos de análisis y resultado de ejemplo, 14 de octubre)
 
 - **La IA elige el método** de cada categoría según las respuestas (PESTEL, 5 Fuerzas de Porter, VRIO, DOFA o CAME) y el resultado y el PDF muestran cuál usó y por qué (DEC-019).

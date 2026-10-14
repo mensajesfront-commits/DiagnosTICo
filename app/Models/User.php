@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\OpcionesPerfil;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -75,6 +76,15 @@ class User extends Authenticatable
      * La cuenta puede iniciar sesión si está activa (RN-004) y, si es de una
      * empresa, la empresa también lo está (RN-025).
      */
+    /**
+     * ¿Quiere este aviso por correo? Lo elige en Mi perfil (A6, E11); si no
+     * ha elegido, vale el valor inicial de `OpcionesPerfil`.
+     */
+    public function quiereAviso(string $clave): bool
+    {
+        return OpcionesPerfil::avisosDe($this)[$clave] ?? true;
+    }
+
     public function puedeEntrar(): bool
     {
         if ($this->activo === false) {

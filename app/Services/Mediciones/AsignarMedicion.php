@@ -92,7 +92,7 @@ class AsignarMedicion
         // `ultimo_aviso_en`, y la pantalla ofrece "Reenviar aviso".
         if ($aviso) {
             try {
-                $this->enviarAviso->enviar($medicion);
+                $this->enviarAviso->enviar($medicion, alAsignar: true);
             } catch (ValidationException) {
             }
         }
