@@ -523,6 +523,17 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         </span>
                     </p>
                     <p
+                        v-if="pendiente.solicitud"
+                        class="mt-3 rounded-md bg-aviso-suave px-3 py-2 text-xs text-aviso"
+                        role="status"
+                    >
+                        <strong
+                            >Pidió una medición nueva
+                            {{ haceCuanto(pendiente.solicitud) }}.</strong
+                        >
+                        Asígnale otra abajo o dale una nueva fecha.
+                    </p>
+                    <p
                         v-if="pendiente.estado === 'enviada'"
                         class="mt-3 text-xs text-tinta-suave"
                     >

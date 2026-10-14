@@ -43,8 +43,13 @@ export type FilaMedicion = {
     /** ISO del último aviso por correo. */
     ultimo_aviso: string | null;
     resultado: { puntaje: number; nivel: Exclude<Nivel, 'sin'> } | null;
-    /** En terminadas: número de la medición pendiente de la empresa. */
-    pendiente_numero: number | null;
+    /** En terminadas: la medición pendiente de la empresa, si tiene. */
+    pendiente: {
+        numero: number;
+        estado: 'no_iniciada' | 'en_curso' | 'enviada';
+    } | null;
+    /** En vencidas: ISO de la solicitud de medición nueva abierta (HU-083). */
+    solicitud: string | null;
 };
 
 export type SectorInicio = {

@@ -7,6 +7,7 @@ use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
 use App\Models\Sector;
+use App\Models\SolicitudMedicion;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -35,6 +36,7 @@ class DatosEmpresas
             ->get();
 
         $respuestas = self::respuestasDe($empresas->flatMap(fn (Empresa $e) => $e->mediciones->modelKeys())->all());
+        $solicitudes = SolicitudMedicion::abiertasDe($empresas->modelKeys());
         $lista = [];
 
         foreach ($empresas as $empresa) {
@@ -50,7 +52,10 @@ class DatosEmpresas
                 'nivel' => $ultimo->resultado->nivel ?? 'sin',
                 'variacion' => $variacion,
                 'mediciones' => $empresa->mediciones->where('estado', 'terminada')->count(),
-                'pendiente' => $pendiente ? self::pendiente($pendiente, $respuestas) : null,
+                'pendiente' => $pendiente ? [
+                    ...self::pendiente($pendiente, $respuestas),
+                    'solicitud' => $solicitudes[$empresa->id] ?? null,
+                ] : null,
                 'activa' => $empresa->activa,
             ];
         }
@@ -148,6 +153,8 @@ class DatosEmpresas
                 'vence' => $pendiente->fecha_limite?->toDateString(),
                 'tiene_respuestas' => $respuestas->has($pendiente->id),
                 'ultimo_aviso' => $pendiente->ultimo_aviso_en?->toIso8601String(),
+                // HU-083: la empresa pidió una medición nueva (fecha ISO).
+                'solicitud' => SolicitudMedicion::abiertasDe([$empresa->id])[$empresa->id] ?? null,
             ] : null,
             'mediciones' => array_reverse($filas),
             'evolucion' => array_values(array_filter(array_map(fn (array $f) => $f['puntaje'] === null ? null : [

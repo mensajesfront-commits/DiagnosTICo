@@ -6,6 +6,7 @@ use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
 use App\Models\Sector;
+use App\Models\SolicitudMedicion;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -33,6 +34,8 @@ class DatosInicio
 
         return [
             'indicadores' => self::indicadores($mediciones),
+            // HU-083: empresas con una solicitud de medición nueva abierta.
+            'solicitudes' => count(array_filter($mediciones, fn (array $m) => $m['solicitud'] !== null)),
             'mediciones' => $mediciones,
             'niveles' => self::empresasPorNivel(),
             'sectores' => self::diagnosticosPorSector(),
@@ -85,10 +88,11 @@ class DatosInicio
             ->with(['empresa:id,nombre,sector_id', 'empresa.sector:id,nombre', 'version:id,contenido', 'resultado:id,medicion_id,puntaje_total,nivel'])
             ->get();
 
-        // Medición pendiente de cada empresa, para "Tiene la medición 3 en curso".
+        // Medición pendiente de cada empresa, para "Tiene la medición 3 sin iniciar".
         $pendientePorEmpresa = $mediciones
             ->filter(fn (Medicion $m) => in_array($m->estado, ['no_iniciada', 'en_curso', 'enviada'], true))
-            ->mapWithKeys(fn (Medicion $m) => [$m->empresa_id => $m->numero]);
+            ->mapWithKeys(fn (Medicion $m) => [$m->empresa_id => ['numero' => $m->numero, 'estado' => $m->estado]]);
+        $solicitudes = SolicitudMedicion::abiertasDe($mediciones->pluck('empresa_id')->unique()->values()->all());
 
         $respuestas = DB::table('respuestas')
             ->whereIn('medicion_id', $mediciones->modelKeys())
@@ -125,7 +129,9 @@ class DatosInicio
                 // Al asignar con aviso, "Recordatorio" o "Reenviar aviso" (HU-008).
                 'ultimo_aviso' => $m->ultimo_aviso_en?->toIso8601String(),
                 'resultado' => $m->resultado ? ['puntaje' => $m->resultado->puntaje_total, 'nivel' => $m->resultado->nivel] : null,
-                'pendiente_numero' => $estado === 'terminada' ? $pendientePorEmpresa->get($m->empresa_id) : null,
+                'pendiente' => $estado === 'terminada' ? $pendientePorEmpresa->get($m->empresa_id) : null,
+                // HU-083: en la vencida, la fecha (ISO) en que la empresa pidió una nueva.
+                'solicitud' => $estado === 'vencida' ? ($solicitudes[$m->empresa_id] ?? null) : null,
             ];
         }
 
@@ -134,6 +140,13 @@ class DatosInicio
 
             if ($orden !== 0) {
                 return $orden;
+            }
+
+            // Vencidas: primero las que tienen una solicitud abierta (HU-083).
+            $solicitud = ($b['solicitud'] !== null) <=> ($a['solicitud'] !== null);
+
+            if ($solicitud !== 0) {
+                return $solicitud;
             }
 
             // Pendientes: la más antigua primero. Terminadas: la más reciente primero.

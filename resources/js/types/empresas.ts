@@ -15,6 +15,8 @@ export type PendienteResumen = {
     numero: number;
     estado: EstadoMedicion;
     avance: Avance | null;
+    /** ISO de la solicitud de medición nueva abierta (HU-083). */
+    solicitud: string | null;
 };
 
 /** Fila de A3. */
@@ -156,6 +158,8 @@ export type EmpresaAsignable = {
         version: number | null;
         tiene_respuestas: boolean;
     } | null;
+    /** ISO de la solicitud de medición nueva abierta (HU-083). */
+    solicitud: string | null;
     /** Número que tendrá la nueva medición. */
     siguiente: number;
     /** Usuario principal: "Para:" y {nombre_usuario} del correo. */
