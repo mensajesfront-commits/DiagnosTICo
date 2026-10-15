@@ -143,6 +143,14 @@ class DatosResultado
             // Hasta 2 y 2, sin repetir una categoría en las dos listas.
             'fuertes' => array_slice(array_reverse($orden), 0, min(2, intdiv(count($orden), 2))),
             'debiles' => array_slice($orden, 0, min(2, intdiv(count($orden), 2))),
+            // Página 1: cuántas categorías quedaron en cada nivel.
+            'por_nivel' => collect(Niveles::NIVELES)->map(fn (array $n, string $clave) => [
+                'clave' => $clave,
+                'nombre' => $n[0],
+                'cantidad' => count(array_filter($categorias, fn (array $c) => $c['nivel'] === $clave)),
+            ])->values()->all(),
+            // Página 3: después de las 3 prioridades, el resto de la más débil a la más fuerte.
+            'otras' => array_slice($orden, 3),
             'radar' => [
                 'etiquetas' => array_column($categorias, 'nombre'),
                 'actual' => array_column($categorias, 'puntaje'),

@@ -34,6 +34,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ### Corregido
 
+- **Informe PDF:** las etiquetas largas del radar se cortaban en el borde; ahora se parten en dos líneas. La página 1 suma "Tus categorías por nivel" y lo más fuerte y lo más débil, y la página 3 lista, después de las 3 prioridades, las demás categorías con su recomendación.
 - A1 decía "Tiene la medición N en curso" aunque la pendiente no estuviera iniciada.
 
 ### Agregado (métodos de análisis y resultado de ejemplo, 14 de octubre)
