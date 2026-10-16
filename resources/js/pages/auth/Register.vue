@@ -22,6 +22,8 @@
  */
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, nextTick, ref, watch } from 'vue';
+import CaptchaTurnstile from '@/components/auth/CaptchaTurnstile.vue';
+import ModalVerificarCorreo from '@/components/auth/ModalVerificarCorreo.vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
@@ -55,13 +57,23 @@ const props = withDefaults(
         sectores?: SectorRegistro[];
         /** Los 18 países de Hispanoamérica (DEC-016). */
         paises?: Pais[];
+        /** Llave del captcha (Cloudflare Turnstile); null si está apagado. */
+        captcha?: string | null;
+        /** Recién registrado: correo por verificar con el código (L2b). */
+        verificando?: string | null;
+        status?: string;
     }>(),
     {
         passwordRules: undefined,
         sectores: () => [],
         paises: () => [],
+        captcha: null,
+        verificando: null,
+        status: undefined,
     },
 );
+
+const captchaRef = ref<InstanceType<typeof CaptchaTurnstile> | null>(null);
 
 const MAX_DESCRIPCION = 300;
 
@@ -90,6 +102,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
     terminos: false,
+    captcha: '',
 });
 
 const paso = ref<1 | 2>(1);
@@ -167,6 +180,9 @@ function enviar(): void {
             if (CAMPOS_PASO_1.some((campo) => campo in errores)) {
                 paso.value = 1;
             }
+
+            // El token del captcha sirve una vez: se pide otro.
+            captchaRef.value?.reiniciar();
         },
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
@@ -465,6 +481,21 @@ const pasos = [
                 </p>
             </div>
 
+            <div v-if="captcha">
+                <CaptchaTurnstile
+                    ref="captchaRef"
+                    v-model="form.captcha"
+                    :llave="captcha"
+                />
+                <p
+                    v-if="form.errors.captcha"
+                    class="mt-1 text-xs text-aviso"
+                    role="alert"
+                >
+                    {{ form.errors.captcha }}
+                </p>
+            </div>
+
             <div class="flex flex-col-reverse gap-3 sm:flex-row">
                 <Boton variante="secundario" class="sm:w-40" @click="atras">
                     Atrás
@@ -472,7 +503,7 @@ const pasos = [
                 <Boton
                     type="submit"
                     class="flex-1"
-                    :disabled="!form.terminos"
+                    :disabled="!form.terminos || (!!captcha && !form.captcha)"
                     :cargando="form.processing"
                     data-test="register-user-button"
                 >
@@ -491,4 +522,10 @@ const pasos = [
             </Link>
         </p>
     </form>
+
+    <ModalVerificarCorreo
+        v-if="verificando"
+        :correo="verificando"
+        :status="status"
+    />
 </template>

@@ -115,9 +115,21 @@ Envía a `POST /register`:
 
 Ya funciona de punta a punta: `Fortify::registerView` entrega `sectores` y `paises`, y `CreateNewUser` crea la empresa y el usuario principal con el rol Empresa en una sola transacción (T-047, versión mínima; ver `15_BACKEND.md`).
 
-### L2b · Verifica tu correo (`auth/VerificarCorreo`)
+### L2b · Verifica tu correo (`components/auth/ModalVerificarCorreo.vue`)
 
-Ruta: `GET /verifica-tu-correo`. Props: `correo` y `status`. Después de "Crear cuenta" muestra a qué correo se mandó el enlace, los 3 pasos y "Reenviar el correo" (`POST /verifica-tu-correo/reenviar`). L1 recibe `correo` (ya escrito) al volver del enlace y muestra el aviso `correo_sin_verificar` con "Reenviar el correo".
+**Ventana sobre L2 y L1.** Se abre cuando la página recibe `verificando`, el correo por verificar. Pasa en dos casos:
+
+- después de "Registrar empresa";
+- al intentar entrar sin haber verificado.
+
+**El código:**
+
+- Es un campo de 6 dígitos que se envía solo al completarlo: `POST /verificar-correo`.
+- "Reenviar código" se habilita a los 60 segundos: `POST /verificar-correo/reenviar`.
+- Cerrar la ventana hace `POST /verificar-correo/cancelar` y vuelve a L1.
+- Al acertar, L1 recibe `correo` ya escrito.
+
+**Captcha en L2:** `components/auth/CaptchaTurnstile.vue` (Cloudflare Turnstile) va en el paso 2, con la llave de la prop `captcha`. El botón no se habilita sin el token, y se pide otro token después de cualquier error del formulario.
 
 ### L3 · ¿Olvidaste tu contraseña? (`auth/ForgotPassword`)
 

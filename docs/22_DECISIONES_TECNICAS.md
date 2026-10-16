@@ -211,18 +211,24 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 - **Por qué:** lo pidió el equipo (14 de octubre de 2026): el análisis no puede ser siempre DOFA; depende de las respuestas.
 - **Ojo:** **[INCONSISTENCIA DETECTADA]** RN-028 dice que el resultado no incluye análisis FODA. No se muestra una matriz FODA, solo el nombre del método que guió el análisis y por qué. Falta que NuevasTIC confirme que esto no choca con RN-028.
 
-### DEC-020 — Verificar el correo al registrarse
+### DEC-020 — Verificar el correo al registrarse (con código y captcha)
 
 - **Decisión (pedido de Cristian, 16 de octubre de 2026):**
-  - Al pulsar "Crear cuenta" (L2) la cuenta se crea, pero no se entra al sistema.
-  - Se abre "Verifica tu correo" (L2b) y llega un correo con "Verificar mi correo".
-  - El enlace vence en 24 horas, no pide sesión y lleva a Iniciar sesión con el correo ya escrito. La contraseña se escribe otra vez, por seguridad.
-  - Sin verificar no se inicia sesión. El aviso solo aparece con la contraseña correcta (RN-005).
+  - **Captcha:** antes de "Registrar empresa" hay que pasar el captcha. Se usa Cloudflare Turnstile, que es gratis y la mayoría de las veces no pide resolver imágenes.
+  - **Cuenta sin entrar:** al registrarse, la cuenta se crea pero no entra al sistema.
+  - **Ventana en el registro:** se abre "Verifica tu correo" en la misma pantalla.
+  - **Código en lugar de enlace:** el correo trae un código de 6 dígitos, para que la gente no desconfíe de un enlace. Vence en 15 minutos, admite 5 intentos y "Reenviar código" se habilita a los 60 segundos.
+  - **Después de verificar:** se pasa a Iniciar sesión con el correo ya escrito. La contraseña se escribe otra vez, por seguridad.
+  - **Sin verificar no se entra:** si alguien lo intenta con la contraseña correcta, se abre la misma ventana. Con la contraseña equivocada no se revela nada (RN-005).
 - **Quién no pasa por la verificación:**
-  - **Invitaciones (A5, A3.2):** crear la contraseña desde el enlace del correo ya prueba el correo.
+  - **Invitaciones (A5, A3.2):** crear la contraseña desde el correo ya prueba el correo.
   - **Colaboradores (E12):** los crea su empresa, que ya está verificada.
   - **Cuentas anteriores a este cambio:** quedan verificadas (migración `2026_10_16_000001`).
-- **Por qué:** evitar cuentas con correos falsos o que no existen.
-- **[FUNCIONALIDAD POR DEFINIR]** Qué hacer con los registros que nunca se verifican: por ahora quedan sin poder entrar y la empresa aparece en A3. Se podrían borrar solos a los N días.
+- **Captcha:**
+  - Llaves en `TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`.
+  - Sin llaves, en local y en pruebas se usan las de prueba de Cloudflare, que siempre aprueban.
+  - `CAPTCHA_ACTIVO=false` lo apaga; las pruebas automáticas lo apagan.
+  - **[INFORMACIÓN PENDIENTE]** Las llaves reales las crea NuevasTIC con su cuenta de Cloudflare si pone el sistema en línea.
+- **Por qué:** evitar cuentas con correos falsos o que no existen, y registros hechos por robots.
+- **[FUNCIONALIDAD POR DEFINIR]** Qué hacer con los registros que nunca se verifican: por ahora quedan sin poder entrar y la empresa aparece en A3.
 - **Sigue sin verificación** el cambio de correo en Mi perfil (E11).
-

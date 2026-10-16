@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Acceso\CodigoVerificacion;
 use App\Support\OpcionesPerfil;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -35,6 +36,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $terminos_aceptados_en
  * @property Carbon|null $invitacion_enviada_en
  * @property Carbon|null $email_verified_at
+ * @property string|null $codigo_verificacion Código de verificación cifrado (L2b)
+ * @property Carbon|null $codigo_vence_en
+ * @property int $codigo_intentos
  * @property string|null $password
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
@@ -48,7 +52,7 @@ use Spatie\Permission\Traits\HasRoles;
     'name', 'email', 'password', 'empresa_id', 'cargo', 'telefono', 'activo',
     'ciudad', 'departamento', 'pais', 'zona_horaria', 'idioma', 'avisos',
 ])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'foto_ruta'])]
+#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'foto_ruta', 'codigo_verificacion'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
@@ -63,6 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'codigo_vence_en' => 'datetime',
             'password' => 'hashed',
             'activo' => 'boolean',
             'avisos' => 'array',
@@ -81,6 +86,15 @@ class User extends Authenticatable implements MustVerifyEmail
      * ¿Quiere este aviso por correo? Lo elige en Mi perfil (A6, E11); si no
      * ha elegido, vale el valor inicial de `OpcionesPerfil`.
      */
+    /**
+     * L2b · En lugar del enlace de Laravel, un código de 6 dígitos. Lo usa
+     * el evento `Registered` al crear la cuenta.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        app(CodigoVerificacion::class)->enviar($this);
+    }
+
     public function quiereAviso(string $clave): bool
     {
         return OpcionesPerfil::avisosDe($this)[$clave] ?? true;

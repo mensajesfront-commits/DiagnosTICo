@@ -32,16 +32,16 @@ Route::get('ubicaciones/{pais}', [UbicacionesController::class, 'show'])
     ->middleware('throttle:60,1')
     ->name('ubicaciones.pais');
 
-// L2b · Verificar el correo al registrarse. Sin sesión: la cuenta no entra
-// hasta verificar, y el enlace se abre desde el correo.
-Route::get('verifica-tu-correo', [VerificacionCorreoController::class, 'aviso'])->name('verificacion.aviso');
-Route::post('verifica-tu-correo/reenviar', [VerificacionCorreoController::class, 'reenviar'])
+// L2b · Verificar el correo con el código de 6 dígitos. Sin sesión: la
+// cuenta no entra hasta verificar. La ventana vive en L1 y L2.
+Route::post('verificar-correo', [VerificacionCorreoController::class, 'verificar'])
+    ->middleware('throttle:10,1')
+    ->name('verificacion.verificar');
+Route::post('verificar-correo/reenviar', [VerificacionCorreoController::class, 'reenviar'])
     ->middleware('throttle:3,1')
     ->name('verificacion.reenviar');
-Route::get('verificar-correo/{id}/{hash}', [VerificacionCorreoController::class, 'confirmar'])
-    ->whereNumber('id')
-    ->middleware('throttle:10,1')
-    ->name('verificacion.confirmar');
+Route::post('verificar-correo/cancelar', [VerificacionCorreoController::class, 'cancelar'])
+    ->name('verificacion.cancelar');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // A5.4 · Salir de "Ver como" (el middleware VerComo la deja pasar).

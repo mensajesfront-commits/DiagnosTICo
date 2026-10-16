@@ -9,8 +9,9 @@
 
 export const rutas = {
     verificacion: {
-        aviso: '/verifica-tu-correo',
-        reenviar: '/verifica-tu-correo/reenviar',
+        verificar: '/verificar-correo',
+        reenviar: '/verificar-correo/reenviar',
+        cancelar: '/verificar-correo/cancelar',
     },
     diagnosticos: {
         todos: () => '/diagnosticos',

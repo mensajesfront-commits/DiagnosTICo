@@ -82,7 +82,7 @@ class RegistrationTest extends TestCase
 
         // L2b: no entra hasta verificar el correo.
         $this->assertGuest();
-        $response->assertRedirect(route('verificacion.aviso', absolute: false));
+        $response->assertRedirect(route('register', absolute: false));
 
         $usuario = User::where('email', 'laura@rojas.co')->firstOrFail();
         $this->assertTrue($usuario->hasRole('Empresa'));
@@ -116,7 +116,7 @@ class RegistrationTest extends TestCase
 
         $this->post(route('register.store'), $this->datos($sector, ['actividad_economica_id' => null]))
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('verificacion.aviso', absolute: false));
+            ->assertRedirect(route('register', absolute: false));
     }
 
     public function test_description_and_job_title_are_required()

@@ -10,8 +10,9 @@ use Laravel\Fortify\Contracts\RegisterResponse;
 
 /**
  * L2 · Después de "Crear cuenta" no se entra al sistema: la cuenta espera a
- * que la persona confirme su correo (L2b). Fortify inicia la sesión al
- * registrar; aquí se cierra y se pasa a "Verifica tu correo".
+ * que la persona confirme su correo con el código (L2b). Fortify inicia la
+ * sesión al registrar; aquí se cierra y se vuelve al registro, que abre la
+ * ventana "Verifica tu correo".
  */
 class RegistroResponse implements RegisterResponse
 {
@@ -25,6 +26,6 @@ class RegistroResponse implements RegisterResponse
         $request->session()->regenerateToken();
         $request->session()->put(VerificacionCorreoController::LLAVE, $correo);
 
-        return to_route('verificacion.aviso');
+        return to_route('register');
     }
 }

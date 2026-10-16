@@ -3,89 +3,88 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\Acceso\CodigoVerificacion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\URL;
-use Inertia\Inertia;
-use Inertia\Response;
 
 /**
- * L2b · Verificación del correo al registrarse.
+ * L2b · Verificación del correo con un código de 6 dígitos (DEC-020).
  *
- * 1. Después de "Crear cuenta", la pantalla "Verifica tu correo" muestra a
- *    qué correo se mandó el enlace y deja reenviarlo.
- * 2. El enlace del correo (firmado, vence en 24 horas) marca el correo como
- *    verificado y lleva a Iniciar sesión con el correo ya escrito.
+ * Después de "Crear cuenta" (o al intentar entrar sin verificar) se abre la
+ * ventana "Verifica tu correo" en la misma pantalla. La persona escribe el
+ * código que le llegó y pasa a Iniciar sesión con el correo ya escrito.
  *
- * Sin verificar no se puede iniciar sesión (FortifyServiceProvider). Así no
- * se crean cuentas con correos que no existen.
+ * El correo que se verifica es el de la sesión de quien se registró o de
+ * quien escribió la contraseña correcta: nadie puede pedir códigos para
+ * otra cuenta.
  */
 class VerificacionCorreoController extends Controller
 {
-    /** Correo recién registrado, en la sesión de quien se registró. */
+    /** Correo por verificar, en la sesión de quien se registró. */
     public const string LLAVE = 'verificar_correo';
 
-    /** Correo verificado, para escribirlo solo en Iniciar sesión. */
+    /** Correo recién verificado, para escribirlo solo en Iniciar sesión. */
     public const string VERIFICADO = 'correo_verificado';
 
-    public function aviso(Request $request): Response|RedirectResponse
+    public function __construct(private readonly CodigoVerificacion $codigos) {}
+
+    public function verificar(Request $request): RedirectResponse
     {
-        $correo = $request->session()->get(self::LLAVE);
+        $datos = $request->validate(
+            ['codigo' => ['required', 'digits:6']],
+            ['codigo.required' => 'Escribe el código de 6 dígitos.', 'codigo.digits' => 'El código tiene 6 dígitos.'],
+        );
 
-        if (! is_string($correo) || $correo === '') {
-            return to_route('login');
-        }
-
-        return Inertia::render('auth/VerificarCorreo', [
-            'correo' => $correo,
-            'status' => $request->session()->get('status'),
-        ]);
-    }
-
-    /** "Reenviar el correo": solo a la cuenta que se registró en esta sesión. */
-    public function reenviar(Request $request): RedirectResponse
-    {
-        $correo = $request->session()->get(self::LLAVE);
-        $usuario = is_string($correo) ? User::where('email', $correo)->first() : null;
+        $usuario = $this->pendiente($request);
 
         if ($usuario === null) {
             return to_route('login');
         }
 
-        if ($usuario->hasVerifiedEmail()) {
-            $request->session()->flash(self::VERIFICADO, $usuario->email);
+        $error = $this->codigos->verificar($usuario, $datos['codigo']);
 
-            return to_route('login')->with('status', 'Tu correo ya está verificado. Inicia sesión.');
-        }
-
-        $usuario->sendEmailVerificationNotification();
-
-        return back()->with('status', 'Te enviamos otro correo. Revisa también la carpeta de spam.');
-    }
-
-    /** El enlace del correo. No pide sesión: se abre desde el correo, en cualquier navegador. */
-    public function confirmar(Request $request, int $id, string $hash): RedirectResponse
-    {
-        $usuario = User::find($id);
-
-        if ($usuario === null || ! hash_equals(sha1($usuario->getEmailForVerification()), $hash)) {
-            return to_route('login')->withErrors(['email' => 'El enlace de verificación no es válido.']);
-        }
-
-        if (! URL::hasValidSignature($request)) {
-            // Vencido: quien se registró puede pedir otro desde "Verifica tu correo".
-            $request->session()->put(self::LLAVE, $usuario->email);
-
-            return to_route('verificacion.aviso')->with('status', 'El enlace venció. Pide uno nuevo con "Reenviar el correo".');
-        }
-
-        if (! $usuario->hasVerifiedEmail()) {
-            $usuario->markEmailAsVerified();
+        if ($error !== null) {
+            return back()->withErrors(['codigo' => $error]);
         }
 
         $request->session()->forget(self::LLAVE);
         $request->session()->flash(self::VERIFICADO, $usuario->email);
 
         return to_route('login')->with('status', 'Tu correo quedó verificado. Escribe tu contraseña para entrar.');
+    }
+
+    public function reenviar(Request $request): RedirectResponse
+    {
+        $usuario = $this->pendiente($request);
+
+        if ($usuario === null) {
+            return to_route('login');
+        }
+
+        $this->codigos->enviar($usuario);
+
+        return back()->with('status', 'Te enviamos un código nuevo. Revisa también la carpeta de spam.');
+    }
+
+    /** "Usar otro correo": cierra la ventana; la cuenta sigue sin verificar. */
+    public function cancelar(Request $request): RedirectResponse
+    {
+        $request->session()->forget(self::LLAVE);
+
+        return to_route('login');
+    }
+
+    private function pendiente(Request $request): ?User
+    {
+        $correo = $request->session()->get(self::LLAVE);
+        $usuario = is_string($correo) ? User::where('email', $correo)->first() : null;
+
+        if ($usuario?->hasVerifiedEmail()) {
+            $request->session()->forget(self::LLAVE);
+
+            return null;
+        }
+
+        return $usuario;
     }
 }

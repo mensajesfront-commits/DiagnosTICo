@@ -19,12 +19,12 @@ import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import ModalAccesoBloqueado from '@/components/auth/ModalAccesoBloqueado.vue';
 import ModalCuentaDesactivada from '@/components/auth/ModalCuentaDesactivada.vue';
+import ModalVerificarCorreo from '@/components/auth/ModalVerificarCorreo.vue';
 import Aviso from '@/components/base/Aviso.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Entrada from '@/components/base/Entrada.vue';
-import { rutas } from '@/lib/rutas';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
@@ -42,6 +42,8 @@ const props = defineProps<{
     canResetPassword: boolean;
     /** Correo recién verificado (L2b). */
     correo?: string | null;
+    /** Falta verificar el correo: abre la ventana del código (L2b). */
+    verificando?: string | null;
 }>();
 
 const correoEscrito = ref(props.correo ?? '');
@@ -107,20 +109,24 @@ onBeforeUnmount(() => clearInterval(reloj));
 <template>
     <Head title="Iniciar sesión" />
 
-    <Aviso v-if="status" tono="exito" class="mb-5">{{ status }}</Aviso>
+    <Aviso v-if="status && !verificando" tono="exito" class="mb-5">{{
+        status
+    }}</Aviso>
     <Aviso
-        v-if="sinVerificar"
+        v-if="sinVerificar && !verificando"
         tono="info"
         titulo="Falta verificar tu correo"
         class="mb-5"
     >
         {{ sinVerificar }}
-        <Link
-            :href="rutas.verificacion.aviso"
-            class="font-medium underline underline-offset-2"
-            >Reenviar el correo</Link
-        >
     </Aviso>
+
+    <ModalVerificarCorreo
+        v-if="verificando"
+        :key="verificando"
+        :correo="verificando"
+        :status="status"
+    />
 
     <Form
         v-bind="store.form()"

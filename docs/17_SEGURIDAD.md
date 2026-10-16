@@ -126,7 +126,12 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 
 ## Verificación del correo (L2b, DEC-020)
 
-- **Registro:** una empresa que se registra (L2) no entra hasta verificar su correo. El enlace es una URL firmada que vence en 24 horas (`verificacion.confirmar`, 10 por minuto) y comprueba el `sha1` del correo.
-- **Inicio de sesión:** sin verificar, Fortify rechaza la entrada con `correo_sin_verificar`. Solo se avisa con la contraseña correcta, así no se revela qué correos existen (RN-005).
-- **Reenvío:** "Reenviar el correo" solo funciona para el correo guardado en la sesión de quien se registró o intentó entrar con la contraseña correcta (3 por minuto).
+- **Captcha:** el registro pide el token de Cloudflare Turnstile y el servidor lo confirma con `siteverify` (`App\Support\Captcha`). Sin token válido, la cuenta no se crea.
+- **Código:**
+  - es de 6 dígitos y se guarda cifrado (`users.codigo_verificacion`);
+  - vence en 15 minutos y admite 5 intentos;
+  - pedir otro reemplaza al anterior.
+- **A quién se le envía:** solo al correo guardado en la sesión de quien se registró o de quien escribió la contraseña correcta. Nadie puede pedir ni probar códigos de otra cuenta.
+- **Límites:** verificar, 10 por minuto; reenviar, 3 por minuto.
+- **Inicio de sesión:** sin verificar, Fortify rechaza la entrada con `correo_sin_verificar` y abre la ventana. Solo pasa con la contraseña correcta (RN-005).
 

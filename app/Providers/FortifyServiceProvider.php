@@ -7,19 +7,19 @@ use App\Actions\Fortify\ResetUserPassword;
 use App\Http\Controllers\VerificacionCorreoController;
 use App\Http\Responses\AvisoRecuperacionResponse;
 use App\Http\Responses\RegistroResponse;
+use App\Services\Acceso\CodigoVerificacion;
+use App\Support\Captcha;
 use App\Models\Sector;
 use App\Models\User;
 use App\Support\Fechas;
 use App\Support\Ubicaciones;
 use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -54,7 +54,6 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
         $this->configureLogin();
         $this->configureResetEmail();
-        $this->configureVerificationEmail();
     }
 
     /**
@@ -90,8 +89,13 @@ class FortifyServiceProvider extends ServiceProvider
             // escribió la contraseña correcta (RN-005).
             if (! $usuario->hasVerifiedEmail()) {
                 $request->session()->put(VerificacionCorreoController::LLAVE, $usuario->email);
+                $codigos = app(CodigoVerificacion::class);
 
-                throw ValidationException::withMessages(['correo_sin_verificar' => "Primero confirma tu correo: te enviamos un enlace a {$usuario->email}."]);
+                if (! $codigos->vigente($usuario)) {
+                    $codigos->enviar($usuario);
+                }
+
+                throw ValidationException::withMessages(['correo_sin_verificar' => "Primero confirma tu correo: escribe el código que enviamos a {$usuario->email}."]);
             }
 
             return $usuario;
@@ -102,24 +106,6 @@ class FortifyServiceProvider extends ServiceProvider
      * Correo de "¿Olvidaste tu contraseña?" en español y con el nombre del
      * sistema. El enlace no vence por tiempo (RN-006, config/auth.php).
      */
-    private function configureVerificationEmail(): void
-    {
-        // El enlace no pide sesión (se abre desde el correo) y vence en 24 horas.
-        VerifyEmail::createUrlUsing(fn (User $usuario): string => URL::temporarySignedRoute(
-            'verificacion.confirmar',
-            now()->addDay(),
-            ['id' => $usuario->getKey(), 'hash' => sha1($usuario->getEmailForVerification())],
-        ));
-
-        VerifyEmail::toMailUsing(fn (object $usuario, string $url): MailMessage => (new MailMessage)
-            ->subject('Confirma tu correo en '.config('app.name'))
-            ->greeting('Hola, '.($usuario->name ?? '').':')
-            ->line('Recibimos el registro de tu empresa. Para activar la cuenta, confirma que este correo es tuyo.')
-            ->action('Verificar mi correo', $url)
-            ->line('El enlace vence en 24 horas. Si no te registraste, ignora este correo: la cuenta no se activará.')
-            ->salutation('El equipo de NuevasTIC'));
-    }
-
     private function configureResetEmail(): void
     {
         ResetPassword::toMailUsing(function (object $usuario, string $token): MailMessage {
@@ -159,6 +145,8 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
             // Recién verificado (L2b): el correo ya va escrito.
             'correo' => $request->session()->get(VerificacionCorreoController::VERIFICADO),
+            // Falta verificar: abre la ventana del código.
+            'verificando' => $request->session()->get(VerificacionCorreoController::LLAVE),
         ]));
 
         Fortify::resetPasswordView(fn (Request $request) => Inertia::render('auth/ResetPassword', [
@@ -171,7 +159,7 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::registerView(fn () => Inertia::render('auth/Register', [
+        Fortify::registerView(fn (Request $request) => Inertia::render('auth/Register', [
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
             // Solo los sectores activos se ofrecen al registrarse (RN-003),
             // cada uno con sus actividades económicas (CIIU) activas.
@@ -179,6 +167,11 @@ class FortifyServiceProvider extends ServiceProvider
             // Los 18 países de Hispanoamérica; departamentos y ciudades se
             // piden a /ubicaciones/{pais} al elegir el país (DEC-016).
             'paises' => Ubicaciones::paises(),
+            // Captcha antes de crear la cuenta (null si está apagado).
+            'captcha' => Captcha::llaveSitio(),
+            // Recién registrado: abre la ventana del código (L2b).
+            'verificando' => $request->session()->get(VerificacionCorreoController::LLAVE),
+            'status' => $request->session()->get('status'),
         ]));
 
     }
