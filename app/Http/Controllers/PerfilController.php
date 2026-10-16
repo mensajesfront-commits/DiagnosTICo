@@ -13,6 +13,7 @@ use App\Support\Ubicaciones;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -112,7 +113,7 @@ class PerfilController extends Controller
         $usuario->save();
 
         if ($cambiaCorreo) {
-            $this->codigos->enviar($usuario, $correoNuevo);
+            $this->codigos->enviar($usuario, $correoNuevo, 'correo');
         }
 
         if ($request->editaEmpresa() && $usuario->empresa) {
@@ -133,6 +134,49 @@ class PerfilController extends Controller
             : 'Cambios guardados.']);
 
         return to_route('profile.edit');
+    }
+
+    /**
+     * "¿Olvidaste tu contraseña?" en Cambiar contraseña: manda un código al
+     * correo de la cuenta (solo a ese). Con él se crea la nueva sin la actual.
+     */
+    public function codigoContrasena(Request $request): RedirectResponse
+    {
+        /** @var User $usuario */
+        $usuario = $request->user();
+        $this->codigos->enviar($usuario, motivo: 'contrasena');
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Te enviamos un código a {$usuario->email}."]);
+
+        return back();
+    }
+
+    public function contrasenaConCodigo(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'codigo' => ['required', 'digits:6'],
+            'password' => ['required', 'string', Password::default(), 'confirmed'],
+        ], [
+            'codigo.required' => 'Escribe el código de 6 dígitos.',
+            'codigo.digits' => 'El código tiene 6 dígitos.',
+        ], ['password' => 'contraseña nueva']);
+
+        /** @var User $usuario */
+        $usuario = $request->user();
+        $error = $this->codigos->comprobar($usuario, $datos['codigo']);
+
+        if ($error !== null) {
+            return back()->withErrors(['codigo' => $error]);
+        }
+
+        $usuario->forceFill([
+            'password' => $datos['password'],
+            'contrasena_actualizada_en' => now(),
+        ])->save();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Contraseña actualizada. Tu sesión sigue abierta.']);
+
+        return back();
     }
 
     /** Confirma el correo nuevo con el código que le llegó. */
@@ -176,7 +220,7 @@ class PerfilController extends Controller
         $usuario = $request->user();
 
         if ($usuario->email_pendiente !== null) {
-            $this->codigos->enviar($usuario, $usuario->email_pendiente);
+            $this->codigos->enviar($usuario, $usuario->email_pendiente, 'correo');
         }
 
         return back()->with('status', 'Te enviamos un código nuevo. Revisa también la carpeta de spam.');

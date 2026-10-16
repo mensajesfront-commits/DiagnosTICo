@@ -322,3 +322,34 @@ it('guardar sin cambiar el correo no manda código', function () {
     Notification::assertNothingSent();
     expect($admin->fresh()->email_pendiente)->toBeNull();
 });
+
+it('"¿Olvidaste tu contraseña?" manda un código al correo de la cuenta y con él cambia la contraseña', function () {
+    Notification::fake();
+    $admin = User::factory()->create()->assignRole('Administrador');
+
+    $this->actingAs($admin)->post(route('perfil.contrasena.codigo'))->assertSessionHasNoErrors();
+
+    $codigo = '';
+    Notification::assertSentTo($admin, CodigoVerificacionCorreo::class, function (CodigoVerificacionCorreo $n) use (&$codigo) {
+        $codigo = $n->codigo;
+
+        return $n->motivo === 'contrasena';
+    });
+
+    $malo = $codigo === '111111' ? '222222' : '111111';
+    $this->put(route('perfil.contrasena.con-codigo'), ['codigo' => $malo, 'password' => 'Nueva123!', 'password_confirmation' => 'Nueva123!'])
+        ->assertSessionHasErrors('codigo');
+    expect(Hash::check('Nueva123!', $admin->fresh()->password))->toBeFalse();
+
+    $this->put(route('perfil.contrasena.con-codigo'), ['codigo' => $codigo, 'password' => 'Nueva123!', 'password_confirmation' => 'Nueva123!'])
+        ->assertSessionHasNoErrors();
+    expect(Hash::check('Nueva123!', $admin->fresh()->password))->toBeTrue();
+
+    // El código ya se usó.
+    $this->put(route('perfil.contrasena.con-codigo'), ['codigo' => $codigo, 'password' => 'Otra123!', 'password_confirmation' => 'Otra123!'])
+        ->assertSessionHasErrors('codigo');
+});
+
+it('sin sesión no se pide el código de la contraseña', function () {
+    $this->post(route('perfil.contrasena.codigo'))->assertRedirect(route('login'));
+});

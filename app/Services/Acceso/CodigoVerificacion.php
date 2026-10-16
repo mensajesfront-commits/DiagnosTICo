@@ -20,9 +20,10 @@ class CodigoVerificacion
 
     /**
      * Crea un código nuevo y lo manda al correo de la cuenta o, al cambiarlo
-     * en Mi perfil, al correo nuevo (`$destino`).
+     * en Mi perfil, al correo nuevo (`$destino`). `$motivo` cambia el texto
+     * del correo: registro, correo o contrasena.
      */
-    public function enviar(User $usuario, ?string $destino = null): void
+    public function enviar(User $usuario, ?string $destino = null, string $motivo = 'registro'): void
     {
         $codigo = (string) random_int(100000, 999999);
 
@@ -34,9 +35,9 @@ class CodigoVerificacion
 
         // Al momento, no en la cola: la persona lo está esperando.
         if ($destino !== null) {
-            Notification::route('mail', $destino)->notifyNow(new CodigoVerificacionCorreo($codigo, $usuario->name, cambio: true));
+            Notification::route('mail', $destino)->notifyNow(new CodigoVerificacionCorreo($codigo, $usuario->name, $motivo));
         } else {
-            $usuario->notifyNow(new CodigoVerificacionCorreo($codigo, $usuario->name));
+            $usuario->notifyNow(new CodigoVerificacionCorreo($codigo, $usuario->name, $motivo));
         }
     }
 
