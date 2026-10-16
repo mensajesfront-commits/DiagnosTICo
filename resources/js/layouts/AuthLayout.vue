@@ -6,7 +6,9 @@
  * se desplaza el formulario (el registro es largo), aunque una lista
  * desplegable alargue la página. En pantallas pequeñas el panel se reduce a la marca.
  */
+import { Link } from '@inertiajs/vue3';
 import Logo from '@/components/marca/Logo.vue';
+import { politica, terminos } from '@/routes/legal';
 
 const {
     title = '',
@@ -55,6 +57,19 @@ const {
                 >
                     soporte@nuevastic.co
                 </a>
+                <span class="mt-2 block">
+                    <Link
+                        :href="terminos()"
+                        class="underline underline-offset-2 hover:text-white"
+                        >Términos de uso</Link
+                    >
+                    ·
+                    <Link
+                        :href="politica()"
+                        class="underline underline-offset-2 hover:text-white"
+                        >Política de tratamiento de datos</Link
+                    >
+                </span>
             </p>
         </aside>
 
@@ -83,6 +98,15 @@ const {
                     <a href="mailto:soporte@nuevastic.co" class="underline">
                         soporte@nuevastic.co
                     </a>
+                    <span class="mt-1 block">
+                        <Link :href="terminos()" class="underline"
+                            >Términos de uso</Link
+                        >
+                        ·
+                        <Link :href="politica()" class="underline"
+                            >Política de datos</Link
+                        >
+                    </span>
                 </p>
             </div>
         </main>

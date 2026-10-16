@@ -52,6 +52,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - **El cargo del dueño de la empresa no se repite.** Ningún colaborador puede tener el cargo de la cuenta principal, ni al crearlo o editarlo (E12) ni desde su Mi perfil (E11). Tampoco el dueño puede tomar el cargo de un colaborador (E11, A3.1d). Se compara sin mayúsculas, tildes ni espacios de más (regla `CargoDelDueno`). Los cargos de los demás colaboradores sí se pueden repetir.
 
+### Agregado (términos de uso y política de datos, 16 de octubre)
+
+- **Borrador de los términos de uso y de la política de tratamiento de datos** (Ley 1581 de 2012), escrito con lo que el sistema hace de verdad: qué datos guarda, que las respuestas van a OpenAI sin el nombre de la empresa, Cloudflare en el captcha, los 7 días sin verificar, los 90 días para recuperar una cuenta, "Ver como" y los plazos para consultas y reclamos.
+- En L2 se abren en una ventana sin salir del formulario. También quedan en las páginas públicas `/terminos-de-uso` y `/politica-de-datos`, enlazadas al pie de las pantallas de acceso.
+- Lo que NuevasTIC no ha entregado (razón social, NIT, domicilio, vigencia, costo, proveedores) va marcado y resaltado como [INFORMACIÓN PENDIENTE].
+
 ### Corregido
 
 - **Teléfono (L2, A3.2, A3.1d, A6, E11):** se elige el indicativo del país y el campo solo acepta los dígitos de ese país (Colombia 10, Argentina 11…). Se guarda como "+57 3001234567" y el servidor valida el largo (`TelefonoValido`, `App\Support\Telefonos`).

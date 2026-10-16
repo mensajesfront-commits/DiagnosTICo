@@ -30,9 +30,12 @@ import Campo from '@/components/base/Campo.vue';
 import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import CampoTelefono from '@/components/base/CampoTelefono.vue';
 import Entrada from '@/components/base/Entrada.vue';
+import Modal from '@/components/base/Modal.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
+import TextoLegal from '@/components/legal/TextoLegal.vue';
 import SelectorUbicacion from '@/components/ubicacion/SelectorUbicacion.vue';
+import { documentosLegales } from '@/lib/legales';
 import { cn } from '@/lib/utils';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -86,6 +89,9 @@ const CAMPOS_PASO_1 = [
     'departamento',
     'ciudad',
 ] as const;
+
+/** Documento abierto en la ventana (términos o política), o ninguno. */
+const legal = ref<'terminos' | 'politica' | null>(null);
 
 const form = useForm({
     empresa_nombre: '',
@@ -462,14 +468,21 @@ const pasos = [
                     />
                     <span>
                         Acepto los
-                        <!-- [INFORMACIÓN PENDIENTE] Faltan los enlaces reales de los términos y de la política. -->
-                        <a href="#" class="text-marca underline"
-                            >términos de uso</a
+                        <button
+                            type="button"
+                            class="text-marca underline"
+                            @click="legal = 'terminos'"
                         >
+                            términos de uso
+                        </button>
                         y la
-                        <a href="#" class="text-marca underline">
+                        <button
+                            type="button"
+                            class="text-marca underline"
+                            @click="legal = 'politica'"
+                        >
                             política de tratamiento de datos
-                        </a>
+                        </button>
                     </span>
                 </label>
                 <p
@@ -522,6 +535,20 @@ const pasos = [
             </Link>
         </p>
     </form>
+
+    <!-- Términos y política en una ventana, sin salir del formulario. -->
+    <Modal
+        :abierto="legal !== null"
+        :titulo="legal ? documentosLegales[legal].titulo : ''"
+        :descripcion="legal ? documentosLegales[legal].resumen : undefined"
+        ancho="xl"
+        @update:abierto="(v) => !v && (legal = null)"
+    >
+        <TextoLegal v-if="legal" :documento="documentosLegales[legal]" />
+        <template #pie>
+            <Boton @click="legal = null">Volver al registro</Boton>
+        </template>
+    </Modal>
 
     <ModalVerificarCorreo
         v-if="verificando"
