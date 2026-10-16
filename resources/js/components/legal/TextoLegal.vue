@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Texto de los términos de uso o de la política de datos (L2). Se usa en la
- * ventana de Crear cuenta y en las páginas públicas. Las marcas
+ * ventana de Crear cuenta. Las marcas
  * [INFORMACIÓN PENDIENTE] se resaltan para que nadie las pase por alto.
  */
 import TextoConMarcas from '@/components/legal/TextoConMarcas.vue';

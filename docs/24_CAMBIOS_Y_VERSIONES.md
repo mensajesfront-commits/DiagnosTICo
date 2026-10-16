@@ -55,7 +55,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 ### Agregado (términos de uso y política de datos, 16 de octubre)
 
 - **Borrador de los términos de uso y de la política de tratamiento de datos** (Ley 1581 de 2012), escrito con lo que el sistema hace de verdad: qué datos guarda, que las respuestas van a OpenAI sin el nombre de la empresa, Cloudflare en el captcha, los 7 días sin verificar, los 90 días para recuperar una cuenta, "Ver como" y los plazos para consultas y reclamos.
-- En L2 se abren en una ventana sin salir del formulario. También quedan en las páginas públicas `/terminos-de-uso` y `/politica-de-datos`, enlazadas al pie de las pantallas de acceso.
+- Solo están en L2: se abren en una ventana sin salir del formulario.
 - Lo que NuevasTIC no ha entregado (razón social, NIT, domicilio, vigencia, costo, proveedores) va marcado y resaltado como [INFORMACIÓN PENDIENTE].
 
 ### Corregido

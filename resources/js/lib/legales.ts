@@ -1,9 +1,8 @@
 /**
  * Términos de uso y política de tratamiento de datos personales (L2).
  *
- * Se muestran en una ventana desde Crear cuenta y en las páginas públicas
- * /terminos-de-uso y /politica-de-datos. El texto describe lo que el sistema
- * hace de verdad (docs/17_SEGURIDAD.md, docs/06_REQUISITOS_NO_FUNCIONALES.md,
+ * Solo se muestran en una ventana desde Crear cuenta. El texto describe lo
+ * que el sistema hace de verdad (docs/17_SEGURIDAD.md, docs/06_REQUISITOS_NO_FUNCIONALES.md,
  * RNF-011) y sigue la Ley 1581 de 2012 y el Decreto 1074 de 2015.
  *
  * Lo que NuevasTIC no ha entregado queda marcado con [INFORMACIÓN PENDIENTE]

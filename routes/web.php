@@ -26,11 +26,6 @@ Route::get('/', fn () => auth()->check()
     ? to_route('dashboard')
     : to_route('login'))->name('home');
 
-// Términos de uso y política de tratamiento de datos (L2). Públicas: se
-// aceptan al registrarse y deben poder consultarse siempre (Ley 1581 de 2012).
-Route::inertia('terminos-de-uso', 'auth/DocumentoLegal', ['documento' => 'terminos'])->name('legal.terminos');
-Route::inertia('politica-de-datos', 'auth/DocumentoLegal', ['documento' => 'politica'])->name('legal.politica');
-
 // País → departamento → ciudad (L2, A6, E11). Pública: el registro no tiene sesión.
 Route::get('ubicaciones/{pais}', [UbicacionesController::class, 'show'])
     ->where('pais', '[A-Za-z]{2}')

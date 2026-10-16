@@ -111,7 +111,7 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
 - Claves (`APP_KEY`, base de datos, correo, OpenAI) solo en `.env`.
 
-**Términos y política de datos:** hay un borrador según la Ley 1581 de 2012, en `resources/js/lib/legales.ts`. Se abre en una ventana desde L2 y en las páginas públicas `/terminos-de-uso` y `/politica-de-datos`, enlazadas en las pantallas de acceso. **[INFORMACIÓN PENDIENTE]** NuevasTIC debe completar sus datos (razón social, NIT, domicilio, teléfono, vigencia, costo, proveedores) y hacerlo revisar por su asesor legal. Lo que falta se ve resaltado en el texto.
+**Términos y política de datos:** hay un borrador según la Ley 1581 de 2012, en `resources/js/lib/legales.ts`. Solo se abre en una ventana desde el registro (L2). **[INFORMACIÓN PENDIENTE]** NuevasTIC debe completar sus datos (razón social, NIT, domicilio, teléfono, vigencia, costo, proveedores) y hacerlo revisar por su asesor legal. Lo que falta se ve resaltado en el texto.
 
 ## Comprobado en la prueba técnica
 
