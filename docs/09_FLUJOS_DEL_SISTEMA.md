@@ -1,8 +1,8 @@
 # Flujos del sistema
 
-**Estado:** EN CURSO (T-042). El flujo de la medición (sección 1) es el **diseño** que se implementa en la semana 5; los flujos de acceso (sección 3) ya están construidos.
+**Estado:** COMPLETO (T-042). Todos los flujos están construidos y probados (14 de octubre de 2026).
 
-Los diagramas están en Mermaid; GitHub los dibuja solos. Los nombres de clases y trabajos (`AnalizarCategoria`, `PublicarResultado`…) son una **propuesta** para el backend.
+Los diagramas están en Mermaid; GitHub los dibuja solos. Los nombres de clases y trabajos (`AnalizarMedicion`, `AnalizarCategoria`, `PublicarResultado`…) son los del código (`11_DISENO_TECNICO.md`).
 
 ## 1. De responder a ver el resultado
 
@@ -71,7 +71,7 @@ Puntos clave:
 - **Nada bloquea la pantalla (RNF-004).** El envío solo cambia el estado y encola trabajos; la empresa puede salir de E5.
 - **Cada categoría es independiente.** Si una falla, las demás conservan su análisis (HU-069 CA-004).
 - **El PDF se genera una sola vez** con lo guardado, sin volver a llamar a la IA (RN-024).
-- **[FUNCIONALIDAD POR DEFINIR]** Qué ve la empresa si una categoría queda fallida tras 3 intentos. El wireframe A4 dice: "la categoría queda 'pendiente de análisis' y el resultado se recalcula al reintentar". Falta decidir si el resultado se publica sin esa categoría o espera a que el Administrador la reintente.
+- **Categoría fallida tras 3 intentos:** el resultado espera. La empresa ve en E4 qué categoría falló y "Reintentar"; los administradores reciben el correo `AnalisisFallido`. Al reintentar, solo esa categoría vuelve a la cola y, cuando termina, se publica el resultado completo.
 
 ## 2. Estados de la medición
 
@@ -156,12 +156,12 @@ sequenceDiagram
     L-->>U: Vuelve a L1 con "Tu contraseña se actualizó"
 ```
 
-## 4. Tareas programadas (semana 5)
+## 4. Tareas programadas (`routes/console.php`)
 
 | Tarea | Cuándo | Qué hace |
 |---|---|---|
-| Marcar vencidas (HU-070) | Cada día | Pasa a "Vencida" las mediciones sin enviar cuya fecha límite ya pasó |
-| Borrar cuentas eliminadas (`cuentas:purgar`, DEC-017) | Cada día, 03:10 | Borra para siempre las cuentas y empresas eliminadas hace más de 90 días |
-| Resumen semanal | Cada semana | Envía al Administrador las mediciones pendientes, si lo activó en Mi perfil (A6) |
+| Marcar vencidas (`mediciones:vencer`, HU-070) | Cada día, 00:05 | Pasa a "Vencida" las mediciones sin enviar cuya fecha límite ya pasó |
+| Borrar cuentas eliminadas (`cuentas:purgar`, DEC-017, DEC-020) | Cada día, 03:10 | Borra para siempre las cuentas y empresas eliminadas hace más de 90 días y los registros que no verificaron el correo en 7 días |
+| Resumen semanal (`mediciones:resumen`) | Lunes, 07:50 | Envía a los administradores que lo activaron en Mi perfil (A6) las mediciones pendientes, las vencidas y las solicitudes abiertas |
 
-**[INFORMACIÓN PENDIENTE]** La hora de la tarea diaria y el día del resumen semanal.
+**[INFORMACIÓN PENDIENTE]** NuevasTIC confirma el día y la hora del resumen semanal.

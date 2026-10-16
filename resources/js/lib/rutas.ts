@@ -8,6 +8,11 @@
  */
 
 export const rutas = {
+    verificacion: {
+        verificar: '/verificar-correo',
+        reenviar: '/verificar-correo/reenviar',
+        cancelar: '/verificar-correo/cancelar',
+    },
     diagnosticos: {
         todos: () => '/diagnosticos',
         sector: (sectorId: number) => `/diagnosticos?sector=${sectorId}`,
@@ -16,6 +21,8 @@ export const rutas = {
                 ? `/diagnosticos/crear?sector=${sectorId}`
                 : '/diagnosticos/crear',
         guardar: () => '/diagnosticos',
+        restaurar: (id: number) => `/diagnosticos/${id}/restaurar`,
+        eliminarArchivado: (id: number) => `/diagnosticos/${id}/archivado`,
         editar: (id: number, parte?: number, pregunta?: number) =>
             `/diagnosticos/${id}/editar` +
             (parte
@@ -30,6 +37,8 @@ export const rutas = {
             `/diagnosticos/${id}/categorias/${parte}/orden`,
         agregarCategorias: (id: number) => `/diagnosticos/${id}/categorias`,
         importancia: (id: number) => `/diagnosticos/${id}/importancia`,
+        resultadoEjemplo: (id: number, version?: number) =>
+            `/diagnosticos/${id}/resultado-ejemplo${version ? `?version=${version}` : ''}`,
         publicar: (id: number) => `/diagnosticos/${id}/publicar`,
         duplicar: (id: number) => `/diagnosticos/${id}/duplicar`,
         archivar: (id: number) => `/diagnosticos/${id}/archivar`,
@@ -126,6 +135,9 @@ export const rutas = {
         quitar: () => '/configuracion-ia/ajuste',
         vistaPrevia: () => '/configuracion-ia/vista-previa',
         probar: () => '/configuracion-ia/probar',
+    },
+    verComo: {
+        salir: () => '/ver-como/salir',
     },
     historial: {
         mio: () => '/historial',

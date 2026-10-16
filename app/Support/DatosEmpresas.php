@@ -7,6 +7,7 @@ use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
 use App\Models\Sector;
+use App\Models\SolicitudMedicion;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -35,6 +36,7 @@ class DatosEmpresas
             ->get();
 
         $respuestas = self::respuestasDe($empresas->flatMap(fn (Empresa $e) => $e->mediciones->modelKeys())->all());
+        $solicitudes = SolicitudMedicion::abiertasDe($empresas->modelKeys());
         $lista = [];
 
         foreach ($empresas as $empresa) {
@@ -50,7 +52,10 @@ class DatosEmpresas
                 'nivel' => $ultimo->resultado->nivel ?? 'sin',
                 'variacion' => $variacion,
                 'mediciones' => $empresa->mediciones->where('estado', 'terminada')->count(),
-                'pendiente' => $pendiente ? self::pendiente($pendiente, $respuestas) : null,
+                'pendiente' => $pendiente ? [
+                    ...self::pendiente($pendiente, $respuestas),
+                    'solicitud' => $solicitudes[$empresa->id] ?? null,
+                ] : null,
                 'activa' => $empresa->activa,
             ];
         }
@@ -148,6 +153,8 @@ class DatosEmpresas
                 'vence' => $pendiente->fecha_limite?->toDateString(),
                 'tiene_respuestas' => $respuestas->has($pendiente->id),
                 'ultimo_aviso' => $pendiente->ultimo_aviso_en?->toIso8601String(),
+                // HU-083: la empresa pidió una medición nueva (fecha ISO).
+                'solicitud' => SolicitudMedicion::abiertasDe([$empresa->id])[$empresa->id] ?? null,
             ] : null,
             'mediciones' => array_reverse($filas),
             'evolucion' => array_values(array_filter(array_map(fn (array $f) => $f['puntaje'] === null ? null : [
@@ -155,12 +162,51 @@ class DatosEmpresas
                 'fecha' => $f['terminada'] ?? $f['asignada'],
                 'puntaje' => $f['puntaje'],
             ], $filas))),
+            // "Ver:" de la gráfica: la evolución de cada categoría (por nombre).
+            'evolucion_categorias' => self::evolucionCategorias($mediciones),
             'colaboradores' => $usuarios
                 ->filter(fn (User $u) => $u->hasRole('Colaborador'))
                 ->map(fn (User $u) => ['id' => $u->id, 'name' => $u->name, 'email' => $u->email, 'cargo' => $u->cargo, 'activo' => $u->activo])
                 ->values()->all(),
             'diagnosticos' => self::diagnosticosPublicados($empresa->sector_id),
         ];
+    }
+
+    /**
+     * Puntaje de cada categoría medición por medición, en el orden en que
+     * aparecen. Solo las mediciones con resultado.
+     *
+     * @param  Collection<int, Medicion>  $mediciones  ordenadas por número
+     * @return list<array{nombre: string, puntos: list<array{numero: int, fecha: string|null, puntaje: int}>}>
+     */
+    private static function evolucionCategorias(Collection $mediciones): array
+    {
+        $series = [];
+
+        foreach ($mediciones as $m) {
+            /** @var list<array{nombre?: string, puntaje?: int|float}> $categorias */
+            $categorias = $m->resultado->por_categoria ?? [];
+
+            foreach ($categorias as $c) {
+                $nombre = (string) ($c['nombre'] ?? '');
+
+                if ($nombre === '' || ! isset($c['puntaje'])) {
+                    continue;
+                }
+
+                $series[$nombre][] = [
+                    'numero' => $m->numero,
+                    'fecha' => ($m->terminada_en ?? $m->created_at)?->toDateString(),
+                    'puntaje' => (int) $c['puntaje'],
+                ];
+            }
+        }
+
+        return array_map(
+            fn (string $nombre, array $puntos) => ['nombre' => $nombre, 'puntos' => $puntos],
+            array_keys($series),
+            array_values($series),
+        );
     }
 
     /**

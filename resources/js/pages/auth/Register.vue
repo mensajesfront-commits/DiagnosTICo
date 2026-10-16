@@ -22,14 +22,20 @@
  */
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, nextTick, ref, watch } from 'vue';
+import CaptchaTurnstile from '@/components/auth/CaptchaTurnstile.vue';
+import ModalVerificarCorreo from '@/components/auth/ModalVerificarCorreo.vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import CampoContrasena from '@/components/base/CampoContrasena.vue';
+import CampoTelefono from '@/components/base/CampoTelefono.vue';
 import Entrada from '@/components/base/Entrada.vue';
+import Modal from '@/components/base/Modal.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
+import TextoLegal from '@/components/legal/TextoLegal.vue';
 import SelectorUbicacion from '@/components/ubicacion/SelectorUbicacion.vue';
+import { documentosLegales } from '@/lib/legales';
 import { cn } from '@/lib/utils';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -54,13 +60,23 @@ const props = withDefaults(
         sectores?: SectorRegistro[];
         /** Los 18 países de Hispanoamérica (DEC-016). */
         paises?: Pais[];
+        /** Llave del captcha (Cloudflare Turnstile); null si está apagado. */
+        captcha?: string | null;
+        /** Recién registrado: correo por verificar con el código (L2b). */
+        verificando?: string | null;
+        status?: string;
     }>(),
     {
         passwordRules: undefined,
         sectores: () => [],
         paises: () => [],
+        captcha: null,
+        verificando: null,
+        status: undefined,
     },
 );
+
+const captchaRef = ref<InstanceType<typeof CaptchaTurnstile> | null>(null);
 
 const MAX_DESCRIPCION = 300;
 
@@ -73,6 +89,9 @@ const CAMPOS_PASO_1 = [
     'departamento',
     'ciudad',
 ] as const;
+
+/** Documento abierto en la ventana (términos o política), o ninguno. */
+const legal = ref<'terminos' | 'politica' | null>(null);
 
 const form = useForm({
     empresa_nombre: '',
@@ -89,6 +108,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
     terminos: false,
+    captcha: '',
 });
 
 const paso = ref<1 | 2>(1);
@@ -166,6 +186,9 @@ function enviar(): void {
             if (CAMPOS_PASO_1.some((campo) => campo in errores)) {
                 paso.value = 1;
             }
+
+            // El token del captcha sirve una vez: se pide otro.
+            captchaRef.value?.reiniciar();
         },
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
@@ -390,12 +413,11 @@ const pasos = [
                     opcional
                     :error="form.errors.telefono"
                 >
-                    <Entrada
+                    <CampoTelefono
                         id="telefono"
                         v-model="form.telefono"
-                        type="tel"
-                        autocomplete="tel"
-                        placeholder="+57 300 000 0000"
+                        :pais="form.pais"
+                        :invalida="!!form.errors.telefono"
                     />
                 </Campo>
 
@@ -446,14 +468,21 @@ const pasos = [
                     />
                     <span>
                         Acepto los
-                        <!-- [INFORMACIÓN PENDIENTE] Faltan los enlaces reales de los términos y de la política. -->
-                        <a href="#" class="text-marca underline"
-                            >términos de uso</a
+                        <button
+                            type="button"
+                            class="text-marca underline"
+                            @click="legal = 'terminos'"
                         >
+                            términos de uso
+                        </button>
                         y la
-                        <a href="#" class="text-marca underline">
+                        <button
+                            type="button"
+                            class="text-marca underline"
+                            @click="legal = 'politica'"
+                        >
                             política de tratamiento de datos
-                        </a>
+                        </button>
                     </span>
                 </label>
                 <p
@@ -465,6 +494,21 @@ const pasos = [
                 </p>
             </div>
 
+            <div v-if="captcha">
+                <CaptchaTurnstile
+                    ref="captchaRef"
+                    v-model="form.captcha"
+                    :llave="captcha"
+                />
+                <p
+                    v-if="form.errors.captcha"
+                    class="mt-1 text-xs text-aviso"
+                    role="alert"
+                >
+                    {{ form.errors.captcha }}
+                </p>
+            </div>
+
             <div class="flex flex-col-reverse gap-3 sm:flex-row">
                 <Boton variante="secundario" class="sm:w-40" @click="atras">
                     Atrás
@@ -472,7 +516,7 @@ const pasos = [
                 <Boton
                     type="submit"
                     class="flex-1"
-                    :disabled="!form.terminos"
+                    :disabled="!form.terminos || (!!captcha && !form.captcha)"
                     :cargando="form.processing"
                     data-test="register-user-button"
                 >
@@ -491,4 +535,24 @@ const pasos = [
             </Link>
         </p>
     </form>
+
+    <!-- Términos y política en una ventana, sin salir del formulario. -->
+    <Modal
+        :abierto="legal !== null"
+        :titulo="legal ? documentosLegales[legal].titulo : ''"
+        :descripcion="legal ? documentosLegales[legal].resumen : undefined"
+        ancho="xl"
+        @update:abierto="(v) => !v && (legal = null)"
+    >
+        <TextoLegal v-if="legal" :documento="documentosLegales[legal]" />
+        <template #pie>
+            <Boton @click="legal = null">Volver al registro</Boton>
+        </template>
+    </Modal>
+
+    <ModalVerificarCorreo
+        v-if="verificando"
+        :correo="verificando"
+        :status="status"
+    />
 </template>

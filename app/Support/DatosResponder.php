@@ -43,7 +43,7 @@ class DatosResponder
                 'tipo' => $p['tipo'],
                 'indicacion' => $p['indicacion'],
                 'obligatoria' => (bool) ($p['obligatoria'] ?? true),
-                'opciones' => array_map(fn (array $o) => ['ref' => $o['ref'], 'texto' => $o['texto'], 'exclusiva' => (bool) ($o['exclusiva'] ?? false)], $p['opciones'] ?? []),
+                'opciones' => array_map(fn (array $o) => ['ref' => $o['ref'], 'texto' => $o['texto'], 'exclusiva' => (bool) ($o['exclusiva'] ?? false), 'con_texto' => (bool) ($o['con_texto'] ?? false)], $p['opciones'] ?? []),
             ], $c['preguntas'] ?? []),
         ], $categorias);
     }

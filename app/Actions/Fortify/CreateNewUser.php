@@ -2,6 +2,9 @@
 
 namespace App\Actions\Fortify;
 
+use Closure;
+use App\Rules\TelefonoValido;
+use App\Support\Captcha;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\ActividadEconomica;
@@ -56,10 +59,18 @@ class CreateNewUser implements CreatesNewUsers
             'ciudad' => ['required', 'string', 'min:2', 'max:255'],
             ...$this->profileRules(),
             'cargo' => ['required', 'string', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:30'],
+            'telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
             'password' => $this->passwordRules(),
             'terminos' => ['accepted'],
-        ], [], [
+            // Captcha (Cloudflare Turnstile) antes de crear la cuenta.
+            'captcha' => [Rule::requiredIf(Captcha::activo()), function (string $atributo, mixed $valor, Closure $fallar): void {
+                if (! Captcha::valido(is_string($valor) ? $valor : null, request()->ip())) {
+                    $fallar('Confirma que no eres un robot y vuelve a pulsar "Registrar empresa".');
+                }
+            }],
+        ], [
+            'captcha.required' => 'Confirma que no eres un robot y vuelve a pulsar "Registrar empresa".',
+        ], [
             'empresa_nombre' => 'nombre de la empresa',
             'sector_id' => 'sector',
             'actividad_economica_id' => 'actividad económica',

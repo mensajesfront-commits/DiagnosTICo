@@ -9,8 +9,8 @@
  *   Se puede responder para probar, pero nada se guarda (CA-004).
  * - Con `?version=` muestra una versión publicada en solo lectura.
  *
- * [FUNCIONALIDAD POR DEFINIR] "Resultado de ejemplo" (A2.6, HU-030) llega con
- * Resultados (semana 5).
+ * "Resultado de ejemplo" abre A2.6 (HU-030) con el mismo contenido (borrador o
+ * versión).
  */
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
@@ -324,12 +324,17 @@ const nadaQuePublicar = computed(
                         >
                             Cuestionario
                         </span>
-                        <span
-                            class="px-3 py-1 text-tinta-suave"
-                            title="Llega con Resultados (HU-030)"
+                        <Link
+                            :href="
+                                rutas.diagnosticos.resultadoEjemplo(
+                                    diagnostico.id,
+                                    version?.numero,
+                                )
+                            "
+                            class="rounded-md px-3 py-1 text-tinta-suave hover:text-marca"
                         >
-                            Resultado de ejemplo · Próximamente
-                        </span>
+                            Resultado de ejemplo
+                        </Link>
                     </div>
                     <label
                         v-if="categorias.length"
@@ -460,8 +465,23 @@ const nadaQuePublicar = computed(
                                     {{ o.texto }}
                                 </button>
                             </div>
+                            <input
+                                v-if="
+                                    p.tipo !== 'abierta' &&
+                                    p.opciones.some(
+                                        (o) =>
+                                            o.con_texto &&
+                                            marcada(p.ref, o.ref),
+                                    )
+                                "
+                                type="text"
+                                maxlength="255"
+                                placeholder="¿Cuál?"
+                                :aria-label="`¿Cuál? Pregunta ${i + 1}`"
+                                class="mt-2 h-9 w-full max-w-md rounded-md border border-linea-fuerte px-3 text-sm focus-visible:border-marca focus-visible:outline-none"
+                            />
                             <textarea
-                                v-else
+                                v-if="p.tipo === 'abierta'"
                                 v-model="respuestas[p.ref] as string"
                                 rows="2"
                                 maxlength="1000"

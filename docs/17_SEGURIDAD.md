@@ -51,7 +51,7 @@ Lo que no tiene casilla en A5.2 se decide por el rol:
 
 - **Inicio del Administrador (A1):** cualquier rol interno (que no sea Empresa ni Colaborador). Lo que muestra depende de sus permisos.
 - **Colaboradores (E12):** solo el rol Empresa (RN-025, HU-076).
-- **"Ver como" (A5.4):** lo usa quien tiene `usuarios.gestionar`, en solo lectura y con registro (RN-026). Sirve para **comprobar que cada rol ve solo las pantallas que se le asignaron**, así que se usa sobre cuentas de Empresa, Colaborador, Consultor y cualquier rol creado, **no sobre cuentas de Administrador** (respuesta del equipo, 6 de octubre). **[INCONSISTENCIA DETECTADA]** El wireframe A5.4b muestra "Ver como" sobre un Administrador; queda fuera según esta respuesta.
+- **"Ver como" (A5.4):** lo usa quien tiene `usuarios.gestionar`, en solo lectura y con registro (RN-026). Sirve para **comprobar que cada rol ve solo las pantallas que se le asignaron**, así que se usa sobre cuentas de Empresa, Colaborador, Consultor y cualquier rol creado, **no sobre cuentas de Administrador** (respuesta del equipo, 6 de octubre). **[INCONSISTENCIA DETECTADA]** El wireframe A5.4b muestra "Ver como" sobre un Administrador; queda fuera según esta respuesta. Tampoco se usa sobre la propia cuenta. El bloqueo de escritura y el registro los hace el middleware `VerComo` (docs/15_BACKEND.md).
 
 Para todas las cuentas, sin permiso: iniciar y cerrar sesión y recuperar la contraseña.
 
@@ -111,7 +111,7 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
 - Claves (`APP_KEY`, base de datos, correo, OpenAI) solo en `.env`.
 
-**[INFORMACIÓN PENDIENTE]** Los términos de uso y la política de tratamiento de datos no tienen URL todavía (L2 apunta a `#`).
+**Términos y política de datos:** hay un borrador según la Ley 1581 de 2012, en `resources/js/lib/legales.ts`. Solo se abre en una ventana desde el registro (L2). **[INFORMACIÓN PENDIENTE]** NuevasTIC debe completar sus datos (razón social, NIT, domicilio, teléfono, vigencia, costo, proveedores) y hacerlo revisar por su asesor legal. Lo que falta se ve resaltado en el texto.
 
 ## Comprobado en la prueba técnica
 
@@ -123,3 +123,15 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 - Las claves (OpenAI, correo, base de datos) van solo en `.env`, que no se sube al repositorio.
 - `.env.example` lleva placeholders y un comentario por variable.
 - Antes de entregar se revisa que ninguna clave haya quedado en el código (T-147).
+
+## Verificación del correo (L2b, DEC-020)
+
+- **Captcha:** el registro pide el token de Cloudflare Turnstile y el servidor lo confirma con `siteverify` (`App\Support\Captcha`). Sin token válido, la cuenta no se crea.
+- **Código:**
+  - es de 6 dígitos y se guarda cifrado (`users.codigo_verificacion`);
+  - vence en 15 minutos y admite 5 intentos;
+  - pedir otro reemplaza al anterior.
+- **A quién se le envía:** solo al correo guardado en la sesión de quien se registró o de quien escribió la contraseña correcta. Nadie puede pedir ni probar códigos de otra cuenta.
+- **Límites:** verificar, 10 por minuto; reenviar, 3 por minuto.
+- **Inicio de sesión:** sin verificar, Fortify rechaza la entrada con `correo_sin_verificar` y abre la ventana. Solo pasa con la contraseña correcta (RN-005).
+

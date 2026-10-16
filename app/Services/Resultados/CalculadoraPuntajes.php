@@ -101,13 +101,17 @@ class CalculadoraPuntajes
         }
 
         $elegidas = array_map('strval', $elegidas ?? []);
-        /** @var list<array{ref: string, texto: string}> $opciones */
+        /** @var list<array{ref: string, texto: string, con_texto?: bool}> $opciones */
         $opciones = $pregunta['opciones'] ?? [];
+        $detalle = trim((string) $texto);
         $textos = [];
 
         foreach ($opciones as $opcion) {
             if (in_array($opcion['ref'], $elegidas, true)) {
-                $textos[] = $opcion['texto'];
+                // "Otro" con lo que escribió la empresa: "Otro: TikTok".
+                $textos[] = ($opcion['con_texto'] ?? false) && $detalle !== ''
+                    ? $opcion['texto'].': '.$detalle
+                    : $opcion['texto'];
             }
         }
 

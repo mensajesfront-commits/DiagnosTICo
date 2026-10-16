@@ -36,7 +36,7 @@ import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import { fechaCorreo } from '@/lib/correo';
 import type { ValoresCorreo } from '@/lib/correo';
-import { diaYMes, fechaLocal } from '@/lib/fechas';
+import { diaYMes, fechaLocal, haceCuanto } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { DiagnosticosDelSector, EmpresaAsignable } from '@/types/empresas';
@@ -396,6 +396,17 @@ const estadoPendiente: Record<string, string> = {
                     </span>
                 </div>
 
+                <p
+                    v-if="empresa?.solicitud"
+                    class="rounded-md bg-aviso-suave px-3 py-2 text-xs text-aviso"
+                    role="status"
+                >
+                    <strong
+                        >{{ empresa.nombre }} pidió una medición nueva
+                        {{ haceCuanto(empresa.solicitud) }}.</strong
+                    >
+                    Al asignarla, la solicitud queda atendida.
+                </p>
                 <p
                     v-if="empresa?.pendiente"
                     class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta"

@@ -20,6 +20,14 @@ return [
     ],
 
     /*
+    | Días que espera un registro sin verificar el correo (L2b) antes de que
+    | `cuentas:purgar` lo borre, con su empresa. Así el correo queda libre.
+    */
+    'sin_verificar' => [
+        'dias' => (int) env('DIAS_REGISTRO_SIN_VERIFICAR', 7),
+    ],
+
+    /*
     | Correo de contacto que ve la empresa (E1, medición vencida).
     | [INFORMACIÓN PENDIENTE] NuevasTIC confirma la dirección real.
     */

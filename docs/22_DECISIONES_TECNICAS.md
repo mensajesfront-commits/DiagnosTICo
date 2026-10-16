@@ -17,13 +17,14 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-009 | Guzzle 7 en lugar de Guzzle 8 | Vigente |
 | DEC-010 | Fuentes IBM Plex servidas desde el proyecto | Vigente |
 | DEC-011 | Chromium instalado con Playwright en la imagen de Sail | Vigente |
-| DEC-012 | Del kit solo se deja el registro; sin modo oscuro | Vigente |
+| DEC-012 | Del kit solo se deja el registro; sin modo oscuro | Cambiada el 16 oct: el registro verifica el correo (DEC-020) |
 | DEC-013 | La llamada real a OpenAI se prueba cuando se use la IA | Vigente |
 | DEC-014 | Reglas de acceso propias sobre Fortify | Vigente |
 | DEC-015 | Registro en dos pasos y actividad económica CIIU | Vigente |
 | DEC-016 | País, departamento y ciudad en cascada | Vigente |
 | DEC-017 | Eliminar cuentas con 90 días para recuperarlas | Vigente |
 | DEC-018 | Catálogo CIIU Rev. 5 A.C. y subsectores por división | Vigente |
+| DEC-020 | Verificar el correo al registrarse | Vigente |
 
 ---
 
@@ -201,3 +202,37 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - En la Rev. 5 algunos códigos cambiaron de significado. Por ejemplo, 8691 era "apoyo diagnóstico" y ahora es "intermediación para los servicios de salud". Una empresa que ya tenía uno de esos códigos queda con el nombre nuevo.
   - **[INFORMACIÓN PENDIENTE]** Confirmar con NuevasTIC si el RUT de la DIAN ya usa la Rev. 5 o sigue con la Rev. 4.
 
+### DEC-019 — La IA elige el método de análisis según las respuestas
+
+- **Decisión:**
+  - En cada categoría, la IA elige **un** método según lo que respondió la empresa y lo usa para la observación de la categoría y la recomendación: **PESTEL** (entorno), **5 Fuerzas de Porter** (competencia), **VRIO** (recursos propios), **DOFA** (interno y externo a la vez) o **CAME** (convertir un problema claro en acciones). Si un "Ten en cuenta" pide un método, usa ese.
+  - La respuesta de la IA trae `metodo` (una de las cinco claves; la salida estructurada no acepta otra) y `metodo_motivo` (por qué encaja). El resultado lo guarda en `por_categoria[].metodo` y lo muestra en E6 ("Analizado con …"), en las recomendaciones y en el PDF.
+  - La guía de cuándo usar cada uno está en las instrucciones generales por defecto (`ArmadorPrompt::GENERAL`, "Detalles y restricciones") y en el formato fijo, que se envía siempre aunque el Administrador cambie las instrucciones. Los métodos están en `App\Support\MetodosAnalisis`.
+- **Por qué:** lo pidió el equipo (14 de octubre de 2026): el análisis no puede ser siempre DOFA; depende de las respuestas.
+- **Ojo:** **[INCONSISTENCIA DETECTADA]** RN-028 dice que el resultado no incluye análisis FODA. No se muestra una matriz FODA, solo el nombre del método que guió el análisis y por qué. Falta que NuevasTIC confirme que esto no choca con RN-028.
+
+### DEC-020 — Verificar el correo al registrarse (con código y captcha)
+
+- **Decisión (pedido de Cristian, 16 de octubre de 2026):**
+  - **Captcha:** antes de "Registrar empresa" hay que pasar el captcha. Se usa Cloudflare Turnstile, que es gratis y la mayoría de las veces no pide resolver imágenes.
+  - **Cuenta sin entrar:** al registrarse, la cuenta se crea pero no entra al sistema.
+  - **Ventana en el registro:** se abre "Verifica tu correo" en la misma pantalla.
+  - **Código en lugar de enlace:** el correo trae un código de 6 dígitos, para que la gente no desconfíe de un enlace. Vence en 15 minutos, admite 5 intentos y "Reenviar código" se habilita a los 60 segundos.
+  - **Después de verificar:** se pasa a Iniciar sesión con el correo ya escrito. La contraseña se escribe otra vez, por seguridad.
+  - **Sin verificar no se entra:** si alguien lo intenta con la contraseña correcta, se abre la misma ventana. Con la contraseña equivocada no se revela nada (RN-005).
+- **Quién no pasa por la verificación:**
+  - **Invitaciones (A5, A3.2):** crear la contraseña desde el correo ya prueba el correo.
+  - **Colaboradores (E12):** los crea su empresa, que ya está verificada.
+  - **Cuentas anteriores a este cambio:** quedan verificadas (migración `2026_10_16_000001`).
+- **Captcha:**
+  - Llaves en `TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`.
+  - Sin llaves, en local y en pruebas se usan las de prueba de Cloudflare, que siempre aprueban.
+  - `CAPTCHA_ACTIVO=false` lo apaga; las pruebas automáticas lo apagan.
+  - **[INFORMACIÓN PENDIENTE]** Las llaves reales las crea NuevasTIC con su cuenta de Cloudflare si pone el sistema en línea.
+- **Por qué:** evitar cuentas con correos falsos o que no existen, y registros hechos por robots.
+- **Registros sin verificar:** la tarea diaria `cuentas:purgar` los borra a los 7 días, con su empresa si no tiene otra cuenta. Así el correo queda libre para registrarse otra vez. Se cambia con `DIAS_REGISTRO_SIN_VERIFICAR`. Las invitaciones sin contraseña no cuentan.
+- **Cambio de correo en Mi perfil (A6, E11):**
+  - Al guardar un correo distinto, los demás cambios se guardan, pero el correo no cambia todavía.
+  - Llega un código al correo nuevo y se abre la ventana "Confirma tu nuevo correo".
+  - Hasta confirmarlo se sigue entrando con el anterior.
+  - Cerrar la ventana descarta el cambio (`users.email_pendiente`).

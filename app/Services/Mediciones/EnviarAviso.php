@@ -17,13 +17,22 @@ use Throwable;
  */
 class EnviarAviso
 {
-    public function enviar(Medicion $medicion): void
+    /**
+     * @param  bool  $alAsignar  Si es el aviso de una medición recién asignada:
+     *                           respeta "Avisarme cuando me asignen una medición" (E11).
+     *                           Los recordatorios los pide el Administrador y salen siempre.
+     */
+    public function enviar(Medicion $medicion, bool $alAsignar = false): void
     {
         $medicion->loadMissing('empresa');
         $principal = $medicion->empresa ? DatosEmpresas::principal($medicion->empresa) : null;
 
         if ($principal === null) {
             throw ValidationException::withMessages(['envio' => 'La empresa no tiene usuario principal a quien enviarle el correo.']);
+        }
+
+        if ($alAsignar && ! $principal->quiereAviso('medicion_asignada')) {
+            throw ValidationException::withMessages(['envio' => 'La empresa apagó el aviso por correo de mediciones nuevas en su perfil.']);
         }
 
         $correo = CorreoAviso::deMedicion($medicion);

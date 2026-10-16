@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Perfil;
 
+use App\Rules\CargoDelDueno;
+use App\Rules\TelefonoValido;
 use App\Concerns\ProfileValidationRules;
 use App\Models\ActividadEconomica;
 use App\Models\User;
@@ -32,8 +34,11 @@ class ActualizarPerfilRequest extends FormRequest
 
         $reglas = [
             ...$this->profileRules($usuario->id),
-            'cargo' => ['nullable', 'string', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:30'],
+            // El cargo del dueño de la empresa no se repite con el de ningún colaborador.
+            'cargo' => array_filter(['nullable', 'string', 'max:255', $usuario->empresa_id
+                ? new CargoDelDueno($usuario->empresa_id, $usuario->hasRole('Empresa'), $usuario->id)
+                : null]),
+            'telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
             'pais' => ['nullable', 'string', Rule::in(Ubicaciones::nombresDePaises())],
             'departamento' => ['nullable', 'string', new DepartamentoDelPais($this->string('pais')->value())],
             'ciudad' => ['nullable', 'string', 'min:2', 'max:255'],

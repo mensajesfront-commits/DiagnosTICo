@@ -303,6 +303,12 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                                 e.pendiente.avance ?? undefined
                                             "
                                         />
+                                        <span
+                                            v-if="e.pendiente.solicitud"
+                                            class="text-xs font-medium text-aviso"
+                                            title="La empresa pidió una medición nueva (HU-083)"
+                                            >Pidió una nueva</span
+                                        >
                                     </span>
                                     <span v-else class="text-tinta-suave">
                                         Sin medición pendiente

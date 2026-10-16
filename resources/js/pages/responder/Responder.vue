@@ -14,8 +14,9 @@
  *
  * La empresa no recibe los puntajes de las opciones (RN-013).
  *
- * [FUNCIONALIDAD POR DEFINIR] La opción "Otro" con texto ("¿Cuál otro
- * canal?") del wireframe necesita un campo en las opciones.
+ * La opción "Otro" que pide escribir cuál (`con_texto`): al elegirla aparece
+ * el campo "¿Cuál?" (máx. 255) y se guarda al dejar de escribir. La IA lee
+ * "Otro: lo que escribió".
  */
 import { Head, Link } from '@inertiajs/vue3';
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
@@ -107,8 +108,22 @@ async function guardar(p: PreguntaResponder): Promise<void> {
     }
 }
 
+/** ¿Eligió la opción "Otro" que pide escribir cuál? */
+const pideCual = (p: PreguntaResponder) =>
+    p.opciones.some(
+        (o) => o.con_texto && respuestas[p.ref].opciones.includes(o.ref),
+    );
+
+/** Sin "Otro" elegida, lo que escribió en "¿Cuál?" ya no va. */
+function limpiarCual(p: PreguntaResponder): void {
+    if (!pideCual(p)) {
+        respuestas[p.ref].texto = '';
+    }
+}
+
 function elegirUna(p: PreguntaResponder, opcion: string): void {
     respuestas[p.ref].opciones = [opcion];
+    limpiarCual(p);
     void guardar(p);
 }
 
@@ -131,6 +146,7 @@ function marcar(p: PreguntaResponder, opcion: string): void {
         ];
     }
 
+    limpiarCual(p);
     void guardar(p);
 }
 
@@ -416,7 +432,31 @@ const pistas = {
                             </label>
                         </div>
 
-                        <div v-else class="mt-3">
+                        <div
+                            v-if="p.tipo !== 'abierta' && pideCual(p)"
+                            class="mt-2"
+                        >
+                            <label
+                                :for="`cual-${p.ref}`"
+                                class="block text-xs font-medium"
+                                >¿Cuál?
+                                <span class="font-normal text-tinta-suave"
+                                    >(opcional)</span
+                                ></label
+                            >
+                            <input
+                                :id="`cual-${p.ref}`"
+                                v-model="respuestas[p.ref].texto"
+                                type="text"
+                                maxlength="255"
+                                placeholder="Escribe cuál"
+                                class="mt-1 h-10 w-full rounded-md border border-linea-fuerte bg-white px-3 text-sm focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none sm:max-w-md"
+                                @input="escribir(p)"
+                                @blur="salirDelCampo(p)"
+                            />
+                        </div>
+
+                        <div v-else-if="p.tipo === 'abierta'" class="mt-3">
                             <textarea
                                 v-model="respuestas[p.ref].texto"
                                 rows="4"

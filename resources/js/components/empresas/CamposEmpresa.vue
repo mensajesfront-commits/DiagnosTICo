@@ -17,6 +17,7 @@
 import { computed, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Campo from '@/components/base/Campo.vue';
+import CampoTelefono from '@/components/base/CampoTelefono.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import SelectorUbicacion from '@/components/ubicacion/SelectorUbicacion.vue';
@@ -180,11 +181,10 @@ const id = (campo: string) => `${props.prefijo}-${campo}`;
                 :para="id('telefono')"
                 :error="errores.telefono"
             >
-                <Entrada
+                <CampoTelefono
                     :id="id('telefono')"
                     v-model="form.telefono"
-                    type="tel"
-                    maxlength="30"
+                    :pais="form.pais"
                     :invalida="!!errores.telefono"
                 />
             </Campo>
@@ -302,11 +302,11 @@ const id = (campo: string) => `${props.prefijo}-${campo}`;
                 :para="id('usuario-telefono')"
                 :error="errores.usuario_telefono"
             >
-                <Entrada
+                <CampoTelefono
                     :id="id('usuario-telefono')"
                     v-model="form.usuario_telefono"
-                    type="tel"
-                    maxlength="30"
+                    :pais="form.pais"
+                    :invalida="!!errores.usuario_telefono"
                 />
             </Campo>
         </div>

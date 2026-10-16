@@ -4,9 +4,11 @@ use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
+use App\Notifications\CodigoVerificacionCorreo;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -255,4 +257,89 @@ it('conserva una zona de antes que ya no está en la lista', function () {
 
     $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['zona_horaria' => 'Europe/Madrid']))
         ->assertSessionHasNoErrors();
+});
+
+/** El código que llegó al correo nuevo. */
+function codigoCambio(string $correo): string
+{
+    $codigo = '';
+    Notification::assertSentOnDemand(CodigoVerificacionCorreo::class, function (CodigoVerificacionCorreo $n, array $canales, object $destino) use ($correo, &$codigo) {
+        if (($destino->routes['mail'] ?? null) === $correo) {
+            $codigo = $n->codigo;
+
+            return true;
+        }
+
+        return false;
+    });
+
+    return $codigo;
+}
+
+it('cambiar el correo manda un código al correo nuevo y no lo cambia hasta confirmarlo', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['email' => 'viejo@nuevastic.co'])->assignRole('Administrador');
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, ['email' => 'Nuevo@NuevasTIC.co', 'name' => 'Cristian']))
+        ->assertRedirect(route('profile.edit'));
+
+    $admin->refresh();
+    expect($admin->email)->toBe('viejo@nuevastic.co')
+        ->and($admin->email_pendiente)->toBe('nuevo@nuevastic.co')
+        ->and($admin->name)->toBe('Cristian');
+
+    $this->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $p) => $p->where('usuario.email_pendiente', 'nuevo@nuevastic.co'));
+
+    $codigo = codigoCambio('nuevo@nuevastic.co');
+    $malo = $codigo === '111111' ? '222222' : '111111';
+    $this->post(route('perfil.correo.verificar'), ['codigo' => $malo])->assertSessionHasErrors('codigo');
+    expect($admin->fresh()->email)->toBe('viejo@nuevastic.co');
+
+    $this->post(route('perfil.correo.verificar'), ['codigo' => $codigo])->assertSessionHasNoErrors();
+    expect($admin->fresh()->email)->toBe('nuevo@nuevastic.co')
+        ->and($admin->fresh()->email_pendiente)->toBeNull();
+});
+
+it('cerrar la ventana descarta el correo nuevo', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['email' => 'viejo@nuevastic.co'])->assignRole('Administrador');
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['email' => 'nuevo@nuevastic.co']));
+    $this->post(route('perfil.correo.cancelar'))->assertRedirect(route('profile.edit'));
+
+    expect($admin->fresh()->email)->toBe('viejo@nuevastic.co')
+        ->and($admin->fresh()->email_pendiente)->toBeNull();
+});
+
+it('guardar sin cambiar el correo no manda código', function () {
+    Notification::fake();
+    $admin = User::factory()->create()->assignRole('Administrador');
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['name' => 'Otro nombre']));
+
+    Notification::assertNothingSent();
+    expect($admin->fresh()->email_pendiente)->toBeNull();
+});
+
+it('un colaborador no puede ponerse en Mi perfil el cargo del dueño', function () {
+    $dueno = cuentaDeEmpresa();
+    $dueno->update(['cargo' => 'Gerente']);
+    $colaborador = User::factory()->create(['empresa_id' => $dueno->empresa_id, 'cargo' => 'Ventas'])->assignRole('Colaborador');
+
+    $this->actingAs($colaborador)
+        ->patch(route('profile.update'), datosPerfil($colaborador, ['cargo' => ' GERENTE ']))
+        ->assertSessionHasErrors('cargo');
+
+    expect($colaborador->fresh()->cargo)->toBe('Ventas');
+});
+
+it('el dueño no puede ponerse en Mi perfil el cargo de un colaborador', function () {
+    $dueno = cuentaDeEmpresa();
+    User::factory()->create(['empresa_id' => $dueno->empresa_id, 'name' => 'Andrés Pérez', 'cargo' => 'Marketing'])->assignRole('Colaborador');
+
+    $this->actingAs($dueno)
+        ->patch(route('profile.update'), datosPerfil($dueno, ['cargo' => 'marketing']))
+        ->assertSessionHasErrors(['cargo' => 'Ese cargo ya lo tiene Andrés Pérez. El cargo del dueño de la empresa no se puede repetir.']);
 });

@@ -22,7 +22,13 @@ export type PreguntaResponder = {
     indicacion: string;
     obligatoria: boolean;
     /** `exclusiva`: "Ninguna"; al marcarla se desmarcan las demás. */
-    opciones: { ref: string; texto: string; exclusiva: boolean }[];
+    /** `con_texto`: "Otro"; al elegirla se escribe cuál. */
+    opciones: {
+        ref: string;
+        texto: string;
+        exclusiva: boolean;
+        con_texto: boolean;
+    }[];
 };
 
 export type CategoriaResponder = {

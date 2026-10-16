@@ -45,7 +45,7 @@ class PruebaIa extends Command
     /**
      * Categoría de ejemplo tomada del wireframe E6 (Restaurante La Esquina).
      *
-     * @return array{nombre: string, sector: string, preguntas: list<array{id: string, tipo: string, texto: string, respuesta: string, puntaje: int|null, criterio?: string}>}
+     * @return array{nombre: string, sector: string, preguntas: list<array{id: string, tipo: string, texto: string, respuesta: string, puntaje: int|null, criterio?: string, calificar?: string}>}
      */
     public static function categoriaDeEjemplo(): array
     {
@@ -74,6 +74,7 @@ class PruebaIa extends Command
                     'respuesta' => 'Los contesto yo cuando tengo tiempo, a veces al día siguiente.',
                     'puntaje' => null,
                     'criterio' => 'Más puntaje si responde rápido, con un responsable claro y con mensajes automáticos o plantillas.',
+                    'calificar' => 'Califica esta respuesta con un entero de 0 a 100 según el criterio.',
                 ],
             ],
         ];

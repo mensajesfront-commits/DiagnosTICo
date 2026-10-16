@@ -120,7 +120,11 @@ it('al enviar analiza cada categoría, publica el resultado inmutable y avisa a 
         ->and($resultado->por_categoria[0]['preguntas'][1]['puntaje'])->toBe(100)
         ->and($resultado->por_categoria[0]['preguntas'][2]['puntaje'])->toBe(40)
         ->and($resultado->por_categoria[0]['preguntas'][3]['respuesta'])->toBeNull()
-        ->and($resultado->por_categoria[1]['recomendacion']['titulo'])->toBe('Mejora Automatización');
+        ->and($resultado->por_categoria[1]['recomendacion']['titulo'])->toBe('Mejora Automatización')
+        // La IA de prueba elige el método por el nombre de la categoría.
+        ->and($resultado->por_categoria[0]['metodo']['clave'])->toBe('VRIO')
+        ->and($resultado->por_categoria[0]['metodo']['nombre'])->toBe('VRIO')
+        ->and($resultado->por_categoria[1]['metodo']['clave'])->toBe('DOFA');
 
     // Puntajes y observaciones guardados por respuesta.
     expect(Respuesta::where('medicion_id', $this->medicion->id)->where('pregunta_ref', 'p3')->value('puntaje'))->toBe(40)

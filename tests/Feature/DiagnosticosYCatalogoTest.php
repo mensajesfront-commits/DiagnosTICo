@@ -264,3 +264,38 @@ it('no elimina una categoría que ya tiene respuestas (RN-009)', function () {
     $this->actingAs($this->admin)->delete(route('categorias.destroy', $libre))->assertRedirect();
     expect(Categoria::find($libre->id))->toBeNull();
 });
+
+it('los archivados se ven en su ventana, se restauran y se eliminan si nadie los respondió', function () {
+    $admin = User::factory()->create()->assignRole('Administrador');
+    $sector = Sector::factory()->create();
+    $sinUso = Diagnostico::factory()->publicado()->create(['sector_id' => $sector->id, 'nombre' => 'Sin uso']);
+    $usado = Diagnostico::factory()->publicado()->create(['sector_id' => $sector->id, 'nombre' => 'Usado']);
+    Medicion::factory()->create([
+        'empresa_id' => Empresa::factory()->create(['sector_id' => $sector->id])->id,
+        'version_diagnostico_id' => $usado->versiones()->firstOrFail()->id,
+        'numero' => 1,
+    ]);
+
+    $this->actingAs($admin);
+    $this->post(route('diagnosticos.archivar', $sinUso));
+    $this->post(route('diagnosticos.archivar', $usado));
+
+    $this->get(route('diagnosticos.index', ['sector' => $sector->id]))
+        ->assertInertia(fn (Assert $p) => $p->has('archivados', 2)->has('diagnosticos', 0));
+
+    // Con mediciones no se elimina.
+    $this->delete(route('diagnosticos.eliminar-archivado', $usado))->assertSessionHasErrors('diagnostico');
+    expect(Diagnostico::find($usado->id))->not->toBeNull();
+
+    // Sin mediciones se elimina con sus versiones.
+    $this->delete(route('diagnosticos.eliminar-archivado', $sinUso))->assertSessionHasNoErrors();
+    expect(Diagnostico::find($sinUso->id))->toBeNull();
+
+    // Restaurar lo devuelve a publicados.
+    $this->post(route('diagnosticos.restaurar', $usado))->assertSessionHasNoErrors();
+    expect($usado->fresh()->estado)->toBe(Diagnostico::PUBLICADO)
+        ->and($usado->fresh()->archivado_en)->toBeNull();
+
+    // Un publicado no se borra por esta ruta.
+    $this->delete(route('diagnosticos.eliminar-archivado', $usado))->assertStatus(422);
+});

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
+use App\Models\SolicitudMedicion;
 use App\Models\User;
 use App\Notifications\AvisoMedicion;
 use App\Services\Mediciones\AsignarMedicion;
@@ -41,6 +42,7 @@ class MedicionesController extends Controller
             ->with(['version:id,diagnostico_id,numero', 'version.diagnostico:id,nombre'])
             ->withExists('respuestas')
             ->whereIn('empresa_id', $empresas->modelKeys())->get()->keyBy('empresa_id');
+        $solicitudes = SolicitudMedicion::abiertasDe($empresas->modelKeys());
 
         return Inertia::render('mediciones/Asignar', [
             'empresas' => $empresas->map(fn (Empresa $e) => [
@@ -57,6 +59,8 @@ class MedicionesController extends Controller
                     'version' => $p->version?->numero,
                     'tiene_respuestas' => (bool) $p->getAttribute('respuestas_exists'),
                 ] : null,
+                // HU-083: la empresa pidió una medición nueva (fecha ISO).
+                'solicitud' => $solicitudes[$e->id] ?? null,
                 'siguiente' => ((int) $e->mediciones()->where('estado', '!=', 'cancelada')->max('numero')) + 1,
                 // Para "Para:" y {nombre_usuario} del correo (A3.1e).
                 'principal' => ($u = $principales->get($e->id)) ? ['name' => $u->name, 'email' => $u->email] : null,
@@ -128,6 +132,8 @@ class MedicionesController extends Controller
     {
         $this->soloPendiente($medicion);
         $medicion->forceFill(['estado' => 'cancelada', 'cancelada_en' => now()])->save();
+        // Cancelar la vencida también responde la solicitud de la empresa (HU-083).
+        SolicitudMedicion::atender($medicion->empresa_id);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Medición {$medicion->numero} cancelada."]);
 
@@ -150,6 +156,7 @@ class MedicionesController extends Controller
             : $medicion->estado;
 
         $medicion->forceFill(['fecha_limite' => $datos['fecha_limite'] ?? null, 'estado' => $estado])->save();
+        SolicitudMedicion::atender($medicion->empresa_id);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Nueva fecha para la medición {$medicion->numero}."]);
 

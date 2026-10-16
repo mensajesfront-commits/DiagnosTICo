@@ -6,9 +6,77 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Agregado (cierre funcional, 14 de octubre)
+
+- **HU-083 · Atender las solicitudes de nueva medición:**
+  - aviso en A1 ("N empresas pidieron una medición nueva"), con esas filas primero en Vencidas y "Asignar nueva";
+  - aviso en A3, en la ficha, en A3.4 y en Asignar medición.
+  - Asignar otra medición, darle nueva fecha a la vencida o cancelarla deja la solicitud atendida.
+- **Opción "Otro" que pide escribir cuál:** se elige en A2.1b (se marca sola si empieza por "Otro"). En E2 aparece "¿Cuál?" y la IA lee "Otro: lo que escribió". Columna `opciones.con_texto`.
+- **"Ver:" en la gráfica de evolución** (A3.1, A3.4, E8): puntaje total o una categoría.
+- **A5:** la cuenta principal de una empresa dice qué medición pendiente tiene, para el aviso al desactivarla o cambiarle el rol.
+- **Avisos de Mi perfil (A6, E11):**
+  - cada correo respeta lo que eligió quien lo recibe;
+  - correo nuevo "Una empresa envió su diagnóstico";
+  - resumen semanal de mediciones pendientes (`mediciones:resumen`, lunes 07:50).
+- **Documentos nuevos:**
+  - 07 Reglas de negocio;
+  - 11 Diseño técnico;
+  - 13 API e integraciones;
+  - 16 Infraestructura;
+  - 19 Pruebas;
+  - 20 Despliegue;
+  - 21 Mantenimiento;
+  - 25 Roadmap;
+  - 29 Funcionalidades;
+  - 31 Manual de usuario.
+- Estado de cada historia actualizado en `05_REQUISITOS_FUNCIONALES.md`.
+
+### Agregado (verificación del correo, 16 de octubre)
+
+- **L2b · Verifica tu correo** (DEC-020):
+  - **Captcha** (Cloudflare Turnstile) antes de "Registrar empresa".
+  - Al registrarse no se entra al sistema: se abre una ventana para escribir el **código de 6 dígitos** que llega por correo. Vence en 15 minutos, admite 5 intentos y tiene "Reenviar código".
+  - Al acertar, lleva a Iniciar sesión con el correo escrito.
+  - Si se intenta entrar sin verificar, se abre la misma ventana en L1.
+  - Los registros sin verificar se borran a los 7 días (`cuentas:purgar`).
+  - **Mi perfil:** cambiar el correo también pide el código, enviado al correo nuevo.
+
+### Agregado (diagnósticos archivados, 16 de octubre)
+
+- **A2 · Archivados (N):** junto al título de la tabla se abre la ventana con los diagnósticos archivados del sector o de todos.
+  - **Restaurar** los devuelve a publicados.
+  - **Eliminar** los borra para siempre, con su historial de versiones y doble confirmación. Solo se puede si ninguna empresa los respondió, porque esos resultados se hicieron con ese diagnóstico (RN-010, RN-023).
+
+### Agregado (cargo del dueño único, 16 de octubre)
+
+- **El cargo del dueño de la empresa no se repite.** Ningún colaborador puede tener el cargo de la cuenta principal, ni al crearlo o editarlo (E12) ni desde su Mi perfil (E11). Tampoco el dueño puede tomar el cargo de un colaborador (E11, A3.1d). Se compara sin mayúsculas, tildes ni espacios de más (regla `CargoDelDueno`). Los cargos de los demás colaboradores sí se pueden repetir.
+
+### Agregado (términos de uso y política de datos, 16 de octubre)
+
+- **Borrador de los términos de uso y de la política de tratamiento de datos** (Ley 1581 de 2012), escrito con lo que el sistema hace de verdad: qué datos guarda, que las respuestas van a OpenAI sin el nombre de la empresa, Cloudflare en el captcha, los 7 días sin verificar, los 90 días para recuperar una cuenta, "Ver como" y los plazos para consultas y reclamos.
+- Solo están en L2: se abren en una ventana sin salir del formulario.
+- Lo que NuevasTIC no ha entregado (razón social, NIT, domicilio, vigencia, costo, proveedores) va marcado y resaltado como [INFORMACIÓN PENDIENTE].
+
+### Corregido
+
+- **Teléfono (L2, A3.2, A3.1d, A6, E11):** se elige el indicativo del país y el campo solo acepta los dígitos de ese país (Colombia 10, Argentina 11…). Se guarda como "+57 3001234567" y el servidor valida el largo (`TelefonoValido`, `App\Support\Telefonos`).
+- **Informe PDF:** las etiquetas largas del radar se cortaban en el borde; ahora se parten en dos líneas. La página 1 suma "Tus categorías por nivel" y lo más fuerte y lo más débil, y la página 3 lista, después de las 3 prioridades, las demás categorías con su recomendación.
+- A1 decía "Tiene la medición N en curso" aunque la pendiente no estuviera iniciada.
+
+### Agregado (métodos de análisis y resultado de ejemplo, 14 de octubre)
+
+- **La IA elige el método** de cada categoría según las respuestas (PESTEL, 5 Fuerzas de Porter, VRIO, DOFA o CAME) y el resultado y el PDF muestran cuál usó y por qué (DEC-019).
+- **A2.6 · Resultado de ejemplo** (HU-030): mejor caso, caso medio y peor caso con el mismo cálculo que un resultado real, y el formato del PDF.
+- La IA acepta el puntaje de las abiertas como `45.0` o `"45"` y el error dice qué devolvió si no la califica.
+
 ### Agregado (opción "Ninguna", 13 de octubre)
 
 - En selección múltiple, una opción puede excluir a las demás ("Ninguna", "Nada"): al marcarla se desmarcan las otras, y el servidor no las acepta juntas. Columna `opciones.exclusiva`.
+
+### Agregado ("Ver como", 13 de octubre)
+
+- **A5.4 · "Ver como"** (HU-053, HU-054): desde Usuarios (A5) o la ficha de la empresa (A3.1), el Administrador ve el sistema como otra cuenta, con su menú y sus datos, en solo lectura, con la franja de aviso y "Salir de Ver como". Queda registrado quién lo usó y cuándo (RN-026).
 
 ### Agregado (historial, 13 de octubre)
 

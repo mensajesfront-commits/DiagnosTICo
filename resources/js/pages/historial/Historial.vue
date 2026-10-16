@@ -22,6 +22,7 @@ import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
+import SelectorEvolucion from '@/components/graficas/SelectorEvolucion.vue';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
@@ -33,6 +34,14 @@ const props = defineProps<Historial>();
 const page = usePage();
 const puedeAsignar = computed(() =>
     page.props.auth.permisos.includes('mediciones.asignar'),
+);
+
+// --- "Ver:" de la gráfica: total o una categoría ---------------------------------
+const verCategoria = ref('');
+const puntosEvolucion = computed(
+    () =>
+        props.evolucion_categorias.find((c) => c.nombre === verCategoria.value)
+            ?.puntos ?? props.evolucion,
 );
 
 const fecha = (texto: string | null) =>
@@ -200,17 +209,29 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
         <section
             class="shrink-0 rounded-xl border border-linea bg-white px-5 py-4"
         >
-            <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
                 <h2 class="text-sm font-semibold">
-                    Evolución del puntaje total
+                    {{
+                        verCategoria
+                            ? `Evolución de ${verCategoria}`
+                            : 'Evolución del puntaje total'
+                    }}
                 </h2>
-                <span class="text-xs text-tinta-suave"
+                <SelectorEvolucion
+                    v-if="evolucion.length >= 2"
+                    v-model="verCategoria"
+                    :categorias="evolucion_categorias"
+                />
+                <span v-else class="text-xs text-tinta-suave"
                     >Aparece desde la segunda medición</span
                 >
             </div>
             <!-- La gráfica toma la altura de su contenedor. -->
             <div v-if="evolucion.length >= 2" class="mt-2 h-44">
-                <EvolucionPuntaje :puntos="evolucion" />
+                <EvolucionPuntaje
+                    :key="verCategoria"
+                    :puntos="puntosEvolucion"
+                />
             </div>
             <p
                 v-else

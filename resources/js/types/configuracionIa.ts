@@ -115,6 +115,8 @@ export type ResultadoPrueba = {
             puntaje: number | null;
             observacion: string;
         }[];
+        metodo: string;
+        metodo_motivo: string;
         observacion_categoria: string;
         recomendacion: { titulo: string; detalle: string };
     };
