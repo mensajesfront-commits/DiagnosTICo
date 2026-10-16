@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Rules\CargoDelDueno;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,7 +61,7 @@ class ColaboradoresController extends Controller
         $datos = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             // Área o cargo dentro de la empresa ("Marketing", "Producción").
-            'cargo' => ['required', 'string', 'min:2', 'max:255'],
+            'cargo' => ['required', 'string', 'min:2', 'max:255', new CargoDelDueno($yo->empresa_id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)],
             'password' => ['required', 'string', Password::default()],
         ], [
@@ -101,7 +102,7 @@ class ColaboradoresController extends Controller
 
         $datos = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'cargo' => ['required', 'string', 'min:2', 'max:255'],
+            'cargo' => ['required', 'string', 'min:2', 'max:255', new CargoDelDueno($colaborador->empresa_id, false, $colaborador->id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($colaborador->id)],
             'password' => ['nullable', 'string', Password::default()],
         ], [

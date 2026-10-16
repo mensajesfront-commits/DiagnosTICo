@@ -174,6 +174,53 @@ it('pide una contraseña fuerte al cambiarla', function () {
         ->assertSessionHasErrors('password');
 });
 
+// --- El cargo del dueño no se repite -----------------------------------------
+
+it('no deja crear un colaborador con el cargo del dueño, aunque cambien mayúsculas, tildes o espacios', function () {
+    $laura = empresaConPrincipal();
+    $laura->update(['cargo' => 'Gerente General']);
+
+    foreach (['Gerente General', '  gerente   general ', 'GERENTE GENERAL', 'Gérente General'] as $cargo) {
+        $this->actingAs($laura)
+            ->post(route('colaboradores.store'), [
+                'name' => 'Mariana Díaz',
+                'cargo' => $cargo,
+                'email' => 'mariana@laesquina.co',
+                'password' => 'Mesa-47-Sol',
+            ])
+            ->assertSessionHasErrors(['cargo' => '«Gerente General» es el cargo del dueño de la empresa. Elige otro cargo.']);
+    }
+
+    expect(User::where('email', 'mariana@laesquina.co')->exists())->toBeFalse();
+});
+
+it('no deja cambiar el cargo de un colaborador al del dueño', function () {
+    $laura = empresaConPrincipal();
+    $laura->update(['cargo' => 'Gerente']);
+    $andres = colaboradorDe($laura, ['cargo' => 'Ventas']);
+
+    $this->actingAs($laura)
+        ->put(route('colaboradores.actualizar', $andres), datosDe($andres, ['cargo' => 'gerente']))
+        ->assertSessionHasErrors('cargo');
+
+    expect($andres->fresh()->cargo)->toBe('Ventas');
+});
+
+it('el cargo del dueño de otra empresa sí se puede usar', function () {
+    $otra = empresaConPrincipal('Otra empresa');
+    $otra->update(['cargo' => 'Gerente']);
+    $laura = empresaConPrincipal();
+
+    $this->actingAs($laura)
+        ->post(route('colaboradores.store'), [
+            'name' => 'Mariana Díaz',
+            'cargo' => 'Gerente',
+            'email' => 'mariana@laesquina.co',
+            'password' => 'Mesa-47-Sol',
+        ])
+        ->assertSessionHasNoErrors();
+});
+
 // --- HU-079 · Desactivar y reactivar -----------------------------------------
 
 it('desactiva y reactiva un colaborador', function () {

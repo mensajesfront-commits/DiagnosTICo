@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Empresas;
 
+use App\Rules\CargoDelDueno;
 use App\Rules\TelefonoValido;
 use App\Models\ActividadEconomica;
 use App\Models\Empresa;
@@ -63,7 +64,8 @@ class DatosEmpresaRequest extends FormRequest
             'sitio_web' => ['nullable', 'string', 'url', 'max:255'],
             'numero_empleados' => ['nullable', 'string', Rule::in(OpcionesPerfil::RANGOS_EMPLEADOS)],
             'usuario_nombre' => ['required', 'string', 'max:255'],
-            'cargo' => ['nullable', 'string', 'max:255'],
+            // Cargo del usuario principal: ningún colaborador puede tenerlo.
+            'cargo' => array_filter(['nullable', 'string', 'max:255', $empresa ? new CargoDelDueno($empresa->id, true, $principal?->id) : null]),
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($principal?->id)->withoutTrashed()],
             'usuario_telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
         ];

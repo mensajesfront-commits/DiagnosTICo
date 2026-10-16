@@ -48,6 +48,10 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
   - **Restaurar** los devuelve a publicados.
   - **Eliminar** los borra para siempre, con su historial de versiones y doble confirmación. Solo se puede si ninguna empresa los respondió, porque esos resultados se hicieron con ese diagnóstico (RN-010, RN-023).
 
+### Agregado (cargo del dueño único, 16 de octubre)
+
+- **El cargo del dueño de la empresa no se repite.** Ningún colaborador puede tener el cargo de la cuenta principal, ni al crearlo o editarlo (E12) ni desde su Mi perfil (E11). Tampoco el dueño puede tomar el cargo de un colaborador (E11, A3.1d). Se compara sin mayúsculas, tildes ni espacios de más (regla `CargoDelDueno`). Los cargos de los demás colaboradores sí se pueden repetir.
+
 ### Corregido
 
 - **Teléfono (L2, A3.2, A3.1d, A6, E11):** se elige el indicativo del país y el campo solo acepta los dígitos de ese país (Colombia 10, Argentina 11…). Se guarda como "+57 3001234567" y el servidor valida el largo (`TelefonoValido`, `App\Support\Telefonos`).

@@ -53,7 +53,7 @@ Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validaci
 
 | Regla | Qué exige | Se cumple en | Se ve en | Pruebas |
 |---|---|---|---|---|
-| RN-025 | Colaboradores sin límite, con casi los permisos de la empresa (no crean colaboradores ni cambian los datos de la empresa). Se desactivan con la empresa. | Rol `Colaborador` del seeder, `role:Empresa` en las rutas de E12 y `CerrarSesionCuentaInactiva` | E12, E11 | `ColaboradoresTest`, `PerfilTest` |
+| RN-025 | Colaboradores sin límite, con casi los permisos de la empresa (no crean colaboradores ni cambian los datos de la empresa). Se desactivan con la empresa. Ningún colaborador puede tener el cargo del dueño (cuenta principal), comparado sin mayúsculas, tildes ni espacios de más. | Rol `Colaborador` del seeder, `role:Empresa` en las rutas de E12 y `CerrarSesionCuentaInactiva`; regla `CargoDelDueno` | E12, E11 | `ColaboradoresTest`, `PerfilTest` |
 | RN-026 | "Ver como" es solo de lectura y queda registrado. | Middleware `VerComo` (bloquea todo lo que no sea GET) y tabla `registros_ver_como` | Franja de aviso (`FranjaVerComo`) | `VerComoTest` |
 | RN-027 | Los roles Administrador, Empresa y Colaborador son fijos; cada cuenta tiene un rol; un rol solo se elimina si no tiene cuentas. | `RolesController` y `UsuariosController::cambiarRol` | A5, A5.2–A5.5 | `UsuariosYRolesTest` |
 

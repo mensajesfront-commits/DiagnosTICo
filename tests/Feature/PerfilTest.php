@@ -322,3 +322,24 @@ it('guardar sin cambiar el correo no manda código', function () {
     Notification::assertNothingSent();
     expect($admin->fresh()->email_pendiente)->toBeNull();
 });
+
+it('un colaborador no puede ponerse en Mi perfil el cargo del dueño', function () {
+    $dueno = cuentaDeEmpresa();
+    $dueno->update(['cargo' => 'Gerente']);
+    $colaborador = User::factory()->create(['empresa_id' => $dueno->empresa_id, 'cargo' => 'Ventas'])->assignRole('Colaborador');
+
+    $this->actingAs($colaborador)
+        ->patch(route('profile.update'), datosPerfil($colaborador, ['cargo' => ' GERENTE ']))
+        ->assertSessionHasErrors('cargo');
+
+    expect($colaborador->fresh()->cargo)->toBe('Ventas');
+});
+
+it('el dueño no puede ponerse en Mi perfil el cargo de un colaborador', function () {
+    $dueno = cuentaDeEmpresa();
+    User::factory()->create(['empresa_id' => $dueno->empresa_id, 'name' => 'Andrés Pérez', 'cargo' => 'Marketing'])->assignRole('Colaborador');
+
+    $this->actingAs($dueno)
+        ->patch(route('profile.update'), datosPerfil($dueno, ['cargo' => 'marketing']))
+        ->assertSessionHasErrors(['cargo' => 'Ese cargo ya lo tiene Andrés Pérez. El cargo del dueño de la empresa no se puede repetir.']);
+});
