@@ -19,6 +19,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { Lock, LogOut } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
+import ModalVerificarCorreo from '@/components/auth/ModalVerificarCorreo.vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
@@ -51,6 +52,8 @@ type Usuario = {
     ultimo_acceso_en: string | null;
     creado_en: string | null;
     contrasena_actualizada_en: string | null;
+    /** Correo nuevo que espera el código (DEC-020). */
+    email_pendiente: string | null;
 };
 
 type Empresa = {
@@ -67,6 +70,8 @@ type Empresa = {
 };
 
 const props = defineProps<{
+    /** Aviso del servidor ("Te enviamos un código nuevo"). */
+    status?: string;
     usuario: Usuario;
     rol: string | null;
     empresa: Empresa | null;
@@ -119,6 +124,16 @@ const form = useForm(datosIniciales());
 
 // Al guardar, el servidor devuelve los datos nuevos: pasan a ser los
 // "sin cambios" del formulario.
+// El correo del formulario vuelve al guardado (al cancelar o confirmar el cambio).
+watch(
+    () => [props.usuario.email, props.usuario.email_pendiente] as const,
+    ([correo, pendiente]) => {
+        if (pendiente === null) {
+            form.email = correo;
+        }
+    },
+);
+
 watch(
     () => props.usuario,
     () => {
@@ -399,6 +414,13 @@ function cerrarSesion(): void {
                                     autocomplete="email"
                                     :invalida="!!form.errors.email"
                                 />
+                                <p
+                                    v-if="form.email !== usuario.email"
+                                    class="text-xs text-tinta-suave"
+                                >
+                                    Al guardar te enviaremos un código a este
+                                    correo para confirmarlo.
+                                </p>
                             </Campo>
                             <Campo
                                 etiqueta="Teléfono"
@@ -740,4 +762,17 @@ function cerrarSesion(): void {
             </Boton>
         </template>
     </Modal>
+
+    <ModalVerificarCorreo
+        v-if="usuario.email_pendiente"
+        :key="usuario.email_pendiente"
+        :correo="usuario.email_pendiente"
+        :status="status"
+        :rutas="{
+            verificar: '/mi-perfil/correo/verificar',
+            reenviar: '/mi-perfil/correo/reenviar',
+            cancelar: '/mi-perfil/correo/cancelar',
+        }"
+        cambio
+    />
 </template>

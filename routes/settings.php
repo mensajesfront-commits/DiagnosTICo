@@ -20,6 +20,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('mi-perfil/foto', [PerfilController::class, 'foto'])->name('perfil.foto');
 
+    // Cambiar el correo: se confirma con un código al correo nuevo (DEC-020).
+    Route::post('mi-perfil/correo/verificar', [PerfilController::class, 'verificarCorreo'])
+        ->middleware('throttle:10,1')
+        ->name('perfil.correo.verificar');
+    Route::post('mi-perfil/correo/reenviar', [PerfilController::class, 'reenviarCodigoCorreo'])
+        ->middleware('throttle:3,1')
+        ->name('perfil.correo.reenviar');
+    Route::post('mi-perfil/correo/cancelar', [PerfilController::class, 'cancelarCambioCorreo'])
+        ->name('perfil.correo.cancelar');
+
     Route::get('imagenes/{tipo}/{id}', [PerfilController::class, 'imagen'])
         ->whereIn('tipo', ['usuario', 'empresa'])
         ->whereNumber('id')

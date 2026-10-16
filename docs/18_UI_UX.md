@@ -153,7 +153,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.3 | Al abrir, el panel muestra la primera categoría; con «Cancelar» queda vacío con una indicación. | El wireframe solo muestra el panel con una categoría elegida. |
 | Todas | Dice «Captter» donde el wireframe dice «Diagnóstico Empresarial». | Nombre del sistema decidido por el equipo (6 de octubre). |
 | A6 | La lista de requisitos de la contraseña tiene 5 puntos; el wireframe muestra 3. | RN-001. **[INCONSISTENCIA DETECTADA]** (también en L2 y L4). |
-| E11 | Al cambiar el correo se guarda directo, sin enlace de verificación. | La verificación de correo está quitada (DEC-012). **[FUNCIONALIDAD POR DEFINIR]** |
+| E11 | Al cambiar el correo se confirma con un código de 6 dígitos al correo nuevo, en una ventana. | Resuelto con DEC-020: código en lugar del enlace del wireframe. |
 | E11 | El colaborador ve «Información de empresa» bloqueada, con una nota. | RN-025: solo la cuenta principal cambia esos datos. El wireframe solo muestra la cuenta principal. |
 | A5 | "Ver como" no aparece en las cuentas de Administrador. | Respuesta del equipo (6 oct): "Ver como" es para revisar lo que ven los otros roles. |
 | A5.5 | "Cambiar rol" no ofrece "Colaborador", y a las cuentas internas tampoco "Empresa". | Un colaborador lo crea su empresa (RN-025); una cuenta sin empresa no puede ser Empresa. |

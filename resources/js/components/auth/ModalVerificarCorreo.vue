@@ -7,6 +7,9 @@
  *
  * "Reenviar código" se habilita a los 60 segundos. Cerrar la ventana la
  * deja sin verificar (vuelve a abrirse al intentar entrar).
+ *
+ * Mi perfil (A6, E11) la usa para confirmar un correo nuevo: pasa sus
+ * propias `rutas` y `cambio` (cerrar descarta el cambio).
  */
 import { router, useForm } from '@inertiajs/vue3';
 import { MailCheck } from '@lucide/vue';
@@ -16,13 +19,24 @@ import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
 import { rutas } from '@/lib/rutas';
 
-const props = defineProps<{ correo: string; status?: string }>();
+type Rutas = { verificar: string; reenviar: string; cancelar: string };
+
+const props = withDefaults(
+    defineProps<{
+        correo: string;
+        status?: string;
+        rutas?: Rutas;
+        /** Confirma un correo nuevo en Mi perfil, no un registro. */
+        cambio?: boolean;
+    }>(),
+    { status: undefined, rutas: () => rutas.verificacion, cambio: false },
+);
 
 const abierto = ref(true);
 const form = useForm({ codigo: '' });
 
 function verificar(): void {
-    form.post(rutas.verificacion.verificar, {
+    form.post(props.rutas.verificar, {
         preserveScroll: true,
         onError: () => form.reset('codigo'),
     });
@@ -63,7 +77,7 @@ const reenviando = ref(false);
 
 function reenviar(): void {
     router.post(
-        rutas.verificacion.reenviar,
+        props.rutas.reenviar,
         {},
         {
             preserveScroll: true,
@@ -77,17 +91,24 @@ function reenviar(): void {
 // Cerrar: la cuenta queda sin verificar y se vuelve a Iniciar sesión.
 watch(abierto, (valor) => {
     if (!valor) {
-        router.post(rutas.verificacion.cancelar);
+        router.post(props.rutas.cancelar, {}, { preserveScroll: true });
     }
 });
 </script>
 
 <template>
-    <Modal v-model:abierto="abierto" titulo="Verifica tu correo" ancho="sm">
+    <Modal
+        v-model:abierto="abierto"
+        :titulo="cambio ? 'Confirma tu nuevo correo' : 'Verifica tu correo'"
+        ancho="sm"
+    >
         <template #descripcion>
             Enviamos un código de 6 dígitos a
             <strong class="text-tinta">{{ correo }}</strong
             >.
+            <template v-if="cambio">
+                Hasta confirmarlo sigues entrando con tu correo actual.
+            </template>
         </template>
 
         <form

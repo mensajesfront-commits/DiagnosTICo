@@ -416,6 +416,8 @@ Todo está conectado al backend. `medicion_pendiente` dice la medición pendient
 
 Ruta: `GET /mi-perfil` (ya existe, `PerfilController`). Una sola pantalla para todas las cuentas: con `empresa = null` se ve como A6 (Administrador y roles internos); con empresa, como E11.
 
+- **Cambiar el correo:** al guardar un correo distinto, llega un código al correo nuevo y se abre `ModalVerificarCorreo` (modo `cambio`) mientras `usuario.email_pendiente` tenga valor. Usa `POST /mi-perfil/correo/verificar`, `/reenviar` y `/cancelar`.
+
 | Prop | Tipo | Nota |
 |---|---|---|
 | `usuario` | objeto | `name`, `email`, `cargo`, `telefono`, `pais`, `departamento`, `ciudad`, `zona_horaria`, `idioma`, `avisos` (clave → sí/no), `foto_url`, `ultimo_acceso_en`, `creado_en`, `contrasena_actualizada_en` |

@@ -231,4 +231,8 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - **[INFORMACIÓN PENDIENTE]** Las llaves reales las crea NuevasTIC con su cuenta de Cloudflare si pone el sistema en línea.
 - **Por qué:** evitar cuentas con correos falsos o que no existen, y registros hechos por robots.
 - **Registros sin verificar:** la tarea diaria `cuentas:purgar` los borra a los 7 días, con su empresa si no tiene otra cuenta. Así el correo queda libre para registrarse otra vez. Se cambia con `DIAS_REGISTRO_SIN_VERIFICAR`. Las invitaciones sin contraseña no cuentan.
-- **Sigue sin verificación** el cambio de correo en Mi perfil (E11).
+- **Cambio de correo en Mi perfil (A6, E11):**
+  - Al guardar un correo distinto, los demás cambios se guardan, pero el correo no cambia todavía.
+  - Llega un código al correo nuevo y se abre la ventana "Confirma tu nuevo correo".
+  - Hasta confirmarlo se sigue entrando con el anterior.
+  - Cerrar la ventana descarta el cambio (`users.email_pendiente`).

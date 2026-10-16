@@ -40,6 +40,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
   - Al acertar, lleva a Iniciar sesión con el correo escrito.
   - Si se intenta entrar sin verificar, se abre la misma ventana en L1.
   - Los registros sin verificar se borran a los 7 días (`cuentas:purgar`).
+  - **Mi perfil:** cambiar el correo también pide el código, enviado al correo nuevo.
 
 ### Corregido
 

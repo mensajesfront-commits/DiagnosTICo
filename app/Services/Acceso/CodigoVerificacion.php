@@ -5,11 +5,12 @@ namespace App\Services\Acceso;
 use App\Models\User;
 use App\Notifications\CodigoVerificacionCorreo;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 
 /**
- * L2b · Código de 6 dígitos para verificar el correo al registrarse
- * (DEC-020). Se guarda cifrado; vence en 15 minutos y admite 5 intentos.
- * Pedir otro reemplaza al anterior.
+ * Código de 6 dígitos para confirmar un correo (DEC-020): al registrarse
+ * (L2b) y al cambiar el correo en Mi perfil (A6, E11). Se guarda cifrado;
+ * vence en 15 minutos y admite 5 intentos. Pedir otro reemplaza al anterior.
  */
 class CodigoVerificacion
 {
@@ -17,8 +18,11 @@ class CodigoVerificacion
 
     public const int INTENTOS = 5;
 
-    /** Crea un código nuevo y lo manda al correo de la cuenta. */
-    public function enviar(User $usuario): void
+    /**
+     * Crea un código nuevo y lo manda al correo de la cuenta o, al cambiarlo
+     * en Mi perfil, al correo nuevo (`$destino`).
+     */
+    public function enviar(User $usuario, ?string $destino = null): void
     {
         $codigo = (string) random_int(100000, 999999);
 
@@ -29,7 +33,11 @@ class CodigoVerificacion
         ])->save();
 
         // Al momento, no en la cola: la persona lo está esperando.
-        $usuario->notifyNow(new CodigoVerificacionCorreo($codigo));
+        if ($destino !== null) {
+            Notification::route('mail', $destino)->notifyNow(new CodigoVerificacionCorreo($codigo, $usuario->name, cambio: true));
+        } else {
+            $usuario->notifyNow(new CodigoVerificacionCorreo($codigo, $usuario->name));
+        }
     }
 
     /** ¿Tiene un código que todavía sirve? */
@@ -50,6 +58,21 @@ class CodigoVerificacion
             return null;
         }
 
+        $error = $this->comprobar($usuario, $codigo);
+
+        if ($error === null) {
+            $usuario->forceFill(['email_verified_at' => now()])->save();
+        }
+
+        return $error;
+    }
+
+    /**
+     * Comprueba el código sin decidir qué se confirma. Si sirve, lo borra y
+     * devuelve null; si no, cuenta el intento y devuelve el mensaje.
+     */
+    public function comprobar(User $usuario, string $codigo): ?string
+    {
         if ($usuario->codigo_verificacion === null || ! $usuario->codigo_vence_en?->isFuture()) {
             return 'El código venció. Pide uno nuevo con "Reenviar código".';
         }
@@ -68,7 +91,6 @@ class CodigoVerificacion
         }
 
         $usuario->forceFill([
-            'email_verified_at' => now(),
             'codigo_verificacion' => null,
             'codigo_vence_en' => null,
             'codigo_intentos' => 0,

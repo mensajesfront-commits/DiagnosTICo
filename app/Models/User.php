@@ -37,6 +37,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $invitacion_enviada_en
  * @property Carbon|null $email_verified_at
  * @property string|null $codigo_verificacion Código de verificación cifrado (L2b)
+ * @property string|null $email_pendiente Correo nuevo de Mi perfil, sin confirmar
  * @property Carbon|null $codigo_vence_en
  * @property int $codigo_intentos
  * @property string|null $password
