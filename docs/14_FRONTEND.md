@@ -55,6 +55,8 @@ resources/js/
 
 ## Componentes base
 
+- `CampoTelefono`: indicativo del país y número con el largo de ese país (`lib/telefonos.ts`, la misma lista que `App\Support\Telefonos`). Lo usan L2, A3.2, A3.1d, A6 y E11.
+
 | Componente | Para qué |
 |---|---|
 | `Boton` | Primario, secundario, enlace o peligro. Con `href` es un enlace de Inertia. |

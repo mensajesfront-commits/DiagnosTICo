@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Empresas;
 
+use App\Rules\TelefonoValido;
 use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
@@ -58,13 +59,13 @@ class DatosEmpresaRequest extends FormRequest
             'pais' => ['required', 'string', Rule::in(Ubicaciones::nombresDePaises())],
             'departamento' => ['required', 'string', new DepartamentoDelPais($this->string('pais')->value())],
             'ciudad' => ['required', 'string', 'min:2', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:30'],
+            'telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
             'sitio_web' => ['nullable', 'string', 'url', 'max:255'],
             'numero_empleados' => ['nullable', 'string', Rule::in(OpcionesPerfil::RANGOS_EMPLEADOS)],
             'usuario_nombre' => ['required', 'string', 'max:255'],
             'cargo' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($principal?->id)->withoutTrashed()],
-            'usuario_telefono' => ['nullable', 'string', 'max:30'],
+            'usuario_telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
         ];
 
         if ($empresa === null) {

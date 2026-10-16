@@ -26,6 +26,7 @@ import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import CampoContrasena from '@/components/base/CampoContrasena.vue';
+import CampoTelefono from '@/components/base/CampoTelefono.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
@@ -390,12 +391,11 @@ const pasos = [
                     opcional
                     :error="form.errors.telefono"
                 >
-                    <Entrada
+                    <CampoTelefono
                         id="telefono"
                         v-model="form.telefono"
-                        type="tel"
-                        autocomplete="tel"
-                        placeholder="+57 300 000 0000"
+                        :pais="form.pais"
+                        :invalida="!!form.errors.telefono"
                     />
                 </Campo>
 

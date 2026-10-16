@@ -40,7 +40,7 @@ class RegistrationTest extends TestCase
             'name' => 'Laura Gómez',
             'cargo' => 'Gerente',
             'email' => 'laura@rojas.co',
-            'telefono' => '+57 300 000 0000',
+            'telefono' => '+57 3000000000',
             'password' => 'Clave123!',
             'password_confirmation' => 'Clave123!',
             'terminos' => '1',

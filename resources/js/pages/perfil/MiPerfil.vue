@@ -22,6 +22,7 @@ import { computed, ref, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
+import CampoTelefono from '@/components/base/CampoTelefono.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Interruptor from '@/components/base/Interruptor.vue';
 import Modal from '@/components/base/Modal.vue';
@@ -402,13 +403,14 @@ function cerrarSesion(): void {
                             <Campo
                                 etiqueta="Teléfono"
                                 para="perfil-telefono"
+                                opcional
                                 :error="form.errors.telefono"
                             >
-                                <Entrada
+                                <CampoTelefono
                                     id="perfil-telefono"
                                     v-model="form.telefono"
-                                    type="tel"
-                                    autocomplete="tel"
+                                    :pais="form.pais || form.empresa?.pais"
+                                    :invalida="!!form.errors.telefono"
                                 />
                             </Campo>
 

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Rules\TelefonoValido;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\ActividadEconomica;
@@ -56,7 +57,7 @@ class CreateNewUser implements CreatesNewUsers
             'ciudad' => ['required', 'string', 'min:2', 'max:255'],
             ...$this->profileRules(),
             'cargo' => ['required', 'string', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:30'],
+            'telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
             'password' => $this->passwordRules(),
             'terminos' => ['accepted'],
         ], [], [
