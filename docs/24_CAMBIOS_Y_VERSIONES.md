@@ -39,6 +39,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
   - Al registrarse no se entra al sistema: se abre una ventana para escribir el **código de 6 dígitos** que llega por correo. Vence en 15 minutos, admite 5 intentos y tiene "Reenviar código".
   - Al acertar, lleva a Iniciar sesión con el correo escrito.
   - Si se intenta entrar sin verificar, se abre la misma ventana en L1.
+  - Los registros sin verificar se borran a los 7 días (`cuentas:purgar`).
 
 ### Corregido
 

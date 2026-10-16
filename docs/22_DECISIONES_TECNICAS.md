@@ -230,5 +230,5 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - `CAPTCHA_ACTIVO=false` lo apaga; las pruebas automáticas lo apagan.
   - **[INFORMACIÓN PENDIENTE]** Las llaves reales las crea NuevasTIC con su cuenta de Cloudflare si pone el sistema en línea.
 - **Por qué:** evitar cuentas con correos falsos o que no existen, y registros hechos por robots.
-- **[FUNCIONALIDAD POR DEFINIR]** Qué hacer con los registros que nunca se verifican: por ahora quedan sin poder entrar y la empresa aparece en A3.
+- **Registros sin verificar:** la tarea diaria `cuentas:purgar` los borra a los 7 días, con su empresa si no tiene otra cuenta. Así el correo queda libre para registrarse otra vez. Se cambia con `DIAS_REGISTRO_SIN_VERIFICAR`. Las invitaciones sin contraseña no cuentan.
 - **Sigue sin verificación** el cambio de correo en Mi perfil (E11).

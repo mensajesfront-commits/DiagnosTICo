@@ -163,3 +163,27 @@ it('crear la contraseña desde una invitación también verifica el correo', fun
 
     expect($invitada->fresh()->hasVerifiedEmail())->toBeTrue();
 });
+
+it('borra a los 7 días el registro sin verificar con su empresa; el verificado y la invitación se quedan', function () {
+    registrar($this);
+    $laura = User::where('email', 'laura@rojas.co')->firstOrFail();
+    $empresaId = $laura->empresa_id;
+    $verificada = User::factory()->create(['email' => 'ok@empresa.co']);
+    $invitada = User::factory()->unverified()->create(['password' => null]);
+
+    $this->travel(6)->days();
+    $this->artisan('cuentas:purgar')->assertSuccessful();
+    expect(User::find($laura->id))->not->toBeNull();
+
+    $this->travel(2)->days();
+    $this->artisan('cuentas:purgar')->assertSuccessful();
+
+    expect(User::withTrashed()->find($laura->id))->toBeNull()
+        ->and(App\Models\Empresa::withTrashed()->find($empresaId))->toBeNull()
+        ->and(User::find($verificada->id))->not->toBeNull()
+        ->and(User::find($invitada->id))->not->toBeNull();
+
+    // El correo queda libre para registrarse otra vez.
+    $this->flushSession();
+    registrar($this)->assertSessionHasNoErrors();
+});
