@@ -4,23 +4,28 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Http\Controllers\VerificacionCorreoController;
 use App\Http\Responses\AvisoRecuperacionResponse;
+use App\Http\Responses\RegistroResponse;
 use App\Models\Sector;
 use App\Models\User;
 use App\Support\Fechas;
 use App\Support\Ubicaciones;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Fortify\Contracts\FailedPasswordResetLinkRequestResponse;
+use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Contracts\SuccessfulPasswordResetLinkRequestResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
@@ -35,6 +40,8 @@ class FortifyServiceProvider extends ServiceProvider
         // RN-005: mismo aviso exista o no el correo.
         $this->app->bind(FailedPasswordResetLinkRequestResponse::class, AvisoRecuperacionResponse::class);
         $this->app->bind(SuccessfulPasswordResetLinkRequestResponse::class, AvisoRecuperacionResponse::class);
+        // L2b: después de registrarse se espera la verificación del correo.
+        $this->app->bind(RegisterResponse::class, RegistroResponse::class);
     }
 
     /**
@@ -47,6 +54,7 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
         $this->configureLogin();
         $this->configureResetEmail();
+        $this->configureVerificationEmail();
     }
 
     /**
@@ -78,6 +86,14 @@ class FortifyServiceProvider extends ServiceProvider
                 throw ValidationException::withMessages(['cuenta_desactivada' => trans('auth.desactivada')]);
             }
 
+            // L2b: sin verificar el correo no se entra. Solo lo sabe quien
+            // escribió la contraseña correcta (RN-005).
+            if (! $usuario->hasVerifiedEmail()) {
+                $request->session()->put(VerificacionCorreoController::LLAVE, $usuario->email);
+
+                throw ValidationException::withMessages(['correo_sin_verificar' => "Primero confirma tu correo: te enviamos un enlace a {$usuario->email}."]);
+            }
+
             return $usuario;
         });
     }
@@ -86,6 +102,24 @@ class FortifyServiceProvider extends ServiceProvider
      * Correo de "¿Olvidaste tu contraseña?" en español y con el nombre del
      * sistema. El enlace no vence por tiempo (RN-006, config/auth.php).
      */
+    private function configureVerificationEmail(): void
+    {
+        // El enlace no pide sesión (se abre desde el correo) y vence en 24 horas.
+        VerifyEmail::createUrlUsing(fn (User $usuario): string => URL::temporarySignedRoute(
+            'verificacion.confirmar',
+            now()->addDay(),
+            ['id' => $usuario->getKey(), 'hash' => sha1($usuario->getEmailForVerification())],
+        ));
+
+        VerifyEmail::toMailUsing(fn (object $usuario, string $url): MailMessage => (new MailMessage)
+            ->subject('Confirma tu correo en '.config('app.name'))
+            ->greeting('Hola, '.($usuario->name ?? '').':')
+            ->line('Recibimos el registro de tu empresa. Para activar la cuenta, confirma que este correo es tuyo.')
+            ->action('Verificar mi correo', $url)
+            ->line('El enlace vence en 24 horas. Si no te registraste, ignora este correo: la cuenta no se activará.')
+            ->salutation('El equipo de NuevasTIC'));
+    }
+
     private function configureResetEmail(): void
     {
         ResetPassword::toMailUsing(function (object $usuario, string $token): MailMessage {
@@ -123,6 +157,8 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(fn (Request $request) => Inertia::render('auth/Login', [
             'canResetPassword' => Features::enabled(Features::resetPasswords()),
             'status' => $request->session()->get('status'),
+            // Recién verificado (L2b): el correo ya va escrito.
+            'correo' => $request->session()->get(VerificacionCorreoController::VERIFICADO),
         ]));
 
         Fortify::resetPasswordView(fn (Request $request) => Inertia::render('auth/ResetPassword', [

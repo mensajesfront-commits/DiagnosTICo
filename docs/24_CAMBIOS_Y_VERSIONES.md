@@ -32,6 +32,10 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
   - 31 Manual de usuario.
 - Estado de cada historia actualizado en `05_REQUISITOS_FUNCIONALES.md`.
 
+### Agregado (verificación del correo, 16 de octubre)
+
+- **L2b · Verifica tu correo** (DEC-020): al registrarse no se entra hasta confirmar el correo. Llega "Verificar mi correo" (vence en 24 horas) y el enlace lleva a Iniciar sesión con el correo escrito. "Reenviar el correo" en L2b y aviso en L1 si se intenta entrar sin verificar.
+
 ### Corregido
 
 - **Teléfono (L2, A3.2, A3.1d, A6, E11):** se elige el indicativo del país y el campo solo acepta los dígitos de ese país (Colombia 10, Argentina 11…). Se guarda como "+57 3001234567" y el servidor valida el largo (`TelefonoValido`, `App\Support\Telefonos`).

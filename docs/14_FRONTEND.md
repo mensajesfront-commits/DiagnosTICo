@@ -115,6 +115,10 @@ Envía a `POST /register`:
 
 Ya funciona de punta a punta: `Fortify::registerView` entrega `sectores` y `paises`, y `CreateNewUser` crea la empresa y el usuario principal con el rol Empresa en una sola transacción (T-047, versión mínima; ver `15_BACKEND.md`).
 
+### L2b · Verifica tu correo (`auth/VerificarCorreo`)
+
+Ruta: `GET /verifica-tu-correo`. Props: `correo` y `status`. Después de "Crear cuenta" muestra a qué correo se mandó el enlace, los 3 pasos y "Reenviar el correo" (`POST /verifica-tu-correo/reenviar`). L1 recibe `correo` (ya escrito) al volver del enlace y muestra el aviso `correo_sin_verificar` con "Reenviar el correo".
+
 ### L3 · ¿Olvidaste tu contraseña? (`auth/ForgotPassword`)
 
 | Prop | Tipo | Nota |

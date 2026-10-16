@@ -66,6 +66,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 |---|---|---|---|
 | L1 | Iniciar sesión | `pages/auth/Login.vue` | Hecha |
 | L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha y conectada (dos pasos, DEC-015 y DEC-016) |
+| L2b | Verifica tu correo | `pages/auth/VerificarCorreo.vue` | Hecha y conectada. Sin wireframe: pedido del equipo (DEC-020) |
 | L3 | ¿Olvidaste tu contraseña? | `pages/auth/ForgotPassword.vue` | Hecha |
 | L4 | Crea una contraseña nueva | `pages/auth/ResetPassword.vue` | Hecha |
 | A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada, con todas sus acciones |

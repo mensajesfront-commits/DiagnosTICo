@@ -123,3 +123,10 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 - Las claves (OpenAI, correo, base de datos) van solo en `.env`, que no se sube al repositorio.
 - `.env.example` lleva placeholders y un comentario por variable.
 - Antes de entregar se revisa que ninguna clave haya quedado en el código (T-147).
+
+## Verificación del correo (L2b, DEC-020)
+
+- **Registro:** una empresa que se registra (L2) no entra hasta verificar su correo. El enlace es una URL firmada que vence en 24 horas (`verificacion.confirmar`, 10 por minuto) y comprueba el `sha1` del correo.
+- **Inicio de sesión:** sin verificar, Fortify rechaza la entrada con `correo_sin_verificar`. Solo se avisa con la contraseña correcta, así no se revela qué correos existen (RN-005).
+- **Reenvío:** "Reenviar el correo" solo funciona para el correo guardado en la sesión de quien se registró o intentó entrar con la contraseña correcta (3 por minuto).
+

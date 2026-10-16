@@ -24,9 +24,11 @@ class ResetUserPassword implements ResetsUserPasswords
 
         // También completa una invitación (A5): la cuenta queda activa con su
         // primera contraseña.
+        // El enlace llegó a su correo: eso también lo verifica.
         $user->forceFill([
             'password' => $input['password'],
             'contrasena_actualizada_en' => now(),
+            'email_verified_at' => $user->email_verified_at ?? now(),
         ])->save();
     }
 }

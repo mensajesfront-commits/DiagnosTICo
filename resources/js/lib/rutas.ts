@@ -8,6 +8,10 @@
  */
 
 export const rutas = {
+    verificacion: {
+        aviso: '/verifica-tu-correo',
+        reenviar: '/verifica-tu-correo/reenviar',
+    },
     diagnosticos: {
         todos: () => '/diagnosticos',
         sector: (sectorId: number) => `/diagnosticos?sector=${sectorId}`,

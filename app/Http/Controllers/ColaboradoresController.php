@@ -76,7 +76,8 @@ class ColaboradoresController extends Controller
                 'empresa_id' => $yo->empresa_id,
                 'activo' => true,
             ]);
-            $colaborador->forceFill(['contrasena_actualizada_en' => now()])->save();
+            // Lo crea su empresa, que ya verificó su correo: no pasa por la verificación.
+            $colaborador->forceFill(['contrasena_actualizada_en' => now(), 'email_verified_at' => now()])->save();
             $colaborador->assignRole('Colaborador');
 
             return $colaborador;

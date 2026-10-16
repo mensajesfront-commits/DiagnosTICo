@@ -16,6 +16,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
 use App\Http\Controllers\UsuariosController;
+use App\Http\Controllers\VerificacionCorreoController;
 use App\Http\Controllers\VerComoController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,17 @@ Route::get('ubicaciones/{pais}', [UbicacionesController::class, 'show'])
     ->where('pais', '[A-Za-z]{2}')
     ->middleware('throttle:60,1')
     ->name('ubicaciones.pais');
+
+// L2b · Verificar el correo al registrarse. Sin sesión: la cuenta no entra
+// hasta verificar, y el enlace se abre desde el correo.
+Route::get('verifica-tu-correo', [VerificacionCorreoController::class, 'aviso'])->name('verificacion.aviso');
+Route::post('verifica-tu-correo/reenviar', [VerificacionCorreoController::class, 'reenviar'])
+    ->middleware('throttle:3,1')
+    ->name('verificacion.reenviar');
+Route::get('verificar-correo/{id}/{hash}', [VerificacionCorreoController::class, 'confirmar'])
+    ->whereNumber('id')
+    ->middleware('throttle:10,1')
+    ->name('verificacion.confirmar');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // A5.4 · Salir de "Ver como" (el middleware VerComo la deja pasar).

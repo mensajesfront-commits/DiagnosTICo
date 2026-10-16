@@ -17,13 +17,14 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-009 | Guzzle 7 en lugar de Guzzle 8 | Vigente |
 | DEC-010 | Fuentes IBM Plex servidas desde el proyecto | Vigente |
 | DEC-011 | Chromium instalado con Playwright en la imagen de Sail | Vigente |
-| DEC-012 | Del kit solo se deja el registro; sin modo oscuro | Vigente |
+| DEC-012 | Del kit solo se deja el registro; sin modo oscuro | Cambiada el 16 oct: el registro verifica el correo (DEC-020) |
 | DEC-013 | La llamada real a OpenAI se prueba cuando se use la IA | Vigente |
 | DEC-014 | Reglas de acceso propias sobre Fortify | Vigente |
 | DEC-015 | Registro en dos pasos y actividad económica CIIU | Vigente |
 | DEC-016 | País, departamento y ciudad en cascada | Vigente |
 | DEC-017 | Eliminar cuentas con 90 días para recuperarlas | Vigente |
 | DEC-018 | Catálogo CIIU Rev. 5 A.C. y subsectores por división | Vigente |
+| DEC-020 | Verificar el correo al registrarse | Vigente |
 
 ---
 
@@ -209,3 +210,19 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - La guía de cuándo usar cada uno está en las instrucciones generales por defecto (`ArmadorPrompt::GENERAL`, "Detalles y restricciones") y en el formato fijo, que se envía siempre aunque el Administrador cambie las instrucciones. Los métodos están en `App\Support\MetodosAnalisis`.
 - **Por qué:** lo pidió el equipo (14 de octubre de 2026): el análisis no puede ser siempre DOFA; depende de las respuestas.
 - **Ojo:** **[INCONSISTENCIA DETECTADA]** RN-028 dice que el resultado no incluye análisis FODA. No se muestra una matriz FODA, solo el nombre del método que guió el análisis y por qué. Falta que NuevasTIC confirme que esto no choca con RN-028.
+
+### DEC-020 — Verificar el correo al registrarse
+
+- **Decisión (pedido de Cristian, 16 de octubre de 2026):**
+  - Al pulsar "Crear cuenta" (L2) la cuenta se crea, pero no se entra al sistema.
+  - Se abre "Verifica tu correo" (L2b) y llega un correo con "Verificar mi correo".
+  - El enlace vence en 24 horas, no pide sesión y lleva a Iniciar sesión con el correo ya escrito. La contraseña se escribe otra vez, por seguridad.
+  - Sin verificar no se inicia sesión. El aviso solo aparece con la contraseña correcta (RN-005).
+- **Quién no pasa por la verificación:**
+  - **Invitaciones (A5, A3.2):** crear la contraseña desde el enlace del correo ya prueba el correo.
+  - **Colaboradores (E12):** los crea su empresa, que ya está verificada.
+  - **Cuentas anteriores a este cambio:** quedan verificadas (migración `2026_10_16_000001`).
+- **Por qué:** evitar cuentas con correos falsos o que no existen.
+- **[FUNCIONALIDAD POR DEFINIR]** Qué hacer con los registros que nunca se verifican: por ahora quedan sin poder entrar y la empresa aparece en A3. Se podrían borrar solos a los N días.
+- **Sigue sin verificación** el cambio de correo en Mi perfil (E11).
+

@@ -80,8 +80,9 @@ class RegistrationTest extends TestCase
 
         $response = $this->post(route('register.store'), $this->datos($sector));
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        // L2b: no entra hasta verificar el correo.
+        $this->assertGuest();
+        $response->assertRedirect(route('verificacion.aviso', absolute: false));
 
         $usuario = User::where('email', 'laura@rojas.co')->firstOrFail();
         $this->assertTrue($usuario->hasRole('Empresa'));
@@ -114,9 +115,8 @@ class RegistrationTest extends TestCase
         $sector = Sector::factory()->create();
 
         $this->post(route('register.store'), $this->datos($sector, ['actividad_economica_id' => null]))
-            ->assertSessionHasNoErrors();
-
-        $this->assertAuthenticated();
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('verificacion.aviso', absolute: false));
     }
 
     public function test_description_and_job_title_are_required()

@@ -10,9 +10,13 @@
  *   contraseña correcta (RN-004, RN-025).
  * - `bloqueo` (segundos que faltan): 5 intentos fallidos en un minuto. El
  *   botón queda desactivado hasta que termina la cuenta regresiva.
+ *
+ * L2b: `correo_sin_verificar` (con la contraseña correcta) avisa que falta
+ * confirmar el correo y enlaza a "Verifica tu correo" para reenviarlo. Al
+ * volver del enlace de verificación, `correo` llega ya escrito.
  */
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
-import { onBeforeUnmount, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import ModalAccesoBloqueado from '@/components/auth/ModalAccesoBloqueado.vue';
 import ModalCuentaDesactivada from '@/components/auth/ModalCuentaDesactivada.vue';
 import Aviso from '@/components/base/Aviso.vue';
@@ -20,6 +24,7 @@ import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Entrada from '@/components/base/Entrada.vue';
+import { rutas } from '@/lib/rutas';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
@@ -31,11 +36,22 @@ defineOptions({
     },
 });
 
-defineProps<{
+const props = defineProps<{
     /** Aviso que deja el servidor, por ejemplo "Contraseña actualizada" (HU-004). */
     status?: string;
     canResetPassword: boolean;
+    /** Correo recién verificado (L2b). */
+    correo?: string | null;
 }>();
+
+const correoEscrito = ref(props.correo ?? '');
+
+/** L2b: entró con la contraseña correcta pero no ha verificado el correo. */
+const sinVerificar = computed(
+    () =>
+        (page.props.errors as Record<string, string> | undefined)
+            ?.correo_sin_verificar,
+);
 
 const page = usePage();
 
@@ -92,6 +108,19 @@ onBeforeUnmount(() => clearInterval(reloj));
     <Head title="Iniciar sesión" />
 
     <Aviso v-if="status" tono="exito" class="mb-5">{{ status }}</Aviso>
+    <Aviso
+        v-if="sinVerificar"
+        tono="info"
+        titulo="Falta verificar tu correo"
+        class="mb-5"
+    >
+        {{ sinVerificar }}
+        <Link
+            :href="rutas.verificacion.aviso"
+            class="font-medium underline underline-offset-2"
+            >Reenviar el correo</Link
+        >
+    </Aviso>
 
     <Form
         v-bind="store.form()"
@@ -102,6 +131,7 @@ onBeforeUnmount(() => clearInterval(reloj));
         <Campo obligatorio etiqueta="Correo" para="email" :error="errors.email">
             <Entrada
                 id="email"
+                v-model="correoEscrito"
                 type="email"
                 name="email"
                 required
