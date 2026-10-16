@@ -9801,7 +9801,7 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-019 — Eliminar o archivar una categoría | RF-010 | Hecha |
 | HU-020 — Crear un diagnóstico | RF-011 | Hecha |
 | HU-021 — Duplicar un diagnóstico | RF-011 | Hecha |
-| HU-022 — Archivar o eliminar un diagnóstico | RF-011 | Hecha |
+| HU-022 — Archivar o eliminar un diagnóstico | RF-011 | Hecha (los archivados se ven en "Archivados (N)" de A2: se restauran o, si nadie los respondió, se eliminan) |
 | HU-023 — Ver y ordenar el contenido del diagnóstico | RF-012 | Hecha |
 | HU-024 — Agregar una pregunta | RF-013 | Hecha |
 | HU-025 — Editar o eliminar una pregunta | RF-013 | Hecha |

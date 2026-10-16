@@ -203,6 +203,8 @@ Comportamiento:
 
 **Subsectores del sector (DEC-018):** el modal de crear o editar sector (`ModalSector`, A2.2a / A2.2) tiene "Subsectores · división CIIU", un `Combobox` con las 87 divisiones (prop `divisionesCiiu` de A2). Si el nombre escrito es exactamente el de una división, se elige sola. Envía `ciiu_division`. Cada `Sector` trae `ciiu_division` y `subsectores` (cuántos activos).
 
+- **Archivados (N):** botón en el encabezado de la tabla que abre `modales/ModalArchivados.vue`. Recibe la prop `archivados: DiagnosticoArchivado[]` (del sector o de todos). Tiene "Restaurar" (`POST /diagnosticos/{id}/restaurar`) y "Eliminar", con segunda confirmación (`DELETE /diagnosticos/{id}/archivado`). Eliminar está deshabilitado si el diagnóstico tiene mediciones.
+
 ### A2.3 · Catálogo de categorías (`categorias/Index`)
 
 Ruta: `GET /categorias`.

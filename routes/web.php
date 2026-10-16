@@ -70,6 +70,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('diagnosticos', [DiagnosticosController::class, 'guardar'])->name('diagnosticos.guardar');
         Route::post('diagnosticos/{diagnostico}/duplicar', [DiagnosticosController::class, 'duplicar'])->name('diagnosticos.duplicar');
         Route::post('diagnosticos/{diagnostico}/archivar', [DiagnosticosController::class, 'archivar'])->name('diagnosticos.archivar');
+        Route::post('diagnosticos/{diagnostico}/restaurar', [DiagnosticosController::class, 'restaurar'])->name('diagnosticos.restaurar');
+        Route::delete('diagnosticos/{diagnostico}/archivado', [DiagnosticosController::class, 'eliminarArchivado'])->name('diagnosticos.eliminar-archivado');
         Route::delete('diagnosticos', [DiagnosticosController::class, 'eliminarVarios'])->name('diagnosticos.eliminar-varios');
         Route::delete('diagnosticos/{diagnostico}/borrador', [DiagnosticosController::class, 'eliminarBorrador'])->name('diagnosticos.eliminar-borrador');
         Route::delete('diagnosticos/{diagnostico}', [DiagnosticosController::class, 'eliminar'])->name('diagnosticos.eliminar');

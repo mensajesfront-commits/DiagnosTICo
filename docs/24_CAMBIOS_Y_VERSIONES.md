@@ -42,6 +42,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
   - Los registros sin verificar se borran a los 7 días (`cuentas:purgar`).
   - **Mi perfil:** cambiar el correo también pide el código, enviado al correo nuevo.
 
+### Agregado (diagnósticos archivados, 16 de octubre)
+
+- **A2 · Archivados (N):** junto al título de la tabla se abre la ventana con los diagnósticos archivados del sector o de todos.
+  - **Restaurar** los devuelve a publicados.
+  - **Eliminar** los borra para siempre, con su historial de versiones y doble confirmación. Solo se puede si ninguna empresa los respondió, porque esos resultados se hicieron con ese diagnóstico (RN-010, RN-023).
+
 ### Corregido
 
 - **Teléfono (L2, A3.2, A3.1d, A6, E11):** se elige el indicativo del país y el campo solo acepta los dígitos de ese país (Colombia 10, Argentina 11…). Se guarda como "+57 3001234567" y el servidor valida el largo (`TelefonoValido`, `App\Support\Telefonos`).
