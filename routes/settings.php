@@ -18,14 +18,6 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('throttle:6,1')
         ->name('user-password.update');
 
-    // "¿Olvidaste tu contraseña?": código al correo de la cuenta.
-    Route::post('mi-perfil/contrasena/codigo', [PerfilController::class, 'codigoContrasena'])
-        ->middleware('throttle:3,1')
-        ->name('perfil.contrasena.codigo');
-    Route::put('mi-perfil/contrasena/con-codigo', [PerfilController::class, 'contrasenaConCodigo'])
-        ->middleware('throttle:10,1')
-        ->name('perfil.contrasena.con-codigo');
-
     Route::post('mi-perfil/foto', [PerfilController::class, 'foto'])->name('perfil.foto');
 
     // Cambiar el correo: se confirma con un código al correo nuevo (DEC-020).

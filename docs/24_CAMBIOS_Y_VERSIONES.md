@@ -41,7 +41,6 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
   - Si se intenta entrar sin verificar, se abre la misma ventana en L1.
   - Los registros sin verificar se borran a los 7 días (`cuentas:purgar`).
   - **Mi perfil:** cambiar el correo también pide el código, enviado al correo nuevo.
-  - **Mi perfil · Cambiar contraseña:** "¿Olvidaste tu contraseña?" manda un código al correo de la cuenta y con él se crea la nueva sin la actual.
 
 ### Corregido
 
