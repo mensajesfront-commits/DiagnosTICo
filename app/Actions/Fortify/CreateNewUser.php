@@ -60,7 +60,7 @@ class CreateNewUser implements CreatesNewUsers
             ...$this->profileRules(),
             'cargo' => ['required', 'string', 'max:255'],
             'telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
-            'password' => $this->passwordRules(),
+            'password' => $this->passwordRules(is_string($input['email'] ?? null) ? $input['email'] : null),
             'terminos' => ['accepted'],
             // Captcha (Cloudflare Turnstile) antes de crear la cuenta.
             'captcha' => [Rule::requiredIf(Captcha::activo()), function (string $atributo, mixed $valor, Closure $fallar): void {

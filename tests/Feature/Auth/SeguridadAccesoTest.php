@@ -201,9 +201,9 @@ it('envía el correo de recuperación en español', function () {
     Notification::assertSentTo($usuario, ResetPassword::class, function (ResetPassword $aviso) use ($usuario) {
         $correo = $aviso->toMail($usuario);
 
-        expect($correo->subject)->toStartWith('Crea una contraseña nueva para')
+        expect($correo->subject)->toStartWith('Cambia tu contraseña de')
             ->and($correo->greeting)->toBe('Hola, Laura:')
-            ->and($correo->actionText)->toBe('Crear contraseña nueva');
+            ->and($correo->actionText)->toBe('Cambiar contraseña');
 
         return true;
     });
@@ -222,6 +222,64 @@ it('acepta el enlace de recuperación aunque hayan pasado días (RN-006)', funct
         'password_confirmation' => 'NuevaClave1!',
     ])->assertSessionHasNoErrors()->assertRedirect(route('login'));
 });
+
+// --- Contraseña nueva: distinta y sin partes del correo (17 oct.) ----------
+
+it('no deja recuperar la cuenta con la misma contraseña de antes', function () {
+    $usuario = User::factory()->create(['email' => 'laura@laesquina.co', 'password' => 'Mesa-47-Sol']);
+
+    $this->post(route('password.update'), [
+        'token' => Password::createToken($usuario),
+        'email' => $usuario->email,
+        'password' => 'Mesa-47-Sol',
+        'password_confirmation' => 'Mesa-47-Sol',
+    ])->assertSessionHasErrors(['password' => 'La contraseña nueva debe ser distinta de la anterior.']);
+});
+
+it('no deja recuperar la cuenta con una contraseña que tenga partes del correo', function () {
+    $usuario = User::factory()->create(['email' => 'juan.perez1102@empresa.co']);
+
+    $this->post(route('password.update'), [
+        'token' => Password::createToken($usuario),
+        'email' => $usuario->email,
+        'password' => 'Clave-1102!',
+        'password_confirmation' => 'Clave-1102!',
+    ])->assertSessionHasErrors(['password' => 'La contraseña no puede tener partes de tu correo («1102»).']);
+});
+
+it('no deja registrarse con una contraseña que tenga partes del correo', function () {
+    $this->post(route('register.store'), [
+        'empresa_nombre' => 'Rojas & Asociados',
+        'sector_id' => Sector::factory()->create()->id,
+        'ciudad' => 'Bogotá',
+        'departamento' => 'Bogotá D.C.',
+        'pais' => 'Colombia',
+        'descripcion' => 'Bufete de derecho laboral.',
+        'cargo' => 'Socia',
+        'name' => 'Laura Gómez',
+        'email' => 'laura@rojas.co',
+        'password' => 'Laura-2026!',
+        'password_confirmation' => 'Laura-2026!',
+        'terminos' => '1',
+    ])->assertSessionHasErrors(['password' => 'La contraseña no puede tener partes de tu correo («laura»).']);
+
+    $this->assertGuest();
+});
+
+it('no deja poner en Mi perfil la misma contraseña ni una con partes del correo', function (string $nueva, string $mensaje) {
+    $usuario = User::factory()->create(['email' => 'laura@laesquina.co', 'password' => 'Mesa-47-Sol'])->assignRole('Administrador');
+
+    $this->actingAs($usuario)
+        ->put(route('user-password.update'), [
+            'current_password' => 'Mesa-47-Sol',
+            'password' => $nueva,
+            'password_confirmation' => $nueva,
+        ])
+        ->assertSessionHasErrors(['password' => $mensaje]);
+})->with([
+    'la misma' => ['Mesa-47-Sol', 'La contraseña nueva debe ser distinta de la anterior.'],
+    'con el correo' => ['LaEsquina-47!', 'La contraseña no puede tener partes de tu correo («laesquina»).'],
+]);
 
 // --- Límite de intentos ----------------------------------------------------
 

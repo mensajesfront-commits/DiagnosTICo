@@ -116,10 +116,11 @@ class FortifyServiceProvider extends ServiceProvider
             ], false));
 
             return (new MailMessage)
-                ->subject('Crea una contraseña nueva para '.config('app.name'))
+                ->subject('Cambia tu contraseña de '.config('app.name'))
                 ->greeting("Hola, {$usuario->name}:")
                 ->line('Recibimos una solicitud para cambiar la contraseña de tu cuenta.')
-                ->action('Crear contraseña nueva', $url)
+                ->action('Cambiar contraseña', $url)
+                ->line('La contraseña nueva debe ser distinta de la anterior y no puede tener partes de tu correo.')
                 ->line('El enlace sirve hasta que guardes la contraseña nueva. Si pides otro, solo funciona el último.')
                 ->line('Si no pediste el cambio, ignora este correo: tu contraseña sigue igual.')
                 ->salutation('El equipo de NuevasTIC');

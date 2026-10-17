@@ -221,6 +221,25 @@ it('el cargo del dueño de otra empresa sí se puede usar', function () {
         ->assertSessionHasNoErrors();
 });
 
+it('la contraseña del colaborador no puede tener partes de su correo ni repetir la anterior', function () {
+    $laura = empresaConPrincipal();
+
+    $this->actingAs($laura)
+        ->post(route('colaboradores.store'), [
+            'name' => 'Mariana Díaz',
+            'cargo' => 'Marketing',
+            'email' => 'mariana1102@laesquina.co',
+            'password' => 'Clave-1102!',
+        ])
+        ->assertSessionHasErrors(['password' => 'La contraseña no puede tener partes de tu correo («1102»).']);
+
+    $andres = colaboradorDe($laura, ['email' => 'andres@laesquina.co', 'password' => 'Mesa-47-Sol']);
+
+    $this->actingAs($laura)
+        ->put(route('colaboradores.actualizar', $andres), datosDe($andres, ['password' => 'Mesa-47-Sol']))
+        ->assertSessionHasErrors(['password' => 'La contraseña nueva debe ser distinta de la anterior.']);
+});
+
 // --- HU-079 · Desactivar y reactivar -----------------------------------------
 
 it('desactiva y reactiva un colaborador', function () {

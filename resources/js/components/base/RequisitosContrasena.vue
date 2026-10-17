@@ -14,13 +14,16 @@ const props = withDefaults(
         confirmacion?: string;
         /** Dos columnas, como en el registro (L2). */
         columnas?: boolean;
+        /** Correo de la cuenta: la contraseña no puede tener partes de él. */
+        correo?: string;
     }>(),
-    { confirmacion: undefined, columnas: false },
+    { confirmacion: undefined, columnas: false, correo: '' },
 );
 
 const estado = computed(() =>
     revisarContrasena(props.contrasena, props.confirmacion ?? '', {
         conConfirmacion: props.confirmacion !== undefined,
+        correo: props.correo,
     }),
 );
 </script>

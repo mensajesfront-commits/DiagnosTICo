@@ -58,6 +58,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Solo están en L2: se abren en una ventana sin salir del formulario.
 - Lo que NuevasTIC no ha entregado (razón social, NIT, domicilio, vigencia, costo, proveedores) va marcado y resaltado como [INFORMACIÓN PENDIENTE].
 
+### Agregado (contraseña nueva más segura, 17 de octubre)
+
+- **La contraseña no puede tener partes del correo.** De "juan.perez1102@empresa.co" no se pueden usar "juan", "perez", "1102" ni "empresa", sin importar mayúsculas ni tildes. Las partes de menos de 3 caracteres no cuentan. Aplica en el registro (L2), la contraseña nueva (L4), Mi perfil y los colaboradores (E12). La lista de requisitos lo marca en vivo ("Sin partes de tu correo").
+- **La contraseña nueva debe ser distinta de la anterior** (L4, Mi perfil y editar colaborador). Esto lo revisa solo el servidor.
+- El correo de "¿Olvidaste tu contraseña?" ahora dice "Cambia tu contraseña" y su botón, "Cambiar contraseña".
+
 ### Corregido
 
 - **Teléfono (L2, A3.2, A3.1d, A6, E11):** se elige el indicativo del país y el campo solo acepta los dígitos de ese país (Colombia 10, Argentina 11…). Se guarda como "+57 3001234567" y el servidor valida el largo (`TelefonoValido`, `App\Support\Telefonos`).

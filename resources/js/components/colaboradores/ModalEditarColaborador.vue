@@ -73,8 +73,10 @@ const listo = computed(
         form.email.trim() !== '' &&
         form.isDirty &&
         (!cambiarContrasena.value ||
-            revisarContrasena(form.password, '', { conConfirmacion: false })
-                .completa),
+            revisarContrasena(form.password, '', {
+                conConfirmacion: false,
+                correo: form.email,
+            }).completa),
 );
 
 function guardar(): void {
@@ -186,7 +188,10 @@ function guardar(): void {
                             :invalida="!!form.errors.password"
                         />
                     </Campo>
-                    <RequisitosContrasena :contrasena="form.password" />
+                    <RequisitosContrasena
+                        :contrasena="form.password"
+                        :correo="form.email"
+                    />
                     <p
                         class="rounded-md bg-lienzo-oscuro/60 px-3 py-2.5 text-xs text-tinta-suave"
                     >

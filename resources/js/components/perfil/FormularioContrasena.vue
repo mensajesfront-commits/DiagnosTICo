@@ -5,7 +5,7 @@
  * Envía current_password, password y password_confirmation a
  * PUT /mi-perfil/contrasena. La sesión sigue abierta después del cambio.
  */
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
@@ -24,10 +24,15 @@ const form = useForm({
     password_confirmation: '',
 });
 
+/** La contraseña no puede tener partes del correo de la cuenta. */
+const correo = computed(() => usePage().props.auth.user.email);
+
 const listo = computed(
     () =>
         form.current_password !== '' &&
-        revisarContrasena(form.password, form.password_confirmation).completa,
+        revisarContrasena(form.password, form.password_confirmation, {
+            correo: correo.value,
+        }).completa,
 );
 
 function enviar(): void {
@@ -97,6 +102,7 @@ defineExpose({ listo, form, enviar });
         <RequisitosContrasena
             :contrasena="form.password"
             :confirmacion="form.password_confirmation"
+            :correo="correo"
             columnas
         />
 

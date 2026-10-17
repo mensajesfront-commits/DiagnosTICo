@@ -456,6 +456,7 @@ const pasos = [
             <RequisitosContrasena
                 :contrasena="form.password"
                 :confirmacion="form.password_confirmation"
+                :correo="form.email"
                 columnas
             />
 

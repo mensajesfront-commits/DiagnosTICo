@@ -108,6 +108,7 @@ const totalRequisitos = computed(
         <RequisitosContrasena
             :contrasena="contrasena"
             :confirmacion="confirmacion"
+            :correo="props.email"
         />
 
         <div>

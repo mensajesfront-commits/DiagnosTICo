@@ -17,7 +17,7 @@ class CambiarContrasenaRequest extends FormRequest
     {
         return [
             'current_password' => $this->currentPasswordRules(),
-            'password' => $this->passwordRules(),
+            'password' => $this->passwordRules($this->user()?->email, $this->user()),
         ];
     }
 
