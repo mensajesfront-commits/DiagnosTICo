@@ -32,6 +32,7 @@ const listo = computed(
         form.current_password !== '' &&
         revisarContrasena(form.password, form.password_confirmation, {
             correo: correo.value,
+            anterior: form.current_password,
         }).completa,
 );
 
@@ -103,6 +104,7 @@ defineExpose({ listo, form, enviar });
             :contrasena="form.password"
             :confirmacion="form.password_confirmation"
             :correo="correo"
+            :anterior="form.current_password"
             columnas
         />
 

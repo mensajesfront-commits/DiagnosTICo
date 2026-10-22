@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import {
     parteDelCorreoEn,
     partesDelCorreo,
+    repiteLaAnterior,
     revisarContrasena,
 } from '@/lib/contrasena';
 
@@ -83,5 +84,22 @@ describe('partes del correo en la contraseña', () => {
                 correo: 'laura@laesquina.co',
             }).completa,
         ).toBe(false);
+    });
+});
+
+describe('nada igual a la contraseña actual (Mi perfil)', () => {
+    it('rechaza 4 caracteres seguidos de la actual, sin importar mayúsculas', () => {
+        expect(repiteLaAnterior('MESA-99-Luna', 'Mesa-47-Sol')).toBe(true);
+        expect(repiteLaAnterior('Luna-a-47-S!', 'Mesa-47-Sol')).toBe(true);
+        expect(repiteLaAnterior('Cielo#2026', 'Mesa-47-Sol')).toBe(false);
+    });
+
+    it('muestra el requisito solo si se escribió la actual', () => {
+        const ids = (anterior: string) =>
+            revisarContrasena('Cielo#2026', 'Cielo#2026', {
+                anterior,
+            }).requisitos.map((r) => r.id);
+        expect(ids('')).not.toContain('anterior');
+        expect(ids('Mesa-47-Sol')).toContain('anterior');
     });
 });

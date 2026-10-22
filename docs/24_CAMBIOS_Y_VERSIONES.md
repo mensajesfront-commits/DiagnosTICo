@@ -64,6 +64,11 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **La contraseña nueva debe ser distinta de la anterior** (L4, Mi perfil y editar colaborador). Esto lo revisa solo el servidor.
 - El correo de "¿Olvidaste tu contraseña?" ahora dice "Cambia tu contraseña" y su botón, "Cambiar contraseña".
 
+### Agregado (nada igual a la contraseña actual, 22 de octubre)
+
+- **En Mi perfil, la contraseña nueva no puede repetir partes de la actual:** ningún trozo de 4 caracteres seguidos o más, sin importar mayúsculas ni tildes ("Mesa-47-Sol" → "Mesa-99-Luna" no pasa). La lista de requisitos lo marca en vivo ("Nada igual a la contraseña actual"). Regla `SinPartesDeLaAnterior`.
+- Al recuperar la contraseña (L4) y cuando la empresa cambia la de un colaborador solo se puede revisar que no sea idéntica: las contraseñas se guardan cifradas y no se pueden leer sus partes.
+
 ### Agregado (plazo de las mediciones, 22 de octubre)
 
 - **Mínimo 3 días para responder.** Al asignar una medición (A3.1b, A3.2, ficha) o darle nueva fecha, la fecha límite más cercana que se acepta es dentro de 3 días. El calendario no deja elegir antes y el servidor lo valida. Se cambia con `PLAZO_MINIMO_DIAS`.

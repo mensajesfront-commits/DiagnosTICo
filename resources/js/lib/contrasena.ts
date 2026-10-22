@@ -18,6 +18,7 @@ export type RequisitoContrasena = {
         contrasena: string,
         confirmacion: string,
         correo: string,
+        anterior: string,
     ) => boolean;
 };
 
@@ -58,6 +59,27 @@ export function partesDelCorreo(correo: string): string[] {
     return [...new Set(partes.filter((p) => p.length >= MINIMO_PARTE))];
 }
 
+/** Trozos de 4 caracteres seguidos que no se pueden repetir de la actual. */
+const LARGO_PARTE_ANTERIOR = 4;
+
+/**
+ * La nueva repite un trozo de 4 caracteres o más de la actual. Igual que
+ * `SinPartesDeLaAnterior` en el servidor. Solo en Mi perfil, donde se escribe
+ * la contraseña actual.
+ */
+export function repiteLaAnterior(nueva: string, anterior: string): boolean {
+    const texto = normalizar(nueva);
+    const vieja = normalizar(anterior);
+
+    for (let i = 0; i + LARGO_PARTE_ANTERIOR <= vieja.length; i++) {
+        if (texto.includes(vieja.slice(i, i + LARGO_PARTE_ANTERIOR))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /** La primera parte del correo que aparece en la contraseña, o null. */
 export function parteDelCorreoEn(
     contrasena: string,
@@ -96,6 +118,12 @@ export const requisitosContrasena: RequisitoContrasena[] = [
             c.length > 0 && parteDelCorreoEn(c, correo) === null,
     },
     {
+        id: 'anterior',
+        texto: 'Nada igual a la contraseña actual',
+        cumple: (c, _confirmacion, _correo, anterior) =>
+            c.length > 0 && !repiteLaAnterior(c, anterior),
+    },
+    {
         id: 'coinciden',
         texto: 'Las dos contraseñas coinciden',
         cumple: (c, confirmacion) => c.length > 0 && c === confirmacion,
@@ -109,7 +137,9 @@ export type EstadoRequisito = { id: string; texto: string; cumple: boolean };
  * colaborador una sola vez), se omite el requisito "coinciden". Sin correo
  * (aún no escrito), se omite "Sin partes de tu correo".
  *
- * "Distinta de la anterior" solo lo puede revisar el servidor.
+ * Con la contraseña actual (Mi perfil) se agrega "Nada igual a la contraseña
+ * actual". En L4 y con los colaboradores la actual no se conoce: el servidor
+ * solo revisa que no sea idéntica.
  */
 export function revisarContrasena(
     contrasena: string,
@@ -117,15 +147,17 @@ export function revisarContrasena(
     {
         conConfirmacion = true,
         correo = '',
-    }: { conConfirmacion?: boolean; correo?: string } = {},
+        anterior = '',
+    }: { conConfirmacion?: boolean; correo?: string; anterior?: string } = {},
 ): { requisitos: EstadoRequisito[]; cumplidos: number; completa: boolean } {
     const requisitos = requisitosContrasena
         .filter((r) => conConfirmacion || r.id !== 'coinciden')
         .filter((r) => r.id !== 'correo' || partesDelCorreo(correo).length > 0)
+        .filter((r) => r.id !== 'anterior' || anterior.length > 0)
         .map((r) => ({
             id: r.id,
             texto: r.texto,
-            cumple: r.cumple(contrasena, confirmacion, correo),
+            cumple: r.cumple(contrasena, confirmacion, correo, anterior),
         }));
     const cumplidos = requisitos.filter((r) => r.cumple).length;
 

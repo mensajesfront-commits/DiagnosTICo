@@ -281,6 +281,25 @@ it('no deja poner en Mi perfil la misma contraseña ni una con partes del correo
     'con el correo' => ['LaEsquina-47!', 'La contraseña no puede tener partes de tu correo («laesquina»).'],
 ]);
 
+it('en Mi perfil la contraseña nueva no puede repetir partes de la actual', function (string $nueva, bool $pasa) {
+    $usuario = User::factory()->create(['email' => 'laura@laesquina.co', 'password' => 'Mesa-47-Sol'])->assignRole('Administrador');
+
+    $respuesta = $this->actingAs($usuario)->put(route('user-password.update'), [
+        'current_password' => 'Mesa-47-Sol',
+        'password' => $nueva,
+        'password_confirmation' => $nueva,
+    ]);
+
+    $pasa
+        ? $respuesta->assertSessionHasNoErrors()
+        : $respuesta->assertSessionHasErrors(['password' => 'La contraseña nueva no puede repetir partes de la actual (4 caracteres seguidos o más).']);
+})->with([
+    'mismo comienzo' => ['MESA-99-Luna', false],
+    'mismo final' => ['Cielo-12-Sol!', false],
+    'trozo del medio' => ['Luna-a-47-S!', false],
+    'nada igual' => ['Cielo#2026', true],
+]);
+
 // --- Límite de intentos ----------------------------------------------------
 
 it('limita los intentos de registro y de recuperación', function (string $ruta) {
