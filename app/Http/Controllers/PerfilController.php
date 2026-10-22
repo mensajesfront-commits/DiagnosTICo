@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\Acceso\CodigoVerificacion;
 use App\Support\OpcionesPerfil;
 use App\Support\Ubicaciones;
+use App\Support\HistorialContrasenas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -201,6 +202,7 @@ class PerfilController extends Controller
             'password' => $request->string('password')->value(),
             'contrasena_actualizada_en' => now(),
         ])->save();
+        HistorialContrasenas::registrar($usuario, $request->string('password')->value());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Contraseña actualizada. Tu sesión sigue abierta.']);
 

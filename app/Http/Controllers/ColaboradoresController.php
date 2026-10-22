@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Rules\CargoDelDueno;
 use App\Rules\DistintaDeLaAnterior;
 use App\Rules\SinDatosDelCorreo;
+use App\Support\HistorialContrasenas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -81,6 +82,7 @@ class ColaboradoresController extends Controller
             ]);
             // Lo crea su empresa, que ya verificó su correo: no pasa por la verificación.
             $colaborador->forceFill(['contrasena_actualizada_en' => now(), 'email_verified_at' => now()])->save();
+            HistorialContrasenas::registrar($colaborador, $datos['password']);
             $colaborador->assignRole('Colaborador');
 
             return $colaborador;
@@ -132,6 +134,10 @@ class ColaboradoresController extends Controller
         }
 
         $colaborador->save();
+
+        if ($cambiaContrasena) {
+            HistorialContrasenas::registrar($colaborador, $datos['password']);
+        }
 
         if ($cambiaCorreo || $cambiaContrasena) {
             $this->cerrarSesiones($colaborador);

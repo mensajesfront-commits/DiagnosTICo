@@ -567,6 +567,17 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `inicio` | timestamp | Sí | `2026-10-26 10:00:00` | |
 | `fin` | timestamp | No | `2026-10-26 10:12:00` | `null` mientras siga mirando (RN-026) |
 
+### `contrasenas_anteriores`
+
+Las últimas 5 contraseñas de cada cuenta, para que la nueva no repita ninguna (22 de octubre de 2026, `HistorialContrasenas`). Nunca guarda el texto de la contraseña.
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `1` | |
+| `user_id` | bigint → `users.id` | Sí | `7` | Se borra con la cuenta |
+| `hash_minusculas` | varchar | Sí | `$2y$12$…` | La contraseña en minúsculas, cifrada con bcrypt: así se compara sin importar mayúsculas |
+| `created_at` | timestamp | No | `2026-10-22 09:15:00` | Cuándo se puso esa contraseña |
+
 ## Cada tabla con un ejemplo (T-064)
 
 Un solo caso de punta a punta: el restaurante «La Esquina» responde su segunda medición.

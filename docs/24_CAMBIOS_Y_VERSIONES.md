@@ -67,7 +67,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 ### Agregado (nada igual a la contraseña actual, 22 de octubre)
 
 - **En Mi perfil, la contraseña nueva no puede repetir partes de la actual:** ningún trozo de 4 caracteres seguidos o más, sin importar mayúsculas ni tildes ("Mesa-47-Sol" → "Mesa-99-Luna" no pasa). La lista de requisitos lo marca en vivo ("Nada igual a la contraseña actual"). Regla `SinPartesDeLaAnterior`.
-- Al recuperar la contraseña (L4) y cuando la empresa cambia la de un colaborador solo se puede revisar que no sea idéntica: las contraseñas se guardan cifradas y no se pueden leer sus partes.
+- Al recuperar la contraseña (L4) y cuando la empresa cambia la de un colaborador no se conocen las partes de la anterior, porque está cifrada. Ahí, y también en Mi perfil, la nueva **no puede ser ninguna de las últimas 5**, aunque cambien mayúsculas y minúsculas (tabla `contrasenas_anteriores`, `HistorialContrasenas`). L4 lo avisa debajo de los requisitos. Las cuentas de antes de este cambio empiezan su historial con la próxima contraseña.
 
 ### Agregado (plazo de las mediciones, 22 de octubre)
 

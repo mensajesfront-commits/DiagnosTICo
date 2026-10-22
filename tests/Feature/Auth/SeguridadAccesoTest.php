@@ -3,8 +3,10 @@
 use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
+use App\Support\HistorialContrasenas;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Testing\TestResponse;
@@ -299,6 +301,45 @@ it('en Mi perfil la contraseña nueva no puede repetir partes de la actual', fun
     'trozo del medio' => ['Luna-a-47-S!', false],
     'nada igual' => ['Cielo#2026', true],
 ]);
+
+it('al recuperar la contraseña no deja usar ninguna de las últimas 5, aunque cambien las mayúsculas', function () {
+    $usuario = User::factory()->create(['email' => 'laura@laesquina.co']);
+    $claves = ['Mesa-47-Sol', 'Cielo#2026', 'Rio-88-Luz!', 'Monte$5150', 'Brisa-33-Mar', 'Nube@7070'];
+
+    foreach ($claves as $clave) {
+        $usuario->forceFill(['password' => $clave])->save();
+        HistorialContrasenas::registrar($usuario, $clave);
+    }
+
+    $intentar = fn (string $nueva) => $this->post(route('password.update'), [
+        'token' => Password::createToken($usuario->fresh()),
+        'email' => $usuario->email,
+        'password' => $nueva,
+        'password_confirmation' => $nueva,
+    ]);
+
+    // Una de las últimas 5, con otras mayúsculas.
+    $intentar('RIO-88-LUZ!')->assertSessionHasErrors(['password' => 'La contraseña nueva no puede ser ninguna de tus últimas 5, aunque cambies mayúsculas y minúsculas.']);
+    // La actual, idéntica.
+    $intentar('Nube@7070')->assertSessionHasErrors(['password' => 'La contraseña nueva debe ser distinta de la anterior.']);
+    // La sexta hacia atrás ya no cuenta.
+    $intentar('Mesa-47-Sol')->assertSessionHasNoErrors();
+});
+
+it('guarda solo las últimas 5 contraseñas, cifradas', function () {
+    $usuario = User::factory()->create();
+
+    foreach (['Clave-1a!', 'Clave-2b!', 'Clave-3c!', 'Clave-4d!', 'Clave-5e!', 'Clave-6f!', 'Clave-7g!'] as $clave) {
+        HistorialContrasenas::registrar($usuario, $clave);
+    }
+
+    $hashes = DB::table('contrasenas_anteriores')->where('user_id', $usuario->id)->pluck('hash_minusculas');
+
+    expect($hashes)->toHaveCount(5)
+        ->and($hashes->contains(fn (string $h) => str_contains($h, 'clave')))->toBeFalse()
+        ->and(HistorialContrasenas::usada($usuario, 'CLAVE-7G!'))->toBeTrue()
+        ->and(HistorialContrasenas::usada($usuario, 'Clave-2b!'))->toBeFalse();
+});
 
 // --- Límite de intentos ----------------------------------------------------
 

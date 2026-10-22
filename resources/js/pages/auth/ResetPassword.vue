@@ -110,6 +110,10 @@ const totalRequisitos = computed(
             :confirmacion="confirmacion"
             :correo="props.email"
         />
+        <p class="-mt-2 text-xs text-tinta-suave">
+            Tampoco puede ser ninguna de tus últimas 5 contraseñas, aunque
+            cambies mayúsculas y minúsculas.
+        </p>
 
         <div>
             <Boton

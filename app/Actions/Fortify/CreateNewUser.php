@@ -12,6 +12,7 @@ use App\Models\Empresa;
 use App\Models\User;
 use App\Rules\DepartamentoDelPais;
 use App\Support\Ubicaciones;
+use App\Support\HistorialContrasenas;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -105,6 +106,7 @@ class CreateNewUser implements CreatesNewUsers
 
             // Constancia de que aceptó los términos y la política de datos.
             $usuario->forceFill(['terminos_aceptados_en' => now()])->save();
+            HistorialContrasenas::registrar($usuario, $input['password']);
 
             $usuario->assignRole('Empresa');
 

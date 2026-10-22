@@ -4,6 +4,7 @@ namespace App\Actions\Fortify;
 
 use App\Concerns\PasswordValidationRules;
 use App\Models\User;
+use App\Support\HistorialContrasenas;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\ResetsUserPasswords;
 
@@ -30,5 +31,7 @@ class ResetUserPassword implements ResetsUserPasswords
             'contrasena_actualizada_en' => now(),
             'email_verified_at' => $user->email_verified_at ?? now(),
         ])->save();
+
+        HistorialContrasenas::registrar($user, $input['password']);
     }
 }
