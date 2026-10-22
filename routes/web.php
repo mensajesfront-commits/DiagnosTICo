@@ -12,6 +12,7 @@ use App\Http\Controllers\MedicionesController;
 use App\Http\Controllers\ResponderController;
 use App\Http\Controllers\ResultadoEjemploController;
 use App\Http\Controllers\ResultadosController;
+use App\Http\Controllers\RevisionResultadosController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
@@ -139,6 +140,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('permission:ia.editar')->group(function () {
         Route::put('configuracion-ia', [ConfiguracionIaController::class, 'guardar'])->name('ia.guardar');
+        // Revisión antes de publicar (supervisión humana).
+        Route::put('configuracion-ia/revision', [RevisionResultadosController::class, 'cambiar'])->name('revision.cambiar');
+        Route::get('revision/{medicion}', [RevisionResultadosController::class, 'ver'])->name('revision.ver');
+        Route::post('revision/{medicion}/aprobar', [RevisionResultadosController::class, 'aprobar'])->name('revision.aprobar');
+        Route::post('revision/{medicion}/rehacer', [RevisionResultadosController::class, 'rehacer'])->name('revision.rehacer');
         Route::delete('configuracion-ia/ajuste', [ConfiguracionIaController::class, 'quitar'])->name('ia.quitar');
         Route::post('configuracion-ia/probar', [ConfiguracionIaController::class, 'probar'])->middleware('throttle:10,1')->name('ia.probar');
     });

@@ -15,11 +15,17 @@
  *
  * Todo llega calculado y no cambia (RN-023). Sin FODA ni comparación con
  * promedios (RN-028).
+ *
+ * Con `revision`, es el resultado que espera la aprobación de un
+ * administrador (revisión antes de publicar): aún no se guarda ni lo ve la
+ * empresa. Se aprueba y publica, o se rehace el análisis de una categoría o
+ * de todas.
  */
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
+import Modal from '@/components/base/Modal.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
@@ -31,7 +37,10 @@ import { diaYMes, fechaLocal, mesYAnio } from '@/lib/fechas';
 import { niveles, ordenNiveles } from '@/lib/niveles';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
-import { empresa as inicioEmpresa } from '@/routes/inicio';
+import {
+    administrador as inicioAdministrador,
+    empresa as inicioEmpresa,
+} from '@/routes/inicio';
 import type {
     CabeceraResultado,
     EjemploResultado,
@@ -45,7 +54,49 @@ const props = defineProps<{
     interno: boolean;
     /** A2.6 · Resultado de ejemplo de un diagnóstico (HU-030): datos de muestra. */
     ejemplo?: EjemploResultado | null;
+    /** Revisión antes de publicar: el resultado aún no se publica. */
+    revision?: { desde: string | null } | null;
 }>();
+
+// --- Revisión antes de publicar ---------------------------------------------------
+const modalAprobar = ref(false);
+/** Categoría que se rehace; '' = todas. null = ventana cerrada. */
+const rehacerCual = ref<string | null>(null);
+const enviando = ref(false);
+
+function aprobar(): void {
+    router.post(
+        rutas.revision.aprobar(props.medicion.id),
+        {},
+        {
+            onStart: () => (enviando.value = true),
+            onFinish: () => {
+                enviando.value = false;
+                modalAprobar.value = false;
+            },
+        },
+    );
+}
+
+function rehacer(): void {
+    router.post(
+        rutas.revision.rehacer(props.medicion.id),
+        rehacerCual.value ? { categoria: rehacerCual.value } : {},
+        {
+            onStart: () => (enviando.value = true),
+            onFinish: () => {
+                enviando.value = false;
+                rehacerCual.value = null;
+            },
+        },
+    );
+}
+
+const nombreRehacer = computed(
+    () =>
+        props.resultado.categorias.find((c) => c.ref === rehacerCual.value)
+            ?.nombre ?? null,
+);
 
 // --- A2.6 · Resultado de ejemplo -------------------------------------------------
 const casos = [
@@ -91,14 +142,16 @@ const pestanas = [
 const pestana = ref<Pestana>('resumen');
 
 const volver = computed(() =>
-    props.ejemplo
-        ? { href: props.ejemplo.volver, texto: 'Volver a la vista previa' }
-        : props.interno
-          ? {
-                href: rutas.empresas.ver(props.medicion.empresa.id),
-                texto: props.medicion.empresa.nombre,
-            }
-          : { href: inicioEmpresa(), texto: 'Inicio' },
+    props.revision
+        ? { href: inicioAdministrador(), texto: 'Inicio' }
+        : props.ejemplo
+          ? { href: props.ejemplo.volver, texto: 'Volver a la vista previa' }
+          : props.interno
+            ? {
+                  href: rutas.empresas.ver(props.medicion.empresa.id),
+                  texto: props.medicion.empresa.nombre,
+              }
+            : { href: inicioEmpresa(), texto: 'Inicio' },
 );
 
 const fechaEnvio = computed(() =>
@@ -161,9 +214,11 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
 <template>
     <Head
         :title="
-            ejemplo
-                ? 'Resultado de ejemplo'
-                : `Resultado · Medición ${medicion.numero}`
+            revision
+                ? `Revisar resultado · Medición ${medicion.numero}`
+                : ejemplo
+                  ? 'Resultado de ejemplo'
+                  : `Resultado · Medición ${medicion.numero}`
         "
     />
 
@@ -187,6 +242,16 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                         >{{ ejemplo.etiqueta }}</span
                     >
                 </h1>
+                <h1
+                    v-else-if="revision"
+                    class="flex flex-wrap items-center gap-2 text-2xl font-semibold"
+                >
+                    Revisar resultado · Medición {{ medicion.numero }}
+                    <span
+                        class="rounded bg-nivel-mejorar-suave px-2 py-0.5 text-xs font-medium text-nivel-mejorar-texto"
+                        >Sin publicar</span
+                    >
+                </h1>
                 <h1 v-else class="text-2xl font-semibold">
                     Resultado del diagnóstico · Medición {{ medicion.numero }}
                 </h1>
@@ -201,6 +266,12 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                 >
                     Ver formato del PDF
                 </a>
+            </div>
+            <div v-else-if="revision" class="flex flex-wrap items-center gap-2">
+                <Boton variante="secundario" @click="rehacerCual = ''">
+                    Rehacer todo el análisis
+                </Boton>
+                <Boton @click="modalAprobar = true">Aprobar y publicar</Boton>
             </div>
             <div v-else class="flex flex-wrap items-center gap-2">
                 <Boton
@@ -536,6 +607,15 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                         {{ categoria.recomendacion.titulo }}.
                         {{ categoria.recomendacion.detalle }}
                     </div>
+                    <Boton
+                        v-if="revision"
+                        variante="secundario"
+                        tamano="sm"
+                        class="self-start"
+                        @click="rehacerCual = categoria.ref"
+                    >
+                        Rehacer el análisis de esta categoría
+                    </Boton>
                 </div>
             </section>
         </div>
@@ -590,7 +670,12 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
             </ol>
         </section>
 
-        <p v-if="ejemplo" class="shrink-0 text-xs text-tinta-suave">
+        <p v-if="revision" class="shrink-0 text-xs text-tinta-suave">
+            Este resultado aún no se publica: la empresa no lo ve hasta que lo
+            apruebes. Revisa las observaciones y recomendaciones de cada
+            categoría en la pestaña Categorías.
+        </p>
+        <p v-else-if="ejemplo" class="shrink-0 text-xs text-tinta-suave">
             Datos de ejemplo: las observaciones y recomendaciones reales las
             escribe la IA según las respuestas de cada empresa.
         </p>
@@ -600,4 +685,42 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
             resultado ya no cambia.
         </p>
     </div>
+
+    <template v-if="revision">
+        <Modal
+            v-model:abierto="modalAprobar"
+            ancho="sm"
+            titulo="¿Aprobar y publicar el resultado?"
+            :descripcion="`${medicion.empresa.nombre} recibirá un correo y podrá ver su resultado y su informe PDF. Después de publicarlo ya no se puede cambiar.`"
+        >
+            <template #pie>
+                <Boton variante="secundario" @click="modalAprobar = false">
+                    Cancelar
+                </Boton>
+                <Boton :cargando="enviando" @click="aprobar">
+                    Sí, publicar
+                </Boton>
+            </template>
+        </Modal>
+        <Modal
+            :abierto="rehacerCual !== null"
+            ancho="sm"
+            :titulo="
+                nombreRehacer
+                    ? `¿Rehacer el análisis de «${nombreRehacer}»?`
+                    : '¿Rehacer todo el análisis?'
+            "
+            descripcion="La IA lo vuelve a hacer con las mismas respuestas. Cuando termine, el resultado vuelve a quedar por revisar y te llega un correo."
+            @update:abierto="(v) => !v && (rehacerCual = null)"
+        >
+            <template #pie>
+                <Boton variante="secundario" @click="rehacerCual = null">
+                    Cancelar
+                </Boton>
+                <Boton :cargando="enviando" @click="rehacer">
+                    Sí, rehacer
+                </Boton>
+            </template>
+        </Modal>
+    </template>
 </template>

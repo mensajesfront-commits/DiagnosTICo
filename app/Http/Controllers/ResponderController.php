@@ -243,6 +243,8 @@ class ResponderController extends Controller
             'terminadas' => $analisis->where('estado', 'terminado')->count(),
             'puntajes_listos' => $analisis->isNotEmpty(),
             'fallidas' => $analisis->where('estado', 'fallido')->map(fn ($a) => (string) ($nombres[$a->categoria_ref] ?? $a->categoria_ref))->values()->all(),
+            // La IA terminó y el equipo de NuevasTIC revisa el resultado antes de publicarlo.
+            'en_revision' => $medicion->revision_desde !== null,
         ];
     }
 

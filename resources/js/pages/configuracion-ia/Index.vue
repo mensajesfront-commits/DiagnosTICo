@@ -18,6 +18,7 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Combobox from '@/components/base/Combobox.vue';
+import Interruptor from '@/components/base/Interruptor.vue';
 import Modal from '@/components/base/Modal.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import ElementoPrompt from '@/components/ia/ElementoPrompt.vue';
@@ -43,6 +44,15 @@ const page = usePage();
 const puedeEditar = computed(() =>
     page.props.auth.permisos.includes('ia.editar'),
 );
+
+// --- Revisión antes de publicar (supervisión humana) -------------------------
+function cambiarRevision(activa: boolean): void {
+    router.put(
+        rutas.revision.cambiar(),
+        { activa },
+        { preserveScroll: true, preserveState: true },
+    );
+}
 
 const capa = computed(() =>
     props.alcance === 'sector'
@@ -550,6 +560,38 @@ const listoParaEditar = computed(
 
             <!-- Panel derecho -->
             <aside class="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto">
+                <section
+                    class="rounded-xl border border-linea bg-white p-4 text-sm"
+                >
+                    <Interruptor
+                        v-if="puedeEditar"
+                        id="revision-publicar"
+                        class="-my-2.5"
+                        :model-value="revision.activa"
+                        @update:model-value="cambiarRevision"
+                    >
+                        <span class="font-semibold"
+                            >Revisar antes de publicar</span
+                        >
+                    </Interruptor>
+                    <h2 v-else class="font-semibold">
+                        Revisar antes de publicar ·
+                        {{ revision.activa ? 'encendida' : 'apagada' }}
+                    </h2>
+                    <p class="mt-1 text-tinta-suave">
+                        {{
+                            revision.activa
+                                ? 'Encendida: cuando la IA termina, el resultado espera a que un administrador lo apruebe o pida rehacer el análisis. La empresa no lo ve hasta entonces.'
+                                : 'Apagada: el resultado se publica solo cuando la IA termina.'
+                        }}
+                    </p>
+                    <p
+                        v-if="revision.actualizado_por"
+                        class="mt-1 text-xs text-tinta-suave"
+                    >
+                        Último cambio: {{ revision.actualizado_por }}
+                    </p>
+                </section>
                 <section
                     class="rounded-xl border border-linea bg-white p-4 text-sm"
                 >

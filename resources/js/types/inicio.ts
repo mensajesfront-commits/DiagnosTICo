@@ -52,6 +52,8 @@ export type FilaMedicion = {
     } | null;
     /** En vencidas: ISO de la solicitud de medición nueva abierta (HU-083). */
     solicitud: string | null;
+    /** Enviada cuyo resultado espera la aprobación de un administrador. */
+    por_revisar: boolean;
 };
 
 export type SectorInicio = {

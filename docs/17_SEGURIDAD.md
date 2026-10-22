@@ -39,7 +39,7 @@ Son los **15 permisos en 6 bloques** del wireframe A5.2 (A5.1 "Crear rol" usa la
 | | `resultados.ver` | Ver resultados y respuestas | Ver resultados, historial y respuestas | A3.3–A3.5, E6–E10 |
 | | `resultados.pdf` | Descargar PDF | Descargar el informe PDF | E6, A3.3 |
 | Configuración IA | `ia.ver` | Ver configuración | Ver prompts, ajustes y el prompt final | A4 |
-| | `ia.editar` | Editar prompts | Editar prompts y ajustes por sector o empresa; probarlos | A4–A4.9 |
+| | `ia.editar` | Editar prompts | Editar prompts y ajustes por sector o empresa; probarlos; encender la revisión antes de publicar, y aprobar o rehacer un resultado por revisar | A4–A4.9, revisión |
 | Usuarios y roles | `usuarios.ver` | Ver usuarios | Ver cuentas y roles | A5 |
 | | `usuarios.gestionar` | Gestionar usuarios y roles | Invitar, desactivar, reactivar, cambiar rol, crear y editar roles, "Ver como" | A5.1–A5.5 |
 | Su cuenta | `perfil.editar` | Editar su perfil | Cambiar sus datos personales. En el rol Empresa, también los de la empresa | A6, E11 |

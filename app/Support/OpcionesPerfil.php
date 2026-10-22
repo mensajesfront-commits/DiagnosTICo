@@ -99,6 +99,7 @@ class OpcionesPerfil
     public const array AVISOS_INTERNOS = [
         'empresa_envia' => ['Cuando una empresa envía su diagnóstico', true],
         'ia_falla' => ['Cuando falla el análisis de la IA', true],
+        'resultado_por_revisar' => ['Cuando un resultado espera tu revisión', true],
         'resumen_semanal' => ['Resumen semanal de mediciones pendientes', false],
     ];
 

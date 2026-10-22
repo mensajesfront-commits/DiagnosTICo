@@ -54,7 +54,7 @@ it('muestra Mi perfil del Administrador con sus avisos', function () {
             ->component('perfil/MiPerfil')
             ->where('rol', 'Administrador')
             ->where('empresa', null)
-            ->where('usuario.avisos', ['empresa_envia' => true, 'ia_falla' => true, 'resumen_semanal' => false]));
+            ->where('usuario.avisos', ['empresa_envia' => true, 'ia_falla' => true, 'resultado_por_revisar' => true, 'resumen_semanal' => false]));
 });
 
 it('guarda los datos personales y los avisos', function () {

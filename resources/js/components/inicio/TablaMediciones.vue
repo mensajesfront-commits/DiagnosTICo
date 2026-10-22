@@ -86,6 +86,10 @@ function acciones(f: FilaMedicion): Accion[] {
             return [{ texto: 'Recordatorio', modal: 'correo' }];
         case 'no_iniciada':
             return [{ texto: 'Reenviar aviso', modal: 'correo' }];
+        case 'enviada':
+            return f.por_revisar
+                ? [{ texto: 'Revisar', href: rutas.revision.ver(f.id) }]
+                : [];
         case 'terminada':
             return f.pendiente
                 ? [{ texto: 'Ver resultado', href: resultado }]
@@ -143,7 +147,9 @@ function nota(f: FilaMedicion): string | null {
                 ? `Último avance: ${haceCuanto(f.ultimo_avance)}`
                 : 'Sin respuestas todavía';
         case 'enviada':
-            return 'La IA está analizando sus respuestas';
+            return f.por_revisar
+                ? 'Resultado listo: espera tu revisión'
+                : 'La IA está analizando sus respuestas';
         case 'no_iniciada':
             return f.ultimo_aviso
                 ? `Último aviso: ${haceCuanto(f.ultimo_aviso)}`

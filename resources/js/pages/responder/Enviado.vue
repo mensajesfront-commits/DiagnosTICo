@@ -31,6 +31,8 @@ const props = defineProps<{
         puntajes_listos: boolean;
         /** Nombres de las categorías que fallaron tras los 3 intentos. */
         fallidas: string[];
+        /** La IA terminó y el equipo de NuevasTIC revisa el resultado. */
+        en_revision: boolean;
     };
 }>();
 
@@ -42,7 +44,7 @@ let reloj: ReturnType<typeof setInterval> | null = null;
 onMounted(() => {
     reloj = setInterval(() => {
         // Sin "only": si ya terminó, el servidor redirige al resultado.
-        if (!listo.value && !fallo.value) {
+        if (!listo.value && !fallo.value && !props.analisis.en_revision) {
             router.reload();
         }
     }, 5000);
@@ -179,6 +181,13 @@ function reintentar(): void {
                     </span>
                 </li>
             </ul>
+            <Aviso v-if="analisis.en_revision" tono="info" class="mt-5">
+                <p>
+                    El análisis terminó. El equipo de NuevasTIC está revisando
+                    tu resultado antes de publicarlo; te avisaremos por correo
+                    cuando esté listo.
+                </p>
+            </Aviso>
             <Aviso v-if="fallo" tono="error" class="mt-5">
                 <p>
                     No pudimos terminar el análisis de algunas categorías:
