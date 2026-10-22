@@ -99,13 +99,13 @@ class DatosInicio
             ->get(['medicion_id', 'pregunta_ref', 'updated_at'])
             ->groupBy('medicion_id');
 
-        $hoy = Carbon::today();
+        Plazos::precargar($mediciones->pluck('empresa_id')->all());
         $lista = [];
 
         foreach ($mediciones as $m) {
             $estado = $m->estado;
 
-            if (in_array($estado, ['no_iniciada', 'en_curso'], true) && $m->fecha_limite !== null && $m->fecha_limite->lt($hoy)) {
+            if (in_array($estado, ['no_iniciada', 'en_curso'], true) && Plazos::vencio($m)) {
                 $estado = 'vencida';
             }
 
@@ -121,6 +121,8 @@ class DatosInicio
                 'sector' => $m->empresa?->sector?->nombre,
                 'asignada' => $m->created_at?->toDateString(),
                 'vence' => $m->fecha_limite?->toDateString(),
+                // "Nueva fecha": la más cercana que se acepta (Plazos).
+                'fecha_minima' => Plazos::fechaMinima($m->empresa_id),
                 'estado' => $estado,
                 'avance' => $estado !== 'no_iniciada' && $estado !== 'terminada' && $m->version
                     ? self::avance($m->version->contenido, $respondidas)

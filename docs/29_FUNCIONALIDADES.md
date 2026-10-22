@@ -112,7 +112,7 @@
 | Calcular los puntajes de las preguntas cerradas | Al enviar | HU-068 |
 | Analizar cada categoría con la IA, con 3 intentos | En la cola, después de enviar | HU-069, HU-081 |
 | Publicar el resultado, avisar a la empresa y generar el PDF | Cuando terminan todas las categorías | HU-084 |
-| Marcar las mediciones vencidas | Cada día a las 00:05 | HU-070 |
+| Marcar las mediciones vencidas | Cada hora, a la medianoche de cada empresa | HU-070 |
 | Borrar para siempre las cuentas eliminadas hace más de 90 días | Cada día a las 03:10 | DEC-017 |
 | Resumen semanal de mediciones pendientes a los administradores que lo encendieron | Cada lunes a las 07:50 | A6 |
 | Avisos por correo según lo que cada cuenta eligió en Mi perfil | Al enviar, al asignar, al publicar y si falla la IA | A6, E11 |

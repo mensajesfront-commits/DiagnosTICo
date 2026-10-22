@@ -139,7 +139,8 @@ function verComo(): void {
 }
 
 // --- Asignar otra medición (formulario corto de A3.1b) -----------------------
-const hoy = new Date().toLocaleDateString('en-CA');
+/** Fecha límite más cercana: 3 días, en la hora de la empresa (servidor). */
+const hoy = computed(() => props.fecha_minima);
 
 const asignacion = useForm({
     empresa_id: props.empresa.id,

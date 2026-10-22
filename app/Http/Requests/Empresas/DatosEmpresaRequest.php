@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Rules\DepartamentoDelPais;
 use App\Support\DatosEmpresas;
 use App\Support\OpcionesPerfil;
+use App\Support\Plazos;
 use App\Support\Ubicaciones;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -74,7 +75,8 @@ class DatosEmpresaRequest extends FormRequest
             $reglas += [
                 'asignar_medicion' => ['boolean'],
                 'diagnostico_id' => ['required_if_accepted:asignar_medicion', 'nullable', 'integer'],
-                'fecha_limite' => ['nullable', 'date', 'after_or_equal:today'],
+                // Empresa nueva: aún no tiene zona; se usa la del sistema.
+                'fecha_limite' => Plazos::reglas(null),
             ];
         }
 
@@ -89,7 +91,7 @@ class DatosEmpresaRequest extends FormRequest
         return [
             'email.unique' => 'Ese correo ya es de otra cuenta.',
             'diagnostico_id.required_if_accepted' => 'Elige el diagnóstico de la primera medición.',
-            'fecha_limite.after_or_equal' => 'La fecha límite no puede ser anterior a hoy.',
+            'fecha_limite.after_or_equal' => Plazos::mensaje(null),
         ];
     }
 

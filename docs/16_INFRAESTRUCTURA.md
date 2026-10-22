@@ -36,7 +36,7 @@ Los comandos y las variables por entorno están en `27_ENTORNOS.md`.
 |---|---|---|
 | Web | `php artisan serve` (en Sail lo arranca Supervisor) o un servidor web con PHP-FPM | No hay sistema |
 | Cola | `php artisan queue:work` | Las mediciones enviadas no se analizan, no se publica el resultado ni se genera el PDF, y no salen los correos en cola |
-| Tareas programadas | `php artisan schedule:work` (local) o un cron con `php artisan schedule:run` cada minuto | No se marcan las vencidas (`mediciones:vencer`, 00:05), no se purgan las cuentas eliminadas (`cuentas:purgar`, 03:10) ni sale el resumen semanal (`mediciones:resumen`, lunes 07:50) |
+| Tareas programadas | `php artisan schedule:work` (local) o un cron con `php artisan schedule:run` cada minuto | No se marcan las vencidas (`mediciones:vencer`, cada hora a los :05, según la medianoche de cada empresa), no se purgan las cuentas eliminadas (`cuentas:purgar`, 03:10) ni sale el resumen semanal (`mediciones:resumen`, lunes 07:50) |
 | Frontend | `npm run build` una vez (o `npm run dev` mientras se programa) | No cargan las pantallas |
 | SSR (opcional) | `npm run build:ssr` y `php artisan inertia:start-ssr` | Las páginas se arman solo en el navegador |
 

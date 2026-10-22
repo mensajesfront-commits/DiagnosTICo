@@ -9,7 +9,6 @@ use App\Models\Medicion;
 use App\Models\Sector;
 use App\Models\SolicitudMedicion;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -37,6 +36,7 @@ class DatosEmpresas
 
         $respuestas = self::respuestasDe($empresas->flatMap(fn (Empresa $e) => $e->mediciones->modelKeys())->all());
         $solicitudes = SolicitudMedicion::abiertasDe($empresas->modelKeys());
+        Plazos::precargar($empresas->modelKeys());
         $lista = [];
 
         foreach ($empresas as $empresa) {
@@ -144,6 +144,8 @@ class DatosEmpresas
                 'nivel' => $ultimo->resultado?->nivel,
             ] : null,
             'variacion' => $variacion,
+            // "Asignar otra medición": la fecha límite más cercana que se acepta.
+            'fecha_minima' => Plazos::fechaMinima($empresa->id),
             'pendiente' => $pendiente ? [
                 ...self::pendiente($pendiente, $respuestas),
                 'id' => $pendiente->id,
@@ -151,6 +153,7 @@ class DatosEmpresas
                 'version' => $pendiente->version?->numero,
                 'asignada' => $pendiente->created_at?->toDateString(),
                 'vence' => $pendiente->fecha_limite?->toDateString(),
+                'fecha_minima' => Plazos::fechaMinima($empresa->id),
                 'tiene_respuestas' => $respuestas->has($pendiente->id),
                 'ultimo_aviso' => $pendiente->ultimo_aviso_en?->toIso8601String(),
                 // HU-083: la empresa pidió una medición nueva (fecha ISO).
@@ -271,7 +274,7 @@ class DatosEmpresas
     /** Estado que se muestra: vencida también si pasó la fecha límite sin enviarse. */
     public static function estadoVisible(Medicion $m): string
     {
-        if (in_array($m->estado, ['no_iniciada', 'en_curso'], true) && $m->fecha_limite !== null && $m->fecha_limite->lt(Carbon::today())) {
+        if (in_array($m->estado, ['no_iniciada', 'en_curso'], true) && Plazos::vencio($m)) {
             return 'vencida';
         }
 

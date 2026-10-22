@@ -33,7 +33,7 @@ Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validaci
 |---|---|---|---|---|
 | RN-014 | Una sola medición pendiente por empresa; solo se asignan diagnósticos publicados de su sector. | `AsignarMedicion` (pide `reemplazar` si ya hay una) | A3.1b, A3.1c, A3.1 | `EmpresasTest` |
 | RN-015 | Estados: No iniciada, En curso, Enviada, Terminada y Vencida. | Columna `mediciones.estado`, `DatosEmpresas::estadoVisible()` y `DatosInicio` | `EtiquetaEstado` en A1, A3, E1, E8 | `InicioTest` |
-| RN-016 | Una medición vencida no se responde. La empresa pide una nueva (una solicitud abierta a la vez) y el Administrador la atiende. | `DatosResponder::respondible()`, `ResponderController::solicitar`, `SolicitudMedicion::atender()` | E1, A1, A3, A3.1, A3.1b | `ResponderTest`, `SolicitudesMedicionTest` |
+| RN-016 | Una medición vencida no se responde. La fecha límite vale hasta las 11:59 p. m. en la zona horaria de la empresa y se asigna con al menos 3 días para responder (`Plazos`, 22 de octubre). La empresa pide una nueva (una solicitud abierta a la vez) y el Administrador la atiende. | `DatosResponder::respondible()`, `ResponderController::solicitar`, `SolicitudMedicion::atender()` | E1, A1, A3, A3.1, A3.1b | `ResponderTest`, `SolicitudesMedicionTest` |
 | RN-017 | Después de enviar no se cambian las respuestas. | `DatosResponder::respondible()` rechaza guardar si la medición no está no iniciada o en curso | E3 (confirmación), E9 (solo lectura) | `ResponderTest` |
 
 ## Cálculo, IA y resultado

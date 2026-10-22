@@ -64,6 +64,16 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **La contraseña nueva debe ser distinta de la anterior** (L4, Mi perfil y editar colaborador). Esto lo revisa solo el servidor.
 - El correo de "¿Olvidaste tu contraseña?" ahora dice "Cambia tu contraseña" y su botón, "Cambiar contraseña".
 
+### Agregado (plazo de las mediciones, 22 de octubre)
+
+- **Mínimo 3 días para responder.** Al asignar una medición (A3.1b, A3.2, ficha) o darle nueva fecha, la fecha límite más cercana que se acepta es dentro de 3 días. El calendario no deja elegir antes y el servidor lo valida. Se cambia con `PLAZO_MINIMO_DIAS`.
+- **La fecha límite se cuenta en la hora de cada empresa:** vale hasta las 11:59 p. m. en la zona horaria de su cuenta principal (Mi perfil). La tarea `mediciones:vencer` corre cada hora para que cada empresa venza a su medianoche. E1 dice "Vence hoy a las 11:59 p. m.".
+
+### Corregido (hora del sistema, 22 de octubre)
+
+- El sistema contaba el día en hora UTC: en Colombia, una medición con fecha límite de hoy dejaba de poderse responder a las 7 p. m., y después de las 7 p. m. no se podía elegir "hoy" como fecha. Ahora usa la hora de cada empresa.
+- La limpieza de cuentas (03:10) y el resumen semanal (lunes 07:50) corrían en hora UTC; ahora corren en hora de Colombia (`ZONA_HORARIA_POR_DEFECTO`).
+
 ### Corregido
 
 - **Teléfono (L2, A3.2, A3.1d, A6, E11):** se elige el indicativo del país y el campo solo acepta los dígitos de ese país (Colombia 10, Argentina 11…). Se guarda como "+57 3001234567" y el servidor valida el largo (`TelefonoValido`, `App\Support\Telefonos`).

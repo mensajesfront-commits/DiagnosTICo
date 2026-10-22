@@ -3,7 +3,6 @@
 namespace App\Support;
 
 use App\Models\Medicion;
-use Illuminate\Support\Carbon;
 
 /**
  * La medición como la responde la empresa (E2, E3; HU-060, HU-061): el
@@ -17,11 +16,11 @@ class DatosResponder
     /** Estados en los que se puede responder. */
     public const array RESPONDIBLES = ['no_iniciada', 'en_curso'];
 
-    /** Se puede responder: no iniciada o en curso y no pasó la fecha límite (RN-016). */
+    /** Se puede responder: no iniciada o en curso y no pasó la fecha límite (RN-016), en la hora de la empresa. */
     public static function respondible(Medicion $medicion): bool
     {
         return in_array($medicion->estado, self::RESPONDIBLES, true)
-            && ($medicion->fecha_limite === null || ! $medicion->fecha_limite->lt(Carbon::today()));
+            && ! Plazos::vencio($medicion);
     }
 
     /**

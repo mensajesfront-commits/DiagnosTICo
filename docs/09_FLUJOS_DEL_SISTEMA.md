@@ -160,8 +160,8 @@ sequenceDiagram
 
 | Tarea | Cuándo | Qué hace |
 |---|---|---|
-| Marcar vencidas (`mediciones:vencer`, HU-070) | Cada día, 00:05 | Pasa a "Vencida" las mediciones sin enviar cuya fecha límite ya pasó |
-| Borrar cuentas eliminadas (`cuentas:purgar`, DEC-017, DEC-020) | Cada día, 03:10 | Borra para siempre las cuentas y empresas eliminadas hace más de 90 días y los registros que no verificaron el correo en 7 días |
-| Resumen semanal (`mediciones:resumen`) | Lunes, 07:50 | Envía a los administradores que lo activaron en Mi perfil (A6) las mediciones pendientes, las vencidas y las solicitudes abiertas |
+| Marcar vencidas (`mediciones:vencer`, HU-070) | Cada hora, a los :05 | Pasa a "Vencida" las mediciones sin enviar cuya fecha límite ya pasó, a la medianoche de la zona horaria de cada empresa |
+| Borrar cuentas eliminadas (`cuentas:purgar`, DEC-017, DEC-020) | Cada día, 03:10 (hora de Colombia) | Borra para siempre las cuentas y empresas eliminadas hace más de 90 días y los registros que no verificaron el correo en 7 días |
+| Resumen semanal (`mediciones:resumen`) | Lunes, 07:50 (hora de Colombia) | Envía a los administradores que lo activaron en Mi perfil (A6) las mediciones pendientes, las vencidas y las solicitudes abiertas |
 
 **[INFORMACIÓN PENDIENTE]** NuevasTIC confirma el día y la hora del resumen semanal.

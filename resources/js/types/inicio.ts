@@ -35,6 +35,8 @@ export type FilaMedicion = {
     /** Fechas "AAAA-MM-DD". */
     asignada: string;
     vence: string | null;
+    /** "Nueva fecha": la más cercana que se acepta (3 días, hora de la empresa). */
+    fecha_minima: string;
     estado: EstadoMedicionInicio;
     /** Categorías completas: "6/10". */
     avance: { hechas: number; total: number } | null;

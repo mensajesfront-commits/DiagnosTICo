@@ -34,6 +34,15 @@ return [
     'soporte_email' => env('SOPORTE_EMAIL', 'soporte@nuevastic.co'),
 
     /*
+    | Fecha límite de las mediciones (App\Support\Plazos): mínimo de días
+    | para responder al asignar o cambiar la fecha, y la zona horaria que se
+    | usa si la empresa no tiene cuenta principal. Cada empresa cuenta el día
+    | en la zona de su Mi perfil.
+    */
+    'plazo_minimo_dias' => (int) env('PLAZO_MINIMO_DIAS', 3),
+    'zona_horaria' => env('ZONA_HORARIA_POR_DEFECTO', 'America/Bogota'),
+
+    /*
     | Análisis de la IA sin conexión (App\Services\Ia\AnalizadorDePrueba):
     | puntajes y textos de prueba, sin gastar llamadas a OpenAI. Solo para
     | programar y para las pruebas automáticas; en producción va en false.

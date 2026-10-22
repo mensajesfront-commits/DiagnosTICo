@@ -29,7 +29,7 @@ class DatosHistorial
                 'sector' => $ficha['empresa']['sector'],
             ],
             'pendiente' => $pendiente === null ? null : array_intersect_key($pendiente, array_flip([
-                'id', 'numero', 'estado', 'avance', 'diagnostico', 'version', 'asignada', 'vence', 'tiene_respuestas', 'solicitud',
+                'id', 'numero', 'estado', 'avance', 'diagnostico', 'version', 'asignada', 'vence', 'fecha_minima', 'tiene_respuestas', 'solicitud',
             ])),
             'mediciones' => array_values(array_filter($mediciones, fn (array $m) => $m['puntaje'] !== null)),
             'evolucion' => $ficha['evolucion'],

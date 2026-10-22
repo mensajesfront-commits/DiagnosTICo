@@ -6,7 +6,6 @@ use App\Models\Empresa;
 use App\Models\Medicion;
 use App\Models\SolicitudMedicion;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 
 /**
  * E1 · Inicio de la empresa y del colaborador (HU-057 a HU-059, HU-082),
@@ -79,7 +78,7 @@ class DatosInicioEmpresa
             'preguntas' => $avance['total'],
             'mensaje' => $m->mensaje,
             'fecha_limite' => $limite?->toDateString(),
-            'dias_restantes' => $limite ? (int) Carbon::today()->diffInDays($limite, false) : null,
+            'dias_restantes' => Plazos::diasRestantes($m),
             'avance' => [
                 'respondidas' => $avance['respondidas'],
                 'total' => $avance['total'],

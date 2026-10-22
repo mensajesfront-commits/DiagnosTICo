@@ -73,7 +73,9 @@ const quedan = computed(() => {
         return null;
     }
 
-    return d === 0 ? 'Vence hoy' : `Quedan ${plural(d, 'día', 'días')}`;
+    return d === 0
+        ? 'Vence hoy a las 11:59 p. m.'
+        : `Quedan ${plural(d, 'día', 'días')}`;
 });
 
 const evolucion = computed(() =>

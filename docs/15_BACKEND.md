@@ -242,7 +242,7 @@ Correo de aviso (A3.1e):
 - `App\Services\Mediciones\EnviarAviso`: lo envía al usuario principal y guarda `ultimo_aviso_en`.
 - `AvisoMedicion` va en la **cola** (`ShouldQueue`, 3 intentos): la pantalla no espera al servidor de correo (HU-037 CA-004, CA-005). En local hay que tener corriendo `queue:work`.
 
-Tarea diaria (HU-070): `mediciones:vencer` a las 00:05 marca `vencida` las no iniciadas o en curso con fecha límite anterior a hoy (`schedule:work` en local). **[INFORMACIÓN PENDIENTE]** El día se cuenta con `APP_TIMEZONE` (UTC por defecto); falta decidir si es la hora de Colombia o la de cada empresa.
+Tarea (HU-070): `mediciones:vencer` corre cada hora (a los :05) y marca `vencida` las no iniciadas o en curso cuya fecha límite ya pasó en la zona horaria de la empresa, la de su cuenta principal en Mi perfil (`App\Support\Plazos`; `schedule:work` en local). Al asignar o cambiar la fecha, la más cercana que se acepta es dentro de 3 días (`PLAZO_MINIMO_DIAS`).
 
 ## Responder el diagnóstico (E1–E4, hecho)
 

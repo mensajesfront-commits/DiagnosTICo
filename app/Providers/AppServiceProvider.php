@@ -22,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Zonas horarias de las empresas, guardadas mientras dura la petición.
+        $this->app->scoped(\App\Support\Plazos::class);
+
         // Análisis de la IA (RN-021): OpenAI, o el de prueba sin conexión con
         // IA_DE_PRUEBA=true (para programar sin clave y en las pruebas).
         $this->app->bind(Analizador::class, fn () => config('diagnostico.ia_de_prueba')

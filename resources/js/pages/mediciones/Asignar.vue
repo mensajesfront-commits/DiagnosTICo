@@ -46,12 +46,15 @@ const props = defineProps<{
     /** Por sector: publicados y borradores. */
     diagnosticos: Record<string, DiagnosticosDelSector>;
     empresaInicial: number | null;
+    /** Fecha límite más cercana antes de elegir la empresa (3 días). */
+    fechaMinima: string;
     /** Plantilla general del correo de aviso (A3.1e). */
     plantilla: { asunto: string; cuerpo: string };
 }>();
 
 const MAX_MENSAJE = 500;
-const hoy = new Date().toLocaleDateString('en-CA');
+/** Fecha límite más cercana: 3 días, en la hora de la empresa (servidor). */
+const hoy = computed(() => empresa.value?.fecha_minima ?? props.fechaMinima);
 
 const form = useForm({
     empresa_id: (props.empresas.some((e) => e.id === props.empresaInicial)
