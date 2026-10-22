@@ -38,7 +38,7 @@ class SinDatosDelCorreo implements ValidationRule
 
         foreach (preg_split('/[^a-z0-9]+/', $usuario) ?: [] as $trozo) {
             $partes[] = $trozo;
-            // "cristian20andres04" → "cristian", "20", "andres", "04".
+            // "maria20lopez04" → "maria", "20", "lopez", "04".
             preg_match_all('/[a-z]+|[0-9]+/', $trozo, $grupos);
             array_push($partes, ...$grupos[0]);
         }

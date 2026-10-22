@@ -57,10 +57,10 @@ describe('partes del correo en la contraseña', () => {
             '1102',
             'empresa',
         ]);
-        expect(partesDelCorreo('cristian20andres04@gmail.com')).toEqual([
-            'cristian20andres04',
-            'cristian',
-            'andres',
+        expect(partesDelCorreo('maria20lopez04@gmail.com')).toEqual([
+            'maria20lopez04',
+            'maria',
+            'lopez',
             'gmail',
         ]);
     });

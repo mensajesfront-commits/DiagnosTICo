@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Validator;
 it('saca las partes del correo, sin las de menos de 3 caracteres', function () {
     expect(SinDatosDelCorreo::partes('Juan.Perez1102@Empresa.co'))
         ->toBe(['juanperez1102', 'juan', 'perez1102', 'perez', '1102', 'empresa'])
-        ->and(SinDatosDelCorreo::partes('cristian20andres04@gmail.com'))
-        ->toBe(['cristian20andres04', 'cristian', 'andres', 'gmail'])
+        ->and(SinDatosDelCorreo::partes('maria20lopez04@gmail.com'))
+        ->toBe(['maria20lopez04', 'maria', 'lopez', 'gmail'])
         ->and(SinDatosDelCorreo::partes(null))->toBe([]);
 });
 
