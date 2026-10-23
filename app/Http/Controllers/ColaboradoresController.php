@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Rules\CargoDelDueno;
+use App\Rules\DistintaDeLaAnterior;
+use App\Rules\SinDatosDelCorreo;
+use App\Support\HistorialContrasenas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,9 +64,9 @@ class ColaboradoresController extends Controller
         $datos = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             // Área o cargo dentro de la empresa ("Marketing", "Producción").
-            'cargo' => ['required', 'string', 'min:2', 'max:255'],
+            'cargo' => ['required', 'string', 'min:2', 'max:255', new CargoDelDueno($yo->empresa_id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)],
-            'password' => ['required', 'string', Password::default()],
+            'password' => ['required', 'string', Password::default(), new SinDatosDelCorreo($request->string('email')->value())],
         ], [
             'email.unique' => 'Ya hay una cuenta con este correo.',
         ]);
@@ -76,7 +80,9 @@ class ColaboradoresController extends Controller
                 'empresa_id' => $yo->empresa_id,
                 'activo' => true,
             ]);
-            $colaborador->forceFill(['contrasena_actualizada_en' => now()])->save();
+            // Lo crea su empresa, que ya verificó su correo: no pasa por la verificación.
+            $colaborador->forceFill(['contrasena_actualizada_en' => now(), 'email_verified_at' => now()])->save();
+            HistorialContrasenas::registrar($colaborador, $datos['password']);
             $colaborador->assignRole('Colaborador');
 
             return $colaborador;
@@ -100,9 +106,9 @@ class ColaboradoresController extends Controller
 
         $datos = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'cargo' => ['required', 'string', 'min:2', 'max:255'],
+            'cargo' => ['required', 'string', 'min:2', 'max:255', new CargoDelDueno($colaborador->empresa_id, false, $colaborador->id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($colaborador->id)],
-            'password' => ['nullable', 'string', Password::default()],
+            'password' => ['nullable', 'string', Password::default(), new SinDatosDelCorreo($request->string('email')->value()), new DistintaDeLaAnterior($colaborador)],
         ], [
             'email.unique' => 'Ya hay una cuenta con este correo.',
         ]);
@@ -128,6 +134,10 @@ class ColaboradoresController extends Controller
         }
 
         $colaborador->save();
+
+        if ($cambiaContrasena) {
+            HistorialContrasenas::registrar($colaborador, $datos['password']);
+        }
 
         if ($cambiaCorreo || $cambiaContrasena) {
             $this->cerrarSesiones($colaborador);

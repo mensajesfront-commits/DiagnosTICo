@@ -7,8 +7,10 @@ use App\Http\Requests\Perfil\CambiarContrasenaRequest;
 use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
+use App\Services\Acceso\CodigoVerificacion;
 use App\Support\OpcionesPerfil;
 use App\Support\Ubicaciones;
+use App\Support\HistorialContrasenas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -21,6 +23,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class PerfilController extends Controller
 {
+    public function __construct(private readonly CodigoVerificacion $codigos) {}
+
     public function edit(Request $request): Response
     {
         /** @var User $usuario */
@@ -29,6 +33,7 @@ class PerfilController extends Controller
         $rol = $usuario->getRoleNames()->first();
 
         return Inertia::render('perfil/MiPerfil', [
+            'status' => $request->session()->get('status'),
             'usuario' => [
                 'name' => $usuario->name,
                 'email' => $usuario->email,
@@ -44,6 +49,8 @@ class PerfilController extends Controller
                 'ultimo_acceso_en' => $usuario->ultimo_acceso_en?->toIso8601String(),
                 'creado_en' => $usuario->created_at?->toIso8601String(),
                 'contrasena_actualizada_en' => ($usuario->contrasena_actualizada_en ?? $usuario->created_at)?->toIso8601String(),
+                // Correo nuevo que espera el código (abre la ventana de verificación).
+                'email_pendiente' => $usuario->email_pendiente,
             ],
             'rol' => $rol,
             'empresa' => $empresa ? [
@@ -84,7 +91,6 @@ class PerfilController extends Controller
 
         $usuario->fill([
             'name' => $datos['name'],
-            'email' => $datos['email'],
             'cargo' => $datos['cargo'] ?? null,
             'telefono' => $datos['telefono'] ?? null,
             'ciudad' => $datos['ciudad'] ?? null,
@@ -98,10 +104,17 @@ class PerfilController extends Controller
             ),
         ]);
 
-        // [FUNCIONALIDAD POR DEFINIR] E11 dice que al cambiar el correo se
-        // envía un enlace para verificarlo. La verificación está quitada
-        // (DEC-012), así que por ahora el cambio se guarda directo.
+        // El correo nuevo no se guarda todavía: le llega un código y se
+        // confirma en la ventana de verificación (DEC-020). Se sigue entrando
+        // con el anterior hasta confirmarlo.
+        $correoNuevo = mb_strtolower(trim((string) $datos['email']));
+        $cambiaCorreo = $correoNuevo !== mb_strtolower($usuario->email);
+        $usuario->email_pendiente = $cambiaCorreo ? $correoNuevo : null;
         $usuario->save();
+
+        if ($cambiaCorreo) {
+            $this->codigos->enviar($usuario, $correoNuevo);
+        }
 
         if ($request->editaEmpresa() && $usuario->empresa) {
             $usuario->empresa->update([
@@ -116,7 +129,66 @@ class PerfilController extends Controller
             ]);
         }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Cambios guardados.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $cambiaCorreo
+            ? "Cambios guardados. Para cambiar el correo, escribe el código que enviamos a {$correoNuevo}."
+            : 'Cambios guardados.']);
+
+        return to_route('profile.edit');
+    }
+
+    /** Confirma el correo nuevo con el código que le llegó. */
+    public function verificarCorreo(Request $request): RedirectResponse
+    {
+        $datos = $request->validate(
+            ['codigo' => ['required', 'digits:6']],
+            ['codigo.required' => 'Escribe el código de 6 dígitos.', 'codigo.digits' => 'El código tiene 6 dígitos.'],
+        );
+
+        /** @var User $usuario */
+        $usuario = $request->user();
+        $nuevo = $usuario->email_pendiente;
+
+        if ($nuevo === null) {
+            return to_route('profile.edit');
+        }
+
+        // Otra cuenta pudo tomar el correo mientras tanto.
+        if (User::withTrashed()->where('email', $nuevo)->whereKeyNot($usuario->id)->exists()) {
+            $usuario->forceFill(['email_pendiente' => null])->save();
+
+            return back()->withErrors(['email' => 'Ya hay una cuenta con este correo.']);
+        }
+
+        $error = $this->codigos->comprobar($usuario, $datos['codigo']);
+
+        if ($error !== null) {
+            return back()->withErrors(['codigo' => $error]);
+        }
+
+        $usuario->forceFill(['email' => $nuevo, 'email_pendiente' => null, 'email_verified_at' => now()])->save();
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Listo: tu correo ahora es {$nuevo}."]);
+
+        return to_route('profile.edit');
+    }
+
+    public function reenviarCodigoCorreo(Request $request): RedirectResponse
+    {
+        /** @var User $usuario */
+        $usuario = $request->user();
+
+        if ($usuario->email_pendiente !== null) {
+            $this->codigos->enviar($usuario, $usuario->email_pendiente);
+        }
+
+        return back()->with('status', 'Te enviamos un código nuevo. Revisa también la carpeta de spam.');
+    }
+
+    /** Cerrar la ventana: el correo sigue siendo el anterior. */
+    public function cancelarCambioCorreo(Request $request): RedirectResponse
+    {
+        /** @var User $usuario */
+        $usuario = $request->user();
+        $usuario->forceFill(['email_pendiente' => null, 'codigo_verificacion' => null, 'codigo_vence_en' => null])->save();
 
         return to_route('profile.edit');
     }
@@ -130,6 +202,7 @@ class PerfilController extends Controller
             'password' => $request->string('password')->value(),
             'contrasena_actualizada_en' => now(),
         ])->save();
+        HistorialContrasenas::registrar($usuario, $request->string('password')->value());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Contraseña actualizada. Tu sesión sigue abierta.']);
 

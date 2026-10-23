@@ -28,7 +28,7 @@
  * "Ver resultado" abre A3.3 (HU-038) y "Ver historial completo", A3.4
  * (HU-039).
  */
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
@@ -50,6 +50,7 @@ import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
+import SelectorEvolucion from '@/components/graficas/SelectorEvolucion.vue';
 import {
     diaYMes,
     fechaLocal,
@@ -64,10 +65,20 @@ import type { FichaEmpresa } from '@/types/empresas';
 
 const props = defineProps<FichaEmpresa>();
 
+// "Ver:" de la gráfica: el puntaje total o el de una categoría.
+const verCategoria = ref('');
+const puntosEvolucion = computed(
+    () =>
+        props.evolucion_categorias.find((c) => c.nombre === verCategoria.value)
+            ?.puntos ?? props.evolucion,
+);
+
 type Pestana = 'historial' | 'cuenta';
 
+// Sale de la URL de Inertia y no de `window`: con SSR se arma en Node.
 const pestana = ref<Pestana>(
-    new URLSearchParams(window.location.search).get('pestana') === 'cuenta'
+    new URLSearchParams(usePage().url.split('?')[1] ?? '').get('pestana') ===
+        'cuenta'
         ? 'cuenta'
         : 'historial',
 );
@@ -128,7 +139,8 @@ function verComo(): void {
 }
 
 // --- Asignar otra medición (formulario corto de A3.1b) -----------------------
-const hoy = new Date().toLocaleDateString('en-CA');
+/** Fecha límite más cercana: 3 días, en la hora de la empresa (servidor). */
+const hoy = computed(() => props.fecha_minima);
 
 const asignacion = useForm({
     empresa_id: props.empresa.id,
@@ -332,10 +344,21 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 <section
                     class="flex shrink-0 flex-col rounded-xl border border-linea bg-white px-5 py-4"
                 >
-                    <div class="flex items-baseline justify-between gap-2">
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-2"
+                    >
                         <h2 class="text-sm font-semibold">
-                            Evolución del puntaje total
+                            {{
+                                verCategoria
+                                    ? `Evolución de ${verCategoria}`
+                                    : 'Evolución del puntaje total'
+                            }}
                         </h2>
+                        <SelectorEvolucion
+                            v-model="verCategoria"
+                            class="ml-auto"
+                            :categorias="evolucion_categorias"
+                        />
                         <Link
                             :href="rutas.historial.empresa(empresa.id)"
                             :class="cn(enlace, 'text-xs')"
@@ -345,8 +368,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     </div>
                     <EvolucionPuntaje
                         v-if="evolucion.length > 0"
+                        :key="verCategoria"
                         class="mt-2 h-44"
-                        :puntos="evolucion"
+                        :puntos="puntosEvolucion"
                     />
                     <p
                         v-else
@@ -519,6 +543,17 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                     : 'sin fecha límite'
                             }}
                         </span>
+                    </p>
+                    <p
+                        v-if="pendiente.solicitud"
+                        class="mt-3 rounded-md bg-aviso-suave px-3 py-2 text-xs text-aviso"
+                        role="status"
+                    >
+                        <strong
+                            >Pidió una medición nueva
+                            {{ haceCuanto(pendiente.solicitud) }}.</strong
+                        >
+                        Asígnale otra abajo o dale una nueva fecha.
                     </p>
                     <p
                         v-if="pendiente.estado === 'enviada'"

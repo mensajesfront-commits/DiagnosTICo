@@ -20,7 +20,7 @@
  *
  * "Ver historial completo" abre E8 (HU-067).
  */
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { CalendarDays, Mail } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -73,7 +73,9 @@ const quedan = computed(() => {
         return null;
     }
 
-    return d === 0 ? 'Vence hoy' : `Quedan ${plural(d, 'día', 'días')}`;
+    return d === 0
+        ? 'Vence hoy a las 11:59 p. m.'
+        : `Quedan ${plural(d, 'día', 'días')}`;
 });
 
 const evolucion = computed(() =>
@@ -100,6 +102,9 @@ function pedirNueva(): void {
 }
 
 const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
+
+// A5.4 · En "Ver como" no se responde ni se piden fechas (solo lectura).
+const enVerComo = computed(() => !!usePage().props.verComo);
 </script>
 
 <template>
@@ -325,6 +330,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 <Boton
                     v-if="p.estado === 'no_iniciada' || p.estado === 'en_curso'"
                     :href="rutas.responder.mostrar(p.id)"
+                    :disabled="enVerComo"
                 >
                     {{
                         p.estado === 'en_curso'
@@ -332,6 +338,12 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             : 'Iniciar diagnóstico'
                     }}
                 </Boton>
+                <p
+                    v-if="enVerComo && p.estado !== 'enviada'"
+                    class="text-center text-xs text-tinta-suave"
+                >
+                    No disponible en Ver como
+                </p>
                 <Boton
                     v-else-if="p.estado === 'enviada'"
                     variante="secundario"
@@ -344,6 +356,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         v-if="!p.solicitud_abierta"
                         variante="secundario"
                         :cargando="pidiendo"
+                        :disabled="enVerComo"
                         @click="pedirNueva"
                     >
                         Pedir una nueva fecha

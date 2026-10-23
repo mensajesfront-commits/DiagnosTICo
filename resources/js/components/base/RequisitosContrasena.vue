@@ -14,13 +14,19 @@ const props = withDefaults(
         confirmacion?: string;
         /** Dos columnas, como en el registro (L2). */
         columnas?: boolean;
+        /** Correo de la cuenta: la contraseña no puede tener partes de él. */
+        correo?: string;
+        /** Contraseña actual (Mi perfil): la nueva no puede repetir partes de ella. */
+        anterior?: string;
     }>(),
-    { confirmacion: undefined, columnas: false },
+    { confirmacion: undefined, columnas: false, correo: '', anterior: '' },
 );
 
 const estado = computed(() =>
     revisarContrasena(props.contrasena, props.confirmacion ?? '', {
         conConfirmacion: props.confirmacion !== undefined,
+        correo: props.correo,
+        anterior: props.anterior,
     }),
 );
 </script>

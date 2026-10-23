@@ -51,7 +51,7 @@ Lo que no tiene casilla en A5.2 se decide por el rol:
 
 - **Inicio del Administrador (A1):** cualquier rol interno (que no sea Empresa ni Colaborador). Lo que muestra depende de sus permisos.
 - **Colaboradores (E12):** solo el rol Empresa (RN-025, HU-076).
-- **"Ver como" (A5.4):** lo usa quien tiene `usuarios.gestionar`, en solo lectura y con registro (RN-026). Sirve para **comprobar que cada rol ve solo las pantallas que se le asignaron**, así que se usa sobre cuentas de Empresa, Colaborador, Consultor y cualquier rol creado, **no sobre cuentas de Administrador** (respuesta del equipo, 6 de octubre). **[INCONSISTENCIA DETECTADA]** El wireframe A5.4b muestra "Ver como" sobre un Administrador; queda fuera según esta respuesta.
+- **"Ver como" (A5.4):** lo usa quien tiene `usuarios.gestionar`, en solo lectura y con registro (RN-026). Sirve para **comprobar que cada rol ve solo las pantallas que se le asignaron**, así que se usa sobre cuentas de Empresa, Colaborador, Consultor y cualquier rol creado, **no sobre cuentas de Administrador** (respuesta del equipo, 6 de octubre). **[INCONSISTENCIA DETECTADA]** El wireframe A5.4b muestra "Ver como" sobre un Administrador; queda fuera según esta respuesta. Tampoco se usa sobre la propia cuenta. El bloqueo de escritura y el registro los hace el middleware `VerComo` (docs/15_BACKEND.md).
 
 Para todas las cuentas, sin permiso: iniciar y cerrar sesión y recuperar la contraseña.
 
@@ -91,7 +91,7 @@ Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/
 | 2 | **La empresa y el colaborador solo ven datos de su empresa** (RN-007). Además del permiso, cada consulta se filtra por `empresa_id`. | Mi perfil y sus imágenes ya lo hacen; el resto, con *policies* al crear cada módulo | `PerfilTest` |
 | 3 | **Cuenta desactivada no entra** (RN-004), tampoco las cuentas de una empresa desactivada (RN-025). Si las desactivan con la sesión abierta, la sesión se cierra en la siguiente petición. Con la contraseña correcta, L1 muestra el modal "Su cuenta ha sido desactivada…" (`ModalCuentaDesactivada`). | `User::puedeEntrar()`, `Fortify::authenticateUsing` y el middleware `CerrarSesionCuentaInactiva` | `SeguridadAccesoTest` |
 | 4 | **Los avisos no revelan si un correo existe** (RN-005): el login responde "El correo o la contraseña no son correctos." cuando el correo no existe o la contraseña está mal, también en cuentas desactivadas. El aviso de cuenta desactivada solo lo ve quien escribe la contraseña correcta (decisión del equipo, 7 de octubre); "¿Olvidaste tu contraseña?" responde siempre "Si el correo está registrado, te enviamos un enlace…". | `lang/es/auth.php`, `AvisoRecuperacionResponse` | `SeguridadAccesoTest` |
-| 5 | **Contraseña fuerte en todos los entornos** (RN-001): mínimo 8 caracteres, una mayúscula, un número y un carácter especial. Se aplica al registrarse, al crear la contraseña nueva y al cambiarla en Mi perfil. | `Password::defaults` en `AppServiceProvider` + regla `TieneMayuscula` | `SeguridadAccesoTest` |
+| 5 | **Contraseña fuerte en todos los entornos** (RN-001): mínimo 8 caracteres, una mayúscula, un número y un carácter especial. Se aplica al registrarse, al crear la contraseña nueva y al cambiarla en Mi perfil. Tampoco puede tener partes del correo (de 3 o más caracteres) ni ser igual a la anterior. En Mi perfil tampoco puede repetir 4 caracteres seguidos de la actual; al recuperarla o en los colaboradores no se pueden leer sus partes (está cifrada). En todos los casos la nueva no puede ser ninguna de las últimas 5, sin importar mayúsculas: se guardan en minúsculas cifradas con bcrypt (`contrasenas_anteriores`), nunca en texto. | `Password::defaults` en `AppServiceProvider` + reglas `TieneMayuscula`, `SinDatosDelCorreo` y `DistintaDeLaAnterior` | `SeguridadAccesoTest`, `SinDatosDelCorreoTest`, `ColaboradoresTest` |
 | 6 | **Enlace de contraseña nueva sin vencimiento por tiempo** (RN-006): sirve hasta guardar la contraseña; pedir otro invalida el anterior. | `config/auth.php` (`expire` de un año) | `SeguridadAccesoTest` |
 | 7 | **Límite de intentos:** 5 por minuto en iniciar sesión (por correo e IP; al pasarse, L1 muestra el modal "Demasiados intentos" con la cuenta regresiva y el botón desactivado, `ModalAccesoBloqueado`), registrarse, pedir el enlace y crear la contraseña nueva (por IP). | Limitador `login` de Fortify y middleware `LimitarIntentosAcceso` | `SeguridadAccesoTest`, `AuthenticationTest` |
 | 8 | **Un correo, una cuenta** (RN-002); el correo se guarda y se compara en minúsculas. | Regla `unique` y `lowercase_usernames` de Fortify | `SeguridadAccesoTest` |
@@ -111,7 +111,7 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
 - Claves (`APP_KEY`, base de datos, correo, OpenAI) solo en `.env`.
 
-**[INFORMACIÓN PENDIENTE]** Los términos de uso y la política de tratamiento de datos no tienen URL todavía (L2 apunta a `#`).
+**Términos y política de datos:** hay un borrador según la Ley 1581 de 2012, en `resources/js/lib/legales.ts`. Solo se abre en una ventana desde el registro (L2). **[INFORMACIÓN PENDIENTE]** NuevasTIC debe completar sus datos (razón social, NIT, domicilio, teléfono, vigencia, costo, proveedores) y hacerlo revisar por su asesor legal. Lo que falta se ve resaltado en el texto.
 
 ## Comprobado en la prueba técnica
 
@@ -123,3 +123,15 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 - Las claves (OpenAI, correo, base de datos) van solo en `.env`, que no se sube al repositorio.
 - `.env.example` lleva placeholders y un comentario por variable.
 - Antes de entregar se revisa que ninguna clave haya quedado en el código (T-147).
+
+## Verificación del correo (L2b, DEC-020)
+
+- **Captcha:** el registro pide el token de Cloudflare Turnstile y el servidor lo confirma con `siteverify` (`App\Support\Captcha`). Sin token válido, la cuenta no se crea.
+- **Código:**
+  - es de 6 dígitos y se guarda cifrado (`users.codigo_verificacion`);
+  - vence en 15 minutos y admite 5 intentos;
+  - pedir otro reemplaza al anterior.
+- **A quién se le envía:** solo al correo guardado en la sesión de quien se registró o de quien escribió la contraseña correcta. Nadie puede pedir ni probar códigos de otra cuenta.
+- **Límites:** verificar, 10 por minuto; reenviar, 3 por minuto.
+- **Inicio de sesión:** sin verificar, Fortify rechaza la entrada con `correo_sin_verificar` y abre la ventana. Solo pasa con la contraseña correcta (RN-005).
+

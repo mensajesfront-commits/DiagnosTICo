@@ -15,6 +15,8 @@ export type PendienteResumen = {
     numero: number;
     estado: EstadoMedicion;
     avance: Avance | null;
+    /** ISO de la solicitud de medición nueva abierta (HU-083). */
+    solicitud: string | null;
 };
 
 /** Fila de A3. */
@@ -94,6 +96,8 @@ export type PendienteFicha = PendienteResumen & {
     /** Fechas "AAAA-MM-DD". */
     asignada: string | null;
     vence: string | null;
+    /** Fecha límite más cercana que se acepta (3 días, hora de la empresa). */
+    fecha_minima: string;
     tiene_respuestas: boolean;
     /** ISO del último aviso por correo. */
     ultimo_aviso: string | null;
@@ -115,6 +119,9 @@ export type MedicionFicha = {
 
 export type PuntoEvolucion = { numero: number; fecha: string; puntaje: number };
 
+/** Evolución de una categoría, para "Ver:" de la gráfica. */
+export type EvolucionCategoria = { nombre: string; puntos: PuntoEvolucion[] };
+
 export type Colaborador = {
     id: number;
     name: string;
@@ -133,9 +140,12 @@ export type FichaEmpresa = {
         nivel: Exclude<Nivel, 'sin'>;
     } | null;
     variacion: number | null;
+    /** "Asignar otra medición": fecha límite más cercana que se acepta. */
+    fecha_minima: string;
     pendiente: PendienteFicha | null;
     mediciones: MedicionFicha[];
     evolucion: PuntoEvolucion[];
+    evolucion_categorias: EvolucionCategoria[];
     colaboradores: Colaborador[];
     diagnosticos: DiagnosticoAsignable[];
     opciones: OpcionesEmpresa;
@@ -152,10 +162,15 @@ export type EmpresaAsignable = {
         numero: number;
         estado: EstadoMedicion;
         vence: string | null;
+        fecha_minima: string;
         diagnostico: string | null;
         version: number | null;
         tiene_respuestas: boolean;
     } | null;
+    /** ISO de la solicitud de medición nueva abierta (HU-083). */
+    solicitud: string | null;
+    /** Fecha límite más cercana que se acepta (3 días, hora de la empresa). */
+    fecha_minima: string;
     /** Número que tendrá la nueva medición. */
     siguiente: number;
     /** Usuario principal: "Para:" y {nombre_usuario} del correo. */

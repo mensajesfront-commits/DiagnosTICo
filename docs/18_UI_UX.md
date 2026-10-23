@@ -1,6 +1,6 @@
 # UI/UX
 
-**Estado:** EN CURSO (T-066, T-089). Se agregan las pantallas de cada semana.
+**Estado:** REQUIERE VALIDACIÓN (T-066, T-089). Todas las pantallas están construidas; falta la revisión pantalla por pantalla contra el wireframe.
 
 **[INFORMACIÓN PENDIENTE]** Falta el enlace al prototipo navegable. Los wireframes recibidos son 5 PDF parciales:
 
@@ -66,6 +66,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 |---|---|---|---|
 | L1 | Iniciar sesión | `pages/auth/Login.vue` | Hecha |
 | L2 | Registra tu empresa | `pages/auth/Register.vue` | Hecha y conectada (dos pasos, DEC-015 y DEC-016) |
+| L2b | Verifica tu correo (ventana con el código de 6 dígitos) y captcha en L2 | `components/auth/ModalVerificarCorreo.vue`, `components/auth/CaptchaTurnstile.vue` | Hecha y conectada. Sin wireframe: pedido del equipo (DEC-020) |
 | L3 | ¿Olvidaste tu contraseña? | `pages/auth/ForgotPassword.vue` | Hecha |
 | L4 | Crea una contraseña nueva | `pages/auth/ResetPassword.vue` | Hecha |
 | A1 | Inicio del Administrador: indicadores, mediciones con pestañas, empresas por nivel y diagnósticos por sector | `pages/inicio/Administrador.vue`, `components/inicio/` | Hecha y conectada, con todas sus acciones |
@@ -89,7 +90,8 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.1d | Versiones y publicar | `components/editor/ModalVersiones.vue` | Hecha |
 | A2.1d | Agregar categoría al diagnóstico | `components/editor/ModalAgregarCategoria.vue` | Hecha |
 | A2.1c | Editar importancia | `pages/diagnosticos/Importancia.vue` | Hecha y conectada |
-| A2.4 | Vista previa y estado | `pages/diagnosticos/VistaPrevia.vue` | Hecha y conectada ("Resultado de ejemplo" espera A2.6) |
+| A2.4 | Vista previa y estado | `pages/diagnosticos/VistaPrevia.vue` | Hecha y conectada |
+| A2.6 / A2.6b / A2.6c | Resultado de ejemplo: caso medio, mejor y peor, y el formato del PDF | `pages/resultados/Resultado.vue` (con `ejemplo`) | Hecha y conectada |
 | A3 | Empresas: búsqueda, filtros y tabla paginada | `pages/empresas/Index.vue` | Hecha y conectada |
 | A3.1 | Ficha de la empresa: Historial y gráfica de evolución | `pages/empresas/Ver.vue`, `components/graficas/EvolucionPuntaje.vue` | Hecha y conectada ("Ver resultado" abre A3.3) |
 | A3.1b | Asignar medición, con vista previa | `pages/mediciones/Asignar.vue`, `components/empresas/BuscadorEmpresa.vue` | Hecha y conectada |
@@ -106,6 +108,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A5.1d | Eliminar rol | `components/usuarios/ModalEliminarRol.vue` | Hecha |
 | A5.2 | Crear rol | `components/usuarios/ModalCrearRol.vue` | Hecha |
 | A5.3b | Desactivar o eliminar cuenta | `components/usuarios/ModalDesactivarEliminar.vue` | Hecha y conectada |
+| A5.4 / A5.4b | "Ver como": franja de aviso y "Salir de Ver como" | `components/base/FranjaVerComo.vue`, `layouts/panel/PanelLayout.vue`, `layouts/ResponderLayout.vue`, `components/base/MenuLateral.vue` | Hecha y conectada |
 | A5.5 | Cambiar o asignar rol | `ModalCambiarRol.vue`, `ModalAsignarRol.vue` | Hecha |
 | — | Invitar usuario interno | `components/usuarios/ModalInvitarUsuario.vue` | Hecha. El wireframe no le da código. |
 | A6 | Mi perfil del Administrador | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
@@ -144,13 +147,13 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L1 | Cuenta desactivada y demasiados intentos se avisan en un modal, no bajo el campo. | Pedido por el equipo (7 de octubre). El wireframe no los dibuja. |
 | L2 | El registro va en dos pasos (Mi empresa → Tu usuario), con actividad económica CIIU, descripción corta (máx. 300) y cargo obligatorio. | Cambio pedido por el equipo (7 de octubre, DEC-015). El wireframe muestra un solo formulario. |
 | L2, A6, E11 | País → departamento → ciudad en listas con búsqueda; la etiqueta del departamento cambia según el país (Estado, Provincia, Región). | Pedido por el equipo (8 de octubre, DEC-016). El wireframe muestra solo ciudad y país. |
-| L2 | Los enlaces de términos y de política apuntan a `#`. | **[INFORMACIÓN PENDIENTE]** Faltan las URL reales. |
+| L2 | Los términos y la política solo están en el registro y se abren en una ventana sin salir del formulario. | Pedido por el equipo (16 de octubre). **[INFORMACIÓN PENDIENTE]** NuevasTIC completa sus datos y valida el texto. |
 | A2.5 | En blanco, se eligen las categorías con casillas y se muestra cuánto vale cada una al empezar. | HU-020 pide elegir las categorías; el wireframe solo muestra la opción de copiar. |
 | A2.3 | Si la categoría nunca se respondió, la acción es «Eliminar» en vez de «Archivar». | HU-019 y RN-009. El wireframe solo muestra «Archivar». |
 | A2.3 | Al abrir, el panel muestra la primera categoría; con «Cancelar» queda vacío con una indicación. | El wireframe solo muestra el panel con una categoría elegida. |
 | Todas | Dice «Captter» donde el wireframe dice «Diagnóstico Empresarial». | Nombre del sistema decidido por el equipo (6 de octubre). |
 | A6 | La lista de requisitos de la contraseña tiene 5 puntos; el wireframe muestra 3. | RN-001. **[INCONSISTENCIA DETECTADA]** (también en L2 y L4). |
-| E11 | Al cambiar el correo se guarda directo, sin enlace de verificación. | La verificación de correo está quitada (DEC-012). **[FUNCIONALIDAD POR DEFINIR]** |
+| E11 | Al cambiar el correo se confirma con un código de 6 dígitos al correo nuevo, en una ventana. | Resuelto con DEC-020: código en lugar del enlace del wireframe. |
 | E11 | El colaborador ve «Información de empresa» bloqueada, con una nota. | RN-025: solo la cuenta principal cambia esos datos. El wireframe solo muestra la cuenta principal. |
 | A5 | "Ver como" no aparece en las cuentas de Administrador. | Respuesta del equipo (6 oct): "Ver como" es para revisar lo que ven los otros roles. |
 | A5.5 | "Cambiar rol" no ofrece "Colaborador", y a las cuentas internas tampoco "Empresa". | Un colaborador lo crea su empresa (RN-025); una cuenta sin empresa no puede ser Empresa. |
@@ -162,8 +165,8 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A5 | "Quitar rol" (HU-052) no está. | Cada cuenta tiene un solo rol (RN-027); se cambia con "Cambiar rol". **[FUNCIONALIDAD POR DEFINIR]** qué rol queda al "quitar". |
 | A3.1, A3.1b, A3.2 | Sin migas "Empresas › …": arriba va la flecha "← Empresas" (o "← Ficha de la empresa"). | Pedido del equipo para volver (A2). Así la página no se desplaza. |
 | A3.1d, A3.2 | Agregan actividad económica (subsector CIIU), departamento y descripción corta. Los obligatorios llevan asterisco. | DEC-015, DEC-016 y el pedido del 8 de octubre. |
-| A3.1 | Los colaboradores se ven en Datos de la cuenta, al pulsar "N activos" en Estado de la cuenta. "Ver historial completo" no aparece. | HU-033 CA-003 pide verlos; el wireframe solo muestra el número. A3.4 llega con Resultados. |
-| A3.1 | La gráfica no tiene el selector "Ver: Puntaje total". | **[FUNCIONALIDAD POR DEFINIR]** Ver por categoría necesita los resultados por categoría (semana 5). |
+| A3.1 | Los colaboradores se ven en Datos de la cuenta, al pulsar "N activos" en Estado de la cuenta. | HU-033 CA-003 pide verlos; el wireframe solo muestra el número. "Ver historial completo" abre A3.4. |
+| A3.1 | El selector "Ver: Puntaje total". | Resuelto: "Ver:" elige el puntaje total o una categoría (por su nombre) en A3.1, A3.4 y E8. |
 | A3.1b | Sin "unos 25 minutos" en cada diagnóstico. | **[INFORMACIÓN PENDIENTE]** No hay una regla para estimar el tiempo. |
 | A1d | "Nueva fecha" abre un modal en la misma tabla, en vez de llevar a A3.1b. La medición conserva sus respuestas. | Menos pasos. HU-009 CA-002 se cumple igual; A3.1b también ofrece "dale una nueva fecha". |
 | A3.1d | Al cambiar el correo no se envía enlace de verificación: se guarda y se cierran sus sesiones. | DEC-012 (verificación quitada). |
@@ -174,7 +177,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A2.1b | La indicación para responder es obligatoria al guardar, pero el editor igual avisa "Falta la indicación" en preguntas copiadas sin ella. | HU-024 CA-003 la exige; el wireframe la muestra como algo por corregir. **[INCONSISTENCIA DETECTADA]** menor: las dos cosas quedan cubiertas. |
 | E1 | No muestra "Unos 25 minutos". | **[INFORMACIÓN PENDIENTE]** No hay una regla para estimar el tiempo. |
 | E1 (vencida) | En vez de solo "Escribir a NuevasTIC", el botón "Pedir una nueva fecha" registra la solicitud y avisa a los administradores; el correo de soporte queda debajo. | HU-082 pide que la solicitud quede registrada y una a la vez. |
-| E2 | Sin la opción "Otro" con texto ("¿Cuál otro canal?"). | **[FUNCIONALIDAD POR DEFINIR]** Necesita un campo en las opciones (A2.1b). |
+| E2 | La opción "Otro" con texto ("¿Cuál otro canal?"). | Resuelto: en A2.1b se elige la "Opción que pide escribir cuál" (se marca sola si empieza por "Otro"); en E2, al elegirla aparece "¿Cuál?" (máx. 255) y la IA lee "Otro: lo que escribió". |
 | E2 | La descripción de la categoría es un texto general ("No hay respuestas buenas o malas…"). | **[INFORMACIÓN PENDIENTE]** La versión congelada no guarda la descripción de cada categoría. |
 | E6 | El resultado va en tres pestañas (Resumen, Categorías, Recomendaciones) y el detalle se abre eligiendo una fila de la tabla, en vez de una página larga con acordeones. | Las páginas del panel no tienen scroll de página (pedido del equipo). |
 | E6 | Sin "Mi historial ›" en la ruta de navegación: flecha a Inicio (o a la ficha A3.1 para el Administrador). | Se usan flechas y no migas de pan; E8 aún no existe. |
@@ -185,3 +188,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | A4.5 | "Reemplazar" sustituye el texto completo del elemento, no solo `{contexto_sector}`. | HU-042 CA-002: "Reemplazar lo sustituye". **[INCONSISTENCIA DETECTADA]** menor con el texto del wireframe ("ocupa el lugar del Contexto del sector"). |
 | E8 | Con la medición pendiente no iniciada o vencida, el botón es "Ir a mi inicio" y no "Continuar diagnóstico". | HU-067 CA-005: no se inicia desde el historial. |
 | A3.4 | "Asignar medición" va en el encabezado y no hay "Volver a la empresa": la flecha con el nombre de la empresa lleva a A3.1. | Se usan flechas, no migas de pan. |
+| A5.4 | Los botones que guardan no se apagan uno por uno (solo "Iniciar diagnóstico" y "Pedir una nueva fecha" en E1): al usarlos, el servidor no guarda nada y avisa. | El bloqueo está en el servidor para cubrir todas las pantallas (RN-026). |
+| A2.6 | El selector de caso va junto a las pestañas y la pantalla usa las tres pestañas de E6, en vez de una página larga. | Es la misma pantalla que E6 (CA-003) y las páginas del panel no tienen scroll. |
+| A2.6 | Las observaciones y recomendaciones son textos de muestra ("Recomendación de ejemplo para …"). | Generarlas con la IA costaría una llamada por categoría en cada vista; los puntajes sí son los reales del cálculo. **[FUNCIONALIDAD POR DEFINIR]** si se quiere un botón "Generar con la IA". |
+| E6, PDF | Cada categoría muestra el método con el que la IA la analizó (PESTEL, 5 Fuerzas de Porter, VRIO, DOFA o CAME). | Pedido del equipo (14 oct, DEC-019); NuevasTIC lo confirmó el 23 de octubre. |

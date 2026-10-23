@@ -41,8 +41,10 @@ const listo = computed(
         form.name.trim() !== '' &&
         form.cargo.trim() !== '' &&
         form.email.trim() !== '' &&
-        revisarContrasena(form.password, '', { conConfirmacion: false })
-            .completa,
+        revisarContrasena(form.password, '', {
+            conConfirmacion: false,
+            correo: form.email,
+        }).completa,
 );
 
 function crear(): void {
@@ -141,7 +143,10 @@ function crear(): void {
                     :invalida="!!form.errors.password"
                 />
             </Campo>
-            <RequisitosContrasena :contrasena="form.password" />
+            <RequisitosContrasena
+                :contrasena="form.password"
+                :correo="form.email"
+            />
             <p
                 class="rounded-md bg-lienzo-oscuro/60 px-3 py-2.5 text-xs text-tinta-suave"
             >

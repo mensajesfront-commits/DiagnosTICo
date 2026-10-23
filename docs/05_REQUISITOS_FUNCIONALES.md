@@ -238,7 +238,7 @@ Una historia está **LISTA** si tiene ID, épica, actor, necesidad, beneficio, c
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -356,7 +356,7 @@ Permite que cada persona llegue de forma segura a su inicio según su rol.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -499,7 +499,7 @@ Permite a una empresa crear su cuenta por sí misma para responder el diagnósti
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -607,7 +607,7 @@ Permite recuperar el acceso a quien olvidó su contraseña sin exponer qué corr
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -724,7 +724,7 @@ Permite fijar una contraseña nueva y segura para recuperar el acceso a la cuent
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -829,7 +829,7 @@ Permite proteger la cuenta cerrando la sesión en un equipo.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -943,7 +943,7 @@ Da al administrador una vista rápida de qué empresas necesitan atención.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** NO LISTA: falta dibujar en el prototipo el estado "Enviada" en las pestañas.
 
@@ -1063,7 +1063,7 @@ Permite al administrador ver solo las mediciones del estado que le interesa.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** NO LISTA: falta validar si el registro de envío se muestra en la ficha de la empresa.
 
@@ -1168,7 +1168,7 @@ Permite empujar a las empresas a terminar su medición a tiempo con un recordato
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -1277,7 +1277,7 @@ Permite reactivar una medición vencida dándole una nueva fecha para que la emp
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -1400,7 +1400,7 @@ Permite administrar un sector en un solo lugar viendo sus diagnósticos, resumen
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -1512,7 +1512,7 @@ Permite comparar y encontrar rápido un diagnóstico viendo todos los sectores j
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -1626,7 +1626,7 @@ Permite ofrecer un sector nuevo a empresas de un tipo que aún no existe.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -1740,7 +1740,7 @@ Permite mantener al día los datos y el estado de los sectores.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -1854,7 +1854,7 @@ Permite cerrar un sector sin perder a sus empresas, pasándolas a otro sector.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -1958,7 +1958,7 @@ Permite dejar de ofrecer un sector sin perder la información de sus empresas, d
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -2058,7 +2058,7 @@ Mantiene limpia la lista de sectores sin poner en riesgo empresas ni mediciones 
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -2171,7 +2171,7 @@ Da una lista única de categorías para que todos los diagnósticos usen los mis
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -2290,7 +2290,7 @@ Permite medir un tema nuevo agregando una categoría al catálogo y sumándola a
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -2406,7 +2406,7 @@ Permite retirar una categoría sin perder los resultados anteriores de las empre
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -2518,7 +2518,7 @@ Da el cuestionario que responderán las empresas de un sector, en blanco o a par
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -2623,7 +2623,7 @@ Permite reutilizar un diagnóstico en otro sector o modificarlo sin tocar el pub
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** NO LISTA: falta diseñar el modal de confirmación en el prototipo.
 
@@ -2739,7 +2739,7 @@ Permite sacar un diagnóstico de uso sin perder los resultados ya obtenidos.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -2843,7 +2843,7 @@ Permite revisar y organizar el contenido que verá la empresa, con claridad sobr
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -2970,7 +2970,7 @@ Permite medir algo nuevo con preguntas abiertas, de opción única o de selecci�
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -3084,7 +3084,7 @@ Permite corregir el diagnóstico cambiando o quitando preguntas sin afectar vers
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -3199,7 +3199,7 @@ Permite ampliar lo que mide un diagnóstico tomando categorías del catálogo.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -3303,7 +3303,7 @@ Permite que pesen más los temas importantes para el sector, cuidando que el tot
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -3420,7 +3420,7 @@ Permite revisar el diagnóstico como lo verá la empresa y saber qué falta para
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -3543,7 +3543,7 @@ Permite que las empresas respondan una versión corregida del diagnóstico sin a
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -3659,7 +3659,7 @@ Permite revisar cómo se verá el diagnóstico para la empresa antes de publicar
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -3779,7 +3779,7 @@ Permite encontrar rápido una empresa para consultarla o asignarle una medición
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -3899,7 +3899,7 @@ Permite dar de alta a una empresa que no se registra sola y dejarla lista para r
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -4012,7 +4012,7 @@ Permite seguir el progreso de una empresa en un solo lugar.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -4126,7 +4126,7 @@ Mantiene al día los datos de la empresa y de su usuario principal.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -4247,7 +4247,7 @@ Permite impedir el acceso de una empresa sin perder su información.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -4374,7 +4374,7 @@ Permite poner a una empresa a responder un diagnóstico y medir su evolución.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -4488,7 +4488,7 @@ Permite que el aviso que recibe la empresa sea claro y correcto.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -4549,7 +4549,7 @@ Permite acompañar a la empresa y explicarle su diagnóstico viendo lo mismo que
 ### Reglas de negocio
 
 - RN-023 — El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable.
-- RN-028 — El resultado no incluye análisis FODA ni comparación con promedios.
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
 
 ### Validaciones
 
@@ -4593,7 +4593,7 @@ Permite acompañar a la empresa y explicarle su diagnóstico viendo lo mismo que
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -4697,7 +4697,7 @@ Permite ver cómo ha evolucionado una empresa a lo largo de sus mediciones.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -4801,11 +4801,11 @@ Permite entender el puntaje de una empresa leyendo lo que respondió.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
-**Definition of Ready:** NO LISTA: falta dibujar la pantalla en el prototipo
+**Definition of Ready:** LISTA (sin vista propia en el prototipo: se resolvió con avisos en pantallas que ya existían)
 
-**Vistas del prototipo:** Sin vista en el prototipo
+**Vistas del prototipo:** A1, A3, A3.1, A3.1b (avisos agregados; sin vista propia)
 
 ### Historia de Usuario
 
@@ -4815,7 +4815,14 @@ Permite entender el puntaje de una empresa leyendo lo que respondió.
 
 Cuando una medición vence, la empresa puede pedir una nueva (HU-082). El Administrador recibe la solicitud y la atiende asignando otra medición.
 
-> La solicitud le llega al Administrador por correo. Pendiente de dibujar en el prototipo.
+> La solicitud le llega al Administrador por correo, con el botón "Asignar medición" que abre A3.1b con la empresa elegida. Además, mientras está abierta:
+>
+> - **A1:** junto al título "Mediciones" aparece "1 empresa pidió una medición nueva", que lleva a la pestaña Vencidas. Ahí esas filas van primero, con la nota "Pidió una medición nueva hace N días" y la acción "Asignar nueva".
+> - **A3:** la columna "Medición pendiente" dice "Pidió una nueva".
+> - **A3.1 y A3.4:** la tarjeta de la medición pendiente lo avisa.
+> - **A3.1b:** al elegir la empresa, se avisa que la pidió y que al asignar queda atendida.
+>
+> La solicitud queda atendida si el Administrador asigna otra medición, le da una nueva fecha a la vencida o la cancela (decisión del equipo: las tres respuestas cierran la solicitud para que la empresa pueda volver a pedir más adelante).
 
 ### Valor de negocio
 
@@ -4894,7 +4901,7 @@ Permite al Administrador atender a tiempo a las empresas cuya medición venció.
 
 ### Riesgos
 
-- SIN VISTA: pendiente de dibujar en el prototipo.
+- Sin vista propia en el prototipo: los avisos agregados deben compararse con NuevasTIC en la revisión del wireframe.
 - Depende de HU-036, HU-082 y HU-070.
 
 ---
@@ -4913,7 +4920,7 @@ Permite al Administrador atender a tiempo a las empresas cuya medición venció.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -5038,7 +5045,7 @@ Permite que el análisis de la IA refleje el criterio de NuevasTIC.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -5150,7 +5157,7 @@ Permite que la IA entienda las particularidades de cada sector.
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -5263,7 +5270,7 @@ Permite que el análisis de la IA refleje el caso particular de una empresa sin 
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -5377,7 +5384,7 @@ Permite al Administrador revisar que el prompt final se entienda tal como lo rec
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** NO LISTA: definir el límite de pruebas por día.
 
@@ -5492,7 +5499,7 @@ Permite ver el resultado que daría la IA con un caso real antes de cambiar el p
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -5598,7 +5605,7 @@ Ayuda al Administrador a entender de dónde sale cada parte del prompt antes de 
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -5711,7 +5718,7 @@ Da al Administrador visibilidad de quién tiene acceso al sistema, con qué rol 
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -5824,7 +5831,7 @@ Permite quitar el acceso a una persona sin perder su información y devolvérsel
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -5931,7 +5938,7 @@ Permite saber qué puede hacer cada rol del sistema y quién lo tiene.
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** NO LISTA: confirmar si “Consultor” es un rol creable o solo a futuro.
 
@@ -6041,7 +6048,7 @@ Permite dar acceso a otras personas con permisos a la medida sin depender de cam
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -6145,7 +6152,7 @@ Permite ajustar lo que puede hacer un rol creado y que el cambio llegue a todas 
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -6248,7 +6255,7 @@ Mantiene limpia la lista de roles eliminando los que ya no se usan.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -6362,7 +6369,7 @@ Permite cambiar lo que una persona puede hacer dándole o quitándole un rol de 
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -6468,7 +6475,7 @@ Permite al Administrador ayudar a una empresa viendo exactamente lo que ella ve,
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -6575,7 +6582,7 @@ Permite revisar que los permisos de otro rol sean correctos viendo su menú tal 
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -6689,7 +6696,7 @@ Permite al Administrador mantener sus datos, avisos y contraseña al día y su c
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -6809,7 +6816,7 @@ Permite que los datos de la empresa o del colaborador estén correctos en los in
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -6914,7 +6921,7 @@ Orienta a la empresa nueva sobre qué hacer para empezar su primer diagnóstico.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7020,7 +7027,7 @@ Permite responder a tiempo la medición asignada conociendo el mensaje y la fech
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7125,7 +7132,7 @@ Muestra a la empresa cómo va su último resultado cuando no tiene nada pendient
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7247,7 +7254,7 @@ Permite responder el diagnóstico a su ritmo sin perder lo escrito.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7351,7 +7358,7 @@ Evita enviar un diagnóstico incompleto al mostrar qué falta.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7458,7 +7465,7 @@ Da a la empresa certeza de que confirma el envío sabiendo que no podrá cambiar
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7564,7 +7571,7 @@ Tranquiliza a la empresa mostrando que el análisis avanza y que no debe hacer n
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7645,7 +7652,7 @@ Muestra a la empresa su puntaje, nivel y recomendaciones para saber qué mejorar
 - RN-019 — Niveles fijos: Crítico 0–29, Se puede mejorar 30–59, Vas en buen camino 60–79, Sigue así 80–100.
 - RN-020 — La variación se calcula contra la medición anterior de la misma empresa y solo existe desde la 2.ª medición.
 - RN-023 — El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable.
-- RN-028 — El resultado no incluye análisis FODA ni comparación con promedios.
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
 
 ### Validaciones
 
@@ -7690,7 +7697,7 @@ Muestra a la empresa su puntaje, nivel y recomendaciones para saber qué mejorar
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7795,7 +7802,7 @@ Permite recordar en qué se basó el resultado al leer las propias respuestas.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -7855,7 +7862,7 @@ Permite compartir el resultado con el equipo mediante un informe descargable.
 ### Reglas de negocio
 
 - RN-024 — PDF de 3 páginas (portada y puntaje, puntaje por categoría, recomendaciones), generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA.
-- RN-028 — El resultado no incluye análisis FODA ni comparación con promedios.
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
 
 ### Validaciones
 
@@ -7899,7 +7906,7 @@ Permite compartir el resultado con el equipo mediante un informe descargable.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -8012,7 +8019,7 @@ Permite ver todas las mediciones y la evolución para saber si la empresa ha mej
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** NO LISTA: falta dibujar la pantalla en el prototipo
 
@@ -8131,7 +8138,7 @@ Permite a la empresa seguir con su diagnóstico cuando su medición venció.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -8236,7 +8243,7 @@ Permite a la empresa saber quién tiene acceso a su cuenta.
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -8355,7 +8362,7 @@ Permite a la empresa dar acceso a una persona de su equipo sin compartir su prop
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -8460,7 +8467,7 @@ Permite recuperar el acceso de un colaborador que olvidó su contraseña.
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -8566,7 +8573,7 @@ Permite quitar el acceso a un colaborador sin perder su información.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -8691,7 +8698,7 @@ Garantiza que el puntaje sea justo y siempre igual para todas las empresas.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -8799,7 +8806,7 @@ Obtiene de la IA las observaciones, calificaciones y recomendaciones de cada cat
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -8903,7 +8910,7 @@ Permite que el Administrador vea cada día qué mediciones vencieron.
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -9012,7 +9019,7 @@ Garantiza que la IA reciba instrucciones y respuestas correctas para cada catego
 
 **MoSCoW:** Must
 
-**Estado:** Pendiente
+**Estado:** Hecha
 
 **Definition of Ready:** LISTA
 
@@ -9133,7 +9140,7 @@ Entrega a la empresa un resultado final que no cambia y le avisa cuando está li
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Aplazada
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir y diseñar la sección del bot en el panel (sin vista en el prototipo).
 
@@ -9250,7 +9257,7 @@ Permite al Administrador cambiar las preguntas del bot sin depender de un desarr
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Aplazada
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el texto exacto del saludo del bot.
 
@@ -9350,7 +9357,7 @@ Permite a una empresa iniciar un diagnóstico rápido por chat sin crear una cue
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Aplazada
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071).
 
@@ -9473,7 +9480,7 @@ Permite completar el diagnóstico desde el chat respondiendo una pregunta a la v
 
 **MoSCoW:** Could
 
-**Estado:** Pendiente
+**Estado:** Aplazada
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071), de los que depende la conversación.
 
@@ -9579,7 +9586,7 @@ Evita que la empresa tenga que empezar de nuevo si deja la conversación a media
 
 **MoSCoW:** Should
 
-**Estado:** Pendiente
+**Estado:** Aplazada
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo y las preguntas del bot (HU-071 y HU-072), de los que depende el resultado.
 
@@ -9769,7 +9776,7 @@ Requisito → Épica → Historia → Criterio de aceptación.
 
 ## Historia → requisito (T-061)
 
-Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha" quiere decir que tiene pantalla, backend y pruebas.
+Cada historia con su requisito y su estado en el código al 14 de octubre. "Hecha" quiere decir que tiene pantalla, backend y pruebas.
 
 | Historia | Requisito | Estado |
 |---|---|---|
@@ -9794,15 +9801,15 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-019 — Eliminar o archivar una categoría | RF-010 | Hecha |
 | HU-020 — Crear un diagnóstico | RF-011 | Hecha |
 | HU-021 — Duplicar un diagnóstico | RF-011 | Hecha |
-| HU-022 — Archivar o eliminar un diagnóstico | RF-011 | Hecha |
+| HU-022 — Archivar o eliminar un diagnóstico | RF-011 | Hecha (los archivados se ven en "Archivados (N)" de A2: se restauran o, si nadie los respondió, se eliminan) |
 | HU-023 — Ver y ordenar el contenido del diagnóstico | RF-012 | Hecha |
 | HU-024 — Agregar una pregunta | RF-013 | Hecha |
 | HU-025 — Editar o eliminar una pregunta | RF-013 | Hecha |
 | HU-026 — Agregar categorías al diagnóstico | RF-012 | Hecha |
 | HU-027 — Editar la importancia de las categorías | RF-012 | Hecha |
-| HU-028 — Ver la vista previa y el estado | RF-014 | Hecha (el resultado de ejemplo, CA-005, llega con HU-030) |
+| HU-028 — Ver la vista previa y el estado | RF-014 | Hecha (con el resultado de ejemplo, CA-005, de HU-030) |
 | HU-029 — Publicar una versión | RF-014 | Hecha |
-| HU-030 — Ver un resultado de ejemplo | RF-015 | Pendiente |
+| HU-030 — Ver un resultado de ejemplo | RF-015 | Hecha |
 | HU-031 — Ver la lista de empresas | RF-016 | Hecha |
 | HU-032 — Registrar una empresa | RF-017 | Hecha |
 | HU-033 — Ver la ficha e historial de una empresa | RF-016 | Hecha |
@@ -9825,8 +9832,8 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-050 — Editar un rol | RF-024 | Hecha |
 | HU-051 — Eliminar un rol | RF-024 | Hecha |
 | HU-052 — Asignar o quitar un rol | RF-024 | Hecha |
-| HU-053 — Ver el sistema como una empresa | RF-025 | Pendiente |
-| HU-054 — Ver el sistema como otro administrador | RF-025 | Pendiente |
+| HU-053 — Ver el sistema como una empresa | RF-025 | Hecha |
+| HU-054 — Ver el sistema como otro administrador | RF-025 | Hecha para cuentas de otros roles; no sobre Administradores (respuesta del equipo, 6 oct; `17_SEGURIDAD.md`) |
 | HU-055 — Editar mi perfil (Administrador) | RF-026 | Hecha |
 | HU-056 — Editar mi perfil (Empresa o Colaborador) | RF-026 | Hecha |
 | HU-057 — Ver mi inicio la primera vez | RF-027 | Hecha |
@@ -9842,7 +9849,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-067 — Ver mi historial | RF-033 | Hecha |
 | HU-068 — Calcular los puntajes | RF-036 | Hecha |
 | HU-069 — Analizar cada categoría con la IA | RF-037 | Hecha |
-| HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003, no responder una vencida, llega con E2) |
+| HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003: una vencida no se responde en E2) |
 | HU-071 — Configurar las preguntas del bot | RF-039 | Aplazada |
 | HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Aplazada |
 | HU-073 — Responder las preguntas del bot | RF-040 | Aplazada |
@@ -9855,7 +9862,7 @@ Cada historia con su requisito y su estado en el código al 8 de octubre. "Hecha
 | HU-080 — Entender cómo se arma el prompt final | RF-020 | Hecha |
 | HU-081 — Armar el prompt de cada categoría | RF-037 | Hecha |
 | HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Hecha (botón "Pedir una nueva fecha" en E1) |
-| HU-083 — Atender las solicitudes de nueva medición | RF-034 | Pendiente |
+| HU-083 — Atender las solicitudes de nueva medición | RF-034 | Hecha (aviso en A1, en la lista y la ficha de la empresa y en Asignar medición; se atiende asignando otra, con nueva fecha o cancelando la vencida) |
 | HU-084 — Publicar el resultado | RF-038 | Hecha |
 
 HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la semana 4; mientras tanto vuelven a A2 con un aviso. HU-078 también permite editar el nombre, el cargo y el correo del colaborador, y E12 permite eliminarlo (DEC-017).
@@ -9948,90 +9955,90 @@ HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la sem
 
 | ID | Épica | Historia | Prioridad | Story Points | Estado |
 |---|---|---|---|---:|---|
-| HU-001 | EP-001 | Iniciar sesión | Alta | 5 | Pendiente |
-| HU-002 | EP-001 | Registrar mi empresa | Alta | 5 | Pendiente |
-| HU-003 | EP-001 | Recuperar mi contraseña | Alta | 3 | Pendiente |
-| HU-004 | EP-001 | Crear una contraseña nueva | Alta | 3 | Pendiente |
-| HU-005 | EP-001 | Cerrar sesión | Media | 2 | Pendiente |
-| HU-006 | EP-002 | Ver el inicio con indicadores | Alta | 5 | Pendiente |
-| HU-007 | EP-002 | Filtrar las mediciones por estado | Alta | 3 | Pendiente |
-| HU-008 | EP-002 | Recordar o reenviar el aviso | Media | 3 | Pendiente |
-| HU-009 | EP-002 | Dar una nueva fecha a una medición vencida | Media | 3 | Pendiente |
-| HU-010 | EP-003 | Ver los diagnósticos de un sector | Alta | 5 | Pendiente |
-| HU-011 | EP-003 | Ver todos los diagnósticos | Media | 3 | Pendiente |
-| HU-012 | EP-003 | Crear un sector | Alta | 3 | Pendiente |
-| HU-013 | EP-003 | Editar un sector | Alta | 3 | Pendiente |
-| HU-014 | EP-003 | Reasignar las empresas de un sector | Media | 3 | Pendiente |
-| HU-015 | EP-003 | Desactivar un sector | Media | 2 | Pendiente |
-| HU-016 | EP-003 | Eliminar un sector | Media | 3 | Pendiente |
-| HU-017 | EP-004 | Ver y editar el catálogo de categorías | Alta | 3 | Pendiente |
-| HU-018 | EP-004 | Crear una categoría | Alta | 5 | Pendiente |
-| HU-019 | EP-004 | Eliminar o archivar una categoría | Media | 5 | Pendiente |
-| HU-020 | EP-005 | Crear un diagnóstico | Alta | 8 | Pendiente |
-| HU-021 | EP-005 | Duplicar un diagnóstico | Media | 3 | Pendiente |
-| HU-022 | EP-005 | Archivar o eliminar un diagnóstico | Media | 3 | Pendiente |
-| HU-023 | EP-005 | Ver y ordenar el contenido del diagnóstico | Alta | 5 | Pendiente |
-| HU-024 | EP-005 | Agregar una pregunta | Alta | 8 | Pendiente |
-| HU-025 | EP-005 | Editar o eliminar una pregunta | Alta | 3 | Pendiente |
-| HU-026 | EP-005 | Agregar categorías al diagnóstico | Media | 3 | Pendiente |
-| HU-027 | EP-005 | Editar la importancia de las categorías | Alta | 3 | Pendiente |
-| HU-028 | EP-005 | Ver la vista previa y el estado | Alta | 5 | Pendiente |
-| HU-029 | EP-005 | Publicar una versión | Alta | 5 | Pendiente |
-| HU-030 | EP-005 | Ver un resultado de ejemplo | Baja | 3 | Pendiente |
-| HU-031 | EP-006 | Ver la lista de empresas | Alta | 3 | Pendiente |
-| HU-032 | EP-006 | Registrar una empresa | Alta | 5 | Pendiente |
-| HU-033 | EP-006 | Ver la ficha e historial de una empresa | Alta | 5 | Pendiente |
-| HU-034 | EP-006 | Editar los datos de la cuenta de una empresa | Media | 3 | Pendiente |
-| HU-035 | EP-006 | Desactivar o reactivar la cuenta de una empresa | Media | 3 | Pendiente |
-| HU-036 | EP-006 | Asignar una medición | Alta | 8 | Pendiente |
-| HU-037 | EP-006 | Editar el correo de aviso de la medición | Media | 5 | Pendiente |
-| HU-038 | EP-006 | Ver el resultado de una empresa | Alta | 3 | Pendiente |
-| HU-039 | EP-006 | Ver el historial de una empresa | Media | 3 | Pendiente |
-| HU-040 | EP-006 | Ver las respuestas de una empresa | Media | 2 | Pendiente |
-| HU-041 | EP-007 | Editar las instrucciones generales de la IA | Alta | 5 | Pendiente |
-| HU-042 | EP-007 | Ajustar el prompt para un sector | Media | 5 | Pendiente |
-| HU-043 | EP-007 | Ajustar el prompt para una empresa | Baja | 5 | Pendiente |
-| HU-044 | EP-007 | Ver el prompt completo | Media | 3 | Pendiente |
-| HU-045 | EP-007 | Probar el prompt con un ejemplo | Media | 5 | Pendiente |
-| HU-046 | EP-008 | Ver las cuentas del sistema | Media | 3 | Pendiente |
-| HU-047 | EP-008 | Desactivar o reactivar una cuenta | Media | 3 | Pendiente |
-| HU-048 | EP-008 | Ver los roles del sistema | Media | 3 | Pendiente |
-| HU-049 | EP-008 | Crear un rol | Baja | 5 | Pendiente |
-| HU-050 | EP-008 | Editar un rol | Baja | 3 | Pendiente |
-| HU-051 | EP-008 | Eliminar un rol | Baja | 2 | Pendiente |
-| HU-052 | EP-008 | Asignar o quitar un rol | Media | 5 | Pendiente |
-| HU-053 | EP-008 | Ver el sistema como una empresa | Media | 5 | Pendiente |
-| HU-054 | EP-008 | Ver el sistema como otro administrador | Baja | 3 | Pendiente |
-| HU-055 | EP-009 | Editar mi perfil (Administrador) | Baja | 3 | Pendiente |
-| HU-056 | EP-009 | Editar mi perfil (Empresa o Colaborador) | Baja | 5 | Pendiente |
-| HU-057 | EP-010 | Ver mi inicio la primera vez | Alta | 2 | Pendiente |
-| HU-058 | EP-010 | Ver mi medición pendiente | Alta | 3 | Pendiente |
-| HU-059 | EP-010 | Ver mi inicio sin medición pendiente | Media | 3 | Pendiente |
-| HU-060 | EP-010 | Responder el diagnóstico | Alta | 8 | Pendiente |
-| HU-061 | EP-010 | Revisar antes de enviar | Alta | 3 | Pendiente |
-| HU-062 | EP-010 | Enviar el diagnóstico | Alta | 3 | Pendiente |
-| HU-063 | EP-010 | Esperar el análisis | Alta | 5 | Pendiente |
-| HU-064 | EP-010 | Ver mi resultado | Alta | 8 | Pendiente |
-| HU-065 | EP-010 | Ver mis respuestas | Media | 2 | Pendiente |
-| HU-066 | EP-010 | Descargar el informe en PDF | Alta | 3 | Pendiente |
-| HU-067 | EP-010 | Ver mi historial | Media | 3 | Pendiente |
-| HU-068 | EP-012 | Calcular los puntajes | Alta | 8 | Pendiente |
-| HU-069 | EP-012 | Analizar cada categoría con la IA | Alta | 8 | Pendiente |
-| HU-070 | EP-012 | Marcar mediciones vencidas | Media | 2 | Pendiente |
-| HU-071 | EP-013 | Configurar las preguntas del bot | Alta | 5 | Pendiente |
-| HU-072 | EP-013 | Empezar el diagnóstico por WhatsApp | Alta | 2 | Pendiente |
-| HU-073 | EP-013 | Responder las preguntas del bot | Alta | 5 | Pendiente |
-| HU-074 | EP-013 | Retomar la conversación | Media | 3 | Pendiente |
-| HU-075 | EP-013 | Recibir el resultado por WhatsApp | Alta | 5 | Pendiente |
-| HU-076 | EP-011 | Ver los colaboradores de mi empresa | Media | 2 | Pendiente |
-| HU-077 | EP-011 | Crear un colaborador | Media | 3 | Pendiente |
-| HU-078 | EP-011 | Cambiar la contraseña de un colaborador | Media | 2 | Pendiente |
-| HU-079 | EP-011 | Desactivar o reactivar un colaborador | Baja | 2 | Pendiente |
-| HU-080 | EP-007 | Entender cómo se arma el prompt final | Baja | 2 | Pendiente |
-| HU-081 | EP-012 | Armar el prompt de cada categoría | Alta | 5 | Pendiente |
-| HU-082 | EP-010 | Pedir una nueva medición cuando la mía venció | Media | 3 | Pendiente |
-| HU-083 | EP-006 | Atender las solicitudes de nueva medición | Media | 3 | Pendiente |
-| HU-084 | EP-012 | Publicar el resultado | Alta | 8 | Pendiente |
+| HU-001 | EP-001 | Iniciar sesión | Alta | 5 | Hecha |
+| HU-002 | EP-001 | Registrar mi empresa | Alta | 5 | Hecha |
+| HU-003 | EP-001 | Recuperar mi contraseña | Alta | 3 | Hecha |
+| HU-004 | EP-001 | Crear una contraseña nueva | Alta | 3 | Hecha |
+| HU-005 | EP-001 | Cerrar sesión | Media | 2 | Hecha |
+| HU-006 | EP-002 | Ver el inicio con indicadores | Alta | 5 | Hecha |
+| HU-007 | EP-002 | Filtrar las mediciones por estado | Alta | 3 | Hecha |
+| HU-008 | EP-002 | Recordar o reenviar el aviso | Media | 3 | Hecha |
+| HU-009 | EP-002 | Dar una nueva fecha a una medición vencida | Media | 3 | Hecha |
+| HU-010 | EP-003 | Ver los diagnósticos de un sector | Alta | 5 | Hecha |
+| HU-011 | EP-003 | Ver todos los diagnósticos | Media | 3 | Hecha |
+| HU-012 | EP-003 | Crear un sector | Alta | 3 | Hecha |
+| HU-013 | EP-003 | Editar un sector | Alta | 3 | Hecha |
+| HU-014 | EP-003 | Reasignar las empresas de un sector | Media | 3 | Hecha |
+| HU-015 | EP-003 | Desactivar un sector | Media | 2 | Hecha |
+| HU-016 | EP-003 | Eliminar un sector | Media | 3 | Hecha |
+| HU-017 | EP-004 | Ver y editar el catálogo de categorías | Alta | 3 | Hecha |
+| HU-018 | EP-004 | Crear una categoría | Alta | 5 | Hecha |
+| HU-019 | EP-004 | Eliminar o archivar una categoría | Media | 5 | Hecha |
+| HU-020 | EP-005 | Crear un diagnóstico | Alta | 8 | Hecha |
+| HU-021 | EP-005 | Duplicar un diagnóstico | Media | 3 | Hecha |
+| HU-022 | EP-005 | Archivar o eliminar un diagnóstico | Media | 3 | Hecha |
+| HU-023 | EP-005 | Ver y ordenar el contenido del diagnóstico | Alta | 5 | Hecha |
+| HU-024 | EP-005 | Agregar una pregunta | Alta | 8 | Hecha |
+| HU-025 | EP-005 | Editar o eliminar una pregunta | Alta | 3 | Hecha |
+| HU-026 | EP-005 | Agregar categorías al diagnóstico | Media | 3 | Hecha |
+| HU-027 | EP-005 | Editar la importancia de las categorías | Alta | 3 | Hecha |
+| HU-028 | EP-005 | Ver la vista previa y el estado | Alta | 5 | Hecha |
+| HU-029 | EP-005 | Publicar una versión | Alta | 5 | Hecha |
+| HU-030 | EP-005 | Ver un resultado de ejemplo | Baja | 3 | Hecha |
+| HU-031 | EP-006 | Ver la lista de empresas | Alta | 3 | Hecha |
+| HU-032 | EP-006 | Registrar una empresa | Alta | 5 | Hecha |
+| HU-033 | EP-006 | Ver la ficha e historial de una empresa | Alta | 5 | Hecha |
+| HU-034 | EP-006 | Editar los datos de la cuenta de una empresa | Media | 3 | Hecha |
+| HU-035 | EP-006 | Desactivar o reactivar la cuenta de una empresa | Media | 3 | Hecha |
+| HU-036 | EP-006 | Asignar una medición | Alta | 8 | Hecha |
+| HU-037 | EP-006 | Editar el correo de aviso de la medición | Media | 5 | Hecha |
+| HU-038 | EP-006 | Ver el resultado de una empresa | Alta | 3 | Hecha |
+| HU-039 | EP-006 | Ver el historial de una empresa | Media | 3 | Hecha |
+| HU-040 | EP-006 | Ver las respuestas de una empresa | Media | 2 | Hecha |
+| HU-041 | EP-007 | Editar las instrucciones generales de la IA | Alta | 5 | Hecha |
+| HU-042 | EP-007 | Ajustar el prompt para un sector | Media | 5 | Hecha |
+| HU-043 | EP-007 | Ajustar el prompt para una empresa | Baja | 5 | Hecha |
+| HU-044 | EP-007 | Ver el prompt completo | Media | 3 | Hecha |
+| HU-045 | EP-007 | Probar el prompt con un ejemplo | Media | 5 | Hecha |
+| HU-046 | EP-008 | Ver las cuentas del sistema | Media | 3 | Hecha |
+| HU-047 | EP-008 | Desactivar o reactivar una cuenta | Media | 3 | Hecha |
+| HU-048 | EP-008 | Ver los roles del sistema | Media | 3 | Hecha |
+| HU-049 | EP-008 | Crear un rol | Baja | 5 | Hecha |
+| HU-050 | EP-008 | Editar un rol | Baja | 3 | Hecha |
+| HU-051 | EP-008 | Eliminar un rol | Baja | 2 | Hecha |
+| HU-052 | EP-008 | Asignar o quitar un rol | Media | 5 | Hecha |
+| HU-053 | EP-008 | Ver el sistema como una empresa | Media | 5 | Hecha |
+| HU-054 | EP-008 | Ver el sistema como otro administrador | Baja | 3 | Hecha |
+| HU-055 | EP-009 | Editar mi perfil (Administrador) | Baja | 3 | Hecha |
+| HU-056 | EP-009 | Editar mi perfil (Empresa o Colaborador) | Baja | 5 | Hecha |
+| HU-057 | EP-010 | Ver mi inicio la primera vez | Alta | 2 | Hecha |
+| HU-058 | EP-010 | Ver mi medición pendiente | Alta | 3 | Hecha |
+| HU-059 | EP-010 | Ver mi inicio sin medición pendiente | Media | 3 | Hecha |
+| HU-060 | EP-010 | Responder el diagnóstico | Alta | 8 | Hecha |
+| HU-061 | EP-010 | Revisar antes de enviar | Alta | 3 | Hecha |
+| HU-062 | EP-010 | Enviar el diagnóstico | Alta | 3 | Hecha |
+| HU-063 | EP-010 | Esperar el análisis | Alta | 5 | Hecha |
+| HU-064 | EP-010 | Ver mi resultado | Alta | 8 | Hecha |
+| HU-065 | EP-010 | Ver mis respuestas | Media | 2 | Hecha |
+| HU-066 | EP-010 | Descargar el informe en PDF | Alta | 3 | Hecha |
+| HU-067 | EP-010 | Ver mi historial | Media | 3 | Hecha |
+| HU-068 | EP-012 | Calcular los puntajes | Alta | 8 | Hecha |
+| HU-069 | EP-012 | Analizar cada categoría con la IA | Alta | 8 | Hecha |
+| HU-070 | EP-012 | Marcar mediciones vencidas | Media | 2 | Hecha |
+| HU-071 | EP-013 | Configurar las preguntas del bot | Alta | 5 | Aplazada |
+| HU-072 | EP-013 | Empezar el diagnóstico por WhatsApp | Alta | 2 | Aplazada |
+| HU-073 | EP-013 | Responder las preguntas del bot | Alta | 5 | Aplazada |
+| HU-074 | EP-013 | Retomar la conversación | Media | 3 | Aplazada |
+| HU-075 | EP-013 | Recibir el resultado por WhatsApp | Alta | 5 | Aplazada |
+| HU-076 | EP-011 | Ver los colaboradores de mi empresa | Media | 2 | Hecha |
+| HU-077 | EP-011 | Crear un colaborador | Media | 3 | Hecha |
+| HU-078 | EP-011 | Cambiar la contraseña de un colaborador | Media | 2 | Hecha |
+| HU-079 | EP-011 | Desactivar o reactivar un colaborador | Baja | 2 | Hecha |
+| HU-080 | EP-007 | Entender cómo se arma el prompt final | Baja | 2 | Hecha |
+| HU-081 | EP-012 | Armar el prompt de cada categoría | Alta | 5 | Hecha |
+| HU-082 | EP-010 | Pedir una nueva medición cuando la mía venció | Media | 3 | Hecha |
+| HU-083 | EP-006 | Atender las solicitudes de nueva medición | Media | 3 | Hecha |
+| HU-084 | EP-012 | Publicar el resultado | Alta | 8 | Hecha |
 
 # 10. Priorización
 
@@ -10191,7 +10198,7 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 
 - **PA-001:** ¿Cuál es el texto exacto del saludo del bot de WhatsApp? (HU-072, aplazada)
 - **PA-002:** ¿Cuándo se retoma el bot y cómo será la sección del bot en el panel? (HU-071 a HU-075)
-- **PA-003:** ¿Cuántas pruebas de IA por día puede hacer el Administrador? (HU-045)
+- **PA-003:** ¿Cuántas pruebas de IA por día puede hacer el Administrador? (HU-045) **Respondida (NuevasTIC, 23 de octubre de 2026): 100 al día entre todos los administradores.**
 - **PA-004:** ¿El recordatorio enviado se registra y se muestra en la ficha de la empresa? (HU-008)
 - **PA-005:** ¿Cómo es el modal de confirmación al archivar o eliminar un diagnóstico? (HU-022)
 - **PA-006:** ¿El rol “Consultor” de ejemplo del prototipo (A5.1c) se mantiene o se cambia? (HU-049, HU-050)

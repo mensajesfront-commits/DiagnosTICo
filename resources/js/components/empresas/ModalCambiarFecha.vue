@@ -15,14 +15,22 @@ import Modal from '@/components/base/Modal.vue';
 import { rutas } from '@/lib/rutas';
 
 const props = defineProps<{
-    medicion: { id: number; numero: number; vence: string | null };
+    medicion: {
+        id: number;
+        numero: number;
+        vence: string | null;
+        /** La más cercana que se acepta: 3 días, en la hora de la empresa. */
+        fecha_minima?: string;
+    };
     empresa: string;
 }>();
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 
 const form = useForm({ fecha_limite: '' });
-const hoy = new Date().toLocaleDateString('en-CA');
+const minima = computed(
+    () => props.medicion.fecha_minima ?? new Date().toLocaleDateString('en-CA'),
+);
 
 /** "Solo se cambia una medición pendiente…" (ya se envió o se canceló). */
 const errorMedicion = computed(
@@ -34,7 +42,7 @@ watch(
     (valor) => {
         if (valor) {
             form.fecha_limite =
-                props.medicion.vence && props.medicion.vence >= hoy
+                props.medicion.vence && props.medicion.vence >= minima.value
                     ? props.medicion.vence
                     : '';
             form.clearErrors();
@@ -70,7 +78,7 @@ function guardar(): void {
                     id="cambiar-fecha"
                     v-model="form.fecha_limite"
                     type="date"
-                    :min="hoy"
+                    :min="minima"
                     :invalida="!!form.errors.fecha_limite"
                 />
             </Campo>

@@ -33,11 +33,13 @@ class DatabaseSeeder extends Seeder
         $definida = (string) config('diagnostico.admin.password');
         $contrasena = $definida !== '' ? $definida : Str::password(12, symbols: false);
 
-        User::create([
+        $admin = User::create([
             'name' => 'Administrador',
             'email' => $correo,
             'password' => $contrasena,
-        ])->assignRole('Administrador');
+        ]);
+        $admin->forceFill(['email_verified_at' => now()])->save();
+        $admin->assignRole('Administrador');
 
         $this->command->info("Administrador creado: {$correo}".($definida !== '' ? '' : " · contraseña: {$contrasena}"));
     }

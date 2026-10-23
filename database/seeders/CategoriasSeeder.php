@@ -8,8 +8,8 @@ use Illuminate\Database\Seeder;
 /**
  * Las 10 categorías del catálogo (T-046), tomadas del wireframe A2.3.
  *
- * [INFORMACIÓN PENDIENTE] NuevasTIC debe confirmar los nombres y completar
- * las descripciones que el wireframe deja vacías.
+ * NuevasTIC confirmó los nombres (23 de octubre de 2026). Las descripciones
+ * que el wireframe deja vacías las completa NuevasTIC en el catálogo (A2.3).
  */
 class CategoriasSeeder extends Seeder
 {

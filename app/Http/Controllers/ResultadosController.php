@@ -90,6 +90,8 @@ class ResultadosController extends Controller
     private function siNoHay(Request $request, Medicion $medicion): ?RedirectResponse
     {
         $this->puedeVer($request, $medicion);
+        // Medición sin nombre (empresa borrada): solo cuenta para estadísticas.
+        abort_if($medicion->empresa_id === null, 404);
 
         if ($medicion->estado === 'terminada') {
             return null;

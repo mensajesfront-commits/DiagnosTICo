@@ -3,8 +3,10 @@
 use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
+use App\Support\HistorialContrasenas;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Testing\TestResponse;
@@ -201,9 +203,9 @@ it('envía el correo de recuperación en español', function () {
     Notification::assertSentTo($usuario, ResetPassword::class, function (ResetPassword $aviso) use ($usuario) {
         $correo = $aviso->toMail($usuario);
 
-        expect($correo->subject)->toStartWith('Crea una contraseña nueva para')
+        expect($correo->subject)->toStartWith('Cambia tu contraseña de')
             ->and($correo->greeting)->toBe('Hola, Laura:')
-            ->and($correo->actionText)->toBe('Crear contraseña nueva');
+            ->and($correo->actionText)->toBe('Cambiar contraseña');
 
         return true;
     });
@@ -221,6 +223,122 @@ it('acepta el enlace de recuperación aunque hayan pasado días (RN-006)', funct
         'password' => 'NuevaClave1!',
         'password_confirmation' => 'NuevaClave1!',
     ])->assertSessionHasNoErrors()->assertRedirect(route('login'));
+});
+
+// --- Contraseña nueva: distinta y sin partes del correo (17 oct.) ----------
+
+it('no deja recuperar la cuenta con la misma contraseña de antes', function () {
+    $usuario = User::factory()->create(['email' => 'laura@laesquina.co', 'password' => 'Mesa-47-Sol']);
+
+    $this->post(route('password.update'), [
+        'token' => Password::createToken($usuario),
+        'email' => $usuario->email,
+        'password' => 'Mesa-47-Sol',
+        'password_confirmation' => 'Mesa-47-Sol',
+    ])->assertSessionHasErrors(['password' => 'La contraseña nueva debe ser distinta de la anterior.']);
+});
+
+it('no deja recuperar la cuenta con una contraseña que tenga partes del correo', function () {
+    $usuario = User::factory()->create(['email' => 'juan.perez1102@empresa.co']);
+
+    $this->post(route('password.update'), [
+        'token' => Password::createToken($usuario),
+        'email' => $usuario->email,
+        'password' => 'Clave-1102!',
+        'password_confirmation' => 'Clave-1102!',
+    ])->assertSessionHasErrors(['password' => 'La contraseña no puede tener partes de tu correo («1102»).']);
+});
+
+it('no deja registrarse con una contraseña que tenga partes del correo', function () {
+    $this->post(route('register.store'), [
+        'empresa_nombre' => 'Rojas & Asociados',
+        'sector_id' => Sector::factory()->create()->id,
+        'ciudad' => 'Bogotá',
+        'departamento' => 'Bogotá D.C.',
+        'pais' => 'Colombia',
+        'descripcion' => 'Bufete de derecho laboral.',
+        'cargo' => 'Socia',
+        'name' => 'Laura Gómez',
+        'email' => 'laura@rojas.co',
+        'password' => 'Laura-2026!',
+        'password_confirmation' => 'Laura-2026!',
+        'terminos' => '1',
+    ])->assertSessionHasErrors(['password' => 'La contraseña no puede tener partes de tu correo («laura»).']);
+
+    $this->assertGuest();
+});
+
+it('no deja poner en Mi perfil la misma contraseña ni una con partes del correo', function (string $nueva, string $mensaje) {
+    $usuario = User::factory()->create(['email' => 'laura@laesquina.co', 'password' => 'Mesa-47-Sol'])->assignRole('Administrador');
+
+    $this->actingAs($usuario)
+        ->put(route('user-password.update'), [
+            'current_password' => 'Mesa-47-Sol',
+            'password' => $nueva,
+            'password_confirmation' => $nueva,
+        ])
+        ->assertSessionHasErrors(['password' => $mensaje]);
+})->with([
+    'la misma' => ['Mesa-47-Sol', 'La contraseña nueva debe ser distinta de la anterior.'],
+    'con el correo' => ['LaEsquina-47!', 'La contraseña no puede tener partes de tu correo («laesquina»).'],
+]);
+
+it('en Mi perfil la contraseña nueva no puede repetir partes de la actual', function (string $nueva, bool $pasa) {
+    $usuario = User::factory()->create(['email' => 'laura@laesquina.co', 'password' => 'Mesa-47-Sol'])->assignRole('Administrador');
+
+    $respuesta = $this->actingAs($usuario)->put(route('user-password.update'), [
+        'current_password' => 'Mesa-47-Sol',
+        'password' => $nueva,
+        'password_confirmation' => $nueva,
+    ]);
+
+    $pasa
+        ? $respuesta->assertSessionHasNoErrors()
+        : $respuesta->assertSessionHasErrors(['password' => 'La contraseña nueva no puede repetir partes de la actual (4 caracteres seguidos o más).']);
+})->with([
+    'mismo comienzo' => ['MESA-99-Luna', false],
+    'mismo final' => ['Cielo-12-Sol!', false],
+    'trozo del medio' => ['Luna-a-47-S!', false],
+    'nada igual' => ['Cielo#2026', true],
+]);
+
+it('al recuperar la contraseña no deja usar ninguna de las últimas 5, aunque cambien las mayúsculas', function () {
+    $usuario = User::factory()->create(['email' => 'laura@laesquina.co']);
+    $claves = ['Mesa-47-Sol', 'Cielo#2026', 'Rio-88-Luz!', 'Monte$5150', 'Brisa-33-Mar', 'Nube@7070'];
+
+    foreach ($claves as $clave) {
+        $usuario->forceFill(['password' => $clave])->save();
+        HistorialContrasenas::registrar($usuario, $clave);
+    }
+
+    $intentar = fn (string $nueva) => $this->post(route('password.update'), [
+        'token' => Password::createToken($usuario->fresh()),
+        'email' => $usuario->email,
+        'password' => $nueva,
+        'password_confirmation' => $nueva,
+    ]);
+
+    // Una de las últimas 5, con otras mayúsculas.
+    $intentar('RIO-88-LUZ!')->assertSessionHasErrors(['password' => 'La contraseña nueva no puede ser ninguna de tus últimas 5, aunque cambies mayúsculas y minúsculas.']);
+    // La actual, idéntica.
+    $intentar('Nube@7070')->assertSessionHasErrors(['password' => 'La contraseña nueva debe ser distinta de la anterior.']);
+    // La sexta hacia atrás ya no cuenta.
+    $intentar('Mesa-47-Sol')->assertSessionHasNoErrors();
+});
+
+it('guarda solo las últimas 5 contraseñas, cifradas', function () {
+    $usuario = User::factory()->create();
+
+    foreach (['Clave-1a!', 'Clave-2b!', 'Clave-3c!', 'Clave-4d!', 'Clave-5e!', 'Clave-6f!', 'Clave-7g!'] as $clave) {
+        HistorialContrasenas::registrar($usuario, $clave);
+    }
+
+    $hashes = DB::table('contrasenas_anteriores')->where('user_id', $usuario->id)->pluck('hash_minusculas');
+
+    expect($hashes)->toHaveCount(5)
+        ->and($hashes->contains(fn (string $h) => str_contains($h, 'clave')))->toBeFalse()
+        ->and(HistorialContrasenas::usada($usuario, 'CLAVE-7G!'))->toBeTrue()
+        ->and(HistorialContrasenas::usada($usuario, 'Clave-2b!'))->toBeFalse();
 });
 
 // --- Límite de intentos ----------------------------------------------------

@@ -63,6 +63,19 @@ export type FilaDiagnostico = {
     actualizado_en: string;
 };
 
+/** Diagnóstico archivado (HU-022), en la ventana "Archivados" de A2. */
+export type DiagnosticoArchivado = {
+    id: number;
+    nombre: string;
+    sector_nombre: string | null;
+    version_publicada: number | null;
+    /** ISO. */
+    archivado_en: string | null;
+    /** Con mediciones no se elimina: sus resultados dependen de él. */
+    mediciones: number;
+    empresas: number;
+};
+
 export type EstadoMedicion =
     | 'no_iniciada'
     | 'en_curso'

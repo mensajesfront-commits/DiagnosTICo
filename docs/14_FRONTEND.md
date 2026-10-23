@@ -1,6 +1,6 @@
 # Frontend
 
-**Estado:** EN CURSO (T-088). Se completa con cada pantalla nueva.
+**Estado:** COMPLETO (T-088). Todas las pantallas del alcance están construidas (14 de octubre de 2026).
 
 Cómo está organizado el frontend y, sobre todo, **qué datos espera cada pantalla**. Esa es la parte que necesita el backend para conectar los controladores.
 
@@ -41,7 +41,7 @@ resources/js/
 │   ├── contrasena.ts  Requisitos de contraseña (RN-001)
 │   ├── menu.ts        Secciones del menú por rol y permiso
 │   ├── niveles.ts     Niveles y colores del resultado
-│   └── rutas.ts       URLs previstas mientras no existen las rutas reales
+│   └── rutas.ts       URLs de las pantallas en un solo lugar
 ├── pages/             Una página por pantalla del wireframe
 └── types/             Tipos de los datos que llegan del backend
 ```
@@ -54,6 +54,8 @@ resources/js/
 4. Usa los componentes de `components/base/` antes de crear uno nuevo.
 
 ## Componentes base
+
+- `CampoTelefono`: indicativo del país y número con el largo de ese país (`lib/telefonos.ts`, la misma lista que `App\Support\Telefonos`). Lo usan L2, A3.2, A3.1d, A6 y E11.
 
 | Componente | Para qué |
 |---|---|
@@ -113,6 +115,22 @@ Envía a `POST /register`:
 
 Ya funciona de punta a punta: `Fortify::registerView` entrega `sectores` y `paises`, y `CreateNewUser` crea la empresa y el usuario principal con el rol Empresa en una sola transacción (T-047, versión mínima; ver `15_BACKEND.md`).
 
+### L2b · Verifica tu correo (`components/auth/ModalVerificarCorreo.vue`)
+
+**Ventana sobre L2 y L1.** Se abre cuando la página recibe `verificando`, el correo por verificar. Pasa en dos casos:
+
+- después de "Registrar empresa";
+- al intentar entrar sin haber verificado.
+
+**El código:**
+
+- Es un campo de 6 dígitos que se envía solo al completarlo: `POST /verificar-correo`.
+- "Reenviar código" se habilita a los 60 segundos: `POST /verificar-correo/reenviar`.
+- Cerrar la ventana hace `POST /verificar-correo/cancelar` y vuelve a L1.
+- Al acertar, L1 recibe `correo` ya escrito.
+
+**Captcha en L2:** `components/auth/CaptchaTurnstile.vue` (Cloudflare Turnstile) va en el paso 2, con la llave de la prop `captcha`. El botón no se habilita sin el token, y se pide otro token después de cualquier error del formulario.
+
 ### L3 · ¿Olvidaste tu contraseña? (`auth/ForgotPassword`)
 
 | Prop | Tipo | Nota |
@@ -154,12 +172,13 @@ Ruta: `GET /inicio` (`InicioController@administrador`, datos de `App\Support\Dat
 - Pestañas Todas · En curso · No iniciadas · Vencidas · Terminadas con su contador (HU-007); "Enviada" cuenta como en curso.
 - Página fija en pantallas grandes; la tabla va paginada con las filas que caben (`useFilasQueCaben` en `lib/paginacion.ts`, que también usa A2).
 - Acciones: "Nueva fecha" (A1d) y "Cancelar" abren su modal en la misma tabla (`ModalCambiarFecha`, `ModalCancelarMedicion`); "Recordatorio" (A1b) y "Reenviar aviso" (A1c) abren el correo de la medición (`ModalCorreoAviso`, A3.1e); "Asignar nueva" (A1e) abre A3.1b con la empresa elegida.
-- **[FUNCIONALIDAD POR DEFINIR]** "Ver resultado" abre A3.3 (HU-038). Mientras llega, lleva a la ficha de la empresa (`/empresas/{id}`).
+- "Ver resultado" abre A3.3 (HU-038).
+- Si alguna empresa pidió una medición nueva (HU-083), junto al título aparece el aviso; lleva a Vencidas, donde esas filas van primero con "Asignar nueva".
 - "Último aviso" es `mediciones.ultimo_aviso_en`: al asignar con aviso, con Recordatorio o con Reenviar aviso.
 
 ### A2 / A2·T / A2b · Diagnósticos (`diagnosticos/Index`)
 
-Ruta prevista: `GET /diagnosticos` (Todos) y `GET /diagnosticos?sector={id}`.
+Ruta: `GET /diagnosticos` (Todos) y `GET /diagnosticos?sector={id}`.
 
 | Prop | Tipo | Nota |
 |---|---|---|
@@ -184,9 +203,11 @@ Comportamiento:
 
 **Subsectores del sector (DEC-018):** el modal de crear o editar sector (`ModalSector`, A2.2a / A2.2) tiene "Subsectores · división CIIU", un `Combobox` con las 87 divisiones (prop `divisionesCiiu` de A2). Si el nombre escrito es exactamente el de una división, se elige sola. Envía `ciiu_division`. Cada `Sector` trae `ciiu_division` y `subsectores` (cuántos activos).
 
+- **Archivados (N):** botón en el encabezado de la tabla que abre `modales/ModalArchivados.vue`. Recibe la prop `archivados: DiagnosticoArchivado[]` (del sector o de todos). Tiene "Restaurar" (`POST /diagnosticos/{id}/restaurar`) y "Eliminar", con segunda confirmación (`DELETE /diagnosticos/{id}/archivado`). Eliminar está deshabilitado si el diagnóstico tiene mediciones.
+
 ### A2.3 · Catálogo de categorías (`categorias/Index`)
 
-Ruta prevista: `GET /categorias`.
+Ruta: `GET /categorias`.
 
 | Prop | Tipo | Nota |
 |---|---|---|
@@ -198,7 +219,7 @@ La tabla usa todo el ancho y va paginada, 10 categorías por página (vuelve a l
 
 ### A2.5 · Crear diagnóstico (`diagnosticos/Crear`)
 
-Ruta prevista: `GET /diagnosticos/crear?sector={id}`.
+Ruta: `GET /diagnosticos/crear?sector={id}`.
 
 | Prop | Tipo | Nota |
 |---|---|---|
@@ -231,7 +252,8 @@ Ruta: `GET /empresas/{empresa}` (`EmpresasController@ver`, `DatosEmpresas::ficha
 - **Datos de la cuenta (A3.1d):** `components/empresas/CamposEmpresa.vue` (el mismo de A3.2), "Estado de la cuenta" (estado, registro, último acceso, mediciones y colaboradores en solo lectura) y "Acciones": Ver como, Asignar medición, Desactivar cuenta (`ModalDesactivarEmpresa`, A3.1f) o Reactivar. `?pestana=cuenta` abre esta pestaña.
 - **Consultores:** "Próximamente" (rol aplazado).
 - La pendiente muestra su último aviso y "Enviar recordatorio" (en curso) o "Reenviar aviso" (`ModalCorreoAviso`).
-- **[FUNCIONALIDAD POR DEFINIR]** "Ver resultado" (A3.3, HU-038) aparece sin enlace hasta que exista Resultados.
+- "Ver resultado" abre A3.3 (HU-038). La gráfica tiene "Ver:" para el puntaje total o una categoría (`graficas/SelectorEvolucion.vue`).
+- Si la empresa pidió una medición nueva (HU-083), la tarjeta de la pendiente lo avisa.
 
 ### A3.2 · Registrar empresa (`empresas/Registrar`)
 
@@ -282,7 +304,7 @@ Ruta: `GET /diagnosticos/{id}/importancia`; envía `PUT` con `importancias{parte
 
 Ruta: `GET /diagnosticos/{id}/vista-previa` (`?version=` para una publicada, en solo lectura). Izquierda: categorías completas, los 5 requisitos y las categorías por corregir con "Corregir". Derecha: el cuestionario como lo ve la empresa, una categoría a la vez; las respuestas no se guardan.
 
-- **[FUNCIONALIDAD POR DEFINIR]** La pestaña "Resultado de ejemplo" (A2.6, HU-030) llega con Resultados.
+- La pestaña "Resultado de ejemplo" abre A2.6 (HU-030).
 
 ### E1 · Inicio de la empresa (`inicio/Empresa`)
 
@@ -290,7 +312,7 @@ Ruta: `GET /mi-inicio`. Props en el tipo `InicioEmpresa` (`types/responder.ts`).
 
 - La medición pendiente según su estado: primera vez, no iniciada (mensaje del equipo, fecha límite y días que quedan), en curso (avance y "Continuar diagnóstico"), vencida ("Pedir una nueva fecha" y el correo de soporte; "Nueva medición solicitada" si ya la pidió) o enviada. Sin pendiente: "No tienes diagnósticos pendientes".
 - Primera vez: "Cómo funciona" en 3 pasos. Con resultados: el último (anillo `graficas/AnilloPuntaje.vue`, nivel, variación y `graficas/MiniEvolucion.vue`) y "Tus 3 áreas a trabajar" o "Mis mediciones".
-- "Ver resultado" abre E6 y "Ver informe PDF" descarga el PDF. **[FUNCIONALIDAD POR DEFINIR]** "Ver historial completo" (E8).
+- "Ver resultado" abre E6, "Ver informe PDF" descarga el PDF y "Ver historial completo" abre E8.
 
 ### E2–E4 · Responder, revisar y enviado (`responder/Responder`, `responder/Revisar`, `responder/Enviado`)
 
@@ -300,7 +322,7 @@ Usan `layouts/ResponderLayout.vue` (sin menú lateral) y `components/responder/B
 - **E2:** categorías a la izquierda (✓ completa, ● a medias, número si no empezó); preguntas con "Cómo responder", "Obligatoria" y el tipo. Cada respuesta se guarda al momento con `fetch` (PUT JSON con el token de la cookie `XSRF-TOKEN`); las escritas, al dejar de escribir. Abajo, anterior y siguiente; en la última, "Revisar antes de enviar". La URL guarda la categoría (`?categoria=`).
 - **E3:** con faltantes, la lista con "Completar" y el aviso; completo, "N/N categorías completas" y "Todo listo". "Enviar diagnóstico" pide confirmar.
 - **E4:** los dos pasos con su estado real ("2 de 10" categorías). Se recarga cada 5 s; cuando se publica el resultado, el servidor la lleva a E6. Si una categoría falló tras 3 intentos: "No pudimos terminar el análisis de algunas categorías" y "Reintentar esas categorías".
-- **[FUNCIONALIDAD POR DEFINIR]** La opción "Otro" con texto del wireframe necesita un campo en las opciones.
+- La opción "Otro" (`con_texto`): al elegirla aparece "¿Cuál?" (máx. 255), que se guarda al dejar de escribir; si se cambia de opción, el texto se borra.
 
 ### A4 · Configuración de la IA (`configuracion-ia/Index`)
 
@@ -315,6 +337,12 @@ Ruta: `GET /configuracion-ia`. Props en `ConfiguracionIa` (`types/configuracionI
 ### A4.9 · Cómo se arma el prompt final (`configuracion-ia/ComoSeArma`)
 
 Las cinco capas con lo que aporta cada una, las indicaciones por pregunta y dónde pedir un FODA o PESTEL. Solo lectura.
+
+### A5.4 · "Ver como" (`components/base/FranjaVerComo.vue`)
+
+- Con el dato compartido `verComo`, `PanelLayout` y `ResponderLayout` muestran arriba la franja "Estás viendo como … · Solo lectura" con "Salir de Ver como" (`POST /ver-como/salir`). En el menú lateral, "Cerrar sesión" pasa a ser "Salir de Ver como".
+- La franja pone la clase `ver-como` en `<html>`: `resources/css/app.css` descuenta su alto (`--alto-ver-como`) en las páginas de alto fijo y en el menú, para que no haya scroll de página.
+- E1 apaga "Iniciar diagnóstico" y "Pedir una nueva fecha" con "No disponible en Ver como". En el resto, el servidor rechaza cualquier cambio y avisa.
 
 ### E8 / A3.4 · Historial (`historial/Historial`)
 
@@ -331,6 +359,9 @@ Ruta: `GET /resultados/{medicion}`. Props: `medicion` (`CabeceraResultado`), `re
 
 - Pestañas, para caber sin scroll: **Resumen** (anillo, nivel, frase, variación vs. la medición anterior, escala de niveles, las 3 recomendaciones de las categorías más débiles y el radar actual vs. anterior), **Categorías** (tabla con importancia, puntaje, nivel y "vs. anterior"; al elegir una fila, el detalle con cada pregunta en `components/resultados/PreguntaResultado.vue`, la observación y la recomendación de la categoría) y **Recomendaciones** (todas, de la más débil a la más fuerte).
 - "Ver mis respuestas" (E9) y "Ver informe PDF" (`Boton` con `archivo`: enlace normal, sin Inertia, para descargar).
+
+- El método con el que la IA analizó cada categoría se ve con `components/resultados/EtiquetaMetodo.vue` (en las prioridades, el detalle y las recomendaciones; el motivo, al pasar el cursor).
+- **A2.6 · Resultado de ejemplo (HU-030):** la misma página con la prop `ejemplo` (`caso`, `etiqueta`, `volver`, `pdf`): "Así se vería el resultado", el selector Mejor caso / Caso medio / Peor caso junto a las pestañas, "Volver a la vista previa" y "Ver formato del PDF" (otra pestaña). Se abre desde "Resultado de ejemplo" en A2.4.
 
 ### E9 / A3.5 · Mis respuestas (`resultados/Respuestas`)
 
@@ -381,11 +412,13 @@ Modales (todos en `components/usuarios/`):
 
 Sin modal: "Reactivar" (`POST /usuarios/{id}/reactivar`), "Reenviar invitación" (`POST /usuarios/{id}/invitacion`) y "Ver como" (`POST /usuarios/{id}/ver-como`, A5.4).
 
-Todo está conectado al backend. `medicion_pendiente` llega vacío hasta que exista la tabla de mediciones.
+Todo está conectado al backend. `medicion_pendiente` dice la medición pendiente de la cuenta principal de una empresa ("medición 4 no iniciada (vence el 20 de octubre)").
 
 ### A6 / E11 · Mi perfil (`perfil/MiPerfil`)
 
 Ruta: `GET /mi-perfil` (ya existe, `PerfilController`). Una sola pantalla para todas las cuentas: con `empresa = null` se ve como A6 (Administrador y roles internos); con empresa, como E11.
+
+- **Cambiar el correo:** al guardar un correo distinto, llega un código al correo nuevo y se abre `ModalVerificarCorreo` (modo `cambio`) mientras `usuario.email_pendiente` tenga valor. Usa `POST /mi-perfil/correo/verificar`, `/reenviar` y `/cancelar`.
 
 | Prop | Tipo | Nota |
 |---|---|---|

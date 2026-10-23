@@ -2,6 +2,8 @@
 
 namespace App\Services\Ia;
 
+use App\Support\MetodosAnalisis;
+
 /**
  * Analizador sin conexión para programar y probar sin clave de OpenAI
  * (IA_DE_PRUEBA=true en el .env; también lo usan las pruebas automáticas).
@@ -29,8 +31,12 @@ class AnalizadorDePrueba implements Analizador
             ];
         }
 
+        $metodo = MetodosAnalisis::porCategoria($categoria['nombre']);
+
         return [
             'preguntas' => $preguntas,
+            'metodo' => $metodo,
+            'metodo_motivo' => 'Método de prueba elegido por el nombre de la categoría.',
             'observacion_categoria' => "Observación de prueba de {$categoria['nombre']}: analizada sin conexión a la IA.",
             'recomendacion' => [
                 'titulo' => "Mejora {$categoria['nombre']}",

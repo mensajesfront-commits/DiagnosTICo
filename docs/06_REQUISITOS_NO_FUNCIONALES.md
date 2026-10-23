@@ -10,9 +10,9 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 |---|---|---|---|
 | RNF-001 | Seguridad | Contraseña fuerte y avisos que no revelan correos | Cumplido y probado |
 | RNF-002 | Seguridad | Acceso por rol; empresa y colaborador solo ven su empresa | Cumplido en lo construido |
-| RNF-003 | Usabilidad | Respuestas guardadas al momento; se retoma donde se quedó | Por construir (semana 5) |
-| RNF-004 | Rendimiento | Correos y análisis de la IA en segundo plano | Por construir (semana 5) |
-| RNF-005 | Auditoría | Registro de quién usó "Ver como" y cuándo | Por construir (semana 6) |
+| RNF-003 | Usabilidad | Respuestas guardadas al momento; se retoma donde se quedó | Cumplido y probado |
+| RNF-004 | Rendimiento | Correos y análisis de la IA en segundo plano | Cumplido (análisis, PDF y correos de resultado, solicitudes y avisos en cola) |
+| RNF-005 | Auditoría | Registro de quién usó "Ver como" y cuándo | Cumplido y probado |
 | RNF-006 | Seguridad | Mensajes del bot verificados de Meta | APLAZADO con el bot |
 | RNF-007 | Compatibilidad | Versiones fijas del stack | Cumplido |
 | RNF-008 | Compatibilidad | Navegadores y tamaños de pantalla | Propuesta |
@@ -22,7 +22,7 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 | RNF-012 | Accesibilidad | Uso con teclado, lector de pantalla y sin depender del color | Cumplido en lo construido |
 | RNF-013 | Idioma | Todo en español | Cumplido |
 | RNF-014 | Mantenibilidad | Pruebas, formato y análisis estático en cada cambio | Cumplido |
-| RNF-015 | Confiabilidad | La IA puede fallar sin perder datos | Por construir (semana 5) |
+| RNF-015 | Confiabilidad | La IA puede fallar sin perder datos | Cumplido y probado |
 | RNF-016 | Instalación | Se instala desde cero con el README | Cumplido |
 
 ## Detalle
@@ -95,7 +95,7 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 - La foto y el logo se guardan en una carpeta privada y solo los ve la misma cuenta, su empresa o el Administrador.
 - Las cuentas se desactivan (RN-004) y, si hace falta, el Administrador las elimina confirmando con el correo exacto: quedan 90 días recuperables y luego se borran para siempre con sus datos (DEC-017). Sirve para atender una solicitud de borrado (Ley 1581 de 2012, de protección de datos personales).
 - **[INFORMACIÓN PENDIENTE]**:
-  - el texto y la URL de los términos y de la política de datos;
+  - los datos de NuevasTIC que faltan en los términos y en la política (razón social, NIT, domicilio, teléfono, fecha de vigencia, costo, proveedores de correo y alojamiento) y su revisión legal. El borrador está en `resources/js/lib/legales.ts` y se ve en la ventana del registro (L2);
   - el procedimiento formal de NuevasTIC para recibir y responder una solicitud de borrado (plazos, quién la aprueba, si hay datos que deban conservarse por ley).
 
 ### RNF-012 · Accesibilidad
@@ -112,7 +112,7 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 ### RNF-014 · Mantenibilidad
 
 - Cada pull request corre en GitHub Actions (`composer ci:check`) las pruebas de Pest y Vitest, Pint, y el lint y los tipos del frontend.
-- El análisis estático de PHP (PHPStan) se corre antes de subir, con `composer types:check`. **[FUNCIONALIDAD POR DEFINIR]** Agregarlo también a la CI (T-057).
+- El análisis estático de PHP (PHPStan) corre en la CI dentro de `composer test` (`@types:check`) y se puede correr antes de subir con `composer types:check`.
 - Ningún cambio se une a `develop` sin revisión (`28_CONVENCIONES_DESARROLLO.md`).
 
 ### RNF-015 · Fallas de la IA

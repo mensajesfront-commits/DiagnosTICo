@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\EmpresaDesactivada;
 use App\Services\Mediciones\AsignarMedicion;
 use App\Support\DatosEmpresas;
+use App\Support\Plazos;
 use App\Support\Invitaciones;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,7 +42,10 @@ class EmpresasController extends Controller
     /** A3.2 · Registrar empresa. */
     public function crear(): Response
     {
-        return Inertia::render('empresas/Registrar', ['opciones' => DatosEmpresas::opciones()]);
+        return Inertia::render('empresas/Registrar', [
+            'opciones' => DatosEmpresas::opciones(),
+            'fechaMinima' => Plazos::fechaMinima(null),
+        ]);
     }
 
     /**
