@@ -120,4 +120,6 @@ export type ResultadoPrueba = {
         observacion_categoria: string;
         recomendacion: { titulo: string; detalle: string };
     };
+    /** Pruebas que quedan hoy (100 al día entre todos, PA-003). */
+    restantes: number;
 };

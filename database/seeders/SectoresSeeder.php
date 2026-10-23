@@ -6,8 +6,8 @@ use App\Models\Sector;
 use Illuminate\Database\Seeder;
 
 /**
- * Sectores de ejemplo del wireframe.
- * [INFORMACIÓN PENDIENTE] NuevasTIC debe confirmar la lista real de sectores.
+ * Sectores iniciales del wireframe. NuevasTIC confirmó que es la lista real
+ * (23 de octubre de 2026).
  */
 class SectoresSeeder extends Seeder
 {

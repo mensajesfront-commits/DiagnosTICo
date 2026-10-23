@@ -49,19 +49,25 @@ Lo construido, de punta a punta:
 | PR de `develop` a `main` y etiqueta `v1.0.0` (T-152) | Equipo | `20_DESPLIEGUE.md` |
 | Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160) | Equipo y NuevasTIC | `00_INDICE.md` |
 
-## Decisiones pendientes con NuevasTIC
+## Decisiones de NuevasTIC (23 de octubre de 2026)
 
-- **[INCONSISTENCIA DETECTADA]** RN-028 (sin FODA) frente a DEC-019, que deja que la IA use DOFA y otros métodos.
-- **[INFORMACIÓN PENDIENTE]** Para que NuevasTIC lo confirme:
-  - las frases de cada nivel;
-  - las preguntas opcionales sin responder, que no cuentan en el promedio;
-  - el límite diario de "Probar con un ejemplo" (PA-003);
-  - el correo de soporte (`SOPORTE_EMAIL`);
-  - el día y la hora del resumen semanal.
-- **[INFORMACIÓN PENDIENTE]** Para que NuevasTIC lo entregue:
-  - los diagnósticos reales de cada sector (T-072);
-  - quién paga OpenAI y con qué modelo.
-- **Bot de WhatsApp:** sigue aplazado. Hay que decidir si se saca del cronograma (`03_ALCANCE.md`).
+- La IA puede usar DOFA, PESTEL y los demás métodos: RN-028 se ajustó.
+- Se aprueban las frases de los cuatro niveles.
+- Preguntas opcionales: sin responder no se tienen en cuenta; respondidas son un dato extra que la IA lee, pero no cuentan en el puntaje.
+- "Probar con un ejemplo": 100 pruebas al día entre todos los administradores (PA-003).
+- Al borrar para siempre una empresa, sus mediciones terminadas se conservan sin nombre para estadísticas.
+- La lista de sectores, actividades y categorías es la real.
+- La contraseña sigue pidiendo carácter especial (RN-001).
+- Los diagnósticos los genera NuevasTIC con IA y los carga a mano cuando se lance la aplicación.
+- OpenAI lo paga NuevasTIC, con el modelo gpt-4.1-mini.
+- El bot de WhatsApp lo hace otra persona del equipo, fuera de este repositorio.
+
+## Pendiente con NuevasTIC
+
+- **[INFORMACIÓN PENDIENTE]** El correo de soporte (`SOPORTE_EMAIL`).
+- **[INFORMACIÓN PENDIENTE]** El día y la hora del resumen semanal (hoy, los lunes a las 7:50 a. m.).
+- **[INFORMACIÓN PENDIENTE]** Las llaves reales de Cloudflare Turnstile (el captcha del registro).
+- **[INFORMACIÓN PENDIENTE]** Los datos del responsable en la política de datos (razón social, NIT, domicilio, vigencia).
 - **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Lo vigente es una etapa por categoría y un PDF de 3 páginas.
 
 ## Cómo verificar lo hecho

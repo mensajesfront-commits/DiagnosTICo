@@ -23,7 +23,8 @@ use App\Services\Resultados\CalculadoraPuntajes;
  * {respuestas_categoria}) se reemplazan al armar. Cada parte guarda de qué
  * capa salió, para que A4.4 la marque con su color.
  *
- * Las preguntas opcionales sin responder no se envían.
+ * Las preguntas opcionales sin responder no se envían; las respondidas van
+ * marcadas como dato extra (no cuentan en el puntaje).
  */
 class ArmadorPrompt
 {
@@ -346,6 +347,11 @@ class ArmadorPrompt
                 'respuesta' => $texto,
                 'puntaje' => $p['tipo'] === 'abierta' ? null : CalculadoraPuntajes::cerrada($p, $r['opciones'] ?? []),
             ];
+
+            // Opcional respondida: dato extra para entender a la empresa (NuevasTIC).
+            if (! (bool) ($p['obligatoria'] ?? true)) {
+                $item['dato_extra'] = 'Pregunta opcional: úsala para entender mejor a la empresa; no cuenta en el puntaje.';
+            }
 
             if ($p['tipo'] === 'abierta') {
                 $item['criterio'] = (string) ($p['criterio_ia'] ?? '');

@@ -112,7 +112,10 @@ class PublicarResultado
                 $texto = CalculadoraPuntajes::textoRespuesta($p, $r['opciones'] ?? null, $r['texto'] ?? null);
                 $puntaje = null;
 
-                if ($texto !== null) {
+                // Las opcionales son un dato extra: no cuentan en el puntaje.
+                $extra = ! (bool) ($p['obligatoria'] ?? true);
+
+                if ($texto !== null && ! $extra) {
                     $puntaje = $p['tipo'] === 'abierta'
                         ? ($iaPreguntas[$p['ref']]['puntaje'] ?? null)
                         : CalculadoraPuntajes::cerrada($p, $r['opciones'] ?? []);
@@ -124,6 +127,7 @@ class PublicarResultado
                     'tipo' => $p['tipo'],
                     'respuesta' => $texto,
                     'puntaje' => $puntaje,
+                    'extra' => $extra,
                     'observacion' => $iaPreguntas[$p['ref']]['observacion'] ?? null,
                 ];
             }

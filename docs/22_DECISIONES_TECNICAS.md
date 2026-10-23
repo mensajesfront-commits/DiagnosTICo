@@ -184,7 +184,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 - **Por qué:** lo pidió el equipo (8 de octubre de 2026): limpiar cuentas y atender solicitudes de borrado de datos (Ley 1581 de 2012), dando 90 días por si la empresa se arrepiente.
 - **Colaboradores (E12):** la cuenta principal de la empresa también elimina a sus colaboradores, con la misma espera de 90 días. Ahí la doble confirmación es con **dos botones** ("Eliminar" → "Sí, eliminar a…") en lugar de escribir el correo, porque el correo y el nombre del colaborador se pueden cambiar.
 - **Ojo:** mientras dure la espera, el correo sigue ocupado: no se puede registrar ni invitar otra cuenta con él.
-- **Pendiente:** cuando existan mediciones y resultados, decidir si se borran con la empresa o se conservan anonimizados para las estadísticas. La cantidad de días se cambia con `DIAS_PARA_RECUPERAR_CUENTA`.
+- **Mediciones (NuevasTIC, 23 de octubre de 2026):** las terminadas se conservan sin nombre para las estadísticas; las demás se borran con la empresa (`App\Support\Anonimizar`). La cantidad de días se cambia con `DIAS_PARA_RECUPERAR_CUENTA`.
 
 ### DEC-018 — Catálogo CIIU Rev. 5 A.C. y subsectores por división
 
@@ -209,7 +209,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - La respuesta de la IA trae `metodo` (una de las cinco claves; la salida estructurada no acepta otra) y `metodo_motivo` (por qué encaja). El resultado lo guarda en `por_categoria[].metodo` y lo muestra en E6 ("Analizado con …"), en las recomendaciones y en el PDF.
   - La guía de cuándo usar cada uno está en las instrucciones generales por defecto (`ArmadorPrompt::GENERAL`, "Detalles y restricciones") y en el formato fijo, que se envía siempre aunque el Administrador cambie las instrucciones. Los métodos están en `App\Support\MetodosAnalisis`.
 - **Por qué:** lo pidió el equipo (14 de octubre de 2026): el análisis no puede ser siempre DOFA; depende de las respuestas.
-- **Ojo:** **[INCONSISTENCIA DETECTADA]** RN-028 dice que el resultado no incluye análisis FODA. No se muestra una matriz FODA, solo el nombre del método que guió el análisis y por qué. Falta que NuevasTIC confirme que esto no choca con RN-028.
+- **Confirmado (NuevasTIC, 23 de octubre de 2026):** la IA puede usar DOFA, PESTEL y los demás métodos. No se muestra una matriz FODA, solo el nombre del método que guió el análisis y por qué; RN-028 se ajustó.
 
 ### DEC-020 — Verificar el correo al registrarse (con código y captcha)
 

@@ -4549,7 +4549,7 @@ Permite acompañar a la empresa y explicarle su diagnóstico viendo lo mismo que
 ### Reglas de negocio
 
 - RN-023 — El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable.
-- RN-028 — El resultado no incluye análisis FODA ni comparación con promedios.
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
 
 ### Validaciones
 
@@ -7652,7 +7652,7 @@ Muestra a la empresa su puntaje, nivel y recomendaciones para saber qué mejorar
 - RN-019 — Niveles fijos: Crítico 0–29, Se puede mejorar 30–59, Vas en buen camino 60–79, Sigue así 80–100.
 - RN-020 — La variación se calcula contra la medición anterior de la misma empresa y solo existe desde la 2.ª medición.
 - RN-023 — El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable.
-- RN-028 — El resultado no incluye análisis FODA ni comparación con promedios.
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
 
 ### Validaciones
 
@@ -7862,7 +7862,7 @@ Permite compartir el resultado con el equipo mediante un informe descargable.
 ### Reglas de negocio
 
 - RN-024 — PDF de 3 páginas (portada y puntaje, puntaje por categoría, recomendaciones), generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA.
-- RN-028 — El resultado no incluye análisis FODA ni comparación con promedios.
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
 
 ### Validaciones
 
@@ -10198,7 +10198,7 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 
 - **PA-001:** ¿Cuál es el texto exacto del saludo del bot de WhatsApp? (HU-072, aplazada)
 - **PA-002:** ¿Cuándo se retoma el bot y cómo será la sección del bot en el panel? (HU-071 a HU-075)
-- **PA-003:** ¿Cuántas pruebas de IA por día puede hacer el Administrador? (HU-045)
+- **PA-003:** ¿Cuántas pruebas de IA por día puede hacer el Administrador? (HU-045) **Respondida (NuevasTIC, 23 de octubre de 2026): 100 al día entre todos los administradores.**
 - **PA-004:** ¿El recordatorio enviado se registra y se muestra en la ficha de la empresa? (HU-008)
 - **PA-005:** ¿Cómo es el modal de confirmación al archivar o eliminar un diagnóstico? (HU-022)
 - **PA-006:** ¿El rol “Consultor” de ejemplo del prototipo (A5.1c) se mantiene o se cambia? (HU-049, HU-050)

@@ -47,7 +47,7 @@ Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validaci
 | RN-022 | El prompt se arma por capas: general, sector, empresa, preguntas con respuestas y formato fijo. Lo más específico manda y los cambios valen para las mediciones siguientes. | `ArmadorPrompt` | A4, A4 "Cómo se arma" | `ConfiguracionIaTest`, `AnalisisIaTest` |
 | RN-023 | El resultado se publica sin revisión y no cambia. | `PublicarResultado` crea el resultado una vez; no hay rutas para editarlo | E6, A3.3 | `ResultadosTest` |
 | RN-024 | PDF de 3 páginas, generado una vez al terminar y guardado. No vuelve a llamar a la IA. | `GenerarInformePdf` e `InformePdf`; `ResultadosController::pdf` lo regenera desde el resultado guardado si falta | E6, E8, A3.3 | `ResultadosTest` (con `Pdf::fake()`) |
-| RN-028 | El resultado no incluye FODA ni comparación con promedios. | Esquema de respuesta de `AnalizadorDeCategoria` | E6, PDF | — |
+| RN-028 | El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026). | Esquema de respuesta de `AnalizadorDeCategoria` | E6, PDF | — |
 
 ## Colaboradores, roles y "Ver como"
 
@@ -71,7 +71,8 @@ Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validaci
 
 ## Por confirmar con NuevasTIC
 
-- **[INCONSISTENCIA DETECTADA]** RN-028 dice "sin FODA", pero DEC-019 deja que la IA analice con DOFA (y otros métodos) y lo muestre. El equipo lo dejó así por pedido de Cristian. NuevasTIC debe decidir si se mantiene.
+- **Resuelto (NuevasTIC, 23 de octubre de 2026):** la IA puede usar DOFA, PESTEL y los demás métodos (DEC-019); RN-028 se ajustó.
+- **Preguntas opcionales (NuevasTIC, 23 de octubre de 2026):** sin responder no se tienen en cuenta; respondidas son un dato extra que la IA lee, pero no cuentan en el puntaje.
 - **[INFORMACIÓN PENDIENTE]** Las frases de cada nivel (`Niveles::FRASES`) las escribió el equipo.
 - **[INFORMACIÓN PENDIENTE]** Una pregunta opcional sin responder no cuenta en el promedio de su categoría. Falta confirmar que así lo quiere NuevasTIC.
 - **[INFORMACIÓN PENDIENTE]** El límite por día de "Probar con un ejemplo" en A4 (hoy solo hay límite por minuto).

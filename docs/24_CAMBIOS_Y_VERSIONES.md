@@ -64,6 +64,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **La contraseña nueva debe ser distinta de la anterior** (L4, Mi perfil y editar colaborador). Esto lo revisa solo el servidor.
 - El correo de "¿Olvidaste tu contraseña?" ahora dice "Cambia tu contraseña" y su botón, "Cambiar contraseña".
 
+### Cambiado (decisiones de NuevasTIC, 23 de octubre)
+
+- **Preguntas opcionales:** respondidas son un dato extra. La IA las lee (van marcadas como `dato_extra`), pero no cuentan en el puntaje; el resultado las muestra como "Dato extra".
+- **"Probar con un ejemplo":** 100 pruebas al día entre todos los administradores (PA-003). La ventana dice cuántas quedan.
+- **Al borrar para siempre una empresa**, sus mediciones terminadas se conservan sin nombre para estadísticas (`App\Support\Anonimizar`, migración `2026_10_23_000002`). Se borran el texto libre de las respuestas, el prompt guardado, el mensaje de la asignación y el PDF; se conservan sector, versión, fechas, puntajes y niveles. Las mediciones sin terminar se borran.
+- RN-028 ajustada: la IA puede usar DOFA y los demás métodos. Frases de los niveles, lista de sectores y carácter especial de la contraseña confirmados.
+- `.env.example`: `OPENAI_MODEL="gpt-4.1-mini"`, el modelo que paga NuevasTIC.
+
 ### Agregado (nada igual a la contraseña actual, 22 de octubre)
 
 - **En Mi perfil, la contraseña nueva no puede repetir partes de la actual:** ningún trozo de 4 caracteres seguidos o más, sin importar mayúsculas ni tildes ("Mesa-47-Sol" → "Mesa-99-Luna" no pasa). La lista de requisitos lo marca en vivo ("Nada igual a la contraseña actual"). Regla `SinPartesDeLaAnterior`.

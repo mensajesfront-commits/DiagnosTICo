@@ -89,7 +89,7 @@ Antes de subir, debe pasar `composer ci:check`.
 - **Respaldo:** `pg_dump` de la base y una copia de `storage/app/private` (`16_INFRAESTRUCTURA.md`).
 - **Cuentas eliminadas:** se borran solas a los 90 días (se cambia con la variable `DIAS_PARA_RECUPERAR_CUENTA`, `config/diagnostico.php`).
 - **Resultados:** no se borran ni se editan (RN-023). Para corregir uno, se asigna una medición nueva.
-- **[FUNCIONALIDAD POR DEFINIR]** Al borrar para siempre una empresa se borran sus mediciones. Falta decidir si se conservan sin nombre para las estadísticas (`30_RIESGOS.md`).
+- Al borrar para siempre una empresa, sus mediciones terminadas se conservan sin nombre para las estadísticas (decisión de NuevasTIC, 23 de octubre de 2026; `App\Support\Anonimizar`).
 
 ## 5. Dónde cambiar cada cosa en el código
 

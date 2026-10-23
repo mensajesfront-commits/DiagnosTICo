@@ -12,6 +12,7 @@ use App\Services\Ia\ArmadorPrompt;
 use App\Support\DatosConfiguracionIa;
 use App\Support\DatosResponder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -31,6 +32,9 @@ use Throwable;
  */
 class ConfiguracionIaController extends Controller
 {
+    /** Pruebas de "Probar con un ejemplo" al día (PA-003). */
+    public const int PRUEBAS_POR_DIA = 100;
+
     private const array MODOS = ['usar', 'agregar', 'reemplazar'];
 
     public function index(Request $request): Response
@@ -141,6 +145,18 @@ class ConfiguracionIaController extends Controller
             return response()->json(['message' => 'La empresa no respondió ninguna pregunta de esta categoría. Elige otra.'], 422);
         }
 
+        // PA-003 (NuevasTIC, 23 de octubre de 2026): 100 pruebas al día entre
+        // todos los administradores, porque cada una gasta OpenAI.
+        $limite = self::PRUEBAS_POR_DIA;
+        $llave = 'ia_pruebas:'.now(config('diagnostico.zona_horaria'))->toDateString();
+
+        if ((int) Cache::get($llave, 0) >= $limite) {
+            return response()->json(['message' => "Ya se hicieron las {$limite} pruebas de hoy. Mañana se puede volver a probar."], 429);
+        }
+
+        Cache::add($llave, 0, now()->addDays(2));
+        $usadas = (int) Cache::increment($llave);
+
         try {
             $salida = $analizador->analizar($armado['instrucciones'], $armado['categoria']);
         } catch (Throwable $e) {
@@ -149,7 +165,11 @@ class ConfiguracionIaController extends Controller
             return response()->json(['message' => 'La IA no respondió bien: '.$e->getMessage().' No se guardó nada.'], 422);
         }
 
-        return response()->json(['preguntas' => $armado['categoria']['preguntas'], 'resultado' => $salida]);
+        return response()->json([
+            'preguntas' => $armado['categoria']['preguntas'],
+            'resultado' => $salida,
+            'restantes' => max(0, $limite - $usadas),
+        ]);
     }
 
     /**

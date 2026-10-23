@@ -14,9 +14,10 @@ namespace App\Services\Resultados;
  *   redondeado. Se calcula con los puntajes de categoría ya redondeados, los
  *   mismos que ve la empresa en la tabla.
  *
- * [FUNCIONALIDAD POR DEFINIR] Una pregunta opcional sin responder no entra al
- * promedio de su categoría (no cuenta como 0). Si el equipo decide que cuente
- * como 0, el cambio va solo en categoria().
+ * Preguntas opcionales (decisión de NuevasTIC, 23 de octubre de 2026): no
+ * cuentan en el puntaje. Sin responder no se tienen en cuenta; respondidas
+ * son un dato extra que la IA lee para sus observaciones y recomendaciones
+ * (PublicarResultado::calcular les deja el puntaje en null).
  */
 class CalculadoraPuntajes
 {

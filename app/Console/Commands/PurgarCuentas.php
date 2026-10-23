@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Empresa;
 use App\Models\User;
+use App\Support\Anonimizar;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,9 @@ use Illuminate\Support\Facades\Storage;
  * - los registros que no verificaron el correo en 7 días (L2b, DEC-020):
  *   la cuenta y su empresa, si la empresa no tiene otra cuenta verificada.
  *   Las invitaciones (sin contraseña) no cuentan como registro.
+ *
+ * Antes de borrar una empresa, sus mediciones terminadas se conservan sin
+ * nombre para las estadísticas (Anonimizar, decisión de NuevasTIC).
  */
 class PurgarCuentas extends Command
 {
@@ -50,6 +54,7 @@ class PurgarCuentas extends Command
 
                 if ($empresa && ! $empresa->usuarios()->withTrashed()->exists()) {
                     $archivos[] = $empresa->logo_ruta;
+                    array_push($archivos, ...Anonimizar::medicionesDe($empresa));
                     $empresa->forceDelete();
                     $empresas++;
                 }
@@ -71,6 +76,7 @@ class PurgarCuentas extends Command
 
             foreach ($vencidas as $empresa) {
                 $archivos[] = $empresa->logo_ruta;
+                array_push($archivos, ...Anonimizar::medicionesDe($empresa));
                 $empresa->forceDelete();
                 $empresas++;
             }

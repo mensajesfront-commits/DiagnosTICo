@@ -118,7 +118,7 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
   - **sectores y categorías con datos:** se desactivan o se archivan (RN-008, RN-009);
   - **versiones y resultados publicados:** no se tocan (RN-010, RN-023);
   - **eliminar una cuenta:** pide el correo exacto en A5 y dos botones en E12, y se puede recuperar durante 90 días (DEC-017).
-- **[FUNCIONALIDAD POR DEFINIR]** Al borrar para siempre una empresa se borran sus mediciones; falta decidir si se conservan sin nombre para las estadísticas.
+- Al borrar para siempre una empresa, sus mediciones terminadas se conservan sin nombre para las estadísticas (decisión de NuevasTIC, 23 de octubre de 2026; `App\Support\Anonimizar`).
 
 ### R-010 — Conocimiento repartido
 

@@ -7,9 +7,9 @@ namespace App\Support;
  * octubre): no siempre DOFA; la IA elige el que mejor encaja con lo que
  * respondió la empresa y el resultado muestra cuál usó y por qué.
  *
- * [INCONSISTENCIA DETECTADA] RN-028 dice que el resultado no incluye
- * análisis FODA. Aquí no hay una matriz FODA: solo el nombre del método que
- * guió la observación y la recomendación. Falta que NuevasTIC lo confirme.
+ * NuevasTIC confirmó (23 de octubre de 2026) que la IA puede usar DOFA,
+ * PESTEL y los demás métodos; RN-028 se ajustó. No hay una matriz FODA: solo
+ * el nombre del método que guió la observación y la recomendación.
  */
 class MetodosAnalisis
 {

@@ -40,6 +40,8 @@ export type PreguntaResultado = {
     /** Opciones elegidas separadas por " · " o el texto; null si no respondió. */
     respuesta: string | null;
     puntaje: number | null;
+    /** Opcional: dato extra que no cuenta en el puntaje (no viene en resultados viejos). */
+    extra?: boolean;
     observacion: string | null;
 };
 

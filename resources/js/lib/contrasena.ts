@@ -5,10 +5,8 @@
  * El servidor valida lo mismo; esta lista solo ayuda a la persona mientras
  * escribe. Además, el servidor pide que sea distinta de la anterior.
  *
- * [INCONSISTENCIA DETECTADA] RN-001 exige un carácter especial, pero los
- * wireframes L2 y L4 muestran solo 4 requisitos (sin el carácter especial).
- * Se sigue RN-001 porque 05_REQUISITOS_FUNCIONALES.md es la fuente de verdad.
- * Si se decide quitarlo, basta con borrar la entrada "especial".
+ * El carácter especial de RN-001 se exige aunque los wireframes L2 y L4 no
+ * lo muestren: NuevasTIC lo confirmó (23 de octubre de 2026).
  */
 
 export type RequisitoContrasena = {

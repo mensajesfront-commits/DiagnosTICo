@@ -132,7 +132,10 @@ const resultadoDe = computed(
                 </Boton>
                 <span class="text-xs text-tinta-suave">
                     Gasta una llamada a la IA. Probar no afecta resultados
-                    reales: no se guarda nada.
+                    reales: no se guarda nada. Se permiten 100 pruebas al
+                    día<template v-if="prueba">
+                        · quedan {{ prueba.restantes }} hoy</template
+                    >.
                 </span>
             </div>
 
