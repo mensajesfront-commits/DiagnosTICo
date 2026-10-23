@@ -8,8 +8,6 @@ use App\Models\Medicion;
 use App\Models\Resultado;
 use App\Models\User;
 use App\Notifications\ResultadoListo;
-use App\Notifications\ResultadoPorRevisar;
-use App\Support\Ajustes;
 use App\Support\MetodosAnalisis;
 use App\Support\Niveles;
 use Illuminate\Support\Facades\DB;
@@ -28,19 +26,12 @@ use Illuminate\Support\Facades\Notification;
  *
  * Varias categorías pueden terminar a la vez: la fila de la medición se
  * bloquea para que el resultado se publique una sola vez.
- *
- * Revisión antes de publicar (Ajustes::revisionActiva, 23 de octubre de
- * 2026): si está encendida, al terminar la IA la medición queda "Por revisar"
- * (`revision_desde`) y se avisa a los administradores. Se publica solo cuando
- * uno la aprueba (`$aprobador`), y el resultado guarda quién fue.
  */
 class PublicarResultado
 {
-    public static function siTermino(Medicion $medicion, ?User $aprobador = null): ?Resultado
+    public static function siTermino(Medicion $medicion): ?Resultado
     {
-        $porRevisar = false;
-
-        $resultado = DB::transaction(function () use ($medicion, $aprobador, &$porRevisar): ?Resultado {
+        $resultado = DB::transaction(function () use ($medicion): ?Resultado {
             $medicion = Medicion::with('version')->lockForUpdate()->find($medicion->id);
 
             if ($medicion === null || $medicion->estado !== 'enviada' || Resultado::where('medicion_id', $medicion->id)->exists()) {
@@ -57,28 +48,13 @@ class PublicarResultado
                 }
             }
 
-            // Con la revisión encendida, espera a que un administrador lo apruebe.
-            if ($aprobador === null && (Ajustes::revisionActiva() || $medicion->revision_desde !== null)) {
-                if ($medicion->revision_desde === null) {
-                    $medicion->forceFill(['revision_desde' => now()])->save();
-                    $porRevisar = true;
-                }
-
-                return null;
-            }
-
             $datos = self::consolidar($medicion, $categorias, $analisis->map(fn (AnalisisCategoria $a) => $a->respuesta_ia ?? [])->all());
 
-            $resultado = Resultado::create([...$datos, 'medicion_id' => $medicion->id, 'publicado_en' => now(), 'aprobado_por' => $aprobador?->id]);
+            $resultado = Resultado::create([...$datos, 'medicion_id' => $medicion->id, 'publicado_en' => now()]);
             $medicion->forceFill(['estado' => 'terminada', 'terminada_en' => now()])->save();
 
             return $resultado;
         });
-
-        if ($porRevisar) {
-            $admins = User::role('Administrador')->where('activo', true)->get();
-            Notification::send($admins, new ResultadoPorRevisar($medicion->fresh(['empresa']) ?? $medicion));
-        }
 
         if ($resultado !== null) {
             $resultado->load('medicion.empresa');
@@ -88,28 +64,6 @@ class PublicarResultado
         }
 
         return $resultado;
-    }
-
-    /**
-     * Lo que se publicaría ahora, sin guardar nada: para revisarlo antes de
-     * aprobarlo. Null si alguna categoría no tiene su análisis terminado.
-     *
-     * @return array{puntaje_total: int, nivel: string, variacion: int|null, por_categoria: list<array<string, mixed>>}|null
-     */
-    public static function vistaPrevia(Medicion $medicion): ?array
-    {
-        $medicion->loadMissing('version');
-        /** @var list<array<string, mixed>> $categorias */
-        $categorias = $medicion->version->contenido['categorias'] ?? [];
-        $analisis = AnalisisCategoria::where('medicion_id', $medicion->id)->get()->keyBy('categoria_ref');
-
-        foreach ($categorias as $c) {
-            if (($analisis[$c['ref']]->estado ?? null) !== 'terminado') {
-                return null;
-            }
-        }
-
-        return self::consolidar($medicion, $categorias, $analisis->map(fn (AnalisisCategoria $a) => $a->respuesta_ia ?? [])->all());
     }
 
     /**

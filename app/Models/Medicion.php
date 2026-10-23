@@ -26,7 +26,6 @@ use Illuminate\Support\Carbon;
  * @property string|null $correo_cuerpo
  * @property Carbon|null $ultimo_aviso_en
  * @property Carbon|null $enviada_en
- * @property Carbon|null $revision_desde
  * @property Carbon|null $terminada_en
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -51,7 +50,6 @@ class Medicion extends Model
             'cancelada_en' => 'datetime',
             'ultimo_aviso_en' => 'datetime',
             'enviada_en' => 'datetime',
-            'revision_desde' => 'datetime',
             'terminada_en' => 'datetime',
         ];
     }

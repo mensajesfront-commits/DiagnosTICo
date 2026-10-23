@@ -36,8 +36,6 @@ class DatosInicio
             'indicadores' => self::indicadores($mediciones),
             // HU-083: empresas con una solicitud de medición nueva abierta.
             'solicitudes' => count(array_filter($mediciones, fn (array $m) => $m['solicitud'] !== null)),
-            // Revisión antes de publicar: resultados que esperan aprobación.
-            'porRevisar' => count(array_filter($mediciones, fn (array $m) => $m['por_revisar'])),
             'mediciones' => $mediciones,
             'niveles' => self::empresasPorNivel(),
             'sectores' => self::diagnosticosPorSector(),
@@ -136,8 +134,6 @@ class DatosInicio
                 'pendiente' => $estado === 'terminada' ? $pendientePorEmpresa->get($m->empresa_id) : null,
                 // HU-083: en la vencida, la fecha (ISO) en que la empresa pidió una nueva.
                 'solicitud' => $estado === 'vencida' ? ($solicitudes[$m->empresa_id] ?? null) : null,
-                // La IA terminó y el resultado espera que un administrador lo apruebe.
-                'por_revisar' => $estado === 'enviada' && $m->revision_desde !== null,
             ];
         }
 

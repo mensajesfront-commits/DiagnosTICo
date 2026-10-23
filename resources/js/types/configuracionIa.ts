@@ -67,12 +67,6 @@ export type ConfiguracionIa = {
     variables: VariableIa[];
     formato: { texto: string; esquema: string };
     ejemplos: EjemploIa[];
-    /** Revisión antes de publicar: el resultado espera la aprobación de un administrador. */
-    revision: {
-        activa: boolean;
-        actualizado_en: string | null;
-        actualizado_por: string | null;
-    };
 };
 
 /** Cambios sin guardar de la capa que se edita (vista previa y prueba). */

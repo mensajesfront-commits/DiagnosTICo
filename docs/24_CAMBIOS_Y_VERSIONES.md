@@ -64,16 +64,6 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **La contraseña nueva debe ser distinta de la anterior** (L4, Mi perfil y editar colaborador). Esto lo revisa solo el servidor.
 - El correo de "¿Olvidaste tu contraseña?" ahora dice "Cambia tu contraseña" y su botón, "Cambiar contraseña".
 
-### Agregado (revisión antes de publicar, 23 de octubre)
-
-- **Supervisión humana de la IA**, para cumplir el compromiso del Anexo 4 de NEIVA FEST. En Configuración IA (A4) hay un interruptor **"Revisar antes de publicar"**.
-  - **Encendido:** cuando la IA termina, el resultado queda **por revisar**: no se publica ni lo ve la empresa, y los administradores reciben un correo (aviso `resultado_por_revisar`, que se apaga en Mi perfil).
-  - **A1:** el aviso "N resultados esperan tu revisión" y, en la fila, "Revisar".
-  - **Pantalla de revisión:** el resultado como lo verá la empresa, con **"Aprobar y publicar"** (doble confirmación) y **"Rehacer todo el análisis"** o **"Rehacer el análisis de esta categoría"**. Al aprobar, el resultado guarda quién lo aprobó (`resultados.aprobado_por`).
-  - **E4:** la empresa ve que su resultado está en revisión y que le llegará un correo.
-  - **Apagado:** se publica solo, como antes. Los que ya esperaban revisión siguen esperando.
-- Tablas y columnas nuevas: `ajustes`, `mediciones.revision_desde`, `resultados.aprobado_por`.
-
 ### Agregado (nada igual a la contraseña actual, 22 de octubre)
 
 - **En Mi perfil, la contraseña nueva no puede repetir partes de la actual:** ningún trozo de 4 caracteres seguidos o más, sin importar mayúsculas ni tildes ("Mesa-47-Sol" → "Mesa-99-Luna" no pasa). La lista de requisitos lo marca en vivo ("Nada igual a la contraseña actual"). Regla `SinPartesDeLaAnterior`.

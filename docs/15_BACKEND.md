@@ -272,10 +272,6 @@ Tarea (HU-070): `mediciones:vencer` corre cada hora (a los :05) y marca `vencida
 | POST | `/configuracion-ia/vista-previa` | `ia.vista-previa` | `ia.ver` | JSON. A4.4: el prompt final de un ejemplo (`medicion_id`, `categoria_ref`) con el `borrador` sin guardar; cada trozo con su origen (`general`, `sector`, `empresa`) y si es un dato insertado. 60 por minuto |
 | PUT | `/configuracion-ia` | `ia.guardar` | `ia.editar` | Guarda la capa: general (contexto y tarea obligatorios) o el ajuste de un sector o empresa (`modos` usar · agregar · reemplazar; texto obligatorio si no es "usar"). Máx. 4000 caracteres por elemento |
 | DELETE | `/configuracion-ia/ajuste` | `ia.quitar` | `ia.editar` | Quita el ajuste de un sector o una empresa |
-| PUT | `/configuracion-ia/revision` | `revision.cambiar` | `ia.editar` | Enciende o apaga "Revisar antes de publicar" (tabla `ajustes`) |
-| GET | `/revision/{medicion}` | `revision.ver` | `ia.editar` | El resultado sin publicar, en la misma pantalla de E6 (`PublicarResultado::vistaPrevia`) |
-| POST | `/revision/{medicion}/aprobar` | `revision.aprobar` | `ia.editar` | Publica el resultado y guarda quién lo aprobó (`resultados.aprobado_por`) |
-| POST | `/revision/{medicion}/rehacer` | `revision.rehacer` | `ia.editar` | Rehace el análisis de una categoría (`categoria`) o de todas; vuelve a quedar por revisar al terminar |
 | POST | `/configuracion-ia/probar` | `ia.probar` | `ia.editar` | JSON. A4.7: analiza el ejemplo con el borrador y devuelve lo que diría la IA. No guarda nada; si la IA falla, 422 con el error. 10 por minuto |
 
 - **Datos que se insertan solos:** `{sector}`, `{contexto_sector}` (la descripción del sector), `{categoria}` y `{respuestas_categoria}` (en el texto queda "las preguntas con sus respuestas, que van en el mensaje siguiente"; las respuestas siempre se envían aparte, en JSON).

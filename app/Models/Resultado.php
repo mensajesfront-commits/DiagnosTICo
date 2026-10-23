@@ -19,10 +19,9 @@ use Illuminate\Support\Carbon;
  * @property array<string, mixed> $por_categoria
  * @property string|null $pdf_ruta
  * @property Carbon $publicado_en
- * @property int|null $aprobado_por
  */
 #[Table('resultados')]
-#[Fillable(['medicion_id', 'puntaje_total', 'nivel', 'variacion', 'por_categoria', 'pdf_ruta', 'publicado_en', 'aprobado_por'])]
+#[Fillable(['medicion_id', 'puntaje_total', 'nivel', 'variacion', 'por_categoria', 'pdf_ruta', 'publicado_en'])]
 class Resultado extends Model
 {
     protected function casts(): array

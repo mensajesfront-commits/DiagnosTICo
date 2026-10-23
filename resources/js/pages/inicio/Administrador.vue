@@ -36,8 +36,6 @@ const props = defineProps<{
     sectores: SectorInicio[];
     /** Empresas con una solicitud de medición nueva abierta (HU-083). */
     solicitudes: number;
-    /** Resultados que esperan la aprobación de un administrador. */
-    porRevisar: number;
 }>();
 
 // --- Pestañas (HU-007) ---------------------------------------------------------
@@ -162,19 +160,6 @@ const tarjetas = computed(() => {
                                     : `${solicitudes} empresas pidieron una medición nueva`
                             }}
                             <span v-if="pestana !== 'vencida'"> · Ver</span>
-                        </button>
-                        <button
-                            v-if="porRevisar > 0"
-                            type="button"
-                            class="rounded-full bg-marca-suave px-2.5 py-0.5 text-xs font-medium text-marca hover:underline"
-                            @click="pestana = 'en_curso'"
-                        >
-                            {{
-                                porRevisar === 1
-                                    ? '1 resultado espera tu revisión'
-                                    : `${porRevisar} resultados esperan tu revisión`
-                            }}
-                            <span v-if="pestana !== 'en_curso'"> · Ver</span>
                         </button>
                     </div>
                     <SelectorCompacto

@@ -136,13 +136,6 @@ export const rutas = {
         vistaPrevia: () => '/configuracion-ia/vista-previa',
         probar: () => '/configuracion-ia/probar',
     },
-    // Revisión antes de publicar (supervisión humana).
-    revision: {
-        cambiar: () => '/configuracion-ia/revision',
-        ver: (id: number) => `/revision/${id}`,
-        aprobar: (id: number) => `/revision/${id}/aprobar`,
-        rehacer: (id: number) => `/revision/${id}/rehacer`,
-    },
     verComo: {
         salir: () => '/ver-como/salir',
     },

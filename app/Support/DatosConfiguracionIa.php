@@ -55,8 +55,6 @@ class DatosConfiguracionIa
             'variables' => collect(ArmadorPrompt::VARIABLES)->map(fn (array $v, string $codigo) => ['codigo' => $codigo, 'nombre' => $v[0], 'elemento' => $v[1]])->values()->all(),
             'formato' => ['texto' => ArmadorPrompt::FORMATO, 'esquema' => json_encode(AnalizadorDeCategoria::esquema(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)],
             'ejemplos' => self::ejemplos(),
-            // Revisión antes de publicar (supervisión humana).
-            'revision' => Ajustes::revision(),
         ];
 
         $armador = app(ArmadorPrompt::class);

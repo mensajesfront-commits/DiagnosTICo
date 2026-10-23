@@ -475,7 +475,6 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `cancelada_en` | timestamp | No | `null` | |
 | `asignada_por` | bigint → `users.id` | No | `1` | |
 | `enviada_en`, `terminada_en` | timestamp | No | `2026-10-25 16:40:00` | |
-| `revision_desde` | timestamp | No | `2026-10-25 16:44:00` | La IA terminó y el resultado espera la aprobación de un administrador (revisión antes de publicar) |
 | `created_at`, `updated_at` | timestamp | No | | |
 
 ### `respuestas`
@@ -517,7 +516,6 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `por_categoria` | jsonb | Sí | Ver «Campos JSONB» | |
 | `pdf_ruta` | varchar(255) | No | `pdfs/medicion-9.pdf` | PDF guardado (RN-024) |
 | `publicado_en` | timestamp | Sí | `2026-10-25 16:45:00` | Desde aquí no cambia (RN-023) |
-| `aprobado_por` | bigint → `users.id` | No | `1` | Quién lo aprobó con la revisión encendida; `null` si se publicó solo |
 | `created_at`, `updated_at` | timestamp | No | | |
 
 ### `solicitudes_medicion`
@@ -568,17 +566,6 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `cuenta_id` | bigint → `users.id` | Sí | `7` | La cuenta que se miró |
 | `inicio` | timestamp | Sí | `2026-10-26 10:00:00` | |
 | `fin` | timestamp | No | `2026-10-26 10:12:00` | `null` mientras siga mirando (RN-026) |
-
-### `ajustes`
-
-Opciones generales del sistema (`App\Support\Ajustes`). La primera es `revision_resultados` (revisión antes de publicar).
-
-| Campo | Tipo | Obligatorio | Ejemplo | Nota |
-|---|---|---|---|---|
-| `clave` | varchar (llave) | Sí | `revision_resultados` | |
-| `valor` | jsonb | Sí | `true` | |
-| `actualizado_por` | bigint → `users.id` | No | `1` | Quién lo cambió por última vez |
-| `created_at`, `updated_at` | timestamp | No | | |
 
 ### `contrasenas_anteriores`
 

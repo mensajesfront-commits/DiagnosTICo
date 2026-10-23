@@ -12,12 +12,10 @@ use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\AnalisisFallido;
 use App\Notifications\ResultadoListo;
-use App\Notifications\ResultadoPorRevisar;
 use App\Services\Ia\Analizador;
 use App\Services\Ia\AnalizadorDePrueba;
 use App\Services\Ia\ArmadorPrompt;
 use App\Services\Resultados\CalculadoraPuntajes;
-use App\Support\Ajustes;
 use App\Support\DatosResultado;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Facades\Notification;
@@ -278,77 +276,4 @@ it('la plantilla del PDF tiene 3 páginas con radar, tabla y recomendaciones', f
         ->toContain('Mejora Automatización')
         ->toContain('new Chart(')
         ->not->toContain('cdn.');
-});
-
-// --- Revisión antes de publicar (supervisión humana) ------------------------------
-
-it('con la revisión encendida el resultado espera la aprobación y avisa a los administradores', function () {
-    $this->actingAs($this->admin)->put(route('revision.cambiar'), ['activa' => true])->assertSessionHasNoErrors();
-    expect(Ajustes::revisionActiva())->toBeTrue();
-
-    responderYEnviar($this, $this->medicion);
-
-    $this->medicion->refresh();
-    expect($this->medicion->estado)->toBe('enviada')
-        ->and($this->medicion->revision_desde)->not->toBeNull()
-        ->and(Resultado::where('medicion_id', $this->medicion->id)->exists())->toBeFalse();
-    Notification::assertSentTo($this->admin, ResultadoPorRevisar::class);
-    Notification::assertNotSentTo($this->laura, ResultadoListo::class);
-
-    // La empresa ve que su resultado está en revisión.
-    $this->actingAs($this->laura)->get(route('responder.enviado', $this->medicion))
-        ->assertInertia(fn (Assert $page) => $page->where('analisis.en_revision', true));
-    $this->actingAs($this->laura)->get(route('resultados.ver', $this->medicion))->assertRedirect();
-
-    // El inicio del Administrador lo marca por revisar.
-    $this->actingAs($this->admin)->get(route('inicio.administrador'))
-        ->assertInertia(fn (Assert $page) => $page->where('porRevisar', 1)->where('mediciones.0.por_revisar', true));
-});
-
-it('el administrador ve el resultado sin publicar y al aprobarlo se publica con su nombre', function () {
-    Ajustes::guardar(Ajustes::REVISION, true);
-    responderYEnviar($this, $this->medicion);
-
-    $this->actingAs($this->admin)->get(route('revision.ver', $this->medicion))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('resultados/Resultado')
-            ->where('resultado.puntaje', 52)
-            ->has('revision.desde'));
-
-    $this->actingAs($this->admin)->post(route('revision.aprobar', $this->medicion))
-        ->assertRedirect(route('resultados.ver', $this->medicion));
-
-    $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
-    expect($resultado->puntaje_total)->toBe(52)
-        ->and($resultado->aprobado_por)->toBe($this->admin->id)
-        ->and($this->medicion->fresh()->estado)->toBe('terminada');
-    Notification::assertSentTo($this->laura, ResultadoListo::class);
-});
-
-it('rehacer una categoría vuelve a analizarla y el resultado vuelve a quedar por revisar', function () {
-    Ajustes::guardar(Ajustes::REVISION, true);
-    responderYEnviar($this, $this->medicion);
-    $c2 = AnalisisCategoria::where('medicion_id', $this->medicion->id)->where('categoria_ref', 'c2')->firstOrFail();
-
-    $this->actingAs($this->admin)->post(route('revision.rehacer', $this->medicion), ['categoria' => 'c1'])
-        ->assertRedirect(route('inicio.administrador'));
-
-    $c1 = AnalisisCategoria::where('medicion_id', $this->medicion->id)->where('categoria_ref', 'c1')->firstOrFail();
-    expect($c1->estado)->toBe('terminado')
-        ->and($c1->intentos)->toBe(1)
-        ->and($c2->fresh()->updated_at->equalTo($c2->updated_at))->toBeTrue()
-        ->and($this->medicion->fresh()->revision_desde)->not->toBeNull()
-        ->and(Resultado::where('medicion_id', $this->medicion->id)->exists())->toBeFalse();
-    Notification::assertSentToTimes($this->admin, ResultadoPorRevisar::class, 2);
-});
-
-it('con la revisión apagada se publica solo, y solo el administrador revisa', function () {
-    responderYEnviar($this, $this->medicion);
-    expect($this->medicion->fresh()->estado)->toBe('terminada')
-        ->and(Resultado::where('medicion_id', $this->medicion->id)->value('aprobado_por'))->toBeNull();
-
-    $this->actingAs($this->laura)->put(route('revision.cambiar'), ['activa' => true])->assertForbidden();
-    $this->actingAs($this->laura)->get(route('revision.ver', $this->medicion))->assertForbidden();
-    $this->actingAs($this->laura)->post(route('revision.aprobar', $this->medicion))->assertForbidden();
 });
