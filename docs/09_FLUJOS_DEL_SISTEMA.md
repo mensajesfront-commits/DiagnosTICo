@@ -164,4 +164,4 @@ sequenceDiagram
 | Borrar cuentas eliminadas (`cuentas:purgar`, DEC-017, DEC-020) | Cada día, 03:10 (hora de Colombia) | Borra para siempre las cuentas y empresas eliminadas hace más de 90 días y los registros que no verificaron el correo en 7 días |
 | Resumen semanal (`mediciones:resumen`) | Lunes, 07:50 (hora de Colombia) | Envía a los administradores que lo activaron en Mi perfil (A6) las mediciones pendientes, las vencidas y las solicitudes abiertas |
 
-**[INFORMACIÓN PENDIENTE]** NuevasTIC confirma el día y la hora del resumen semanal.
+NuevasTIC aprobó el resumen semanal como está: los lunes a las 7:50 a. m., hora de Colombia (23 de octubre de 2026).

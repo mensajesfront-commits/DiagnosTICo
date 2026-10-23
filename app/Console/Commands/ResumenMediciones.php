@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Notification;
  * que lo encendieron en Mi perfil (A6). Corre cada semana
  * (routes/console.php).
  *
- * [INFORMACIÓN PENDIENTE] El día y la hora (hoy, lunes a las 07:50) los
- * confirma NuevasTIC.
+ * Los lunes a las 07:50, hora de Colombia: NuevasTIC lo aprobó (23 de
+ * octubre de 2026).
  */
 class ResumenMediciones extends Command
 {

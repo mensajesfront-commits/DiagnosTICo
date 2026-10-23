@@ -61,11 +61,11 @@ Lo construido, de punta a punta:
 - Los diagnósticos los genera NuevasTIC con IA y los carga a mano cuando se lance la aplicación.
 - OpenAI lo paga NuevasTIC, con el modelo gpt-4.1-mini.
 - El bot de WhatsApp lo hace otra persona del equipo, fuera de este repositorio.
+- El resumen semanal se queda como está: los lunes a las 7:50 a. m.
 
 ## Pendiente con NuevasTIC
 
 - **[INFORMACIÓN PENDIENTE]** El correo de soporte (`SOPORTE_EMAIL`).
-- **[INFORMACIÓN PENDIENTE]** El día y la hora del resumen semanal (hoy, los lunes a las 7:50 a. m.).
 - **[INFORMACIÓN PENDIENTE]** Las llaves reales de Cloudflare Turnstile (el captcha del registro).
 - **[INFORMACIÓN PENDIENTE]** Los datos del responsable en la política de datos (razón social, NIT, domicilio, vigencia).
 - **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Lo vigente es una etapa por categoría y un PDF de 3 páginas.

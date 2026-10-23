@@ -69,7 +69,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **Preguntas opcionales:** respondidas son un dato extra. La IA las lee (van marcadas como `dato_extra`), pero no cuentan en el puntaje; el resultado las muestra como "Dato extra".
 - **"Probar con un ejemplo":** 100 pruebas al día entre todos los administradores (PA-003). La ventana dice cuántas quedan.
 - **Al borrar para siempre una empresa**, sus mediciones terminadas se conservan sin nombre para estadísticas (`App\Support\Anonimizar`, migración `2026_10_23_000002`). Se borran el texto libre de las respuestas, el prompt guardado, el mensaje de la asignación y el PDF; se conservan sector, versión, fechas, puntajes y niveles. Las mediciones sin terminar se borran.
-- RN-028 ajustada: la IA puede usar DOFA y los demás métodos. Frases de los niveles, lista de sectores y carácter especial de la contraseña confirmados.
+- RN-028 ajustada: la IA puede usar DOFA y los demás métodos. Frases de los cuatro niveles, lista de sectores, carácter especial de la contraseña y resumen semanal (lunes 7:50 a. m.) confirmados.
 - `.env.example`: `OPENAI_MODEL="gpt-4.1-mini"`, el modelo que paga NuevasTIC.
 
 ### Agregado (nada igual a la contraseña actual, 22 de octubre)
