@@ -18,6 +18,7 @@ import ModalCrearRol from '@/components/usuarios/ModalCrearRol.vue';
 import ModalEliminarRol from '@/components/usuarios/ModalEliminarRol.vue';
 import ModalInvitarUsuario from '@/components/usuarios/ModalInvitarUsuario.vue';
 import PanelRol from '@/components/usuarios/PanelRol.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { BloquePermisos, Cuenta, Rol } from '@/types/usuarios';
@@ -34,6 +35,8 @@ const props = withDefaults(
     }>(),
     { rolId: null },
 );
+
+const { puede } = usePermisos();
 
 const elegidoId = ref<number | null>(props.rolId ?? props.roles[0]?.id ?? null);
 const elegido = computed(
@@ -76,7 +79,12 @@ const rolesInternos = computed(() =>
 
     <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
         <EncabezadoUsuarios class="shrink-0" pestana="roles">
-            <Boton @click="modalCrear = true">+ Crear rol</Boton>
+            <Boton
+                v-if="puede('usuarios.gestionar')"
+                @click="modalCrear = true"
+            >
+                + Crear rol
+            </Boton>
         </EncabezadoUsuarios>
 
         <!-- Página fija: la lista de roles y el panel bajan cada uno en su espacio. -->

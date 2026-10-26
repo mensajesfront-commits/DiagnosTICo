@@ -31,7 +31,7 @@ Son los **15 permisos en 6 bloques** del wireframe A5.2 (A5.1 "Crear rol" usa la
 |---|---|---|---|---|
 | Diagnósticos | `diagnosticos.ver` | Ver diagnósticos | Ver sectores, catálogo, diagnósticos y vista previa | A2, A2·T, A2.3, A2.4, A2.6 |
 | | `diagnosticos.editar` | Editar preguntas e importancia | Crear y editar sectores, categorías, diagnósticos, preguntas e importancia; duplicar y archivar | A2.1–A2.3c, A2.5, A2.7 |
-| | `diagnosticos.publicar` | Publicar versiones | Publicar una versión | A2.1c |
+| | `diagnosticos.publicar` | Publicar versiones | Publicar una versión (la ruta pide este permiso además de `diagnosticos.editar`) | A2.1c |
 | Empresas | `empresas.ver` | Ver empresas | Ver empresas y su ficha | A3, A3.1 |
 | | `empresas.registrar` | Registrar empresas | Registrar empresas, editar sus datos, desactivar y reactivar | A3.1d, A3.1f, A3.2 |
 | | `mediciones.asignar` | Asignar mediciones | Asignar mediciones, dar nueva fecha, recordatorios, correo de aviso y solicitudes | A1b–A1d, A3.1b, A3.1e |
@@ -82,6 +82,8 @@ Los roles del sistema tienen permisos fijos (RN-027). Así los muestra A5.2:
 - El colaborador **sí edita su propio perfil** (su nombre, su teléfono…), respuesta del equipo del 6 de octubre. Lo que no puede es cambiar los datos de la empresa (RN-025): eso lo decide el rol Empresa, no el permiso. **[INCONSISTENCIA DETECTADA]** A5.2 muestra al Colaborador con 4 permisos, sin "Editar su perfil"; manda la respuesta del equipo.
 
 Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/Feature/RolesYPermisosTest.php`) y el menú en `resources/js/lib/menu.ts`.
+
+**Botones según los permisos (26 de octubre de 2026):** cada pantalla oculta los botones y acciones que el rol no permite (`resources/js/composables/usePermisos.ts`). Por ejemplo, con solo "Ver empresas" no aparecen "Registrar empresa", "Asignar medición", "Desactivar cuenta" ni "Ver como", y Datos de la cuenta queda de solo lectura. Sin "Editar" no aparecen crear, editar, archivar ni eliminar en Diagnósticos y el catálogo; sin "Publicar versiones" no aparece "Publicar"; sin "Descargar PDF" no aparece el PDF; sin "Gestionar usuarios y roles" la lista de usuarios y los roles son de solo lectura. El servidor bloquea las rutas igual.
 
 ## Reglas que se aplican en el servidor
 

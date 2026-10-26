@@ -30,6 +30,7 @@ import EncabezadoUsuarios from '@/components/usuarios/EncabezadoUsuarios.vue';
 import ModalCambiarRol from '@/components/usuarios/ModalCambiarRol.vue';
 import ModalDesactivarEliminar from '@/components/usuarios/ModalDesactivarEliminar.vue';
 import ModalInvitarUsuario from '@/components/usuarios/ModalInvitarUsuario.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
@@ -44,6 +45,8 @@ const props = defineProps<{
         'id' | 'nombre' | 'descripcion' | 'activo' | 'del_sistema' | 'aviso'
     >[];
 }>();
+
+const { puede } = usePermisos();
 
 // "Ver todas en Usuarios" desde un rol llega con ?rol=Empresa.
 const page = usePage();
@@ -157,7 +160,12 @@ const enlaceEliminar = 'text-aviso hover:underline';
 
     <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
         <EncabezadoUsuarios class="shrink-0" pestana="usuarios">
-            <Boton @click="modalInvitar = true">+ Invitar usuario</Boton>
+            <Boton
+                v-if="puede('usuarios.gestionar')"
+                @click="modalInvitar = true"
+            >
+                + Invitar usuario
+            </Boton>
         </EncabezadoUsuarios>
 
         <div class="grid shrink-0 gap-3 md:grid-cols-[1fr_13rem_13rem]">
@@ -203,7 +211,10 @@ const enlaceEliminar = 'text-aviso hover:underline';
             </div>
         </div>
 
-        <p class="-mt-2 shrink-0 text-xs text-tinta-suave">
+        <p
+            v-if="puede('usuarios.gestionar')"
+            class="-mt-2 shrink-0 text-xs text-tinta-suave"
+        >
             Las cuentas de empresa se crean al registrar la empresa en
             <Link :href="rutas.empresas.lista()" class="text-marca underline">
                 Empresas</Link
@@ -324,6 +335,12 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                         Mi perfil
                                     </Link>
                                 </template>
+                                <span
+                                    v-else-if="!puede('usuarios.gestionar')"
+                                    class="text-xs text-tinta-suave"
+                                >
+                                    Solo lectura
+                                </span>
                                 <button
                                     v-else-if="cuenta.estado === 'eliminada'"
                                     type="button"

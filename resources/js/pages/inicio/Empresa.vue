@@ -29,12 +29,15 @@ import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import MiniEvolucion from '@/components/graficas/MiniEvolucion.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { InicioEmpresa } from '@/types/responder';
 
 const props = defineProps<Partial<InicioEmpresa> & { sinEmpresa?: boolean }>();
+
+const { puede } = usePermisos();
 
 const plural = (n: number, uno: string, varios: string) =>
     `${n} ${n === 1 ? uno : varios}`;
@@ -619,6 +622,7 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                                     Ver resultado
                                 </Link>
                                 <a
+                                    v-if="puede('resultados.pdf')"
                                     :href="rutas.resultados.pdf(m.id)"
                                     :class="cn(enlace, 'ml-3')"
                                 >

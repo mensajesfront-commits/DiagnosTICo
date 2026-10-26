@@ -64,6 +64,11 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **La contraseña nueva debe ser distinta de la anterior** (L4, Mi perfil y editar colaborador). Esto lo revisa solo el servidor.
 - El correo de "¿Olvidaste tu contraseña?" ahora dice "Cambia tu contraseña" y su botón, "Cambiar contraseña".
 
+### Cambiado (botones según los permisos, 26 de octubre)
+
+- Cada pantalla oculta los botones que el rol de la cuenta no permite (`usePermisos`): Empresas (lista, ficha y Datos de la cuenta en solo lectura), Inicio, Diagnósticos, catálogo, editor y vista previa, resultados y PDF, Usuarios y roles.
+- Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
+
 ### Cambiado (Usuarios y roles fija, 26 de octubre)
 
 - **A5 · Usuarios:** la página queda fija sin importar cuántas cuentas haya. La tabla muestra las filas que caben en la pantalla y el paginado de Empresas (`useFilasQueCaben`), en lugar de 12 por página con desplazamiento.

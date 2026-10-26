@@ -26,12 +26,15 @@ import ModalEliminarPregunta from '@/components/editor/ModalEliminarPregunta.vue
 import ModalPregunta from '@/components/editor/ModalPregunta.vue';
 import ModalVersiones from '@/components/editor/ModalVersiones.vue';
 import TarjetaPregunta from '@/components/editor/TarjetaPregunta.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { guardadoHace } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { DatosEditor, PreguntaEditor } from '@/types/editor';
 
 const props = defineProps<DatosEditor>();
+
+const { puede } = usePermisos();
 
 // --- Categoría elegida ----------------------------------------------------------
 const parteId = ref<number | null>(
@@ -249,6 +252,7 @@ const porcentaje = (n: number) =>
                         Vista previa y estado
                     </Boton>
                     <Boton
+                        v-if="puede('diagnosticos.publicar')"
                         :disabled="!estado.publicable || nadaQuePublicar"
                         @click="modalVersiones = true"
                     >

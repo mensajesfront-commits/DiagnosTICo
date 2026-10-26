@@ -14,11 +14,14 @@ import Modal from '@/components/base/Modal.vue';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import type { DiagnosticoArchivado } from '@/types/diagnosticos';
+import { usePermisos } from '@/composables/usePermisos';
 
 const props = defineProps<{
     archivados: DiagnosticoArchivado[];
     mostrarSector: boolean;
 }>();
+
+const { puede } = usePermisos();
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 
@@ -126,7 +129,10 @@ const plural = (n: number, uno: string, varios: string) =>
                         Sí, eliminar
                     </Boton>
                 </div>
-                <div v-else class="flex items-center gap-3 text-sm">
+                <div
+                    v-else-if="puede('diagnosticos.editar')"
+                    class="flex items-center gap-3 text-sm"
+                >
                     <button
                         type="button"
                         class="text-marca underline underline-offset-2 hover:text-marca-hover disabled:text-tinta-suave"

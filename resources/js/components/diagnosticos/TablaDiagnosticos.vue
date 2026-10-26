@@ -28,6 +28,7 @@ import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
 import Paginacion from '@/components/base/Paginacion.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -47,6 +48,8 @@ const props = withDefaults(
     }>(),
     { mostrarSector: false },
 );
+
+const { puede } = usePermisos();
 
 /** Ids elegidos para eliminar varios a la vez. */
 const seleccion = defineModel<number[]>('seleccion', { default: () => [] });
@@ -132,7 +135,11 @@ const columnas = computed(() => [
             <table class="w-full border-collapse text-sm">
                 <thead>
                     <tr class="border-y border-linea bg-[#f9f8f4] text-left">
-                        <th scope="col" class="w-10 py-2.5 pr-0 pl-4">
+                        <th
+                            v-if="puede('diagnosticos.editar')"
+                            scope="col"
+                            class="w-10 py-2.5 pr-0 pl-4"
+                        >
                             <input
                                 type="checkbox"
                                 class="size-4 accent-marca disabled:opacity-40"
@@ -161,7 +168,10 @@ const columnas = computed(() => [
                             seleccion.includes(fila.id) && 'bg-marca-suave',
                         ]"
                     >
-                        <td class="w-10 py-3 pr-0 pl-4 align-top">
+                        <td
+                            v-if="puede('diagnosticos.editar')"
+                            class="w-10 py-3 pr-0 pl-4 align-top"
+                        >
                             <input
                                 type="checkbox"
                                 class="mt-0.5 size-4 accent-marca disabled:opacity-40"
@@ -222,7 +232,10 @@ const columnas = computed(() => [
                         </td>
                         <td class="px-4 py-3 align-top">
                             <div class="flex gap-2">
-                                <DropdownMenu :modal="false">
+                                <DropdownMenu
+                                    v-if="puede('diagnosticos.editar')"
+                                    :modal="false"
+                                >
                                     <DropdownMenuTrigger as-child>
                                         <Boton
                                             tamano="sm"

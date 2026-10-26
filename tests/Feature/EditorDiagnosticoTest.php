@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\Permission\Models\Role;
 use App\Models\Categoria;
 use App\Models\Diagnostico;
 use App\Models\DiagnosticoCategoria;
@@ -278,4 +279,29 @@ it('guarda una sola opción "Otro" que pide escribir cuál y la congela al publi
     $congelada = collect(app(ContenidoDiagnostico::class)->congelar($this->diagnostico->fresh())['categorias'])
         ->flatMap(fn ($c) => $c['preguntas'])->firstWhere('ref', 'p'.$pregunta->id);
     expect(array_column($congelada['opciones'], 'con_texto'))->toBe([false, true, false]);
+});
+
+it('publicar pide su propio permiso: con solo "Editar" no se publica', function () {
+    $rol = Role::create(['name' => 'Editor de contenido', 'guard_name' => 'web']);
+    $rol->givePermissionTo(['diagnosticos.ver', 'diagnosticos.editar']);
+    $editor = User::factory()->create()->assignRole($rol);
+
+    $this->actingAs($editor)->get(route('diagnosticos.editar', $this->diagnostico))->assertOk();
+    $this->actingAs($editor)
+        ->post(route('diagnosticos.publicar', $this->diagnostico), ['nota' => 'v1', 'pendientes' => 'dejar'])
+        ->assertForbidden();
+
+    expect($this->diagnostico->fresh()->versiones()->exists())->toBeFalse();
+});
+
+it('comparte los permisos de la cuenta para ocultar los botones que no puede usar', function () {
+    $rol = Role::create(['name' => 'Consulta de empresas', 'guard_name' => 'web']);
+    $rol->givePermissionTo(['empresas.ver']);
+    $cristobal = User::factory()->create()->assignRole($rol);
+
+    $this->actingAs($cristobal)->get(route('empresas.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('auth.permisos', ['empresas.ver']));
+    $this->actingAs($cristobal)->get(route('empresas.crear'))->assertForbidden();
+    $this->actingAs($cristobal)->get(route('mediciones.crear'))->assertForbidden();
 });

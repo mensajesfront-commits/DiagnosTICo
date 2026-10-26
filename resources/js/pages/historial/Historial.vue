@@ -23,6 +23,7 @@ import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.v
 import Variacion from '@/components/empresas/Variacion.vue';
 import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
 import SelectorEvolucion from '@/components/graficas/SelectorEvolucion.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
@@ -30,6 +31,8 @@ import { empresa as inicioEmpresa } from '@/routes/inicio';
 import type { Historial } from '@/types/historial';
 
 const props = defineProps<Historial>();
+
+const { puede } = usePermisos();
 
 const page = usePage();
 const puedeAsignar = computed(() =>
@@ -324,6 +327,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                         }}
                                     </Link>
                                     <a
+                                        v-if="puede('resultados.pdf')"
                                         :href="rutas.resultados.pdf(m.id)"
                                         :class="enlace"
                                         >Ver informe PDF</a

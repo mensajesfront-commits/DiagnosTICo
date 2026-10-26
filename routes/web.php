@@ -85,7 +85,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('diagnosticos/{diagnostico}/categorias', [EditorDiagnosticoController::class, 'agregarCategorias'])->name('diagnosticos.categorias.agregar');
         Route::get('diagnosticos/{diagnostico}/importancia', [EditorDiagnosticoController::class, 'importancia'])->name('diagnosticos.importancia');
         Route::put('diagnosticos/{diagnostico}/importancia', [EditorDiagnosticoController::class, 'guardarImportancia'])->name('diagnosticos.importancia.guardar');
-        Route::post('diagnosticos/{diagnostico}/publicar', [EditorDiagnosticoController::class, 'publicar'])->name('diagnosticos.publicar');
+        // Publicar pide además su propio permiso (A5.2: "Publicar versiones").
+        Route::post('diagnosticos/{diagnostico}/publicar', [EditorDiagnosticoController::class, 'publicar'])
+            ->middleware('permission:diagnosticos.publicar')->name('diagnosticos.publicar');
 
         Route::post('sectores', [SectoresController::class, 'store'])->name('sectores.store');
         Route::put('sectores/{sector}', [SectoresController::class, 'update'])->name('sectores.update');

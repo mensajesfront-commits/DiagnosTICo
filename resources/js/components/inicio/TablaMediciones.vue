@@ -28,6 +28,7 @@ import Paginacion from '@/components/base/Paginacion.vue';
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
 import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal, haceCuanto } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
@@ -65,7 +66,20 @@ type Accion = {
     modal?: 'fecha' | 'cancelar' | 'correo';
 };
 
+const { puede } = usePermisos();
+
+/** Solo las acciones que el rol de la cuenta permite. */
 function acciones(f: FilaMedicion): Accion[] {
+    return todasLasAcciones(f).filter((a) =>
+        puede(
+            a.texto === 'Ver resultado'
+                ? 'resultados.ver'
+                : 'mediciones.asignar',
+        ),
+    );
+}
+
+function todasLasAcciones(f: FilaMedicion): Accion[] {
     const resultado = rutas.resultados.ver(f.id);
 
     switch (f.estado) {
@@ -192,11 +206,15 @@ const columnas = ['Empresa', 'Asignada', 'Vence', 'Estado', 'Acción'];
                     >
                         <td class="px-4 py-2.5">
                             <Link
+                                v-if="puede('empresas.ver')"
                                 :href="rutas.empresas.ver(fila.empresa_id)"
                                 class="font-medium hover:text-marca hover:underline"
                             >
                                 {{ fila.empresa }}
                             </Link>
+                            <span v-else class="font-medium">
+                                {{ fila.empresa }}
+                            </span>
                             <p class="text-xs text-tinta-suave">
                                 {{ fila.sector }}
                             </p>

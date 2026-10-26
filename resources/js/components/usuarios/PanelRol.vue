@@ -17,10 +17,13 @@ import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import GrillaPermisos from '@/components/usuarios/GrillaPermisos.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { rutas } from '@/lib/rutas';
 import type { BloquePermisos, Rol } from '@/types/usuarios';
 
 const props = defineProps<{ rol: Rol; bloques: BloquePermisos[] }>();
+
+const { puede } = usePermisos();
 
 const emit = defineEmits<{
     asignar: [];
@@ -127,9 +130,10 @@ function guardar(): void {
             </Campo>
         </div>
 
-        <!-- Rol creado: se edita -->
-        <div
+        <!-- Rol creado: se edita (con usuarios.gestionar) -->
+        <fieldset
             v-else
+            :disabled="!puede('usuarios.gestionar')"
             class="grid items-start gap-4 sm:grid-cols-[1fr_1.4fr_auto]"
         >
             <Campo
@@ -162,7 +166,7 @@ function guardar(): void {
                 />
                 Rol activo
             </label>
-        </div>
+        </fieldset>
 
         <GrillaPermisos
             v-if="rol.del_sistema"
@@ -184,6 +188,7 @@ function guardar(): void {
             v-model="form.permisos"
             :bloques="bloques"
             :notas="rol.notas_permisos"
+            :bloqueada="!puede('usuarios.gestionar')"
             prefijo="editar"
         >
             <template #ayuda>
@@ -201,6 +206,7 @@ function guardar(): void {
                     Cuentas con este rol · {{ rol.cuentas_total }}
                 </h3>
                 <Boton
+                    v-if="puede('usuarios.gestionar')"
                     variante="secundario"
                     tamano="sm"
                     :disabled="!rol.activo"
@@ -227,7 +233,7 @@ function guardar(): void {
                         Tu cuenta
                     </span>
                     <button
-                        v-else
+                        v-else-if="puede('usuarios.gestionar')"
                         type="button"
                         class="text-sm text-marca hover:underline"
                         @click="emit('cambiarRol', cuenta.id)"
@@ -249,7 +255,12 @@ function guardar(): void {
                     Mostrando {{ rol.cuentas.length }} de
                     {{ rol.cuentas_total }}.
                 </template>
-                <template v-if="rol.nombre === 'Administrador'">
+                <template
+                    v-if="
+                        rol.nombre === 'Administrador' &&
+                        puede('usuarios.gestionar')
+                    "
+                >
                     Para sumar a otra persona del equipo de NuevasTIC, usa
                     <button
                         type="button"
@@ -284,6 +295,7 @@ function guardar(): void {
 
         <!-- Pie -->
         <div
+            v-if="puede('usuarios.gestionar')"
             class="flex flex-wrap items-center gap-3 border-t border-linea pt-5"
         >
             <template v-if="rol.del_sistema">

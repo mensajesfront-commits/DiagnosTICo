@@ -23,6 +23,7 @@ import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import Paginacion from '@/components/base/Paginacion.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { niveles, ordenNiveles } from '@/lib/niveles';
 import type { Nivel } from '@/lib/niveles';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
@@ -35,6 +36,8 @@ const props = defineProps<{
     sectores: SectorFiltro[];
     sectorInicial: number | null;
 }>();
+
+const { puede } = usePermisos();
 
 type FiltroMedicion = '' | 'no_iniciada' | 'en_curso' | 'vencida' | 'ninguna';
 type FiltroCuenta = '' | 'activa' | 'desactivada';
@@ -137,10 +140,19 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
 
     <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
         <EncabezadoPagina titulo="Empresas" :descripcion="registradas">
-            <Boton variante="secundario" :href="rutas.mediciones.asignar()">
+            <Boton
+                v-if="puede('mediciones.asignar')"
+                variante="secundario"
+                :href="rutas.mediciones.asignar()"
+            >
                 Asignar medición
             </Boton>
-            <Boton :href="rutas.empresas.crear()">+ Registrar empresa</Boton>
+            <Boton
+                v-if="puede('empresas.registrar')"
+                :href="rutas.empresas.crear()"
+            >
+                + Registrar empresa
+            </Boton>
         </EncabezadoPagina>
 
         <div
@@ -216,7 +228,10 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
             >
                 <template v-if="empresas.length === 0">
                     <p>Todavía no hay empresas registradas.</p>
-                    <Boton :href="rutas.empresas.crear()">
+                    <Boton
+                        v-if="puede('empresas.registrar')"
+                        :href="rutas.empresas.crear()"
+                    >
                         + Registrar empresa
                     </Boton>
                 </template>

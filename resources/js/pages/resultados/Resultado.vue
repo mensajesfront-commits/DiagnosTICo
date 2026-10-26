@@ -27,11 +27,15 @@ import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import RadarCategorias from '@/components/graficas/RadarCategorias.vue';
 import EtiquetaMetodo from '@/components/resultados/EtiquetaMetodo.vue';
 import PreguntaResultado from '@/components/resultados/PreguntaResultado.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal, mesYAnio } from '@/lib/fechas';
 import { niveles, ordenNiveles } from '@/lib/niveles';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
-import { empresa as inicioEmpresa } from '@/routes/inicio';
+import {
+    administrador as inicioAdministrador,
+    empresa as inicioEmpresa,
+} from '@/routes/inicio';
 import type {
     CabeceraResultado,
     EjemploResultado,
@@ -46,6 +50,8 @@ const props = defineProps<{
     /** A2.6 · Resultado de ejemplo de un diagnóstico (HU-030): datos de muestra. */
     ejemplo?: EjemploResultado | null;
 }>();
+
+const { puede } = usePermisos();
 
 // --- A2.6 · Resultado de ejemplo -------------------------------------------------
 const casos = [
@@ -94,10 +100,12 @@ const volver = computed(() =>
     props.ejemplo
         ? { href: props.ejemplo.volver, texto: 'Volver a la vista previa' }
         : props.interno
-          ? {
-                href: rutas.empresas.ver(props.medicion.empresa.id),
-                texto: props.medicion.empresa.nombre,
-            }
+          ? puede('empresas.ver')
+              ? {
+                    href: rutas.empresas.ver(props.medicion.empresa.id),
+                    texto: props.medicion.empresa.nombre,
+                }
+              : { href: inicioAdministrador(), texto: 'Inicio' }
           : { href: inicioEmpresa(), texto: 'Inicio' },
 );
 
@@ -209,7 +217,11 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                 >
                     {{ interno ? 'Ver respuestas' : 'Ver mis respuestas' }}
                 </Boton>
-                <Boton archivo :href="rutas.resultados.pdf(medicion.id)">
+                <Boton
+                    v-if="puede('resultados.pdf')"
+                    archivo
+                    :href="rutas.resultados.pdf(medicion.id)"
+                >
                     Ver informe PDF
                 </Boton>
             </div>
