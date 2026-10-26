@@ -382,16 +382,50 @@ it('una cuenta de empresa no puede eliminar cuentas', function () {
         ->assertForbidden();
 });
 
-it('no deja desactivar un rol que tiene cuentas; sin cuentas, sí', function () {
+it('al desactivar un rol, sus cuentas no entran hasta tener otro rol', function () {
     $rol = Role::create(['name' => 'Consulta de empresas', 'guard_name' => 'web']);
-    $cristobal = User::factory()->create()->assignRole($rol);
-    $datos = ['nombre' => 'Consulta de empresas', 'activo' => false, 'permisos' => ['empresas.ver']];
+    $rol->forceFill(['activo' => true])->save();
+    $cristobal = User::factory()->create(['password' => 'Clave-Segura-2026'])->assignRole($rol);
 
-    $this->actingAs($this->admin)->put(route('roles.update', $rol), $datos)
-        ->assertSessionHasErrors(['activo' => 'Este rol tiene cuentas: pásalas a otro rol antes de desactivarlo.']);
-    expect($cristobal->fresh()->hasRole('Consulta de empresas'))->toBeTrue();
+    $this->actingAs($this->admin)
+        ->put(route('roles.update', $rol), ['nombre' => 'Consulta de empresas', 'activo' => false, 'permisos' => ['empresas.ver']])
+        ->assertSessionHasNoErrors();
 
-    $cristobal->syncRoles([]);
-    $this->actingAs($this->admin)->put(route('roles.update', $rol), $datos)->assertSessionHasNoErrors();
-    expect((bool) $rol->fresh()->getAttribute('activo'))->toBeFalse();
+    expect($cristobal->fresh()->puedeEntrar())->toBeFalse();
+
+    // Con la sesión abierta, se cierra en la siguiente petición.
+    $this->actingAs($cristobal->fresh())->get(route('dashboard'))->assertRedirect(route('login'));
+    $this->assertGuest();
+
+    // Con otro rol vuelve a entrar.
+    $this->actingAs($this->admin)
+        ->put(route('usuarios.cambiar-rol', $cristobal), ['rol_id' => Role::findByName('Administrador')->id])
+        ->assertSessionHasNoErrors();
+    expect($cristobal->fresh()->puedeEntrar())->toBeTrue();
+});
+
+it('no deja desactivar el propio rol', function () {
+    $rol = Role::create(['name' => 'Equipo interno', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+    $rol->syncPermissions(['usuarios.ver', 'usuarios.gestionar']);
+    $yo = User::factory()->create()->assignRole($rol);
+
+    $this->actingAs($yo)
+        ->put(route('roles.update', $rol), ['nombre' => 'Equipo interno', 'activo' => false, 'permisos' => ['usuarios.ver', 'usuarios.gestionar']])
+        ->assertSessionHasErrors(['activo' => 'No puedes desactivar tu propio rol.']);
+    expect((bool) $rol->fresh()->getAttribute('activo'))->toBeTrue();
+});
+
+it('al pasar un colaborador a otro rol pierde las páginas que le dio su empresa', function () {
+    $laura = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole('Empresa');
+    $andres = User::factory()->create(['empresa_id' => $laura->empresa_id])->assignRole('Colaborador');
+    $andres->givePermissionTo(['diagnostico.responder', 'resultados.ver']);
+    $rol = Role::create(['name' => 'Solo lectura', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+
+    $this->actingAs($this->admin)
+        ->put(route('usuarios.cambiar-rol', $andres), ['rol_id' => $rol->id])
+        ->assertSessionHasNoErrors();
+
+    expect($andres->fresh()->getDirectPermissions())->toBeEmpty();
 });

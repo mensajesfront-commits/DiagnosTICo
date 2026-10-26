@@ -48,15 +48,17 @@ class DatosInicioEmpresa
         }
 
         $ultima = $filas === [] ? null : $filas[count($filas) - 1];
+        // Un colaborador sin "Resultados" (E12.1) no recibe puntajes.
+        $veResultados = $usuario->can('resultados.ver');
 
         return [
             'nombre' => $usuario->name,
             'empresa' => ['nombre' => $empresa->nombre, 'sector' => $empresa->sector->nombre ?? ''],
             'realizadas' => count($filas),
             'pendiente' => $pendiente ? self::pendiente($pendiente, $filas === []) : null,
-            'ultima' => $ultima,
-            'mediciones' => array_reverse($filas),
-            'areas' => $ultima ? self::areas($terminadas->last()) : [],
+            'ultima' => $veResultados ? $ultima : null,
+            'mediciones' => $veResultados ? array_reverse($filas) : [],
+            'areas' => $veResultados && $ultima ? self::areas($terminadas->last()) : [],
             'soporte' => config('diagnostico.soporte_email'),
         ];
     }

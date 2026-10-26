@@ -302,6 +302,12 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                 </Etiqueta>
                                 <Etiqueta v-else>○ Desactivada</Etiqueta>
                                 <p
+                                    v-if="cuenta.rol_inactivo"
+                                    class="mt-1 text-xs text-aviso"
+                                >
+                                    Rol inactivo: no puede entrar
+                                </p>
+                                <p
                                     v-if="
                                         cuenta.estado === 'eliminada' &&
                                         cuenta.se_borra_el

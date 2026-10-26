@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ContrasenaLaCambiaTuEmpresa;
 use App\Services\Acceso\CodigoVerificacion;
 use App\Support\OpcionesPerfil;
 use Database\Factories\UserFactory;
@@ -15,6 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Role;
 
 /**
  * @property int $id
@@ -96,6 +98,23 @@ class User extends Authenticatable implements MustVerifyEmail
         app(CodigoVerificacion::class)->enviar($this);
     }
 
+    /**
+     * L3 · Al colaborador no le llega el enlace: su contraseña la cambia la
+     * cuenta principal de su empresa (E12.3).
+     *
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        if ($this->hasRole('Colaborador')) {
+            $this->notify(new ContrasenaLaCambiaTuEmpresa($this->empresa?->nombre));
+
+            return;
+        }
+
+        parent::sendPasswordResetNotification($token);
+    }
+
     public function quiereAviso(string $clave): bool
     {
         return OpcionesPerfil::avisosDe($this)[$clave] ?? true;
@@ -107,7 +126,18 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
 
+        // Rol desactivado (A5.1c): sus cuentas no entran hasta tener otro rol.
+        if ($this->rolInactivo()) {
+            return false;
+        }
+
         return $this->empresa_id === null || $this->empresa?->activa !== false;
+    }
+
+    /** Su rol está desactivado (A5.1c). */
+    public function rolInactivo(): bool
+    {
+        return $this->roles->contains(fn (Role $rol): bool => ! (bool) ($rol->getAttribute('activo') ?? true));
     }
 
     /** Invitada que todavía no crea su contraseña (A5). */

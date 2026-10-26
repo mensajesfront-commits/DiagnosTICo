@@ -29,7 +29,12 @@ class DatosUsuarios
     /** Aclaraciones junto a los permisos (A5.1b, A5.1e, A5.1c). */
     private const array NOTAS = [
         'Empresa' => self::SOLO_SU_EMPRESA,
-        'Colaborador' => self::SOLO_SU_EMPRESA,
+        // La cuenta principal elige estas páginas para cada colaborador (E12.1).
+        'Colaborador' => [
+            'diagnostico.responder' => 'si su empresa se lo da',
+            'resultados.ver' => 'si su empresa se lo da',
+            'resultados.pdf' => 'si su empresa se lo da',
+        ],
         'Consultor' => [
             'empresas.ver' => 'solo las vinculadas',
             'diagnostico.responder' => 'en nombre de la empresa',
@@ -41,6 +46,9 @@ class DatosUsuarios
         'resultados.ver' => 'solo su empresa',
         'resultados.pdf' => 'solo su empresa',
     ];
+
+    /** Aviso de un rol creado e inactivo (A5.1c). */
+    private const string AVISO_INACTIVO = 'Este rol está inactivo: sus cuentas no pueden entrar hasta que les asignes otro rol, y no se puede asignar a ninguna cuenta hasta que lo actives.';
 
     /** Aviso del rol Consultor (A5.1c, PA-006). */
     private const string AVISO_CONSULTOR = 'Disponible en la próxima fase: vincular empresas. Hasta entonces este rol queda inactivo y no se puede asignar a ninguna cuenta.';
@@ -56,7 +64,7 @@ class DatosUsuarios
         // Incluye las eliminadas: la pantalla las muestra solo con el filtro
         // "Eliminadas", para recuperarlas (DEC-017).
         $usuarios = User::withTrashed()
-            ->with(['roles:id,name', 'empresa' => fn ($q) => $q->withTrashed()->select('id', 'nombre')])
+            ->with(['roles:id,name,activo', 'empresa' => fn ($q) => $q->withTrashed()->select('id', 'nombre')])
             ->orderByRaw('id = ? desc', [$yo->id])
             ->orderBy('name')
             ->get();
@@ -109,6 +117,8 @@ class DatosUsuarios
             'colaboradores_activos' => $rol === 'Empresa' ? $colaboradoresActivos : 0,
             // "medición 4 no iniciada (vence el 20 de octubre)".
             'medicion_pendiente' => $rol === 'Empresa' && $pendiente ? self::pendiente($pendiente) : null,
+            // Su rol está desactivado: no entra hasta tener otro (A5.1c).
+            'rol_inactivo' => $u->rolInactivo(),
             'estado' => match (true) {
                 $u->trashed() => 'eliminada',
                 $u->invitacionPendiente() => 'invitacion',
@@ -182,7 +192,7 @@ class DatosUsuarios
                     : $u->email,
                 'es_tuya' => $u->id === auth()->id(),
             ])->values()->all(),
-            'aviso' => $activo ? null : ($r->name === 'Consultor' ? self::AVISO_CONSULTOR : null),
+            'aviso' => $activo ? null : ($r->name === 'Consultor' ? self::AVISO_CONSULTOR : self::AVISO_INACTIVO),
         ];
     }
 

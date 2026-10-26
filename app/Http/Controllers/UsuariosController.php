@@ -240,6 +240,8 @@ class UsuariosController extends Controller
         self::validarRolParaCuenta($rol, $usuario);
 
         $usuario->syncRoles([$rol]);
+        // Las páginas que le dio su empresa como colaborador ya no aplican.
+        $usuario->syncPermissions([]);
 
         if ($request->boolean('avisar')) {
             $usuario->notify(new RolCambiado($rol->name));

@@ -6,6 +6,8 @@
  *   bloqueados; no se elimina (RN-027).
  * - Rol creado (A5.1c): se editan nombre, descripción, si está activo y los
  *   permisos (HU-050). Se elimina solo si no tiene cuentas (HU-051).
+ *   Desactivarlo bloquea a sus cuentas hasta que tengan otro rol; el propio
+ *   rol no se desactiva.
  *
  * Envía (rol creado): PUT /roles/{id} con nombre, descripcion, activo y
  * permisos[]. Los cambios aplican a todas las cuentas con ese rol.
@@ -160,20 +162,23 @@ function guardar(): void {
             </Campo>
             <div class="flex flex-col gap-1 pt-7">
                 <label class="flex items-center gap-2 text-sm">
-                    <!-- Un rol con cuentas no se desactiva (RolesController). -->
                     <input
                         v-model="form.activo"
                         type="checkbox"
-                        class="size-4 accent-marca disabled:opacity-50"
-                        :disabled="form.activo && rol.cuentas_total > 0"
+                        class="size-4 accent-marca"
                     />
                     Rol activo
                 </label>
+                <!-- Desactivarlo bloquea a sus cuentas (RolesController). -->
                 <p
-                    v-if="form.activo && rol.cuentas_total > 0"
-                    class="max-w-48 text-xs text-tinta-suave"
+                    v-if="!form.activo && rol.activo && rol.cuentas_total > 0"
+                    class="max-w-56 text-xs text-aviso"
                 >
-                    Para desactivarlo, pasa primero sus cuentas a otro rol.
+                    {{
+                        rol.cuentas_total === 1
+                            ? 'Al guardar, la cuenta con este rol no podrá entrar hasta que le asignes otro rol.'
+                            : `Al guardar, las ${rol.cuentas_total} cuentas con este rol no podrán entrar hasta que les asignes otro rol.`
+                    }}
                 </p>
                 <p v-if="form.errors.activo" class="text-xs text-aviso">
                     {{ form.errors.activo }}

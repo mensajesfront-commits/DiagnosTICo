@@ -3,9 +3,13 @@
 use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
+use App\Notifications\ContrasenaLaCambiaTuEmpresa;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /*
@@ -74,6 +78,7 @@ it('crea un colaborador que puede iniciar sesión', function () {
             'cargo' => 'Marketing',
             'email' => ' Mariana@LaEsquina.co ',
             'password' => 'Mesa-47-Sol',
+            'paginas' => ['diagnostico.responder', 'resultados.ver'],
         ])
         ->assertRedirect()
         ->assertSessionHasNoErrors();
@@ -83,7 +88,12 @@ it('crea un colaborador que puede iniciar sesión', function () {
         ->and($mariana->empresa_id)->toBe($laura->empresa_id)
         ->and($mariana->activo)->toBeTrue()
         ->and($mariana->cargo)->toBe('Marketing')
-        ->and(Hash::check('Mesa-47-Sol', (string) $mariana->password))->toBeTrue();
+        ->and(Hash::check('Mesa-47-Sol', (string) $mariana->password))->toBeTrue()
+        ->and($mariana->can('diagnostico.responder'))->toBeTrue()
+        ->and($mariana->can('resultados.ver'))->toBeTrue()
+        ->and($mariana->can('resultados.pdf'))->toBeFalse()
+        ->and($mariana->can('perfil.editar'))->toBeFalse()
+        ->and($mariana->can('contrasena.cambiar'))->toBeFalse();
 
     auth()->logout();
     $this->post(route('login.store'), ['email' => 'mariana@laesquina.co', 'password' => 'Mesa-47-Sol']);
@@ -114,7 +124,7 @@ it('no deja a un colaborador crear colaboradores', function () {
 
 function datosDe(User $u, array $cambios = []): array
 {
-    return ['name' => $u->name, 'cargo' => $u->cargo ?? 'Ventas', 'email' => $u->email, 'password' => '', ...$cambios];
+    return ['name' => $u->name, 'cargo' => $u->cargo ?? 'Ventas', 'email' => $u->email, 'password' => '', 'paginas' => ['diagnostico.responder'], ...$cambios];
 }
 
 it('edita nombre, cargo y correo sin tocar la contraseña', function () {
@@ -217,6 +227,7 @@ it('el cargo del dueño de otra empresa sí se puede usar', function () {
             'cargo' => 'Gerente',
             'email' => 'mariana@laesquina.co',
             'password' => 'Mesa-47-Sol',
+            'paginas' => ['resultados.ver'],
         ])
         ->assertSessionHasNoErrors();
 });
@@ -300,4 +311,63 @@ it('no elimina la cuenta principal ni colaboradores de otra empresa', function (
 
     $this->actingAs($laura)->delete(route('colaboradores.eliminar', $laura))->assertForbidden();
     $this->actingAs($laura)->delete(route('colaboradores.eliminar', $ajeno))->assertNotFound();
+});
+
+// --- Páginas que ve cada colaborador (E12.1, E12.3) ---------------------------
+
+it('pide elegir al menos una página y el PDF solo con los resultados', function () {
+    $laura = empresaConPrincipal();
+    $datos = ['name' => 'Mariana Díaz', 'cargo' => 'Marketing', 'email' => 'mariana@laesquina.co', 'password' => 'Mesa-47-Sol'];
+
+    $this->actingAs($laura)->post(route('colaboradores.store'), $datos)
+        ->assertSessionHasErrors(['paginas' => 'Elige al menos una página.']);
+    $this->actingAs($laura)->post(route('colaboradores.store'), [...$datos, 'paginas' => ['resultados.pdf']])
+        ->assertSessionHasErrors(['paginas' => 'Para «Descargar el informe PDF» marca también «Resultados y Mi historial».']);
+    $this->actingAs($laura)->post(route('colaboradores.store'), [...$datos, 'paginas' => ['usuarios.gestionar']])
+        ->assertSessionHasErrors('paginas.0');
+
+    expect(User::where('email', 'mariana@laesquina.co')->exists())->toBeFalse();
+});
+
+it('cambia las páginas de un colaborador y la lista las muestra', function () {
+    $laura = empresaConPrincipal();
+    $andres = colaboradorDe($laura, ['cargo' => 'Ventas']);
+    $andres->givePermissionTo('diagnostico.responder');
+
+    $this->actingAs($laura)
+        ->put(route('colaboradores.actualizar', $andres), datosDe($andres, ['paginas' => ['resultados.ver', 'resultados.pdf']]))
+        ->assertSessionHasNoErrors();
+
+    $andres = $andres->fresh();
+    expect($andres->can('diagnostico.responder'))->toBeFalse()
+        ->and($andres->can('resultados.pdf'))->toBeTrue();
+
+    $this->actingAs($laura)->get(route('colaboradores.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('colaboradores.1.paginas', ['resultados.ver', 'resultados.pdf'])
+            ->has('paginas', 3));
+
+    // Sin "Responder" no entra a responder; sin "Resultados", tampoco a Mi historial.
+    $this->actingAs($andres)->get(route('historial.mio'))->assertOk();
+    $andres->syncPermissions(['diagnostico.responder']);
+    $this->actingAs($andres->fresh())->get(route('historial.mio'))->assertForbidden();
+});
+
+it('al colaborador no le llega el enlace de recuperar la contraseña', function () {
+    Notification::fake();
+    $andres = colaboradorDe(empresaConPrincipal(), ['email' => 'andres@laesquina.co']);
+
+    // L3 muestra el mismo aviso de siempre (RN-005).
+    $this->post(route('password.email'), ['email' => 'andres@laesquina.co'])->assertSessionHasNoErrors();
+
+    Notification::assertSentTo($andres, ContrasenaLaCambiaTuEmpresa::class);
+    Notification::assertNotSentTo($andres, ResetPassword::class);
+    expect(DB::table('password_reset_tokens')->where('email', 'andres@laesquina.co')->exists())->toBeTrue();
+
+    // Ni con un enlace que ya tuviera.
+    $token = Password::broker()->createToken($andres);
+    $this->post(route('password.update'), [
+        'token' => $token, 'email' => 'andres@laesquina.co', 'password' => 'Otra-Clave-77', 'password_confirmation' => 'Otra-Clave-77',
+    ])->assertSessionHasErrors(['email' => 'Tu contraseña la cambia la cuenta principal de tu empresa.']);
+    expect(Hash::check('Otra-Clave-77', (string) $andres->fresh()->password))->toBeFalse();
 });

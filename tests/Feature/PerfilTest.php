@@ -102,18 +102,28 @@ it('deja a la cuenta principal cambiar los datos de la empresa, salvo el sector'
         ->and($empresa->sector_id)->toBe($sector);
 });
 
-it('no deja al colaborador cambiar los datos de la empresa (RN-025)', function () {
+it('el colaborador ve su perfil pero no cambia nada: ni datos, ni foto, ni contraseña', function () {
+    Storage::fake();
     $colaborador = cuentaDeEmpresa('Colaborador');
 
-    $this->actingAs($colaborador)
-        ->patch(route('profile.update'), datosPerfil($colaborador, [
-            'name' => 'Andrés Pérez',
-            'empresa' => ['nombre' => 'Otra', 'ciudad' => 'Otra', 'pais' => 'Colombia'],
-        ]))
-        ->assertSessionHasNoErrors();
+    $this->actingAs($colaborador)->get(route('profile.edit'))->assertOk();
 
-    expect($colaborador->fresh()->name)->toBe('Andrés Pérez')
-        ->and($colaborador->empresa->fresh()->nombre)->toBe('Restaurante La Esquina');
+    $this->actingAs($colaborador)
+        ->patch(route('profile.update'), datosPerfil($colaborador, ['name' => 'Andrés Pérez']))
+        ->assertForbidden();
+    $this->actingAs($colaborador)
+        ->post(route('perfil.foto'), ['foto' => UploadedFile::fake()->create('yo.png', 20, 'image/png')])
+        ->assertForbidden();
+    $this->actingAs($colaborador)
+        ->put(route('user-password.update'), [
+            'current_password' => 'password',
+            'password' => 'NuevaClave1!',
+            'password_confirmation' => 'NuevaClave1!',
+        ])
+        ->assertForbidden();
+
+    expect($colaborador->fresh()->name)->not->toBe('Andrés Pérez')
+        ->and(Hash::check('password', (string) $colaborador->fresh()->password))->toBeTrue();
 });
 
 it('cambia la contraseña con la actual y guarda cuándo', function () {
@@ -135,7 +145,7 @@ it('cambia la contraseña con la actual y guarda cuándo', function () {
 });
 
 it('pide la contraseña actual correcta', function () {
-    $usuario = User::factory()->create();
+    $usuario = User::factory()->create()->assignRole('Administrador');
 
     $this->actingAs($usuario)
         ->from(route('profile.edit'))
@@ -321,18 +331,6 @@ it('guardar sin cambiar el correo no manda código', function () {
 
     Notification::assertNothingSent();
     expect($admin->fresh()->email_pendiente)->toBeNull();
-});
-
-it('un colaborador no puede ponerse en Mi perfil el cargo del dueño', function () {
-    $dueno = cuentaDeEmpresa();
-    $dueno->update(['cargo' => 'Gerente']);
-    $colaborador = User::factory()->create(['empresa_id' => $dueno->empresa_id, 'cargo' => 'Ventas'])->assignRole('Colaborador');
-
-    $this->actingAs($colaborador)
-        ->patch(route('profile.update'), datosPerfil($colaborador, ['cargo' => ' GERENTE ']))
-        ->assertSessionHasErrors('cargo');
-
-    expect($colaborador->fresh()->cargo)->toBe('Ventas');
 });
 
 it('el dueño no puede ponerse en Mi perfil el cargo de un colaborador', function () {

@@ -4203,7 +4203,7 @@ Permite impedir el acceso de una empresa sin perder su información.
 ### Reglas de negocio
 
 - RN-004 — Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar.
-- RN-025 — Colaboradores: sin límite; casi los mismos permisos que la empresa, salvo crear o desactivar colaboradores y cambiar datos de la empresa; la empresa define su correo y contraseña y los comparte; se desactivan junto con la empresa.
+- RN-025 — Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa.
 
 ### Validaciones
 
@@ -5892,7 +5892,7 @@ Permite saber qué puede hacer cada rol del sistema y quién lo tiene.
 ### Reglas de negocio
 
 - RN-007 — Cada rol ve solo las secciones que le corresponden; empresa y colaborador ven solo la información de su propia empresa.
-- RN-025 — Colaboradores: sin límite; casi los mismos permisos que la empresa, salvo crear o desactivar colaboradores y cambiar datos de la empresa; la empresa define su correo y contraseña y los comparte; se desactivan junto con la empresa.
+- RN-025 — Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa.
 - RN-027 — Los roles del sistema (Administrador, Empresa, Colaborador) son fijos; cada cuenta tiene un solo rol; solo se elimina un rol sin cuentas.
 
 ### Validaciones
@@ -6097,6 +6097,14 @@ Permite ajustar lo que puede hacer un rol creado y que el cambio llegue a todas 
 **Cuando** intento asignarlo a una cuenta,
 
 **Entonces** no se puede asignar.
+
+#### CA-005 — Desactivar un rol con cuentas
+
+**Dado** que un rol creado tiene cuentas,
+
+**Cuando** lo desactivo y guardo,
+
+**Entonces** esas cuentas no pueden entrar (y se les cierra la sesión) hasta que les asigne otro rol. No puedo desactivar mi propio rol. (Pedido del equipo, 26 de octubre.)
 
 #### CA-004 — Rol del sistema
 
@@ -6765,7 +6773,7 @@ Permite que los datos de la empresa o del colaborador estén correctos en los in
 ### Reglas de negocio
 
 - RN-001 — Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
-- RN-025 — Colaboradores: sin límite; casi los mismos permisos que la empresa, salvo crear o desactivar colaboradores y cambiar datos de la empresa; la empresa define su correo y contraseña y los comparte; se desactivan junto con la empresa.
+- RN-025 — Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa.
 - RN-007 — Cada rol ve solo las secciones que le corresponden; empresa y colaborador ven solo la información de su propia empresa.
 
 ### Validaciones
@@ -8198,7 +8206,7 @@ Permite a la empresa saber quién tiene acceso a su cuenta.
 
 ### Reglas de negocio
 
-- RN-025 — Colaboradores: sin límite; casi los mismos permisos que la empresa, salvo crear o desactivar colaboradores y cambiar datos de la empresa; la empresa define su correo y contraseña y los comparte; se desactivan junto con la empresa.
+- RN-025 — Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa.
 - RN-007 — Cada rol ve solo las secciones que le corresponden; empresa y colaborador ven solo la información de su propia empresa.
 
 ### Validaciones
@@ -8314,7 +8322,7 @@ Permite a la empresa dar acceso a una persona de su equipo sin compartir su prop
 
 - RN-001 — Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
 - RN-002 — Un correo no puede pertenecer a más de una cuenta.
-- RN-025 — Colaboradores: sin límite; casi los mismos permisos que la empresa, salvo crear o desactivar colaboradores y cambiar datos de la empresa; la empresa define su correo y contraseña y los comparte; se desactivan junto con la empresa.
+- RN-025 — Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa.
 
 ### Validaciones
 
@@ -8423,7 +8431,7 @@ Permite recuperar el acceso de un colaborador que olvidó su contraseña.
 ### Reglas de negocio
 
 - RN-001 — Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
-- RN-025 — Colaboradores: sin límite; casi los mismos permisos que la empresa, salvo crear o desactivar colaboradores y cambiar datos de la empresa; la empresa define su correo y contraseña y los comparte; se desactivan junto con la empresa.
+- RN-025 — Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa.
 
 ### Validaciones
 
@@ -8527,7 +8535,7 @@ Permite quitar el acceso a un colaborador sin perder su información.
 ### Reglas de negocio
 
 - RN-004 — Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar.
-- RN-025 — Colaboradores: sin límite; casi los mismos permisos que la empresa, salvo crear o desactivar colaboradores y cambiar datos de la empresa; la empresa define su correo y contraseña y los comparte; se desactivan junto con la empresa.
+- RN-025 — Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa.
 
 ### Validaciones
 
@@ -9708,7 +9716,7 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 | RN-022 | El prompt se arma con capas: instrucciones generales, ajuste del sector, ajuste de la empresa, preguntas con respuestas y formato fijo; se usa siempre lo más específico y los ajustes aplican a mediciones posteriores. | HU-041, HU-042, HU-043, HU-044, HU-045, HU-069, HU-080, HU-081 |
 | RN-023 | El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable. | HU-038, HU-063, HU-064, HU-084 |
 | RN-024 | PDF de 3 páginas (portada y puntaje, puntaje por categoría, recomendaciones), generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA. | HU-066, HU-084 |
-| RN-025 | Colaboradores: sin límite; casi los mismos permisos que la empresa, salvo crear o desactivar colaboradores y cambiar datos de la empresa; la empresa define su correo y contraseña y los comparte; se desactivan junto con la empresa. | HU-035, HU-048, HU-056, HU-076, HU-077, HU-078, HU-079 |
+| RN-025 | Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa. | HU-035, HU-048, HU-056, HU-076, HU-077, HU-078, HU-079 |
 | RN-026 | “Ver como” es solo de lectura y queda registrado quién lo usó y cuándo. | HU-053, HU-054 |
 | RN-027 | Los roles del sistema (Administrador, Empresa, Colaborador) son fijos; cada cuenta tiene un solo rol; solo se elimina un rol sin cuentas. | HU-048, HU-049, HU-050, HU-051, HU-052 |
 | RN-028 | El resultado no incluye análisis FODA ni comparación con promedios. | HU-038, HU-064, HU-066 |
@@ -10215,7 +10223,8 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 - **[INFORMACIÓN PENDIENTE]** Capacidad del equipo para organizar Sprints (PA-007).
 - **[INFORMACIÓN PENDIENTE]** Diseño y textos del bot de WhatsApp (PA-001, PA-002).
 - **[FUNCIONALIDAD POR DEFINIR]** Rol Usuario; historial de solicitudes de nueva medición.
-- **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. El Colaborador puede editar su propio perfil.
+- **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. ~~El Colaborador puede editar su propio perfil.~~
+- **Cambiado (26 de octubre):** el Colaborador **no** edita su perfil ni su contraseña: lo hace la cuenta principal (E12.3), que además elige qué páginas ve cada colaborador. Desactivar un rol bloquea a sus cuentas hasta que tengan otro rol.
 
 **Supuestos**
 

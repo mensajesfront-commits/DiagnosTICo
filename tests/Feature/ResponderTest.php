@@ -119,7 +119,11 @@ it('no envía con preguntas obligatorias sin responder; completo, queda enviada 
 
 it('un colaborador de la empresa responde; otra empresa no ve la medición', function () {
     $colaborador = User::factory()->create(['empresa_id' => $this->empresa->id])->assignRole('Colaborador');
-    $this->actingAs($colaborador)->get(route('responder.mostrar', $this->medicion))->assertOk();
+    // Sin la página "Responder el diagnóstico" (E12.1) no entra.
+    $this->actingAs($colaborador)->get(route('responder.mostrar', $this->medicion))->assertForbidden();
+
+    $colaborador->givePermissionTo('diagnostico.responder');
+    $this->actingAs($colaborador->fresh())->get(route('responder.mostrar', $this->medicion))->assertOk();
 
     $otra = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole('Empresa');
     $this->actingAs($otra)->get(route('responder.mostrar', $this->medicion))->assertNotFound();

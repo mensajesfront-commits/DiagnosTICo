@@ -330,8 +330,17 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     </div>
                 </div>
 
+                <!-- Colaborador sin "Responder el diagnóstico" (E12.1). -->
+                <p
+                    v-if="!puede('diagnostico.responder')"
+                    class="text-center text-xs text-tinta-suave"
+                >
+                    Tu empresa no te dio acceso para responder el diagnóstico.
+                </p>
                 <Boton
-                    v-if="p.estado === 'no_iniciada' || p.estado === 'en_curso'"
+                    v-else-if="
+                        p.estado === 'no_iniciada' || p.estado === 'en_curso'
+                    "
                     :href="rutas.responder.mostrar(p.id)"
                     :disabled="enVerComo"
                 >
@@ -341,36 +350,38 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                             : 'Iniciar diagnóstico'
                     }}
                 </Boton>
-                <p
-                    v-if="enVerComo && p.estado !== 'enviada'"
-                    class="text-center text-xs text-tinta-suave"
-                >
-                    No disponible en Ver como
-                </p>
-                <Boton
-                    v-else-if="p.estado === 'enviada'"
-                    variante="secundario"
-                    :href="rutas.responder.enviado(p.id)"
-                >
-                    Ver el avance del análisis
-                </Boton>
-                <template v-else>
+                <template v-if="puede('diagnostico.responder')">
+                    <p
+                        v-if="enVerComo && p.estado !== 'enviada'"
+                        class="text-center text-xs text-tinta-suave"
+                    >
+                        No disponible en Ver como
+                    </p>
                     <Boton
-                        v-if="!p.solicitud_abierta"
+                        v-else-if="p.estado === 'enviada'"
                         variante="secundario"
-                        :cargando="pidiendo"
-                        :disabled="enVerComo"
-                        @click="pedirNueva"
+                        :href="rutas.responder.enviado(p.id)"
                     >
-                        Pedir una nueva fecha
+                        Ver el avance del análisis
                     </Boton>
-                    <a
-                        :href="`mailto:${soporte}`"
-                        class="flex items-center justify-center gap-1.5 text-xs text-tinta-suave hover:text-marca"
-                    >
-                        <Mail class="size-3.5" aria-hidden="true" />
-                        {{ soporte }}
-                    </a>
+                    <template v-else>
+                        <Boton
+                            v-if="!p.solicitud_abierta"
+                            variante="secundario"
+                            :cargando="pidiendo"
+                            :disabled="enVerComo"
+                            @click="pedirNueva"
+                        >
+                            Pedir una nueva fecha
+                        </Boton>
+                        <a
+                            :href="`mailto:${soporte}`"
+                            class="flex items-center justify-center gap-1.5 text-xs text-tinta-suave hover:text-marca"
+                        >
+                            <Mail class="size-3.5" aria-hidden="true" />
+                            {{ soporte }}
+                        </a>
+                    </template>
                 </template>
             </div>
         </section>
@@ -438,6 +449,7 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                 </ol>
             </section>
             <p
+                v-if="puede('resultados.ver')"
                 class="rounded-xl border border-dashed border-linea-fuerte bg-white p-6 text-center text-sm"
             >
                 <strong>Aquí verás tus resultados</strong>

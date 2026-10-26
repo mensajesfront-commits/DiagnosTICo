@@ -24,6 +24,8 @@ export type Cuenta = {
     colaboradores_activos: number;
     /** Medición pendiente de su empresa ("Medición 4 no iniciada (vence el 20 oct)"). */
     medicion_pendiente: string | null;
+    /** Su rol está desactivado: no entra hasta tener otro rol (A5.1c). */
+    rol_inactivo: boolean;
     estado: EstadoCuenta;
     invitacion_enviada_en: string | null;
     /** La cuenta con la que se entró: no se desactiva ni cambia su rol. */

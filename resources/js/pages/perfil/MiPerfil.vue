@@ -9,6 +9,9 @@
  * - Empresa y Colaborador: datos personales, "Información de empresa" (solo
  *   la cuenta principal la cambia; el sector, solo NuevasTIC), preferencias
  *   y "Cambiar contraseña" en un modal (E11).
+ * - Sin "Editar su perfil" (el colaborador) la pantalla queda de solo
+ *   lectura, y sin "Cambiar su contraseña" no aparece ese botón: los cambia
+ *   la cuenta principal desde Colaboradores (E12.3).
  *
  * Envía a PATCH /mi-perfil: name, email, cargo, telefono, pais,
  * departamento, ciudad,
@@ -29,6 +32,7 @@ import Interruptor from '@/components/base/Interruptor.vue';
 import Modal from '@/components/base/Modal.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import FormularioContrasena from '@/components/perfil/FormularioContrasena.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import SelectorUbicacion from '@/components/ubicacion/SelectorUbicacion.vue';
 import { haceCuanto, mesYAnio, momento } from '@/lib/fechas';
 import { iniciales } from '@/lib/usuarios';
@@ -95,6 +99,11 @@ defineOptions({
 });
 
 const esEmpresa = computed(() => props.empresa !== null);
+
+const { puede } = usePermisos();
+const editaPerfil = computed(() => puede('perfil.editar'));
+const cambiaContrasena = computed(() => puede('contrasena.cambiar'));
+const esColaborador = computed(() => props.rol === 'Colaborador');
 
 const datosIniciales = () => ({
     name: props.usuario.name,
@@ -220,6 +229,17 @@ function cerrarSesion(): void {
                 <span aria-hidden="true">ⓘ</span>
                 Algunos datos solo puede modificarlos el equipo de NuevasTIC.
             </p>
+            <p
+                v-if="!editaPerfil"
+                class="mt-2 flex gap-2 rounded-md bg-alerta-suave px-4 py-3 text-sm text-alerta"
+            >
+                <span aria-hidden="true">ⓘ</span>
+                {{
+                    esColaborador
+                        ? 'Tus datos y tu contraseña los cambia la cuenta principal de tu empresa. Si necesitas un cambio, pídeselo.'
+                        : 'Tu rol no permite cambiar los datos de tu perfil.'
+                }}
+            </p>
         </header>
 
         <div class="grid items-start gap-5 lg:grid-cols-[290px_1fr]">
@@ -271,38 +291,40 @@ function cerrarSesion(): void {
                         </p>
                     </template>
 
-                    <input
-                        ref="archivo"
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp"
-                        class="sr-only"
-                        aria-label="Elegir imagen"
-                        @change="elegirFoto"
-                    />
-                    <button
-                        type="button"
-                        class="mt-3 text-sm text-marca underline underline-offset-2 hover:text-marca-hover disabled:opacity-50"
-                        :disabled="subiendo"
-                        @click="archivo?.click()"
-                    >
-                        {{
-                            subiendo
-                                ? 'Subiendo…'
-                                : editaEmpresa
-                                  ? 'Cambiar logo'
-                                  : 'Cambiar foto'
-                        }}
-                    </button>
-                    <p
-                        v-if="errorFoto"
-                        class="mt-1 text-xs text-aviso"
-                        role="alert"
-                    >
-                        {{ errorFoto }}
-                    </p>
-                    <p v-else class="mt-1 text-xs text-tinta-suave">
-                        JPG, PNG o WebP, hasta 2 MB.
-                    </p>
+                    <template v-if="editaPerfil">
+                        <input
+                            ref="archivo"
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            class="sr-only"
+                            aria-label="Elegir imagen"
+                            @change="elegirFoto"
+                        />
+                        <button
+                            type="button"
+                            class="mt-3 text-sm text-marca underline underline-offset-2 hover:text-marca-hover disabled:opacity-50"
+                            :disabled="subiendo"
+                            @click="archivo?.click()"
+                        >
+                            {{
+                                subiendo
+                                    ? 'Subiendo…'
+                                    : editaEmpresa
+                                      ? 'Cambiar logo'
+                                      : 'Cambiar foto'
+                            }}
+                        </button>
+                        <p
+                            v-if="errorFoto"
+                            class="mt-1 text-xs text-aviso"
+                            role="alert"
+                        >
+                            {{ errorFoto }}
+                        </p>
+                        <p v-else class="mt-1 text-xs text-tinta-suave">
+                            JPG, PNG o WebP, hasta 2 MB.
+                        </p>
+                    </template>
                 </section>
 
                 <section
@@ -319,6 +341,7 @@ function cerrarSesion(): void {
                             {{ haceCuanto(usuario.contrasena_actualizada_en) }}
                         </p>
                         <Boton
+                            v-if="cambiaContrasena"
                             variante="secundario"
                             tamano="sm"
                             class="mt-3"
@@ -326,6 +349,13 @@ function cerrarSesion(): void {
                         >
                             Cambiar contraseña
                         </Boton>
+                        <p v-else class="mt-2 text-xs text-tinta-suave">
+                            {{
+                                esColaborador
+                                    ? 'Te la cambia la cuenta principal de tu empresa.'
+                                    : 'Tu rol no permite cambiarla desde aquí.'
+                            }}
+                        </p>
                     </div>
 
                     <div>
@@ -363,142 +393,201 @@ function cerrarSesion(): void {
             <div class="flex flex-col gap-5">
                 <form
                     class="rounded-xl border border-linea bg-white"
-                    @submit.prevent="guardar"
+                    @submit.prevent="editaPerfil && guardar()"
                 >
-                    <section class="flex flex-col gap-4 p-6">
-                        <h2 class="text-base font-semibold">
-                            Información personal
-                        </h2>
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <Campo
-                                obligatorio
-                                :etiqueta="
-                                    esEmpresa
-                                        ? 'Nombre de usuario'
-                                        : 'Nombre completo'
-                                "
-                                para="perfil-nombre"
-                                :error="form.errors.name"
-                            >
-                                <Entrada
-                                    id="perfil-nombre"
-                                    v-model="form.name"
-                                    required
-                                    autocomplete="name"
-                                    :invalida="!!form.errors.name"
-                                />
-                            </Campo>
-                            <Campo
-                                etiqueta="Cargo"
-                                para="perfil-cargo"
-                                :error="form.errors.cargo"
-                            >
-                                <Entrada
-                                    id="perfil-cargo"
-                                    v-model="form.cargo"
-                                    autocomplete="organization-title"
-                                />
-                            </Campo>
-                            <Campo
-                                obligatorio
-                                etiqueta="Correo"
-                                para="perfil-correo"
-                                :error="form.errors.email"
-                                ayuda="Con este correo inicias sesión."
-                            >
-                                <Entrada
-                                    id="perfil-correo"
-                                    v-model="form.email"
-                                    type="email"
-                                    required
-                                    autocomplete="email"
-                                    :invalida="!!form.errors.email"
-                                />
-                                <p
-                                    v-if="form.email !== usuario.email"
-                                    class="text-xs text-tinta-suave"
+                    <!-- Solo lectura: los campos se ven bloqueados. -->
+                    <fieldset
+                        :disabled="!editaPerfil"
+                        class="contents [&_button:disabled]:opacity-60 [&_input:disabled]:bg-lienzo-oscuro [&_select:disabled]:bg-lienzo-oscuro"
+                    >
+                        <section class="flex flex-col gap-4 p-6">
+                            <h2 class="text-base font-semibold">
+                                Información personal
+                            </h2>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <Campo
+                                    obligatorio
+                                    :etiqueta="
+                                        esEmpresa
+                                            ? 'Nombre de usuario'
+                                            : 'Nombre completo'
+                                    "
+                                    para="perfil-nombre"
+                                    :error="form.errors.name"
                                 >
-                                    Al guardar te enviaremos un código a este
-                                    correo para confirmarlo.
-                                </p>
-                            </Campo>
-                            <Campo
-                                etiqueta="Teléfono"
-                                para="perfil-telefono"
-                                opcional
-                                :error="form.errors.telefono"
-                            >
-                                <CampoTelefono
-                                    id="perfil-telefono"
-                                    v-model="form.telefono"
-                                    :pais="form.pais || form.empresa?.pais"
-                                    :invalida="!!form.errors.telefono"
-                                />
-                            </Campo>
+                                    <Entrada
+                                        id="perfil-nombre"
+                                        v-model="form.name"
+                                        required
+                                        autocomplete="name"
+                                        :invalida="!!form.errors.name"
+                                    />
+                                </Campo>
+                                <Campo
+                                    etiqueta="Cargo"
+                                    para="perfil-cargo"
+                                    :error="form.errors.cargo"
+                                >
+                                    <Entrada
+                                        id="perfil-cargo"
+                                        v-model="form.cargo"
+                                        autocomplete="organization-title"
+                                    />
+                                </Campo>
+                                <Campo
+                                    obligatorio
+                                    etiqueta="Correo"
+                                    para="perfil-correo"
+                                    :error="form.errors.email"
+                                    ayuda="Con este correo inicias sesión."
+                                >
+                                    <Entrada
+                                        id="perfil-correo"
+                                        v-model="form.email"
+                                        type="email"
+                                        required
+                                        autocomplete="email"
+                                        :invalida="!!form.errors.email"
+                                    />
+                                    <p
+                                        v-if="form.email !== usuario.email"
+                                        class="text-xs text-tinta-suave"
+                                    >
+                                        Al guardar te enviaremos un código a
+                                        este correo para confirmarlo.
+                                    </p>
+                                </Campo>
+                                <Campo
+                                    etiqueta="Teléfono"
+                                    para="perfil-telefono"
+                                    opcional
+                                    :error="form.errors.telefono"
+                                >
+                                    <CampoTelefono
+                                        id="perfil-telefono"
+                                        v-model="form.telefono"
+                                        :pais="form.pais || form.empresa?.pais"
+                                        :invalida="!!form.errors.telefono"
+                                    />
+                                </Campo>
 
-                            <template v-if="!esEmpresa">
-                                <SelectorUbicacion
-                                    v-model:pais="form.pais"
-                                    v-model:departamento="form.departamento"
-                                    v-model:ciudad="form.ciudad"
-                                    prefijo="perfil"
-                                    :paises="opciones.paises"
-                                    :requerido="false"
-                                    :errores="{
-                                        pais: form.errors.pais,
-                                        departamento: form.errors.departamento,
-                                        ciudad: form.errors.ciudad,
-                                    }"
-                                />
-                                <Campo
-                                    etiqueta="Zona horaria"
-                                    para="perfil-zona"
-                                    :error="form.errors.zona_horaria"
-                                >
-                                    <Seleccion
-                                        id="perfil-zona"
-                                        v-model="form.zona_horaria"
+                                <template v-if="!esEmpresa">
+                                    <SelectorUbicacion
+                                        v-model:pais="form.pais"
+                                        v-model:departamento="form.departamento"
+                                        v-model:ciudad="form.ciudad"
+                                        prefijo="perfil"
+                                        :paises="opciones.paises"
+                                        :requerido="false"
+                                        :errores="{
+                                            pais: form.errors.pais,
+                                            departamento:
+                                                form.errors.departamento,
+                                            ciudad: form.errors.ciudad,
+                                        }"
+                                    />
+                                    <Campo
+                                        etiqueta="Zona horaria"
+                                        para="perfil-zona"
+                                        :error="form.errors.zona_horaria"
                                     >
-                                        <option
-                                            v-for="(
-                                                texto, zona
-                                            ) in opciones.zonas"
-                                            :key="zona"
-                                            :value="zona"
+                                        <Seleccion
+                                            id="perfil-zona"
+                                            v-model="form.zona_horaria"
                                         >
-                                            {{ texto }}
-                                        </option>
-                                    </Seleccion>
+                                            <option
+                                                v-for="(
+                                                    texto, zona
+                                                ) in opciones.zonas"
+                                                :key="zona"
+                                                :value="zona"
+                                            >
+                                                {{ texto }}
+                                            </option>
+                                        </Seleccion>
+                                    </Campo>
+                                    <Campo
+                                        etiqueta="Idioma"
+                                        para="perfil-idioma"
+                                        :error="form.errors.idioma"
+                                    >
+                                        <Seleccion
+                                            id="perfil-idioma"
+                                            v-model="form.idioma"
+                                        >
+                                            <option
+                                                v-for="(
+                                                    texto, idioma
+                                                ) in opciones.idiomas"
+                                                :key="idioma"
+                                                :value="idioma"
+                                            >
+                                                {{ texto }}
+                                            </option>
+                                        </Seleccion>
+                                    </Campo>
+                                    <Campo
+                                        etiqueta="Rol"
+                                        para="perfil-rol"
+                                        ayuda="Solo otro administrador puede cambiarlo, desde Usuarios y roles."
+                                    >
+                                        <div class="relative">
+                                            <Entrada
+                                                id="perfil-rol"
+                                                :model-value="rol ?? 'Sin rol'"
+                                                disabled
+                                                class="bg-lienzo-oscuro pr-10 text-tinta-suave"
+                                            />
+                                            <Lock
+                                                class="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-tinta-suave"
+                                                aria-hidden="true"
+                                            />
+                                        </div>
+                                    </Campo>
+                                </template>
+                            </div>
+                        </section>
+
+                        <section
+                            v-if="esEmpresa && empresa"
+                            class="flex flex-col gap-4 border-t border-linea p-6"
+                        >
+                            <h2 class="text-base font-semibold">
+                                Información de empresa
+                            </h2>
+                            <p
+                                v-if="!editaEmpresa"
+                                class="-mt-2 text-xs text-tinta-suave"
+                            >
+                                Solo la cuenta principal de la empresa puede
+                                cambiar estos datos.
+                            </p>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <Campo
+                                    obligatorio
+                                    etiqueta="Nombre de la empresa"
+                                    para="empresa-nombre"
+                                    :error="form.errors['empresa.nombre']"
+                                >
+                                    <Entrada
+                                        id="empresa-nombre"
+                                        v-model="form.empresa.nombre"
+                                        required
+                                        :disabled="!editaEmpresa"
+                                        :invalida="
+                                            !!form.errors['empresa.nombre']
+                                        "
+                                    />
                                 </Campo>
                                 <Campo
-                                    etiqueta="Idioma"
-                                    para="perfil-idioma"
-                                    :error="form.errors.idioma"
-                                >
-                                    <Seleccion
-                                        id="perfil-idioma"
-                                        v-model="form.idioma"
-                                    >
-                                        <option
-                                            v-for="(
-                                                texto, idioma
-                                            ) in opciones.idiomas"
-                                            :key="idioma"
-                                            :value="idioma"
-                                        >
-                                            {{ texto }}
-                                        </option>
-                                    </Seleccion>
-                                </Campo>
-                                <Campo
-                                    etiqueta="Rol"
-                                    para="perfil-rol"
-                                    ayuda="Solo otro administrador puede cambiarlo, desde Usuarios y roles."
+                                    etiqueta="Sector"
+                                    para="empresa-sector"
+                                    ayuda="Solo el equipo de NuevasTIC puede modificar este dato."
                                 >
                                     <div class="relative">
                                         <Entrada
-                                            id="perfil-rol"
-                                            :model-value="rol ?? 'Sin rol'"
+                                            id="empresa-sector"
+                                            :model-value="empresa.sector ?? ''"
                                             disabled
                                             class="bg-lienzo-oscuro pr-10 text-tinta-suave"
                                         />
@@ -508,194 +597,153 @@ function cerrarSesion(): void {
                                         />
                                     </div>
                                 </Campo>
-                            </template>
-                        </div>
-                    </section>
-
-                    <section
-                        v-if="esEmpresa && empresa"
-                        class="flex flex-col gap-4 border-t border-linea p-6"
-                    >
-                        <h2 class="text-base font-semibold">
-                            Información de empresa
-                        </h2>
-                        <p
-                            v-if="!editaEmpresa"
-                            class="-mt-2 text-xs text-tinta-suave"
-                        >
-                            Solo la cuenta principal de la empresa puede cambiar
-                            estos datos.
-                        </p>
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <Campo
-                                obligatorio
-                                etiqueta="Nombre de la empresa"
-                                para="empresa-nombre"
-                                :error="form.errors['empresa.nombre']"
-                            >
-                                <Entrada
-                                    id="empresa-nombre"
-                                    v-model="form.empresa.nombre"
-                                    required
-                                    :disabled="!editaEmpresa"
-                                    :invalida="!!form.errors['empresa.nombre']"
-                                />
-                            </Campo>
-                            <Campo
-                                etiqueta="Sector"
-                                para="empresa-sector"
-                                ayuda="Solo el equipo de NuevasTIC puede modificar este dato."
-                            >
-                                <div class="relative">
-                                    <Entrada
-                                        id="empresa-sector"
-                                        :model-value="empresa.sector ?? ''"
-                                        disabled
-                                        class="bg-lienzo-oscuro pr-10 text-tinta-suave"
-                                    />
-                                    <Lock
-                                        class="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-tinta-suave"
-                                        aria-hidden="true"
-                                    />
-                                </div>
-                            </Campo>
-                            <Campo
-                                :obligatorio="
-                                    editaEmpresa &&
-                                    opciones.actividades.length > 0
-                                "
-                                etiqueta="Actividad económica (subsector)"
-                                para="empresa-actividad"
-                                ayuda="Código CIIU con el que aparece tu empresa en el RUT."
-                                :error="
-                                    form.errors[
-                                        'empresa.actividad_economica_id'
-                                    ]
-                                "
-                                class="sm:col-span-2"
-                            >
-                                <Seleccion
-                                    id="empresa-actividad"
-                                    v-model="
-                                        form.empresa.actividad_economica_id
+                                <Campo
+                                    :obligatorio="
+                                        editaEmpresa &&
+                                        opciones.actividades.length > 0
                                     "
-                                    :required="opciones.actividades.length > 0"
-                                    :disabled="
-                                        !editaEmpresa ||
-                                        opciones.actividades.length === 0
-                                    "
-                                    :invalida="
-                                        !!form.errors[
+                                    etiqueta="Actividad económica (subsector)"
+                                    para="empresa-actividad"
+                                    ayuda="Código CIIU con el que aparece tu empresa en el RUT."
+                                    :error="
+                                        form.errors[
                                             'empresa.actividad_economica_id'
                                         ]
                                     "
+                                    class="sm:col-span-2"
                                 >
-                                    <option value="" disabled>
-                                        {{
+                                    <Seleccion
+                                        id="empresa-actividad"
+                                        v-model="
+                                            form.empresa.actividad_economica_id
+                                        "
+                                        :required="
+                                            opciones.actividades.length > 0
+                                        "
+                                        :disabled="
+                                            !editaEmpresa ||
                                             opciones.actividades.length === 0
-                                                ? 'Tu sector no tiene actividades para elegir'
-                                                : 'Selecciona la actividad'
-                                        }}
-                                    </option>
-                                    <option
-                                        v-for="actividad in opciones.actividades"
-                                        :key="actividad.id"
-                                        :value="actividad.id"
+                                        "
+                                        :invalida="
+                                            !!form.errors[
+                                                'empresa.actividad_economica_id'
+                                            ]
+                                        "
                                     >
-                                        {{ actividad.codigo }} ·
-                                        {{ actividad.nombre }}
-                                    </option>
-                                </Seleccion>
-                            </Campo>
-                            <Campo
-                                :obligatorio="editaEmpresa"
-                                etiqueta="Descripción corta"
-                                para="empresa-descripcion"
-                                ayuda="Qué hace tu empresa y a quién le vende."
-                                :contador="`${form.empresa.descripcion.length}/300`"
-                                :error="form.errors['empresa.descripcion']"
-                                class="sm:col-span-2"
-                            >
-                                <AreaTexto
-                                    id="empresa-descripcion"
-                                    v-model="form.empresa.descripcion"
-                                    required
-                                    rows="3"
-                                    maxlength="300"
-                                    :disabled="!editaEmpresa"
-                                    :invalida="
-                                        !!form.errors['empresa.descripcion']
-                                    "
-                                />
-                            </Campo>
-                            <SelectorUbicacion
-                                v-model:pais="form.empresa.pais"
-                                v-model:departamento="form.empresa.departamento"
-                                v-model:ciudad="form.empresa.ciudad"
-                                prefijo="empresa"
-                                :paises="opciones.paises"
-                                :bloqueado="!editaEmpresa"
-                                :errores="{
-                                    pais: form.errors['empresa.pais'],
-                                    departamento:
-                                        form.errors['empresa.departamento'],
-                                    ciudad: form.errors['empresa.ciudad'],
-                                }"
-                            />
-                            <Campo
-                                etiqueta="Sitio web o red social"
-                                para="empresa-web"
-                                :error="form.errors['empresa.sitio_web']"
-                            >
-                                <Entrada
-                                    id="empresa-web"
-                                    v-model="form.empresa.sitio_web"
-                                    placeholder="https://"
-                                    :disabled="!editaEmpresa"
-                                />
-                            </Campo>
-                            <Campo
-                                etiqueta="Número de empleados"
-                                para="empresa-empleados"
-                                :error="form.errors['empresa.numero_empleados']"
-                            >
-                                <Seleccion
-                                    id="empresa-empleados"
-                                    v-model="form.empresa.numero_empleados"
-                                    :disabled="!editaEmpresa"
+                                        <option value="" disabled>
+                                            {{
+                                                opciones.actividades.length ===
+                                                0
+                                                    ? 'Tu sector no tiene actividades para elegir'
+                                                    : 'Selecciona la actividad'
+                                            }}
+                                        </option>
+                                        <option
+                                            v-for="actividad in opciones.actividades"
+                                            :key="actividad.id"
+                                            :value="actividad.id"
+                                        >
+                                            {{ actividad.codigo }} ·
+                                            {{ actividad.nombre }}
+                                        </option>
+                                    </Seleccion>
+                                </Campo>
+                                <Campo
+                                    :obligatorio="editaEmpresa"
+                                    etiqueta="Descripción corta"
+                                    para="empresa-descripcion"
+                                    ayuda="Qué hace tu empresa y a quién le vende."
+                                    :contador="`${form.empresa.descripcion.length}/300`"
+                                    :error="form.errors['empresa.descripcion']"
+                                    class="sm:col-span-2"
                                 >
-                                    <option value="">Sin elegir</option>
-                                    <option
-                                        v-for="rango in opciones.empleados"
-                                        :key="rango"
-                                        :value="rango"
+                                    <AreaTexto
+                                        id="empresa-descripcion"
+                                        v-model="form.empresa.descripcion"
+                                        required
+                                        rows="3"
+                                        maxlength="300"
+                                        :disabled="!editaEmpresa"
+                                        :invalida="
+                                            !!form.errors['empresa.descripcion']
+                                        "
+                                    />
+                                </Campo>
+                                <SelectorUbicacion
+                                    v-model:pais="form.empresa.pais"
+                                    v-model:departamento="
+                                        form.empresa.departamento
+                                    "
+                                    v-model:ciudad="form.empresa.ciudad"
+                                    prefijo="empresa"
+                                    :paises="opciones.paises"
+                                    :bloqueado="!editaEmpresa"
+                                    :errores="{
+                                        pais: form.errors['empresa.pais'],
+                                        departamento:
+                                            form.errors['empresa.departamento'],
+                                        ciudad: form.errors['empresa.ciudad'],
+                                    }"
+                                />
+                                <Campo
+                                    etiqueta="Sitio web o red social"
+                                    para="empresa-web"
+                                    :error="form.errors['empresa.sitio_web']"
+                                >
+                                    <Entrada
+                                        id="empresa-web"
+                                        v-model="form.empresa.sitio_web"
+                                        placeholder="https://"
+                                        :disabled="!editaEmpresa"
+                                    />
+                                </Campo>
+                                <Campo
+                                    etiqueta="Número de empleados"
+                                    para="empresa-empleados"
+                                    :error="
+                                        form.errors['empresa.numero_empleados']
+                                    "
+                                >
+                                    <Seleccion
+                                        id="empresa-empleados"
+                                        v-model="form.empresa.numero_empleados"
+                                        :disabled="!editaEmpresa"
                                     >
-                                        {{ rango }}
-                                    </option>
-                                </Seleccion>
-                            </Campo>
-                        </div>
-                    </section>
+                                        <option value="">Sin elegir</option>
+                                        <option
+                                            v-for="rango in opciones.empleados"
+                                            :key="rango"
+                                            :value="rango"
+                                        >
+                                            {{ rango }}
+                                        </option>
+                                    </Seleccion>
+                                </Campo>
+                            </div>
+                        </section>
 
-                    <section class="border-t border-linea px-6 pt-5 pb-3">
-                        <h2 class="text-base font-semibold">
-                            {{
-                                esEmpresa ? 'Preferencias' : 'Avisos por correo'
-                            }}
-                        </h2>
-                        <div class="mt-2">
-                            <Interruptor
-                                v-for="(texto, clave) in opciones.avisos"
-                                :id="`aviso-${clave}`"
-                                :key="clave"
-                                v-model="form.avisos[clave]"
-                            >
-                                {{ texto }}
-                            </Interruptor>
-                        </div>
-                    </section>
-
+                        <section class="border-t border-linea px-6 pt-5 pb-3">
+                            <h2 class="text-base font-semibold">
+                                {{
+                                    esEmpresa
+                                        ? 'Preferencias'
+                                        : 'Avisos por correo'
+                                }}
+                            </h2>
+                            <div class="mt-2">
+                                <Interruptor
+                                    v-for="(texto, clave) in opciones.avisos"
+                                    :id="`aviso-${clave}`"
+                                    :key="clave"
+                                    v-model="form.avisos[clave]"
+                                >
+                                    {{ texto }}
+                                </Interruptor>
+                            </div>
+                        </section>
+                    </fieldset>
                     <footer
+                        v-if="editaPerfil"
                         class="flex flex-wrap items-center justify-between gap-3 rounded-b-xl border-t border-linea bg-[#f9f8f4] px-6 py-4"
                     >
                         <p class="text-xs text-tinta-suave" aria-live="polite">
@@ -725,7 +773,7 @@ function cerrarSesion(): void {
                 </form>
 
                 <section
-                    v-if="!esEmpresa"
+                    v-if="!esEmpresa && cambiaContrasena"
                     class="rounded-xl border border-linea bg-white p-6"
                 >
                     <h2 class="text-base font-semibold">Cambiar contraseña</h2>
@@ -743,7 +791,7 @@ function cerrarSesion(): void {
     </div>
 
     <Modal
-        v-if="esEmpresa"
+        v-if="esEmpresa && cambiaContrasena"
         v-model:abierto="modalContrasena"
         titulo="Cambiar contraseña"
         descripcion="Tu sesión sigue abierta después del cambio."

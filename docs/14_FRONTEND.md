@@ -373,7 +373,7 @@ Ruta: `GET /usuarios` (ya existe, `UsuariosController`; permiso `usuarios.ver`).
 
 | Prop | Tipo | Nota |
 |---|---|---|
-| `cuentas` | `Cuenta[]` | **Todas** las cuentas. La búsqueda, los filtros y las páginas de 12 se hacen en la pantalla. Cada una trae `rol`, `empresa`, `es_principal`, `colaboradores_activos`, `medicion_pendiente` (texto), `estado` (`activa`, `desactivada`, `invitacion`, `eliminada`), `eliminada_en`, `se_borra_el`, `invitacion_enviada_en` y `es_tuya` |
+| `cuentas` | `Cuenta[]` | **Todas** las cuentas. La búsqueda, los filtros y las páginas de 12 se hacen en la pantalla. Cada una trae `rol`, `empresa`, `es_principal`, `colaboradores_activos`, `medicion_pendiente` (texto), `rol_inactivo` (su rol está desactivado: no entra), `estado` (`activa`, `desactivada`, `invitacion`, `eliminada`), `eliminada_en`, `se_borra_el`, `invitacion_enviada_en` y `es_tuya` |
 | `roles` | `{ id, nombre, descripcion, activo, del_sistema, aviso }[]` | Para el filtro, "Invitar usuario" y "Cambiar rol" |
 
 Tipos exactos en `resources/js/types/usuarios.ts`.
@@ -441,14 +441,15 @@ Ruta: `GET /colaboradores` (ya existe, `ColaboradoresController`; middleware `ro
 | Prop | Tipo | Nota |
 |---|---|---|
 | `empresa` | `string` | Nombre de la empresa, para el texto de arriba |
-| `colaboradores` | `Colaborador[]` | Las cuentas de la empresa: la principal primero, luego los colaboradores por nombre. Cada una con `id`, `nombre`, `correo`, `cargo`, `es_principal` y `activo` |
+| `colaboradores` | `Colaborador[]` | Las cuentas de la empresa: la principal primero, luego los colaboradores por nombre. Cada una con `id`, `nombre`, `correo`, `cargo`, `es_principal`, `activo` y `paginas` (claves que le dio la cuenta principal; vacío en la principal) |
+| `paginas` | `PaginaColaborador[]` | Páginas que se le pueden dar a un colaborador: `clave` (el permiso), `titulo`, `descripcion` y `necesita` (otra clave que debe ir marcada). Salen de `App\Support\PaginasColaborador` |
 
 Tipos exactos en `resources/js/types/colaboradores.ts`. Si solo llega la cuenta principal, la pantalla muestra la lista vacía con el botón para crear (HU-076 CA-004).
 
 Envía (todo con `colaborador` de la misma empresa; si no, 404):
 
-- `POST /colaboradores` (E12.1): `name`, `cargo` (obligatorio; lista de sugerencias en `lib/cargos.ts` o escrito), `email` y `password`. Correo único (RN-002) y contraseña fuerte (RN-001); no se pide confirmación porque la empresa la escribe y la comparte. Crea la cuenta con `empresa_id` de la empresa y rol **Colaborador**, activa, sin enviar correo. Redirige con `back()`; la pantalla abre E12.2 con lo que se escribió. **El servidor no devuelve la contraseña.**
-- `PUT /colaboradores/{id}` (E12.3, "Editar"): `name`, `cargo`, `email` (único) y `password` (vacía si no se cambia; si va, RN-001). Si cambia el correo o la contraseña, **cierra las sesiones abiertas** del colaborador. Con contraseña nueva, la pantalla abre E12.2 para compartirla.
+- `POST /colaboradores` (E12.1): `name`, `cargo` (obligatorio; lista de sugerencias en `lib/cargos.ts` o escrito), `email`, `password` y `paginas[]` (al menos una; el PDF pide también `resultados.ver`). Correo único (RN-002) y contraseña fuerte (RN-001); no se pide confirmación porque la empresa la escribe y la comparte. Crea la cuenta con `empresa_id` de la empresa y rol **Colaborador**, activa, sin enviar correo. Redirige con `back()`; la pantalla abre E12.2 con lo que se escribió. **El servidor no devuelve la contraseña.**
+- `PUT /colaboradores/{id}` (E12.3, "Editar"): `name`, `cargo`, `email` (único), `password` (vacía si no se cambia; si va, RN-001) y `paginas[]`. Si cambia el correo o la contraseña, **cierra las sesiones abiertas** del colaborador. Con contraseña nueva, la pantalla abre E12.2 para compartirla.
 - `POST /colaboradores/{id}/desactivar` y `/reactivar` (HU-079): cambian `activo`. Nunca sobre la cuenta principal (403).
 - `DELETE /colaboradores/{id}` (DEC-017): elimina el colaborador (sale de la lista, el Administrador lo recupera en 90 días). Sin campos: la doble confirmación es con dos botones en la pantalla, porque el correo y el nombre se pueden cambiar.
 

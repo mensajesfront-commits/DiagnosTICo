@@ -61,6 +61,7 @@ class RolesController extends Controller
 
             foreach ($cuentas as $cuenta) {
                 $cuenta->syncRoles([$rol]);
+                $cuenta->syncPermissions([]);
             }
 
             return $rol;
@@ -78,8 +79,11 @@ class RolesController extends Controller
 
         $datos = $this->validar($request, $rol);
 
-        if (! $datos['activo'] && $rol->users()->exists()) {
-            throw ValidationException::withMessages(['activo' => 'Este rol tiene cuentas: pásalas a otro rol antes de desactivarlo.']);
+        $desactiva = ! $datos['activo'] && (bool) $rol->getAttribute('activo');
+
+        // Desactivarlo bloquea a sus cuentas; la propia no, para no quedar fuera.
+        if ($desactiva && $request->user()?->hasRole($rol)) {
+            throw ValidationException::withMessages(['activo' => 'No puedes desactivar tu propio rol.']);
         }
 
         DB::transaction(function () use ($rol, $datos): void {
@@ -93,7 +97,13 @@ class RolesController extends Controller
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Cambios guardados. Aplican a todas las cuentas con este rol.']);
+        // Sus cuentas no entran hasta tener otro rol; si tienen la sesión
+        // abierta, se cierra en la siguiente petición (CerrarSesionCuentaInactiva).
+        $cuentas = $desactiva ? $rol->users()->count() : 0;
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $cuentas > 0
+            ? 'Rol desactivado. '.($cuentas === 1 ? 'Su cuenta no podrá entrar hasta que le asignes otro rol.' : "Sus {$cuentas} cuentas no podrán entrar hasta que les asignes otro rol.")
+            : 'Cambios guardados. Aplican a todas las cuentas con este rol.']);
 
         return back();
     }
@@ -129,6 +139,8 @@ class RolesController extends Controller
         UsuariosController::validarRolParaCuenta($rol, $cuenta, 'cuenta_id');
 
         $cuenta->syncRoles([$rol]);
+        // Las páginas que le dio su empresa como colaborador ya no aplican.
+        $cuenta->syncPermissions([]);
 
         if ($request->boolean('avisar')) {
             $cuenta->notify(new RolCambiado($rol->name));

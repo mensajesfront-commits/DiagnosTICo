@@ -67,21 +67,24 @@ Los roles del sistema tienen permisos fijos (RN-027). Así los muestra A5.2:
 | `empresas.ver` | ✓ | | |
 | `empresas.registrar` | ✓ | | |
 | `mediciones.asignar` | ✓ | | |
-| `diagnostico.responder` | ✓ | ✓ | ✓ |
-| `resultados.ver` | ✓ | ✓ | ✓ |
-| `resultados.pdf` | ✓ | ✓ | ✓ |
+| `diagnostico.responder` | ✓ | ✓ | elige su empresa |
+| `resultados.ver` | ✓ | ✓ | elige su empresa |
+| `resultados.pdf` | ✓ | ✓ | elige su empresa |
 | `ia.ver` | ✓ | | |
 | `ia.editar` | ✓ | | |
 | `usuarios.ver` | ✓ | | |
 | `usuarios.gestionar` | ✓ | | |
-| `perfil.editar` | ✓ | ✓ | ✓ |
-| `contrasena.cambiar` | ✓ | ✓ | ✓ |
-| **Total** | **15** | **5** | **5** |
+| `perfil.editar` | ✓ | ✓ | |
+| `contrasena.cambiar` | ✓ | ✓ | |
+| **Total** | **15** | **5** | **0 en el rol** |
 
 - El Administrador tiene los 15, también "Responder el diagnóstico", aunque no responde por ninguna empresa (no tiene `empresa_id`).
-- El colaborador **sí edita su propio perfil** (su nombre, su teléfono…), respuesta del equipo del 6 de octubre. Lo que no puede es cambiar los datos de la empresa (RN-025): eso lo decide el rol Empresa, no el permiso. **[INCONSISTENCIA DETECTADA]** A5.2 muestra al Colaborador con 4 permisos, sin "Editar su perfil"; manda la respuesta del equipo.
+- **Colaborador (cambio del 26 de octubre):** el rol no trae permisos. La cuenta principal elige, para cada colaborador, qué páginas ve: "Responder el diagnóstico", "Resultados y Mi historial" y "Descargar el informe PDF" (este último pide también los resultados). Se guardan como permisos directos de su cuenta (`App\Support\PaginasColaborador`); para dar una página nueva se agrega ahí su permiso. Inicio y Mi perfil siempre los ve.
+- El colaborador **no** edita su perfil ni cambia su contraseña: Mi perfil queda en solo lectura y "¿Olvidaste tu contraseña?" le envía un correo que dice que se la cambia la cuenta principal (sin enlace). Esto reemplaza la respuesta del 6 de octubre.
+- Al pasar un colaborador a otro rol (A5.5) pierde las páginas que le dio su empresa.
+- **Rol desactivado:** sus cuentas no entran (mismo modal que una cuenta desactivada) y si tienen la sesión abierta se cierra en la siguiente petición, hasta que les asignen otro rol. Nadie desactiva su propio rol.
 
-Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/Feature/RolesYPermisosTest.php`) y el menú en `resources/js/lib/menu.ts`.
+Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/Feature/RolesYPermisosTest.php`), las páginas del colaborador en `app/Support/PaginasColaborador.php` y el menú en `resources/js/lib/menu.ts`. Mi perfil: `routes/settings.php` pide `perfil.editar` para cambiar datos, foto o correo y `contrasena.cambiar` para la contraseña.
 
 **Botones según los permisos (26 de octubre de 2026):** cada pantalla oculta los botones y acciones que el rol no permite (`resources/js/composables/usePermisos.ts`). Por ejemplo, con solo "Ver empresas" no aparecen "Registrar empresa", "Asignar medición", "Desactivar cuenta" ni "Ver como", y Datos de la cuenta queda de solo lectura. Sin "Editar" no aparecen crear, editar, archivar ni eliminar en Diagnósticos y el catálogo; sin "Publicar versiones" no aparece "Publicar"; sin "Descargar PDF" no aparece el PDF; sin "Gestionar usuarios y roles" la lista de usuarios y los roles son de solo lectura. El servidor bloquea las rutas igual.
 
@@ -100,7 +103,7 @@ Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/
 | 9 | **Constancia de los términos:** se guarda cuándo se aceptaron (`users.terminos_aceptados_en`). | `CreateNewUser` | `SeguridadAccesoTest` |
 | 10 | **El Administrador no restablece contraseñas de otras cuentas** (RN-006). No existe esa ruta; las cuentas internas se invitan y la persona crea su contraseña. | `UsuariosController::invitar` | `UsuariosYRolesTest` |
 | 13 | **Usuarios y roles:** nada sobre la propia cuenta (ni desactivarla ni eliminarla); eliminar pide el correo exacto, no deja sin Administrador al sistema, deja la cuenta 90 días recuperable antes de borrarla para siempre y, si es la cuenta principal, elimina también la empresa y sus colaboradores (DEC-017); los roles del sistema no se editan ni se eliminan; un rol con cuentas no se elimina; los inactivos no se asignan (RN-027). | `UsuariosController`, `RolesController` | `UsuariosYRolesTest` |
-| 14 | **Colaboradores (E12):** solo la cuenta principal crea, cambia la contraseña, desactiva o reactiva, y solo a colaboradores de su empresa (otra empresa: 404). Cambiar la contraseña o desactivar cierra las sesiones del colaborador. Es la única pantalla donde una cuenta define la contraseña de otra (RN-025, HU-078). | `ColaboradoresController` | `ColaboradoresTest` |
+| 14 | **Colaboradores (E12):** solo la cuenta principal crea, cambia la contraseña, desactiva o reactiva, y solo a colaboradores de su empresa (otra empresa: 404). Cambiar la contraseña o desactivar cierra las sesiones del colaborador. Es la única pantalla donde una cuenta define la contraseña de otra (RN-025, HU-078). También elige las páginas que ve cada colaborador; el colaborador no cambia su contraseña ni la recupera por correo. | `ColaboradoresController`, `PaginasColaborador`, `User::sendPasswordResetNotification` | `ColaboradoresTest`, `PerfilTest` |
 | 11 | **Contraseñas cifradas** con bcrypt (`hashed` en el modelo); nunca se guardan ni se muestran en texto. La excepción es E12.2: muestra una sola vez la contraseña que la empresa acaba de escribir, desde el navegador; el servidor no la devuelve. | `User::casts()` | — |
 | 12 | **Protección CSRF y sesión nueva al entrar**, de Laravel e Inertia. | Middleware `web` | — |
 

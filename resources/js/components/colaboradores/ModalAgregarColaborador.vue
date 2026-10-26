@@ -7,7 +7,9 @@
  * con los datos para compartir; la contraseña sale de lo que se escribió
  * aquí, el servidor no la devuelve.
  *
- * Envía: POST /colaboradores con name, cargo, email y password.
+ * También elige qué páginas puede ver (SelectorPaginas).
+ *
+ * Envía: POST /colaboradores con name, cargo, email, password y paginas[].
  */
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
@@ -18,19 +20,32 @@ import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
+import SelectorPaginas from '@/components/colaboradores/SelectorPaginas.vue';
 import { cargosSugeridos } from '@/lib/cargos';
 import { revisarContrasena } from '@/lib/contrasena';
 import { rutas } from '@/lib/rutas';
-import type { DatosDeAcceso } from '@/types/colaboradores';
+import type { DatosDeAcceso, PaginaColaborador } from '@/types/colaboradores';
+
+const props = defineProps<{ paginas: PaginaColaborador[] }>();
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 
 const emit = defineEmits<{ creado: [datos: DatosDeAcceso] }>();
 
-const form = useForm({ name: '', cargo: '', email: '', password: '' });
+// Por defecto, todas: lo que tenía un colaborador antes de poder elegir.
+const todas = () => props.paginas.map((p) => p.clave);
+
+const form = useForm({
+    name: '',
+    cargo: '',
+    email: '',
+    password: '',
+    paginas: todas(),
+});
 
 watch(abierto, (valor) => {
     if (valor) {
+        form.defaults('paginas', todas());
         form.reset();
         form.clearErrors();
     }
@@ -41,6 +56,7 @@ const listo = computed(
         form.name.trim() !== '' &&
         form.cargo.trim() !== '' &&
         form.email.trim() !== '' &&
+        form.paginas.length > 0 &&
         revisarContrasena(form.password, '', {
             conConfirmacion: false,
             correo: form.email,
@@ -70,16 +86,13 @@ function crear(): void {
     <Modal
         v-model:abierto="abierto"
         titulo="Agregar colaborador"
-        descripcion="Crea una cuenta para alguien de tu equipo. Tendrá casi los mismos permisos que tú."
+        descripcion="Crea una cuenta para alguien de tu equipo y elige qué páginas puede ver."
     >
         <form
             id="form-agregar-colaborador"
             class="flex flex-col gap-4"
             @submit.prevent="crear"
         >
-            <p class="text-xs text-tinta-suave">
-                Todos los campos son obligatorios.
-            </p>
             <Campo
                 obligatorio
                 etiqueta="Nombre"
@@ -147,11 +160,17 @@ function crear(): void {
                 :contrasena="form.password"
                 :correo="form.email"
             />
+            <SelectorPaginas
+                v-model="form.paginas"
+                :paginas="paginas"
+                prefijo="agregar-pagina"
+                :error="form.errors.paginas"
+            />
             <p
                 class="rounded-md bg-lienzo-oscuro/60 px-3 py-2.5 text-xs text-tinta-suave"
             >
-                No enviamos la contraseña por correo: tú se la compartes. Podrá
-                cambiarla desde su perfil.
+                No enviamos la contraseña por correo: tú se la compartes. Solo
+                tú puedes cambiarla después, desde «Editar».
             </p>
         </form>
 

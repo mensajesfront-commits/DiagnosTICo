@@ -68,7 +68,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - Cada pantalla oculta los botones que el rol de la cuenta no permite (`usePermisos`): Empresas (lista, ficha y Datos de la cuenta en solo lectura), Inicio, Diagnósticos, catálogo, editor y vista previa, resultados y PDF, Usuarios y roles.
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
-- Corregido (A5.1c): un rol con cuentas no se puede desactivar, y antes la casilla "Rol activo" se dejaba desmarcar y al guardar no pasaba nada. Ahora la casilla se bloquea con la nota "Para desactivarlo, pasa primero sus cuentas a otro rol." y se muestra el error del servidor.
+- Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
+
+### Cambiado (roles y colaboradores, 26 de octubre)
+
+- **Desactivar un rol (A5.1c)** bloquea a sus cuentas: no entran y se les cierra la sesión hasta que les asignes otro rol. Antes no se podía desactivar un rol con cuentas. Al desmarcar "Rol activo" sale el aviso con cuántas cuentas quedan fuera; en A5 esas cuentas dicen "Rol inactivo: no puede entrar". Nadie desactiva su propio rol.
+- **Páginas de cada colaborador (E12.1, E12.3):** la cuenta principal elige qué ve cada colaborador: "Responder el diagnóstico", "Resultados y Mi historial" y "Descargar el informe PDF" (pide también los resultados). La lista de E12 tiene la columna "Puede ver". Los colaboradores que ya existían conservan las tres (migración `paginas_por_colaborador`). Para agregar una página nueva basta con sumarla en `App\Support\PaginasColaborador`.
+- **El colaborador no cambia su perfil ni su contraseña (E11):** Mi perfil queda en solo lectura con un aviso; sin "Cambiar contraseña". "¿Olvidaste tu contraseña?" le manda un correo que dice que se la cambia la cuenta principal. El rol Colaborador queda sin permisos; las rutas de Mi perfil ahora piden "Editar su perfil" y "Cambiar su contraseña".
+- E1 sin "Responder" muestra "Tu empresa no te dio acceso para responder el diagnóstico."; sin "Resultados" no recibe puntajes.
 
 ### Cambiado (Usuarios y roles fija, 26 de octubre)
 
