@@ -64,6 +64,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **La contraseña nueva debe ser distinta de la anterior** (L4, Mi perfil y editar colaborador). Esto lo revisa solo el servidor.
 - El correo de "¿Olvidaste tu contraseña?" ahora dice "Cambia tu contraseña" y su botón, "Cambiar contraseña".
 
+### Cambiado (Usuarios y roles fija, 26 de octubre)
+
+- **A5 · Usuarios:** la página queda fija sin importar cuántas cuentas haya. La tabla muestra las filas que caben en la pantalla y el paginado de Empresas (`useFilasQueCaben`), en lugar de 12 por página con desplazamiento.
+- **A5.2 · Roles:** también fija; la lista de roles y el panel del rol bajan cada uno en su espacio.
+- Se quitó la ruta pequeña "Usuarios y roles" de arriba, que repetía el título.
+
 ### Cambiado (decisiones de NuevasTIC, 23 de octubre)
 
 - **Preguntas opcionales:** respondidas son un dato extra. La IA las lee (van marcadas como `dato_extra`), pero no cuentan en el puntaje; el resultado las muestra como "Dato extra".
