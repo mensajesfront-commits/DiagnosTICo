@@ -68,6 +68,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - Cada pantalla oculta los botones que el rol de la cuenta no permite (`usePermisos`): Empresas (lista, ficha y Datos de la cuenta en solo lectura), Inicio, Diagnósticos, catálogo, editor y vista previa, resultados y PDF, Usuarios y roles.
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
+- Corregido (A5.1c): un rol con cuentas no se puede desactivar, y antes la casilla "Rol activo" se dejaba desmarcar y al guardar no pasaba nada. Ahora la casilla se bloquea con la nota "Para desactivarlo, pasa primero sus cuentas a otro rol." y se muestra el error del servidor.
 
 ### Cambiado (Usuarios y roles fija, 26 de octubre)
 

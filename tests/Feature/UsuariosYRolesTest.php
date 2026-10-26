@@ -381,3 +381,17 @@ it('una cuenta de empresa no puede eliminar cuentas', function () {
         ->delete(route('usuarios.eliminar', $otra), ['confirmacion' => $otra->email])
         ->assertForbidden();
 });
+
+it('no deja desactivar un rol que tiene cuentas; sin cuentas, sí', function () {
+    $rol = Role::create(['name' => 'Consulta de empresas', 'guard_name' => 'web']);
+    $cristobal = User::factory()->create()->assignRole($rol);
+    $datos = ['nombre' => 'Consulta de empresas', 'activo' => false, 'permisos' => ['empresas.ver']];
+
+    $this->actingAs($this->admin)->put(route('roles.update', $rol), $datos)
+        ->assertSessionHasErrors(['activo' => 'Este rol tiene cuentas: pásalas a otro rol antes de desactivarlo.']);
+    expect($cristobal->fresh()->hasRole('Consulta de empresas'))->toBeTrue();
+
+    $cristobal->syncRoles([]);
+    $this->actingAs($this->admin)->put(route('roles.update', $rol), $datos)->assertSessionHasNoErrors();
+    expect((bool) $rol->fresh()->getAttribute('activo'))->toBeFalse();
+});

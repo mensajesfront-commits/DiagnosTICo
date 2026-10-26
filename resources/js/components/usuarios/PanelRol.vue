@@ -158,14 +158,27 @@ function guardar(): void {
             >
                 <Entrada id="rol-descripcion" v-model="form.descripcion" />
             </Campo>
-            <label class="flex items-center gap-2 pt-7 text-sm">
-                <input
-                    v-model="form.activo"
-                    type="checkbox"
-                    class="size-4 accent-marca"
-                />
-                Rol activo
-            </label>
+            <div class="flex flex-col gap-1 pt-7">
+                <label class="flex items-center gap-2 text-sm">
+                    <!-- Un rol con cuentas no se desactiva (RolesController). -->
+                    <input
+                        v-model="form.activo"
+                        type="checkbox"
+                        class="size-4 accent-marca disabled:opacity-50"
+                        :disabled="form.activo && rol.cuentas_total > 0"
+                    />
+                    Rol activo
+                </label>
+                <p
+                    v-if="form.activo && rol.cuentas_total > 0"
+                    class="max-w-48 text-xs text-tinta-suave"
+                >
+                    Para desactivarlo, pasa primero sus cuentas a otro rol.
+                </p>
+                <p v-if="form.errors.activo" class="text-xs text-aviso">
+                    {{ form.errors.activo }}
+                </p>
+            </div>
         </fieldset>
 
         <GrillaPermisos
