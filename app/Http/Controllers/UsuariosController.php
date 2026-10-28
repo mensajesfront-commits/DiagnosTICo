@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Notifications\RolCambiado;
+use App\Support\CambioDeRol;
 use App\Support\DatosUsuarios;
 use App\Support\Fechas;
 use App\Support\Invitaciones;
@@ -92,6 +93,7 @@ class UsuariosController extends Controller
     public function desactivar(User $usuario, Request $request): RedirectResponse
     {
         $this->noSobreLaPropia($usuario, $request);
+        $this->noSobreElPrincipal($usuario);
 
         DB::transaction(function () use ($usuario): void {
             $usuario->forceFill(['activo' => false])->save();
@@ -117,6 +119,7 @@ class UsuariosController extends Controller
     public function eliminar(User $usuario, Request $request): RedirectResponse
     {
         $this->noSobreLaPropia($usuario, $request);
+        $this->noSobreElPrincipal($usuario);
 
         $request->validate(['confirmacion' => ['required', 'string']], [
             'confirmacion.required' => 'Escribe el correo de la cuenta para confirmar.',
@@ -237,19 +240,29 @@ class UsuariosController extends Controller
 
         /** @var Role $rol */
         $rol = Role::query()->findOrFail($datos['rol_id']);
+        CambioDeRol::permitido($usuario, 'rol_id');
         self::validarRolParaCuenta($rol, $usuario);
 
-        $usuario->syncRoles([$rol]);
-        // Las páginas que le dio su empresa como colaborador ya no aplican.
-        $usuario->syncPermissions([]);
+        $empresa = $usuario->empresa?->nombre;
+        $saleDeLaEmpresa = CambioDeRol::aplicar($usuario, $rol, $request->user());
 
-        if ($request->boolean('avisar')) {
+        // Si salió de la empresa, la invitación ya le cuenta el rol nuevo.
+        if ($request->boolean('avisar') && ! $saleDeLaEmpresa) {
             $usuario->notify(new RolCambiado($rol->name));
         }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => "{$usuario->name} ahora tiene el rol {$rol->name}."]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => self::mensajeCambio($usuario, $rol, $saleDeLaEmpresa ? $empresa : null)]);
 
         return back();
+    }
+
+    /** Texto del aviso al cambiar o asignar un rol. */
+    public static function mensajeCambio(User $cuenta, Role $rol, ?string $empresaQueDejo): string
+    {
+        $mensaje = "{$cuenta->name} ahora tiene el rol {$rol->name}.";
+
+        return $empresaQueDejo === null ? $mensaje
+            : $mensaje." Ya no es cuenta de {$empresaQueDejo}: le enviamos a {$cuenta->email} el enlace para crear su contraseña.";
     }
 
     /**
@@ -266,6 +279,12 @@ class UsuariosController extends Controller
         if ($rol->name === 'Empresa' && $usuario->empresa_id === null) {
             throw ValidationException::withMessages([$campo => 'Solo una cuenta de una empresa puede tener el rol Empresa.']);
         }
+    }
+
+    /** La cuenta del Administrador principal no se desactiva ni se elimina. */
+    private function noSobreElPrincipal(User $usuario): void
+    {
+        abort_if($usuario->administrador_principal, 403, 'Es la cuenta principal del Administrador: no se desactiva ni se elimina.');
     }
 
     private function noSobreLaPropia(User $usuario, Request $request): void

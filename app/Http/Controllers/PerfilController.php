@@ -8,9 +8,9 @@ use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Services\Acceso\CodigoVerificacion;
+use App\Support\HistorialContrasenas;
 use App\Support\OpcionesPerfil;
 use App\Support\Ubicaciones;
-use App\Support\HistorialContrasenas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -51,6 +51,8 @@ class PerfilController extends Controller
                 'contrasena_actualizada_en' => ($usuario->contrasena_actualizada_en ?? $usuario->created_at)?->toIso8601String(),
                 // Correo nuevo que espera el código (abre la ventana de verificación).
                 'email_pendiente' => $usuario->email_pendiente,
+                // Teléfono nuevo que espera el código al correo.
+                'telefono_pendiente' => $usuario->telefono_pendiente,
             ],
             'rol' => $rol,
             'empresa' => $empresa ? [
@@ -92,7 +94,6 @@ class PerfilController extends Controller
         $usuario->fill([
             'name' => $datos['name'],
             'cargo' => $datos['cargo'] ?? null,
-            'telefono' => $datos['telefono'] ?? null,
             'ciudad' => $datos['ciudad'] ?? null,
             'departamento' => $datos['departamento'] ?? null,
             'pais' => $datos['pais'] ?? null,
@@ -104,16 +105,27 @@ class PerfilController extends Controller
             ),
         ]);
 
-        // El correo nuevo no se guarda todavía: le llega un código y se
-        // confirma en la ventana de verificación (DEC-020). Se sigue entrando
-        // con el anterior hasta confirmarlo.
+        // El correo y el teléfono nuevos no se guardan todavía: llega un
+        // código y se confirman en la ventana de verificación (DEC-020). El
+        // código va al correo nuevo si cambia; si no, al actual. Hasta
+        // confirmarlo se siguen usando los anteriores. Quitar el teléfono no
+        // pide código.
         $correoNuevo = mb_strtolower(trim((string) $datos['email']));
         $cambiaCorreo = $correoNuevo !== mb_strtolower($usuario->email);
         $usuario->email_pendiente = $cambiaCorreo ? $correoNuevo : null;
+
+        $telefonoNuevo = filled($datos['telefono'] ?? null) ? trim((string) $datos['telefono']) : null;
+        $cambiaTelefono = $telefonoNuevo !== null && $telefonoNuevo !== $usuario->telefono;
+        $usuario->telefono_pendiente = $cambiaTelefono ? $telefonoNuevo : null;
+
+        if ($telefonoNuevo === null) {
+            $usuario->telefono = null;
+        }
+
         $usuario->save();
 
-        if ($cambiaCorreo) {
-            $this->codigos->enviar($usuario, $correoNuevo);
+        if ($cambiaCorreo || $cambiaTelefono) {
+            $this->codigos->enviar($usuario, $cambiaCorreo ? $correoNuevo : $usuario->email);
         }
 
         if ($request->editaEmpresa() && $usuario->empresa) {
@@ -129,14 +141,19 @@ class PerfilController extends Controller
             ]);
         }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => $cambiaCorreo
-            ? "Cambios guardados. Para cambiar el correo, escribe el código que enviamos a {$correoNuevo}."
+        $que = match (true) {
+            $cambiaCorreo && $cambiaTelefono => 'el correo y el teléfono',
+            $cambiaCorreo => 'el correo',
+            default => 'el teléfono',
+        };
+        Inertia::flash('toast', ['type' => 'success', 'message' => $cambiaCorreo || $cambiaTelefono
+            ? "Cambios guardados. Para cambiar {$que}, escribe el código que enviamos a ".($cambiaCorreo ? $correoNuevo : $usuario->email).'.'
             : 'Cambios guardados.']);
 
         return to_route('profile.edit');
     }
 
-    /** Confirma el correo nuevo con el código que le llegó. */
+    /** Confirma el correo o el teléfono nuevos con el código que llegó al correo. */
     public function verificarCorreo(Request $request): RedirectResponse
     {
         $datos = $request->validate(
@@ -147,13 +164,14 @@ class PerfilController extends Controller
         /** @var User $usuario */
         $usuario = $request->user();
         $nuevo = $usuario->email_pendiente;
+        $telefono = $usuario->telefono_pendiente;
 
-        if ($nuevo === null) {
+        if ($nuevo === null && $telefono === null) {
             return to_route('profile.edit');
         }
 
         // Otra cuenta pudo tomar el correo mientras tanto.
-        if (User::withTrashed()->where('email', $nuevo)->whereKeyNot($usuario->id)->exists()) {
+        if ($nuevo !== null && User::withTrashed()->where('email', $nuevo)->whereKeyNot($usuario->id)->exists()) {
             $usuario->forceFill(['email_pendiente' => null])->save();
 
             return back()->withErrors(['email' => 'Ya hay una cuenta con este correo.']);
@@ -165,8 +183,20 @@ class PerfilController extends Controller
             return back()->withErrors(['codigo' => $error]);
         }
 
-        $usuario->forceFill(['email' => $nuevo, 'email_pendiente' => null, 'email_verified_at' => now()])->save();
-        Inertia::flash('toast', ['type' => 'success', 'message' => "Listo: tu correo ahora es {$nuevo}."]);
+        if ($nuevo !== null) {
+            $usuario->forceFill(['email' => $nuevo, 'email_pendiente' => null, 'email_verified_at' => now()]);
+        }
+
+        if ($telefono !== null) {
+            $usuario->forceFill(['telefono' => $telefono, 'telefono_pendiente' => null]);
+        }
+
+        $usuario->save();
+        Inertia::flash('toast', ['type' => 'success', 'message' => match (true) {
+            $nuevo !== null && $telefono !== null => "Listo: tu correo ahora es {$nuevo} y tu teléfono, {$telefono}.",
+            $nuevo !== null => "Listo: tu correo ahora es {$nuevo}.",
+            default => "Listo: tu teléfono ahora es {$telefono}.",
+        }]);
 
         return to_route('profile.edit');
     }
@@ -176,19 +206,19 @@ class PerfilController extends Controller
         /** @var User $usuario */
         $usuario = $request->user();
 
-        if ($usuario->email_pendiente !== null) {
-            $this->codigos->enviar($usuario, $usuario->email_pendiente);
+        if ($usuario->email_pendiente !== null || $usuario->telefono_pendiente !== null) {
+            $this->codigos->enviar($usuario, $usuario->email_pendiente ?? $usuario->email);
         }
 
         return back()->with('status', 'Te enviamos un código nuevo. Revisa también la carpeta de spam.');
     }
 
-    /** Cerrar la ventana: el correo sigue siendo el anterior. */
+    /** Cerrar la ventana: el correo y el teléfono siguen siendo los anteriores. */
     public function cancelarCambioCorreo(Request $request): RedirectResponse
     {
         /** @var User $usuario */
         $usuario = $request->user();
-        $usuario->forceFill(['email_pendiente' => null, 'codigo_verificacion' => null, 'codigo_vence_en' => null])->save();
+        $usuario->forceFill(['email_pendiente' => null, 'telefono_pendiente' => null, 'codigo_verificacion' => null, 'codigo_vence_en' => null])->save();
 
         return to_route('profile.edit');
     }

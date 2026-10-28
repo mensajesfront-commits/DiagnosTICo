@@ -10224,6 +10224,7 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 - **[INFORMACIÓN PENDIENTE]** Diseño y textos del bot de WhatsApp (PA-001, PA-002).
 - **[FUNCIONALIDAD POR DEFINIR]** Rol Usuario; historial de solicitudes de nueva medición.
 - **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. ~~El Colaborador puede editar su propio perfil.~~
+- **Definido (28 de octubre):** la cuenta del Administrador principal (la creada al instalar) no pierde el rol ni se desactiva o elimina. Una cuenta de empresa que pasa a un rol interno deja la empresa y crea una contraseña nueva con la invitación; si era la principal, la empresa queda desactivada. El teléfono nuevo de Mi perfil se confirma con un código al correo.
 - **Cambiado (26 de octubre):** el Colaborador **no** edita su perfil ni su contraseña: lo hace la cuenta principal (E12.3), que además elige qué páginas ve cada colaborador. Desactivar un rol bloquea a sus cuentas hasta que tengan otro rol.
 
 **Supuestos**

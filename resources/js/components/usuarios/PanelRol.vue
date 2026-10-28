@@ -250,6 +250,12 @@ function guardar(): void {
                     >
                         Tu cuenta
                     </span>
+                    <span
+                        v-else-if="cuenta.es_admin_principal"
+                        class="text-xs text-tinta-suave"
+                    >
+                        Administrador principal
+                    </span>
                     <button
                         v-else-if="puede('usuarios.gestionar')"
                         type="button"

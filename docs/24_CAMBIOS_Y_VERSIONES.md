@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (administrador principal, teléfono y cuentas que pasan al equipo, 28 de octubre)
+
+- **Administrador principal (A5):** la cuenta del Administrador creada al instalar (columna `users.administrador_principal`; en una base que ya existía, la cuenta de Administrador más antigua) dice "Administrador principal". Ningún otro Administrador le cambia el rol, se lo asigna a otro rol, la desactiva ni la elimina.
+- **Teléfono en Mi perfil (A6, E11):** el teléfono nuevo se confirma con un código de 6 dígitos, como el correo. El código llega al correo actual o, si también cambia el correo, al correo nuevo (un solo código para los dos). Hasta confirmarlo se mantiene el anterior. Quitar el teléfono no pide código. Columna `users.telefono_pendiente`.
+- **Cuenta de empresa que pasa a un rol interno (A5.5):** deja la empresa (los roles internos no tienen empresa), se borran su contraseña, su cargo y sus avisos, y le llega la invitación para crear una contraseña nueva, como a cualquier cuenta interna. Si era la cuenta principal, la empresa queda desactivada con sus mediciones y resultados. El modal de cambiar o asignar rol lo avisa antes (`App\Support\CambioDeRol`).
+
 ### Cambiado (roles y colaboradores, 26 de octubre)
 
 - **Desactivar un rol (A5.1c)** bloquea a sus cuentas: no entran y se les cierra la sesión hasta que les asignes otro rol. Antes no se podía desactivar un rol con cuentas. Al desmarcar "Rol activo" sale el aviso con cuántas cuentas quedan fuera; en A5 esas cuentas dicen "Rol inactivo: no puede entrar". Nadie desactiva su propio rol.

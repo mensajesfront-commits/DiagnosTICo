@@ -16,7 +16,7 @@ import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
 import OpcionRol from '@/components/usuarios/OpcionRol.vue';
 import { rutas } from '@/lib/rutas';
-import { avisoCuentaPrincipal } from '@/lib/usuarios';
+import { avisoCuentaPrincipal, avisoSaleDeEmpresa } from '@/lib/usuarios';
 import type { Cuenta, Rol } from '@/types/usuarios';
 
 const props = defineProps<{
@@ -60,9 +60,18 @@ const cambia = computed(
     () => form.rol_id !== null && form.rol_id !== rolActual.value?.id,
 );
 
-const aviso = computed(() =>
-    cambia.value ? avisoCuentaPrincipal(props.cuenta, 'cambiar') : null,
-);
+const aviso = computed(() => {
+    if (!cambia.value) {
+        return null;
+    }
+
+    const nuevo = props.roles.find((r) => r.id === form.rol_id)?.nombre ?? null;
+
+    return (
+        avisoSaleDeEmpresa(props.cuenta, nuevo) ??
+        avisoCuentaPrincipal(props.cuenta, 'cambiar')
+    );
+});
 
 const detalle = computed(() =>
     [

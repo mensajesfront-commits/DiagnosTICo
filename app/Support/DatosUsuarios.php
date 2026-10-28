@@ -119,6 +119,8 @@ class DatosUsuarios
             'medicion_pendiente' => $rol === 'Empresa' && $pendiente ? self::pendiente($pendiente) : null,
             // Su rol está desactivado: no entra hasta tener otro (A5.1c).
             'rol_inactivo' => $u->rolInactivo(),
+            // Nadie le quita el rol, la desactiva ni la elimina.
+            'es_admin_principal' => $u->administrador_principal,
             'estado' => match (true) {
                 $u->trashed() => 'eliminada',
                 $u->invitacionPendiente() => 'invitacion',
@@ -191,6 +193,7 @@ class DatosUsuarios
                     ? $u->empresa->nombre.($r->name === 'Colaborador' ? ' · colaborador' : '')
                     : $u->email,
                 'es_tuya' => $u->id === auth()->id(),
+                'es_admin_principal' => $u->administrador_principal,
             ])->values()->all(),
             'aviso' => $activo ? null : ($r->name === 'Consultor' ? self::AVISO_CONSULTOR : self::AVISO_INACTIVO),
         ];

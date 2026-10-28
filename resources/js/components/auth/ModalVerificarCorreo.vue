@@ -8,12 +8,14 @@
  * "Reenviar código" se habilita a los 60 segundos. Cerrar la ventana la
  * deja sin verificar (vuelve a abrirse al intentar entrar).
  *
- * Mi perfil (A6, E11) la usa para confirmar un correo nuevo: pasa sus
- * propias `rutas` y `cambio` (cerrar descarta el cambio).
+ * Mi perfil (A6, E11) la usa para confirmar un correo nuevo, un teléfono
+ * nuevo o los dos: pasa sus propias `rutas`, `cambio` y, si cambia el
+ * teléfono, `telefono` (cerrar descarta el cambio). El código llega al
+ * correo nuevo o, si solo cambia el teléfono, al actual.
  */
 import { router, useForm } from '@inertiajs/vue3';
 import { MailCheck } from '@lucide/vue';
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import Aviso from '@/components/base/Aviso.vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
@@ -28,9 +30,33 @@ const props = withDefaults(
         rutas?: Rutas;
         /** Confirma un correo nuevo en Mi perfil, no un registro. */
         cambio?: boolean;
+        /** Teléfono nuevo de Mi perfil que también se confirma. */
+        telefono?: string | null;
+        /** Si también cambia el correo (el código va al correo nuevo). */
+        cambiaCorreo?: boolean;
     }>(),
-    { status: undefined, rutas: () => rutas.verificacion, cambio: false },
+    {
+        status: undefined,
+        rutas: () => rutas.verificacion,
+        cambio: false,
+        telefono: null,
+        cambiaCorreo: true,
+    },
 );
+
+const titulo = computed(() => {
+    if (!props.cambio) {
+        return 'Verifica tu correo';
+    }
+
+    if (props.telefono && props.cambiaCorreo) {
+        return 'Confirma tu nuevo correo y teléfono';
+    }
+
+    return props.telefono
+        ? 'Confirma tu nuevo teléfono'
+        : 'Confirma tu nuevo correo';
+});
 
 const abierto = ref(true);
 const form = useForm({ codigo: '' });
@@ -97,16 +123,22 @@ watch(abierto, (valor) => {
 </script>
 
 <template>
-    <Modal
-        v-model:abierto="abierto"
-        :titulo="cambio ? 'Confirma tu nuevo correo' : 'Verifica tu correo'"
-        ancho="sm"
-    >
+    <Modal v-model:abierto="abierto" :titulo="titulo" ancho="sm">
         <template #descripcion>
             Enviamos un código de 6 dígitos a
             <strong class="text-tinta">{{ correo }}</strong
-            >.
-            <template v-if="cambio">
+            ><template v-if="!(cambio && telefono)">.</template>
+            <template v-if="cambio && telefono && !cambiaCorreo">
+                para confirmar tu nuevo teléfono
+                <strong class="text-tinta">{{ telefono }}</strong
+                >. Hasta confirmarlo se mantiene el actual.
+            </template>
+            <template v-else-if="cambio && telefono">
+                para confirmar tu nuevo correo y tu nuevo teléfono
+                <strong class="text-tinta">{{ telefono }}</strong
+                >. Hasta confirmarlo sigues con los actuales.
+            </template>
+            <template v-else-if="cambio">
                 Hasta confirmarlo sigues entrando con tu correo actual.
             </template>
         </template>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Notifications\RolCambiado;
+use App\Support\CambioDeRol;
 use App\Support\DatosUsuarios;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Http\RedirectResponse;
@@ -45,11 +46,15 @@ class RolesController extends Controller
 
         $cuentas = User::whereIn('id', $datos['cuentas'] ?? [])->get();
 
+        foreach ($cuentas as $cuenta) {
+            CambioDeRol::permitido($cuenta, 'cuentas');
+        }
+
         if ($cuentas->isNotEmpty() && ! $datos['activo']) {
             throw ValidationException::withMessages(['cuentas' => 'Un rol inactivo no se puede asignar. Actívalo o quita las cuentas.']);
         }
 
-        $rol = DB::transaction(function () use ($datos, $cuentas): Role {
+        $rol = DB::transaction(function () use ($datos): Role {
             /** @var Role $rol */
             $rol = Role::create(['name' => $datos['nombre'], 'guard_name' => 'web']);
             $rol->forceFill([
@@ -59,13 +64,12 @@ class RolesController extends Controller
             ])->save();
             $rol->syncPermissions($datos['permisos'] ?? []);
 
-            foreach ($cuentas as $cuenta) {
-                $cuenta->syncRoles([$rol]);
-                $cuenta->syncPermissions([]);
-            }
-
             return $rol;
         });
+
+        foreach ($cuentas as $cuenta) {
+            CambioDeRol::aplicar($cuenta, $rol, $request->user());
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Rol {$rol->name} creado."]);
 
@@ -136,17 +140,17 @@ class RolesController extends Controller
 
         /** @var User $cuenta */
         $cuenta = User::query()->findOrFail($datos['cuenta_id']);
+        CambioDeRol::permitido($cuenta, 'cuenta_id');
         UsuariosController::validarRolParaCuenta($rol, $cuenta, 'cuenta_id');
 
-        $cuenta->syncRoles([$rol]);
-        // Las páginas que le dio su empresa como colaborador ya no aplican.
-        $cuenta->syncPermissions([]);
+        $empresa = $cuenta->empresa?->nombre;
+        $saleDeLaEmpresa = CambioDeRol::aplicar($cuenta, $rol, $request->user());
 
-        if ($request->boolean('avisar')) {
+        if ($request->boolean('avisar') && ! $saleDeLaEmpresa) {
             $cuenta->notify(new RolCambiado($rol->name));
         }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => "{$cuenta->name} ahora tiene el rol {$rol->name}."]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => UsuariosController::mensajeCambio($cuenta, $rol, $saleDeLaEmpresa ? $empresa : null)]);
 
         return back();
     }

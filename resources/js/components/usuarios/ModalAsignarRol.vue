@@ -11,7 +11,11 @@ import Boton from '@/components/base/Boton.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
 import { rutas } from '@/lib/rutas';
-import { avisoCuentaPrincipal, coincide } from '@/lib/usuarios';
+import {
+    avisoCuentaPrincipal,
+    avisoSaleDeEmpresa,
+    coincide,
+} from '@/lib/usuarios';
 import type { Cuenta, Rol } from '@/types/usuarios';
 
 const props = defineProps<{
@@ -43,7 +47,9 @@ watch(
 );
 
 const coincidentes = computed(() =>
-    props.cuentas.filter((c) => coincide(c, busqueda.value)),
+    props.cuentas.filter(
+        (c) => !c.es_admin_principal && coincide(c, busqueda.value),
+    ),
 );
 const visibles = computed(() => coincidentes.value.slice(0, MOSTRAR));
 
@@ -54,6 +60,12 @@ const elegida = computed(
 const aviso = computed(() => {
     if (!elegida.value) {
         return null;
+    }
+
+    const sale = avisoSaleDeEmpresa(elegida.value, props.rol.nombre);
+
+    if (sale) {
+        return sale;
     }
 
     const principal = avisoCuentaPrincipal(elegida.value, 'cambiar');

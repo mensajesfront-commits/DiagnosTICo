@@ -429,3 +429,64 @@ it('al pasar un colaborador a otro rol pierde las páginas que le dio su empresa
 
     expect($andres->fresh()->getDirectPermissions())->toBeEmpty();
 });
+
+it('nadie le quita el rol, desactiva ni elimina al Administrador principal', function () {
+    $principal = User::factory()->create(['email' => 'admin@nuevastic.co'])->assignRole('Administrador');
+    $principal->forceFill(['administrador_principal' => true])->save();
+    $rol = Role::create(['name' => 'Solo lectura', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+
+    $this->actingAs($this->admin)
+        ->put(route('usuarios.cambiar-rol', $principal), ['rol_id' => $rol->id])
+        ->assertSessionHasErrors(['rol_id' => 'Es la cuenta principal del Administrador: nadie le puede quitar el rol.']);
+    $this->actingAs($this->admin)
+        ->post(route('roles.asignar', $rol), ['cuenta_id' => $principal->id])
+        ->assertSessionHasErrors('cuenta_id');
+    $this->actingAs($this->admin)
+        ->post(route('roles.store'), ['nombre' => 'Otro', 'activo' => true, 'permisos' => [], 'cuentas' => [$principal->id]])
+        ->assertSessionHasErrors('cuentas');
+    $this->actingAs($this->admin)->post(route('usuarios.desactivar', $principal))->assertForbidden();
+    $this->actingAs($this->admin)->delete(route('usuarios.eliminar', $principal), ['confirmacion' => 'admin@nuevastic.co'])->assertForbidden();
+
+    $principal->refresh();
+    expect($principal->hasRole('Administrador'))->toBeTrue()
+        ->and($principal->activo)->toBeTrue()
+        ->and($principal->trashed())->toBeFalse();
+
+    $this->actingAs($this->admin)->get(route('usuarios.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('cuentas', fn ($cuentas) => collect($cuentas)->firstWhere('id', $principal->id)['es_admin_principal'] === true));
+});
+
+it('la cuenta principal de una empresa que pasa a Administrador deja la empresa y crea una contraseña nueva', function () {
+    Notification::fake();
+    $laura = cuentaPrincipal();
+    $laura->forceFill(['cargo' => 'Gerente'])->save();
+    $empresa = $laura->empresa;
+
+    $this->actingAs($this->admin)
+        ->put(route('usuarios.cambiar-rol', $laura), ['rol_id' => Role::findByName('Administrador')->id, 'avisar' => true])
+        ->assertSessionHasNoErrors();
+
+    $laura->refresh();
+    expect($laura->hasRole('Administrador'))->toBeTrue()
+        ->and($laura->empresa_id)->toBeNull()
+        ->and($laura->cargo)->toBeNull()
+        ->and($laura->password)->toBeNull()
+        ->and($laura->invitacionPendiente())->toBeTrue()
+        ->and($empresa->fresh()->activa)->toBeFalse();
+
+    Notification::assertSentTo($laura, InvitacionCuenta::class);
+    Notification::assertNotSentTo($laura, RolCambiado::class);
+});
+
+it('una cuenta interna que cambia de rol conserva su contraseña', function () {
+    Notification::fake();
+    $ana = User::factory()->create()->assignRole('Administrador');
+    $rol = Role::create(['name' => 'Solo lectura', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+
+    $this->actingAs($this->admin)->put(route('usuarios.cambiar-rol', $ana), ['rol_id' => $rol->id])->assertSessionHasNoErrors();
+
+    expect($ana->fresh()->password)->not->toBeNull();
+    Notification::assertNotSentTo($ana, InvitacionCuenta::class);
+});

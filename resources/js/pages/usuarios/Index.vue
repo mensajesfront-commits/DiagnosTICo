@@ -263,6 +263,12 @@ const enlaceEliminar = 'text-aviso hover:underline';
                         >
                             <td class="px-5 py-3">
                                 <p class="font-medium">{{ cuenta.nombre }}</p>
+                                <p
+                                    v-if="cuenta.es_admin_principal"
+                                    class="text-xs font-medium text-marca"
+                                >
+                                    Administrador principal
+                                </p>
                                 <p class="text-xs text-tinta-suave">
                                     {{ cuenta.correo }}
                                 </p>
@@ -346,6 +352,13 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                     class="text-xs text-tinta-suave"
                                 >
                                     Solo lectura
+                                </span>
+                                <!-- Nadie le quita el rol, la desactiva ni la elimina. -->
+                                <span
+                                    v-else-if="cuenta.es_admin_principal"
+                                    class="text-xs text-tinta-suave"
+                                >
+                                    Cuenta principal: no se modifica
                                 </span>
                                 <button
                                     v-else-if="cuenta.estado === 'eliminada'"

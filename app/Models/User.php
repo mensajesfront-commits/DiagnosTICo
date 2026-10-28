@@ -35,11 +35,13 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $ultimo_acceso_en
  * @property Carbon|null $contrasena_actualizada_en
  * @property bool $activo
+ * @property bool $administrador_principal Cuenta del Administrador creada al instalar: no se le quita el rol
  * @property Carbon|null $terminos_aceptados_en
  * @property Carbon|null $invitacion_enviada_en
  * @property Carbon|null $email_verified_at
  * @property string|null $codigo_verificacion Código de verificación cifrado (L2b)
  * @property string|null $email_pendiente Correo nuevo de Mi perfil, sin confirmar
+ * @property string|null $telefono_pendiente Teléfono nuevo de Mi perfil, sin confirmar
  * @property Carbon|null $codigo_vence_en
  * @property int $codigo_intentos
  * @property string|null $password
@@ -73,6 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'codigo_vence_en' => 'datetime',
             'password' => 'hashed',
             'activo' => 'boolean',
+            'administrador_principal' => 'boolean',
             'avisos' => 'array',
             'ultimo_acceso_en' => 'datetime',
             'contrasena_actualizada_en' => 'datetime',

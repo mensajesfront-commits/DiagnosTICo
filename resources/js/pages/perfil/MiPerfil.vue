@@ -58,6 +58,8 @@ type Usuario = {
     contrasena_actualizada_en: string | null;
     /** Correo nuevo que espera el código (DEC-020). */
     email_pendiente: string | null;
+    /** Teléfono nuevo que espera el código al correo. */
+    telefono_pendiente: string | null;
 };
 
 type Empresa = {
@@ -141,6 +143,22 @@ watch(
             form.email = correo;
         }
     },
+);
+
+// Igual con el teléfono: vuelve al guardado al cancelar o confirmar.
+watch(
+    () => [props.usuario.telefono, props.usuario.telefono_pendiente] as const,
+    ([telefono, pendiente]) => {
+        if (pendiente === null) {
+            form.telefono = telefono ?? '';
+        }
+    },
+);
+
+const cambiaTelefono = computed(
+    () =>
+        form.telefono.trim() !== '' &&
+        form.telefono.trim() !== (props.usuario.telefono ?? ''),
 );
 
 watch(
@@ -469,6 +487,13 @@ function cerrarSesion(): void {
                                         :pais="form.pais || form.empresa?.pais"
                                         :invalida="!!form.errors.telefono"
                                     />
+                                    <p
+                                        v-if="cambiaTelefono"
+                                        class="text-xs text-tinta-suave"
+                                    >
+                                        Al guardar te enviaremos un código a tu
+                                        correo para confirmarlo.
+                                    </p>
                                 </Campo>
 
                                 <template v-if="!esEmpresa">
@@ -812,9 +837,11 @@ function cerrarSesion(): void {
     </Modal>
 
     <ModalVerificarCorreo
-        v-if="usuario.email_pendiente"
-        :key="usuario.email_pendiente"
-        :correo="usuario.email_pendiente"
+        v-if="usuario.email_pendiente || usuario.telefono_pendiente"
+        :key="`${usuario.email_pendiente}|${usuario.telefono_pendiente}`"
+        :correo="usuario.email_pendiente ?? usuario.email"
+        :telefono="usuario.telefono_pendiente"
+        :cambia-correo="usuario.email_pendiente !== null"
         :status="status"
         :rutas="{
             verificar: '/mi-perfil/correo/verificar',

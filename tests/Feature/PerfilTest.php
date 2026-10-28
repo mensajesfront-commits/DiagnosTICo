@@ -341,3 +341,55 @@ it('el dueño no puede ponerse en Mi perfil el cargo de un colaborador', functio
         ->patch(route('profile.update'), datosPerfil($dueno, ['cargo' => 'marketing']))
         ->assertSessionHasErrors(['cargo' => 'Ese cargo ya lo tiene Andrés Pérez. El cargo del dueño de la empresa no se puede repetir.']);
 });
+
+it('el teléfono nuevo se confirma con un código al correo actual', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['email' => 'cristian@nuevastic.co', 'telefono' => '+57 3000000000'])->assignRole('Administrador');
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, ['telefono' => '+57 3111111111']))
+        ->assertSessionHasNoErrors();
+
+    $admin->refresh();
+    expect($admin->telefono)->toBe('+57 3000000000')
+        ->and($admin->telefono_pendiente)->toBe('+57 3111111111');
+
+    $this->actingAs($admin)->post(route('perfil.correo.verificar'), ['codigo' => '000000'])->assertSessionHasErrors('codigo');
+    $this->actingAs($admin)->post(route('perfil.correo.verificar'), ['codigo' => codigoCambio('cristian@nuevastic.co')])->assertSessionHasNoErrors();
+
+    $admin->refresh();
+    expect($admin->telefono)->toBe('+57 3111111111')
+        ->and($admin->telefono_pendiente)->toBeNull()
+        ->and($admin->email)->toBe('cristian@nuevastic.co');
+});
+
+it('cambiar correo y teléfono a la vez pide un solo código, al correo nuevo; cancelar deja los dos como estaban', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['email' => 'cristian@nuevastic.co', 'telefono' => '+57 3000000000'])->assignRole('Administrador');
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, ['email' => 'cristian.p@nuevastic.co', 'telefono' => '+57 3111111111']))
+        ->assertSessionHasNoErrors();
+    $this->actingAs($admin)->post(route('perfil.correo.cancelar'));
+
+    $admin->refresh();
+    expect($admin->email)->toBe('cristian@nuevastic.co')->and($admin->telefono)->toBe('+57 3000000000')
+        ->and($admin->telefono_pendiente)->toBeNull()->and($admin->email_pendiente)->toBeNull();
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, ['email' => 'cristian.p@nuevastic.co', 'telefono' => '+57 3111111111']));
+    $this->actingAs($admin)->post(route('perfil.correo.verificar'), ['codigo' => codigoCambio('cristian.p@nuevastic.co')]);
+
+    $admin->refresh();
+    expect($admin->email)->toBe('cristian.p@nuevastic.co')->and($admin->telefono)->toBe('+57 3111111111');
+});
+
+it('quitar el teléfono no pide código', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['telefono' => '+57 3000000000'])->assignRole('Administrador');
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['telefono' => '']))->assertSessionHasNoErrors();
+
+    expect($admin->fresh()->telefono)->toBeNull();
+    Notification::assertNothingSent();
+});

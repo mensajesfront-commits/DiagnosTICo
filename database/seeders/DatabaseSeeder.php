@@ -38,7 +38,8 @@ class DatabaseSeeder extends Seeder
             'email' => $correo,
             'password' => $contrasena,
         ]);
-        $admin->forceFill(['email_verified_at' => now()])->save();
+        // Cuenta principal: ningún otro Administrador le quita el rol.
+        $admin->forceFill(['email_verified_at' => now(), 'administrador_principal' => true])->save();
         $admin->assignRole('Administrador');
 
         $this->command->info("Administrador creado: {$correo}".($definida !== '' ? '' : " · contraseña: {$contrasena}"));
