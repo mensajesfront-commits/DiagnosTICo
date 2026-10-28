@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (responder el diagnóstico más fácil de leer, 28 de octubre)
+
+- **E2 · Responder:** el cuestionario usa casi todo el ancho (hasta 64rem, antes 48rem); la pregunta va en 18 px y las opciones en 16 px; cada opción es un recuadro grande con borde (también las de "Marca todas las que apliquen"), con el foco del teclado visible; "Cómo responder" en un recuadro; número de la pregunta en un círculo que pasa a ✓ y la marca "Respondida". Pedido del equipo para leer mejor, también con baja visión.
+- **Barra de arriba (E2–E4) en celular:** el avance pasa a un segundo renglón y ya no se monta sobre "Guardado" ni "Guardar y salir".
+- **Diagnóstico de ejemplo:** `php artisan db:seed --class=DiagnosticoEjemploSeeder` publica en el sector Comidas un diagnóstico de EJEMPLO con 3 categorías ("Presencia en línea" con 7 preguntas de los tres tipos). No es de NuevasTIC y no lo carga la instalación.
+
 ### Cambiado (administrador principal, teléfono y cuentas que pasan al equipo, 28 de octubre)
 
 - **Administrador principal (A5):** la cuenta del Administrador creada al instalar (columna `users.administrador_principal`; en una base que ya existía, la cuenta de Administrador más antigua) dice "Administrador principal". Ningún otro Administrador le cambia el rol, se lo asigna a otro rol, la desactiva ni la elimina. Es la cuenta de `ADMIN_EMAIL`, que define NuevasTIC al lanzar el proyecto (el seeder la marca aunque ya exista). Solo ella se elimina a sí misma, desde Mi perfil ("Eliminar mi cuenta"): elige a otro Administrador activo como nueva cuenta principal y escribe su correo; se puede recuperar durante 90 días.

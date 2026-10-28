@@ -14,6 +14,11 @@
  *
  * La empresa no recibe los puntajes de las opciones (RN-013).
  *
+ * Diseño para leer fácil (también con baja visión): el cuestionario usa casi
+ * todo el ancho (hasta 64rem), letra de 18 px en las preguntas y 16 px en las
+ * opciones, opciones grandes con borde (también las de "marca varias") y la
+ * marca "Respondida" en cada pregunta.
+ *
  * La opción "Otro" que pide escribir cuál (`con_texto`): al elegirla aparece
  * el campo "¿Cuál?" (máx. 255) y se guarda al dejar de escribir. La IA lee
  * "Otro: lo que escribió".
@@ -225,6 +230,15 @@ const enEsta = computed(
     () => categoria.value.preguntas.filter(respondida).length,
 );
 
+/** Opción grande con borde, fácil de leer y de tocar. */
+const opcionClase =
+    'flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border px-5 py-3 text-base leading-snug has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-marca/40';
+
+const elegida = (p: PreguntaResponder, opcion: string) =>
+    respuestas[p.ref].opciones.includes(opcion)
+        ? 'border-2 border-marca bg-marca-suave/40 font-medium'
+        : 'border-linea-fuerte hover:bg-lienzo';
+
 const pistas = {
     abierta: 'Respuesta escrita',
     opcion_unica: 'Elige una',
@@ -329,16 +343,16 @@ const pistas = {
         </aside>
 
         <div class="flex min-w-0 flex-col">
-            <main id="cuestionario" class="flex-1 px-6 py-6">
-                <div class="mx-auto flex max-w-3xl flex-col gap-4">
+            <main id="cuestionario" class="flex-1 px-4 py-8 sm:px-8">
+                <div class="mx-auto flex max-w-5xl flex-col gap-5">
                     <div>
-                        <p class="font-mono text-xs text-tinta-suave">
+                        <p class="font-mono text-sm text-tinta-suave">
                             CATEGORÍA {{ actual + 1 }} / {{ categorias.length }}
                         </p>
-                        <h1 class="text-2xl font-semibold">
+                        <h1 class="text-3xl font-semibold">
                             {{ categoria.nombre }}
                         </h1>
-                        <p class="mt-1 text-sm text-tinta-suave">
+                        <p class="mt-2 text-base text-tinta-suave">
                             No hay respuestas buenas o malas. Las preguntas
                             marcadas como <strong>Obligatoria</strong> se
                             necesitan para enviar.
@@ -348,132 +362,165 @@ const pistas = {
                     <fieldset
                         v-for="(p, i) in categoria.preguntas"
                         :key="p.ref"
-                        class="rounded-xl border border-linea bg-white px-5 py-4"
+                        :class="
+                            cn(
+                                'rounded-2xl border bg-white px-5 py-6 sm:px-8',
+                                respondida(p)
+                                    ? 'border-marca/40'
+                                    : 'border-linea',
+                            )
+                        "
                     >
                         <legend class="sr-only">Pregunta {{ i + 1 }}</legend>
-                        <div class="flex items-start justify-between gap-4">
-                            <p :id="`texto-${p.ref}`" class="font-medium">
-                                {{ i + 1 }}. {{ p.texto }}
-                            </p>
+                        <div class="flex items-start gap-4">
                             <span
-                                class="flex shrink-0 items-center gap-2 text-xs text-tinta-suave"
-                            >
-                                {{ pistas[p.tipo] }}
-                                <span
-                                    v-if="p.obligatoria"
-                                    class="rounded bg-lienzo-oscuro px-1.5 py-0.5 font-medium text-tinta"
-                                >
-                                    Obligatoria
-                                </span>
-                                <span v-else>(opcional)</span>
-                            </span>
-                        </div>
-                        <p v-if="p.indicacion" class="mt-1 text-xs">
-                            <strong class="text-marca">Cómo responder</strong> ·
-                            {{ p.indicacion }}
-                        </p>
-
-                        <div
-                            v-if="p.tipo === 'opcion_unica'"
-                            role="radiogroup"
-                            :aria-labelledby="`texto-${p.ref}`"
-                            class="mt-3 grid gap-2 sm:grid-cols-2"
-                        >
-                            <label
-                                v-for="o in p.opciones"
-                                :key="o.ref"
                                 :class="
                                     cn(
-                                        'flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-2.5 text-sm',
-                                        respuestas[p.ref].opciones.includes(
-                                            o.ref,
-                                        )
-                                            ? 'border-2 border-marca bg-marca-suave/40'
-                                            : 'border-linea-fuerte hover:bg-lienzo',
+                                        'flex size-10 shrink-0 items-center justify-center rounded-full text-base font-semibold',
+                                        respondida(p)
+                                            ? 'bg-marca text-white'
+                                            : 'bg-marca-suave text-marca',
                                     )
                                 "
+                                aria-hidden="true"
                             >
-                                <input
-                                    type="radio"
-                                    :name="p.ref"
-                                    :value="o.ref"
-                                    :checked="
-                                        respuestas[p.ref].opciones.includes(
-                                            o.ref,
-                                        )
-                                    "
-                                    class="size-4 accent-marca"
-                                    @change="elegirUna(p, o.ref)"
-                                />
-                                {{ o.texto }}
-                            </label>
+                                {{ respondida(p) ? '✓' : i + 1 }}
+                            </span>
+                            <div class="min-w-0 flex-1">
+                                <div
+                                    class="flex flex-wrap items-center gap-2 text-sm text-tinta-suave"
+                                >
+                                    <span>{{ pistas[p.tipo] }}</span>
+                                    <span
+                                        v-if="p.obligatoria"
+                                        class="rounded-md bg-lienzo-oscuro px-2 py-0.5 font-medium text-tinta"
+                                    >
+                                        Obligatoria
+                                    </span>
+                                    <span v-else>(opcional)</span>
+                                    <span
+                                        v-if="respondida(p)"
+                                        class="rounded-md bg-exito-suave px-2 py-0.5 font-medium text-exito"
+                                    >
+                                        ✓ Respondida
+                                    </span>
+                                </div>
+                                <p
+                                    :id="`texto-${p.ref}`"
+                                    class="mt-1.5 text-lg leading-snug font-semibold"
+                                >
+                                    <span class="sr-only">{{ i + 1 }}. </span
+                                    >{{ p.texto }}
+                                </p>
+                                <p
+                                    v-if="p.indicacion"
+                                    class="mt-3 rounded-lg bg-lienzo px-4 py-2.5 text-base"
+                                >
+                                    <strong class="text-marca"
+                                        >Cómo responder:</strong
+                                    >
+                                    {{ p.indicacion }}
+                                </p>
+                            </div>
                         </div>
-
-                        <div
-                            v-else-if="p.tipo === 'seleccion_multiple'"
-                            class="mt-3 grid gap-x-4 gap-y-2 sm:grid-cols-3"
-                        >
-                            <label
-                                v-for="o in p.opciones"
-                                :key="o.ref"
-                                class="flex cursor-pointer items-center gap-2 text-sm"
-                            >
-                                <input
-                                    type="checkbox"
-                                    :checked="
-                                        respuestas[p.ref].opciones.includes(
-                                            o.ref,
-                                        )
-                                    "
-                                    class="size-4 accent-marca"
-                                    @change="marcar(p, o.ref)"
-                                />
-                                {{ o.texto }}
-                            </label>
-                        </div>
-
-                        <div
-                            v-if="p.tipo !== 'abierta' && pideCual(p)"
-                            class="mt-2"
-                        >
-                            <label
-                                :for="`cual-${p.ref}`"
-                                class="block text-xs font-medium"
-                                >¿Cuál?
-                                <span class="font-normal text-tinta-suave"
-                                    >(opcional)</span
-                                ></label
-                            >
-                            <input
-                                :id="`cual-${p.ref}`"
-                                v-model="respuestas[p.ref].texto"
-                                type="text"
-                                maxlength="255"
-                                placeholder="Escribe cuál"
-                                class="mt-1 h-10 w-full rounded-md border border-linea-fuerte bg-white px-3 text-sm focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none sm:max-w-md"
-                                @input="escribir(p)"
-                                @blur="salirDelCampo(p)"
-                            />
-                        </div>
-
-                        <div v-else-if="p.tipo === 'abierta'" class="mt-3">
-                            <textarea
-                                v-model="respuestas[p.ref].texto"
-                                rows="4"
-                                maxlength="1000"
+                        <div class="mt-5 sm:pl-14">
+                            <div
+                                v-if="p.tipo === 'opcion_unica'"
+                                role="radiogroup"
                                 :aria-labelledby="`texto-${p.ref}`"
-                                class="w-full rounded-md border border-linea-fuerte bg-white px-3 py-2 text-sm focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none"
-                                @input="escribir(p)"
-                                @blur="salirDelCampo(p)"
-                            />
-                            <p
-                                class="mt-1 flex justify-between text-xs text-tinta-suave"
+                                class="grid gap-3 sm:grid-cols-2"
                             >
-                                Máximo 1000 caracteres
-                                <span class="font-mono">
-                                    {{ respuestas[p.ref].texto.length }} / 1000
-                                </span>
-                            </p>
+                                <label
+                                    v-for="o in p.opciones"
+                                    :key="o.ref"
+                                    :class="cn(opcionClase, elegida(p, o.ref))"
+                                >
+                                    <input
+                                        type="radio"
+                                        :name="p.ref"
+                                        :value="o.ref"
+                                        :checked="
+                                            respuestas[p.ref].opciones.includes(
+                                                o.ref,
+                                            )
+                                        "
+                                        class="size-5 shrink-0 accent-marca"
+                                        @change="elegirUna(p, o.ref)"
+                                    />
+                                    {{ o.texto }}
+                                </label>
+                            </div>
+
+                            <div
+                                v-else-if="p.tipo === 'seleccion_multiple'"
+                                role="group"
+                                :aria-labelledby="`texto-${p.ref}`"
+                                class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+                            >
+                                <label
+                                    v-for="o in p.opciones"
+                                    :key="o.ref"
+                                    :class="cn(opcionClase, elegida(p, o.ref))"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        :checked="
+                                            respuestas[p.ref].opciones.includes(
+                                                o.ref,
+                                            )
+                                        "
+                                        class="size-5 shrink-0 rounded accent-marca"
+                                        @change="marcar(p, o.ref)"
+                                    />
+                                    {{ o.texto }}
+                                </label>
+                            </div>
+
+                            <div
+                                v-if="p.tipo !== 'abierta' && pideCual(p)"
+                                class="mt-4"
+                            >
+                                <label
+                                    :for="`cual-${p.ref}`"
+                                    class="block text-base font-medium"
+                                    >¿Cuál?
+                                    <span class="font-normal text-tinta-suave"
+                                        >(opcional)</span
+                                    ></label
+                                >
+                                <input
+                                    :id="`cual-${p.ref}`"
+                                    v-model="respuestas[p.ref].texto"
+                                    type="text"
+                                    maxlength="255"
+                                    placeholder="Escribe cuál"
+                                    class="mt-1.5 h-12 w-full rounded-lg border border-linea-fuerte bg-white px-4 text-base focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none sm:max-w-lg"
+                                    @input="escribir(p)"
+                                    @blur="salirDelCampo(p)"
+                                />
+                            </div>
+
+                            <div v-else-if="p.tipo === 'abierta'">
+                                <textarea
+                                    v-model="respuestas[p.ref].texto"
+                                    rows="5"
+                                    maxlength="1000"
+                                    placeholder="Escribe tu respuesta aquí"
+                                    :aria-labelledby="`texto-${p.ref}`"
+                                    class="w-full rounded-lg border border-linea-fuerte bg-white px-4 py-3 text-base leading-relaxed focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none"
+                                    @input="escribir(p)"
+                                    @blur="salirDelCampo(p)"
+                                />
+                                <p
+                                    class="mt-1.5 flex justify-between text-sm text-tinta-suave"
+                                >
+                                    Máximo 1000 caracteres
+                                    <span class="font-mono">
+                                        {{ respuestas[p.ref].texto.length }} /
+                                        1000
+                                    </span>
+                                </p>
+                            </div>
                         </div>
                     </fieldset>
                 </div>
@@ -486,7 +533,7 @@ const pistas = {
                     ← {{ anterior.nombre }}
                 </Boton>
                 <span v-else />
-                <span class="hidden text-xs text-tinta-suave sm:inline">
+                <span class="hidden text-sm text-tinta-suave sm:inline">
                     {{ enEsta }} de {{ categoria.preguntas.length }} preguntas
                     respondidas en esta categoría
                 </span>

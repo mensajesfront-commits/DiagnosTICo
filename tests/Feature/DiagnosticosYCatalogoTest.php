@@ -8,7 +8,10 @@ use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\SectorReasignado;
 use App\Support\DatosDiagnosticos;
+use Database\Seeders\CategoriasSeeder;
+use Database\Seeders\DiagnosticoEjemploSeeder;
 use Database\Seeders\RolesYPermisosSeeder;
+use Database\Seeders\SectoresSeeder;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -298,4 +301,21 @@ it('los archivados se ven en su ventana, se restauran y se eliminan si nadie los
 
     // Un publicado no se borra por esta ruta.
     $this->delete(route('diagnosticos.eliminar-archivado', $usado))->assertStatus(422);
+});
+
+it('el diagnóstico de ejemplo se publica en Comidas con 7 preguntas en Presencia en línea y no se duplica', function () {
+    $this->seed([SectoresSeeder::class, CategoriasSeeder::class]);
+
+    $this->seed(DiagnosticoEjemploSeeder::class);
+    $this->seed(DiagnosticoEjemploSeeder::class);
+
+    $diagnosticos = Diagnostico::where('nombre', DiagnosticoEjemploSeeder::NOMBRE)->get();
+    expect($diagnosticos)->toHaveCount(1);
+
+    $contenido = $diagnosticos->first()->versiones()->firstOrFail()->contenido;
+    expect($contenido['categorias'])->toHaveCount(3)
+        ->and($contenido['categorias'][0]['nombre'])->toBe('Presencia en línea')
+        ->and($contenido['categorias'][0]['preguntas'])->toHaveCount(7)
+        ->and(collect($contenido['categorias'][0]['preguntas'])->pluck('tipo')->unique()->sort()->values()->all())
+        ->toBe(['abierta', 'opcion_unica', 'seleccion_multiple']);
 });
