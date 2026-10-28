@@ -20,7 +20,9 @@
  * estado de la cuenta con sus colaboradores en solo lectura (HU-033 CA-003)
  * y las acciones "Ver como esta empresa", "Asignar medición" y "Desactivar
  * cuenta" (A3.1f) o "Reactivar cuenta". No existe "restablecer contraseña"
- * (RN-006).
+ * (RN-006). Si la empresa se quedó sin cuenta principal (pasó al equipo de
+ * NuevasTIC), "Dar una cuenta principal" abre ModalCuentaPrincipal; sin ella
+ * no se reactiva.
  *
  * La pendiente también tiene "Enviar recordatorio" o "Reenviar aviso" con su
  * último aviso (A3.1e, HU-008).
@@ -46,6 +48,7 @@ import type { FormularioEmpresa } from '@/components/empresas/CamposEmpresa.vue'
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
 import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
+import ModalCuentaPrincipal from '@/components/empresas/ModalCuentaPrincipal.vue';
 import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
@@ -224,6 +227,7 @@ function guardar(): void {
 }
 
 const verColaboradores = ref(false);
+const modalCuenta = ref(false);
 
 const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
 </script>
@@ -748,6 +752,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         :opciones="opciones"
                         :errores="form.errors"
                         :sector-actual="empresa.sector_id"
+                        :sin-cuenta="!principal"
                     />
                 </fieldset>
                 <p
@@ -794,6 +799,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             <dd>
                                 <Etiqueta v-if="!empresa.activa" tono="aviso">
                                     ⊘ Desactivada
+                                </Etiqueta>
+                                <Etiqueta v-else-if="!principal" tono="alerta">
+                                    Sin cuenta principal
                                 </Etiqueta>
                                 <Etiqueta
                                     v-else-if="principal?.invitacion_pendiente"
@@ -914,6 +922,26 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     </p>
                 </section>
 
+                <!-- La cuenta principal pasó al equipo de NuevasTIC. -->
+                <section
+                    v-if="!principal"
+                    class="flex flex-col gap-3 rounded-xl border border-alerta/40 bg-alerta-suave p-5 text-sm"
+                >
+                    <h2 class="font-semibold text-alerta">
+                        Sin cuenta principal
+                    </h2>
+                    <p class="text-alerta">
+                        Nadie puede entrar por esta empresa. Dale una cuenta:
+                        uno de sus colaboradores o una cuenta nueva.
+                    </p>
+                    <Boton
+                        v-if="puede('empresas.registrar')"
+                        @click="modalCuenta = true"
+                    >
+                        Dar una cuenta principal
+                    </Boton>
+                </section>
+
                 <section
                     v-if="
                         puede('usuarios.gestionar') ||
@@ -950,7 +978,11 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             >
                                 Desactivar cuenta
                             </Boton>
-                            <Boton v-else @click="reactivar">
+                            <Boton
+                                v-else
+                                :disabled="!principal"
+                                @click="reactivar"
+                            >
                                 Reactivar cuenta
                             </Boton>
                         </template>
@@ -962,7 +994,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         {{
                             empresa.activa
                                 ? 'Desactivar impide entrar a la empresa; sus mediciones y resultados se conservan.'
-                                : 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar.'
+                                : !principal
+                                  ? 'Para reactivarla, primero dale una cuenta principal.'
+                                  : 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar.'
                         }}
                     </p>
                 </section>
@@ -1005,6 +1039,12 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
             @confirmar="asignar(true)"
         />
     </template>
+    <ModalCuentaPrincipal
+        v-if="!principal"
+        v-model:abierto="modalCuenta"
+        :empresa="empresa"
+        :colaboradores="colaboradores"
+    />
     <ModalDesactivarEmpresa
         v-model:abierto="modalDesactivar"
         :empresa="empresa"

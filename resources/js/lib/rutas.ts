@@ -99,6 +99,7 @@ export const rutas = {
         actualizar: (id: number) => `/empresas/${id}`,
         desactivar: (id: number) => `/empresas/${id}/desactivar`,
         reactivar: (id: number) => `/empresas/${id}/reactivar`,
+        cuentaPrincipal: (id: number) => `/empresas/${id}/cuenta-principal`,
     },
     mediciones: {
         asignar: (empresaId?: number) =>

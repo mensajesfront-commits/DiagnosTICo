@@ -16,8 +16,8 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
 use App\Http\Controllers\UsuariosController;
-use App\Http\Controllers\VerificacionCorreoController;
 use App\Http\Controllers\VerComoController;
+use App\Http\Controllers\VerificacionCorreoController;
 use Illuminate\Support\Facades\Route;
 
 // Al abrir el sistema se entra directo al inicio de sesión; con sesión
@@ -112,6 +112,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('empresas/{empresa}', [EmpresasController::class, 'actualizar'])->name('empresas.actualizar');
         Route::post('empresas/{empresa}/desactivar', [EmpresasController::class, 'desactivar'])->name('empresas.desactivar');
         Route::post('empresas/{empresa}/reactivar', [EmpresasController::class, 'reactivar'])->name('empresas.reactivar');
+        // A3.1d · Empresa sin cuenta principal: una nueva o uno de sus colaboradores.
+        Route::post('empresas/{empresa}/cuenta-principal', [EmpresasController::class, 'cuentaPrincipal'])->name('empresas.cuenta-principal');
     });
 
     Route::middleware('permission:empresas.ver')->group(function () {

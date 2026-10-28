@@ -221,3 +221,68 @@ it('abre Asignar medición con la empresa elegida, su pendiente y los borradores
             ->has("diagnosticos.{$this->sector->id}.publicados", 1)
             ->where("diagnosticos.{$this->sector->id}.borradores.0.nombre", 'Borrador nuevo'));
 });
+
+// --- Empresa sin cuenta principal (su cuenta pasó al equipo) ------------------
+
+function empresaSinCuenta(Sector $sector): Empresa
+{
+    $empresa = Empresa::factory()->create(['nombre' => 'Restaurante La Esquina', 'sector_id' => $sector->id, 'activa' => false]);
+
+    return $empresa;
+}
+
+it('da una cuenta principal nueva a una empresa que se quedó sin ella y le envía la invitación', function () {
+    Notification::fake();
+    $empresa = empresaSinCuenta($this->sector);
+
+    // Sin cuenta principal no se reactiva.
+    $this->actingAs($this->admin)->post(route('empresas.reactivar', $empresa))
+        ->assertSessionHasErrors(['reactivar' => 'Esta empresa no tiene cuenta principal: dale una antes de reactivarla.']);
+
+    $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), [
+        'origen' => 'nueva', 'usuario_nombre' => 'Sofía Rojas', 'email' => ' Sofia@LaEsquina.co ', 'cargo' => 'Gerente',
+    ])->assertSessionHasNoErrors();
+
+    $sofia = User::where('email', 'sofia@laesquina.co')->firstOrFail();
+    expect($sofia->hasRole('Empresa'))->toBeTrue()
+        ->and($sofia->empresa_id)->toBe($empresa->id)
+        ->and($sofia->password)->toBeNull();
+    Notification::assertSentTo($sofia, InvitacionCuenta::class);
+
+    $this->actingAs($this->admin)->post(route('empresas.reactivar', $empresa))->assertSessionHasNoErrors();
+    expect($empresa->fresh()->activa)->toBeTrue();
+
+    // Ya tiene: no se le da otra.
+    $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), [
+        'origen' => 'nueva', 'usuario_nombre' => 'Otra', 'email' => 'otra@laesquina.co',
+    ])->assertStatus(422);
+});
+
+it('un colaborador de la empresa puede pasar a ser su cuenta principal', function () {
+    Notification::fake();
+    $empresa = empresaSinCuenta($this->sector);
+    $andres = User::factory()->create(['empresa_id' => $empresa->id])->assignRole('Colaborador');
+    $andres->givePermissionTo('diagnostico.responder');
+    $otro = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole('Colaborador');
+
+    $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), ['origen' => 'colaborador', 'colaborador_id' => $otro->id])
+        ->assertSessionHasErrors('colaborador_id');
+
+    $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), ['origen' => 'colaborador', 'colaborador_id' => $andres->id])
+        ->assertSessionHasNoErrors();
+
+    $andres->refresh();
+    expect($andres->hasRole('Empresa'))->toBeTrue()
+        ->and($andres->esPrincipal())->toBeTrue()
+        ->and($andres->getDirectPermissions())->toBeEmpty();
+});
+
+it('sin cuenta principal se pueden guardar los datos de la empresa sin los del usuario', function () {
+    $empresa = empresaSinCuenta($this->sector);
+
+    $this->actingAs($this->admin)
+        ->put(route('empresas.actualizar', $empresa), datosEmpresa($this->sector, ['nombre' => 'La Esquina Gourmet', 'usuario_nombre' => '', 'email' => '']))
+        ->assertSessionHasNoErrors();
+
+    expect($empresa->fresh()->nombre)->toBe('La Esquina Gourmet');
+});

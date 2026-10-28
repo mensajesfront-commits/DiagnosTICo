@@ -8,13 +8,18 @@ use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\EmpresaDesactivada;
+use App\Notifications\RolCambiado;
+use App\Rules\CargoDelDueno;
+use App\Rules\TelefonoValido;
 use App\Services\Mediciones\AsignarMedicion;
 use App\Support\DatosEmpresas;
-use App\Support\Plazos;
 use App\Support\Invitaciones;
+use App\Support\Plazos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -143,9 +148,83 @@ class EmpresasController extends Controller
         return back();
     }
 
+    /**
+     * A3.1d · Dar una cuenta principal a una empresa que se quedó sin ella
+     * (su cuenta pasó al equipo de NuevasTIC, CambioDeRol). Puede ser una
+     * cuenta nueva, que recibe el correo para crear su contraseña (RN-006),
+     * o uno de sus colaboradores, que pasa al rol Empresa.
+     */
+    public function cuentaPrincipal(Request $request, Empresa $empresa): RedirectResponse
+    {
+        abort_if(DatosEmpresas::principal($empresa) !== null, 422, 'Esta empresa ya tiene cuenta principal.');
+
+        /** @var User $admin */
+        $admin = $request->user();
+        $request->merge(['email' => mb_strtolower(trim((string) $request->input('email')))]);
+
+        $datos = $request->validate([
+            'origen' => ['required', Rule::in(['nueva', 'colaborador'])],
+            'colaborador_id' => ['required_if:origen,colaborador', 'nullable', 'integer'],
+            'usuario_nombre' => ['required_if:origen,nueva', 'nullable', 'string', 'max:255'],
+            'cargo' => ['nullable', 'string', 'max:255', new CargoDelDueno($empresa->id, true)],
+            'email' => ['required_if:origen,nueva', 'nullable', 'string', 'email', 'max:255', Rule::unique(User::class)],
+            'usuario_telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
+        ], [
+            'email.unique' => 'Ese correo ya es de otra cuenta.',
+            'colaborador_id.required_if' => 'Elige el colaborador.',
+            'usuario_nombre.required_if' => 'Escribe el nombre.',
+            'email.required_if' => 'Escribe el correo.',
+        ], ['usuario_nombre' => 'nombre', 'email' => 'correo']);
+
+        if ($datos['origen'] === 'colaborador') {
+            /** @var User|null $cuenta */
+            $cuenta = $empresa->usuarios()->role('Colaborador')->whereKey($datos['colaborador_id'])->first();
+
+            if ($cuenta === null) {
+                throw ValidationException::withMessages(['colaborador_id' => 'Elige un colaborador de esta empresa.']);
+            }
+
+            DB::transaction(function () use ($cuenta): void {
+                $cuenta->syncRoles(['Empresa']);
+                // Como cuenta principal ve todo: ya no aplican sus páginas.
+                $cuenta->syncPermissions([]);
+                $cuenta->forceFill(['activo' => true])->save();
+            });
+            $cuenta->notify(new RolCambiado('Empresa'));
+            $mensaje = "{$cuenta->name} ahora es la cuenta principal de «{$empresa->nombre}».";
+        } else {
+            $cuenta = DB::transaction(function () use ($datos, $empresa): User {
+                $cuenta = User::create([
+                    'name' => trim((string) $datos['usuario_nombre']),
+                    'cargo' => filled($datos['cargo'] ?? null) ? trim((string) $datos['cargo']) : null,
+                    'email' => $datos['email'],
+                    'telefono' => $datos['usuario_telefono'] ?? null,
+                    'empresa_id' => $empresa->id,
+                    'password' => null,
+                ]);
+                $cuenta->assignRole('Empresa');
+
+                return $cuenta;
+            });
+            Invitaciones::enviar($cuenta, 'Empresa', null, $admin->name);
+            $mensaje = "Enviamos a {$cuenta->email} el enlace para crear su contraseña.";
+        }
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $empresa->activa
+            ? $mensaje
+            : $mensaje.' La empresa sigue desactivada: reactívala para que pueda entrar.']);
+
+        return back();
+    }
+
     /** Reactivar desde la misma ficha (HU-035 CA-006). */
     public function reactivar(Empresa $empresa): RedirectResponse
     {
+        // Sin cuenta principal nadie podría entrar: primero se le da una.
+        if (DatosEmpresas::principal($empresa) === null) {
+            throw ValidationException::withMessages(['reactivar' => 'Esta empresa no tiene cuenta principal: dale una antes de reactivarla.']);
+        }
+
         DB::transaction(function () use ($empresa): void {
             $empresa->update(['activa' => true, 'desactivada_en' => null, 'motivo_desactivacion' => null]);
             DatosEmpresas::principal($empresa)?->forceFill(['activo' => true])->save();
