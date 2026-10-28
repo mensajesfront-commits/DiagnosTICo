@@ -50,7 +50,7 @@ Se hizo desde el frontend para poder probar el registro y el menú de la empresa
 | Modelos | `app/Models/Sector.php`, `app/Models/Empresa.php`, `User::empresa()` | `Sector::activos()` para RN-003 |
 | Roles y permisos | `database/seeders/RolesYPermisosSeeder.php` | La matriz de `17_SEGURIDAD.md` (3 roles, 15 permisos) |
 | Sectores de ejemplo | `database/seeders/SectoresSeeder.php` | 6 sectores (se quitó Talleres, 9 de octubre). **[INFORMACIÓN PENDIENTE]** lista real |
-| Administrador inicial | `database/seeders/DatabaseSeeder.php`, `config/diagnostico.php` | `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `.env` |
+| Administrador inicial | `database/seeders/DatabaseSeeder.php`, `config/diagnostico.php` | `ADMIN_EMAIL` en `.env`; se crea sin contraseña y recibe la invitación (`App\Support\AdministradorPrincipal`, `php artisan admin:invitar`) |
 | Registro | `app/Actions/Fortify/CreateNewUser.php` | Valida los campos de L2 y crea empresa + usuario en una transacción |
 | Pruebas | `tests/Feature/Auth/RegistrationTest.php` | Solo sectores activos, registro completo, sector inactivo y términos |
 

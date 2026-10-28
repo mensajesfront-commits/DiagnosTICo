@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Support\AdministradorPrincipal;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,9 +16,11 @@ class DatabaseSeeder extends Seeder
      * Administrador (T-046). Los niveles son fijos (RN-019) y están en
      * App\Support\Niveles.
      *
-     * El correo y la contraseña del Administrador salen de ADMIN_EMAIL y
-     * ADMIN_PASSWORD en .env (config/diagnostico.php). Sin contraseña, se
-     * genera una y se muestra.
+     * La cuenta del Administrador es la cuenta principal: su correo sale de
+     * ADMIN_EMAIL en .env (lo define NuevasTIC al lanzar). Se crea sin
+     * contraseña y le llega el correo para crearla (RN-006): nadie más la
+     * conoce. Si el correo falla, se muestra el enlace; se reenvía con
+     * `php artisan admin:invitar`.
      */
     public function run(): void
     {
@@ -37,18 +39,23 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $definida = (string) config('diagnostico.admin.password');
-        $contrasena = $definida !== '' ? $definida : Str::password(12, symbols: false);
-
         $admin = User::create([
             'name' => 'Administrador',
             'email' => $correo,
-            'password' => $contrasena,
+            'password' => null,
         ]);
-        // Cuenta principal: ningún otro Administrador le quita el rol.
+        // El enlace del correo también confirma el correo.
         $admin->forceFill(['email_verified_at' => now(), 'administrador_principal' => true])->save();
         $admin->assignRole('Administrador');
 
-        $this->command->info("Administrador creado: {$correo}".($definida !== '' ? '' : " · contraseña: {$contrasena}"));
+        $enlace = AdministradorPrincipal::invitar($admin);
+
+        if ($enlace === null) {
+            $this->command->info("Administrador principal creado: {$correo}. Le enviamos el correo para crear su contraseña.");
+        } else {
+            $this->command->warn("Administrador principal creado: {$correo}, pero no se pudo enviar el correo (revisa MAIL_* en .env).");
+            $this->command->line("Enlace para crear la contraseña: {$enlace}");
+            $this->command->line('Para reenviar el correo: php artisan admin:invitar');
+        }
     }
 }

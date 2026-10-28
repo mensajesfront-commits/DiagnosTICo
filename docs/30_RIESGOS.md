@@ -143,5 +143,5 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
 - **Medidas:**
   - las claves van solo en `.env`, que no se sube;
   - `.env.example` lleva solo marcadores;
-  - el Administrador inicial sale de `ADMIN_EMAIL` y `ADMIN_PASSWORD`;
+  - el Administrador inicial sale de `ADMIN_EMAIL` y crea su contraseña con el correo de invitación;
   - ya no hay cuentas de demostración con contraseñas conocidas.

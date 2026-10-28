@@ -3,12 +3,12 @@
 return [
 
     /*
-    | Cuenta inicial del Administrador que crea `php artisan db:seed` (T-046).
-    | Sin contraseña, el seeder genera una y la muestra en la terminal.
+    | Cuenta principal del Administrador que crea `php artisan db:seed`
+    | (T-046). Se crea sin contraseña: le llega el correo para crearla
+    | (RN-006). Se reenvía con `php artisan admin:invitar`.
     */
     'admin' => [
         'email' => env('ADMIN_EMAIL', 'admin@nuevastic.co'),
-        'password' => env('ADMIN_PASSWORD'),
     ],
 
     /*

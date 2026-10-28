@@ -47,7 +47,7 @@ Después:
   - `IA_DE_PRUEBA=false`;
   - `MAIL_*` con el servidor SMTP real;
   - `LARAVEL_PDF_CHROME_PATH`;
-  - `ADMIN_EMAIL` y `ADMIN_PASSWORD` para la primera cuenta.
+  - `ADMIN_EMAIL` para la cuenta principal del Administrador (la elige NuevasTIC). Configura `MAIL_*` antes de `db:seed`: a ese correo le llega "Crear mi contraseña". Si no llega, `php artisan admin:invitar` lo reenvía o muestra el enlace.
 - **Rutas de prueba técnica:** `/prueba-tecnica/*` solo existen con `APP_ENV=local`; en producción no se cargan.
 
 ### Actualizar a una versión nueva
