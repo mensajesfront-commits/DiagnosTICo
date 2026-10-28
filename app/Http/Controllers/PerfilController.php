@@ -11,9 +11,15 @@ use App\Services\Acceso\CodigoVerificacion;
 use App\Support\HistorialContrasenas;
 use App\Support\OpcionesPerfil;
 use App\Support\Ubicaciones;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -55,6 +61,10 @@ class PerfilController extends Controller
                 'telefono_pendiente' => $usuario->telefono_pendiente,
             ],
             'rol' => $rol,
+            // Solo la cuenta principal del Administrador se elimina a sí misma.
+            'principal' => $usuario->administrador_principal ? [
+                'sucesores' => self::sucesores($usuario)->map(fn (User $u) => ['id' => $u->id, 'nombre' => $u->name, 'correo' => $u->email])->values()->all(),
+            ] : null,
             'empresa' => $empresa ? [
                 'nombre' => $empresa->nombre,
                 'sector' => $empresa->sector?->nombre,
@@ -221,6 +231,65 @@ class PerfilController extends Controller
         $usuario->forceFill(['email_pendiente' => null, 'telefono_pendiente' => null, 'codigo_verificacion' => null, 'codigo_vence_en' => null])->save();
 
         return to_route('profile.edit');
+    }
+
+    /**
+     * A6 · La cuenta principal del Administrador se elimina a sí misma
+     * (DEC-017: recuperable 90 días). Antes elige a otro Administrador
+     * activo como nueva cuenta principal y escribe su propio correo.
+     */
+    public function eliminarCuenta(Request $request): RedirectResponse
+    {
+        /** @var User $yo */
+        $yo = $request->user();
+        abort_unless($yo->administrador_principal, 403, 'Solo la cuenta principal del Administrador se elimina desde aquí.');
+
+        $datos = $request->validate([
+            'sucesor_id' => ['required', 'integer', Rule::in(self::sucesores($yo)->modelKeys())],
+            'confirmacion' => ['required', 'string'],
+        ], [
+            'sucesor_id.required' => 'Elige quién queda como cuenta principal.',
+            'sucesor_id.in' => 'Elige un Administrador activo.',
+            'confirmacion.required' => 'Escribe tu correo para confirmar.',
+        ]);
+
+        if (trim($datos['confirmacion']) !== $yo->email) {
+            throw ValidationException::withMessages(['confirmacion' => 'El correo no coincide. Escríbelo exactamente como aparece.']);
+        }
+
+        /** @var User $sucesor */
+        $sucesor = User::findOrFail($datos['sucesor_id']);
+
+        DB::transaction(function () use ($yo, $sucesor): void {
+            $yo->forceFill(['administrador_principal' => false])->save();
+            $sucesor->forceFill(['administrador_principal' => true])->save();
+            DB::table('password_reset_tokens')->where('email', $yo->email)->delete();
+            $yo->delete();
+        });
+
+        Log::info('Cuenta principal eliminada por sí misma (recuperable)', ['cuenta_id' => $yo->id, 'nueva_principal' => $sucesor->id]);
+
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return to_route('login')->with('status', "Eliminaste tu cuenta. {$sucesor->name} es ahora la cuenta principal del Administrador.");
+    }
+
+    /**
+     * Administradores que pueden quedar como cuenta principal: activos, con
+     * contraseña creada y sin eliminar.
+     *
+     * @return Collection<int, User>
+     */
+    private static function sucesores(User $yo): Collection
+    {
+        return User::role('Administrador')
+            ->whereKeyNot($yo->id)
+            ->where('activo', true)
+            ->whereNotNull('password')
+            ->orderBy('name')
+            ->get();
     }
 
     public function contrasena(CambiarContrasenaRequest $request): RedirectResponse

@@ -37,6 +37,10 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['permission:contrasena.cambiar', 'throttle:6,1'])
         ->name('user-password.update');
 
+    // A6 · La cuenta principal del Administrador se elimina a sí misma,
+    // eligiendo quién queda como principal (nadie más puede eliminarla).
+    Route::delete('mi-perfil/cuenta', [PerfilController::class, 'eliminarCuenta'])->name('perfil.eliminar');
+
     Route::get('imagenes/{tipo}/{id}', [PerfilController::class, 'imagen'])
         ->whereIn('tipo', ['usuario', 'empresa'])
         ->whereNumber('id')

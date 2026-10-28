@@ -98,7 +98,7 @@ El envío de correos y el análisis de la IA corren en segundo plano. Para que f
 ./vendor/bin/sail artisan prueba:ia                     # una llamada real a OpenAI (necesita la clave)
 ```
 
-`migrate --seed` crea los roles con sus permisos, los sectores de ejemplo y la cuenta del Administrador. El correo y la contraseña salen de `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `.env`; si dejas la contraseña vacía, el seeder genera una y la muestra en la terminal. El seeder se puede correr de nuevo sin duplicar nada (`./vendor/bin/sail artisan db:seed`).
+`migrate --seed` crea los roles con sus permisos, los sectores de ejemplo y la cuenta del Administrador. El correo y la contraseña salen de `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `.env`; esa es la **cuenta principal**: ningún otro Administrador la desactiva ni la elimina, y NuevasTIC elige su correo al lanzar el proyecto; si dejas la contraseña vacía, el seeder genera una y la muestra en la terminal. El seeder se puede correr de nuevo sin duplicar nada (`./vendor/bin/sail artisan db:seed`).
 
 - **Cuenta de empresa:** regístrate en `/register`. Queda con el rol Empresa y su menú.
 - **Cuenta de Administrador:** entra con la del seeder. Las pantallas de la prueba técnica y las vistas previas (`/prueba-tecnica/*`) solo existen con `APP_ENV=local`.

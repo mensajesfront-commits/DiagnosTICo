@@ -32,6 +32,7 @@ import Interruptor from '@/components/base/Interruptor.vue';
 import Modal from '@/components/base/Modal.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import FormularioContrasena from '@/components/perfil/FormularioContrasena.vue';
+import ModalEliminarMiCuenta from '@/components/perfil/ModalEliminarMiCuenta.vue';
 import { usePermisos } from '@/composables/usePermisos';
 import SelectorUbicacion from '@/components/ubicacion/SelectorUbicacion.vue';
 import { haceCuanto, mesYAnio, momento } from '@/lib/fechas';
@@ -83,6 +84,13 @@ const props = defineProps<{
     empresa: Empresa | null;
     /** Solo la cuenta principal de la empresa cambia sus datos (RN-025). */
     editaEmpresa: boolean;
+    /**
+     * Cuenta principal del Administrador: puede eliminarse a sí misma,
+     * eligiendo a otro Administrador activo (sucesores) en su lugar.
+     */
+    principal: {
+        sucesores: { id: number; nombre: string; correo: string }[];
+    } | null;
     opciones: {
         /** Los 18 países de Hispanoamérica (DEC-016). */
         paises: Pais[];
@@ -221,6 +229,7 @@ function elegirFoto(evento: Event): void {
 }
 
 const modalContrasena = ref(false);
+const modalEliminar = ref(false);
 
 function cerrarSesion(): void {
     router.flushAll();
@@ -403,6 +412,28 @@ function cerrarSesion(): void {
                             <LogOut class="size-4" aria-hidden="true" />
                             Cerrar sesión
                         </Link>
+                    </div>
+
+                    <!-- Solo la cuenta principal del Administrador se elimina a sí misma. -->
+                    <div v-if="principal" class="border-t border-linea pt-5">
+                        <h2 class="font-semibold">Cuenta principal</h2>
+                        <p class="mt-1 text-xs text-tinta-suave">
+                            Ningún otro Administrador puede desactivar ni
+                            eliminar esta cuenta. Solo tú puedes eliminarla,
+                            eligiendo quién queda en tu lugar.
+                        </p>
+                        <button
+                            v-if="principal.sucesores.length > 0"
+                            type="button"
+                            class="mt-3 text-sm text-aviso underline underline-offset-2 hover:opacity-80"
+                            @click="modalEliminar = true"
+                        >
+                            Eliminar mi cuenta
+                        </button>
+                        <p v-else class="mt-3 text-xs text-tinta-suave">
+                            Para eliminarla, primero invita a otro Administrador
+                            y espera a que cree su contraseña.
+                        </p>
                     </div>
                 </section>
             </div>
@@ -835,6 +866,13 @@ function cerrarSesion(): void {
             </Boton>
         </template>
     </Modal>
+
+    <ModalEliminarMiCuenta
+        v-if="principal"
+        v-model:abierto="modalEliminar"
+        :correo="usuario.email"
+        :sucesores="principal.sucesores"
+    />
 
     <ModalVerificarCorreo
         v-if="usuario.email_pendiente || usuario.telefono_pendiente"

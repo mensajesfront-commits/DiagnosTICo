@@ -393,3 +393,35 @@ it('quitar el teléfono no pide código', function () {
     expect($admin->fresh()->telefono)->toBeNull();
     Notification::assertNothingSent();
 });
+
+it('solo la cuenta principal se elimina a sí misma y deja a otro Administrador como principal', function () {
+    $principal = User::factory()->create(['email' => 'admin@nuevastic.co'])->assignRole('Administrador');
+    $principal->forceFill(['administrador_principal' => true])->save();
+    $ana = User::factory()->create(['name' => 'Ana Torres'])->assignRole('Administrador');
+    $invitada = User::factory()->create(['password' => null])->assignRole('Administrador');
+
+    // Otro Administrador no puede.
+    $this->actingAs($ana)->delete(route('perfil.eliminar'), ['sucesor_id' => $principal->id, 'confirmacion' => $ana->email])->assertForbidden();
+
+    $this->actingAs($principal)->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->has('principal.sucesores', 1)->where('principal.sucesores.0.nombre', 'Ana Torres'));
+
+    $this->actingAs($principal)->delete(route('perfil.eliminar'), ['sucesor_id' => $invitada->id, 'confirmacion' => 'admin@nuevastic.co'])
+        ->assertSessionHasErrors('sucesor_id');
+    $this->actingAs($principal)->delete(route('perfil.eliminar'), ['sucesor_id' => $ana->id, 'confirmacion' => 'otro@nuevastic.co'])
+        ->assertSessionHasErrors('confirmacion');
+
+    $this->actingAs($principal)->delete(route('perfil.eliminar'), ['sucesor_id' => $ana->id, 'confirmacion' => 'admin@nuevastic.co'])
+        ->assertRedirect(route('login'));
+
+    $this->assertGuest();
+    expect($principal->fresh()->trashed())->toBeTrue()
+        ->and($principal->fresh()->administrador_principal)->toBeFalse()
+        ->and($ana->fresh()->administrador_principal)->toBeTrue();
+});
+
+it('las demás cuentas no reciben la opción de eliminarse', function () {
+    $admin = User::factory()->create()->assignRole('Administrador');
+
+    $this->actingAs($admin)->get(route('profile.edit'))->assertInertia(fn (Assert $page) => $page->where('principal', null));
+});

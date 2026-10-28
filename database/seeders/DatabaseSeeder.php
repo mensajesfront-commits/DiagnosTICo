@@ -26,7 +26,14 @@ class DatabaseSeeder extends Seeder
 
         $correo = (string) config('diagnostico.admin.email');
 
-        if (User::where('email', $correo)->exists()) {
+        $existente = User::where('email', $correo)->first();
+
+        if ($existente !== null) {
+            // Cuenta principal: la de ADMIN_EMAIL, si todavía no hay una.
+            if ($existente->hasRole('Administrador') && ! User::where('administrador_principal', true)->exists()) {
+                $existente->forceFill(['administrador_principal' => true])->save();
+            }
+
             return;
         }
 
