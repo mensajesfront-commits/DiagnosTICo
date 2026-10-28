@@ -73,6 +73,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 ### Cambiado (responder el diagnóstico más fácil de leer, 28 de octubre)
 
 - **E2 · Responder:** el cuestionario usa casi todo el ancho (hasta 64rem, antes 48rem); la pregunta va en 18 px y las opciones en 16 px; cada opción es un recuadro grande con borde (también las de "Marca todas las que apliquen"), con el foco del teclado visible; "Cómo responder" en un recuadro; número de la pregunta en un círculo que pasa a ✓ y la marca "Respondida". Pedido del equipo para leer mejor, también con baja visión.
+- **E3 · Revisa antes de enviar:** el mismo diseño que E2: hasta 64rem de ancho, nombres de categoría en 18 px, avance en 16 px y botones grandes "Completar" o "Revisar" en cada categoría.
 - **Barra de arriba (E2–E4) en celular:** el avance pasa a un segundo renglón y ya no se monta sobre "Guardado" ni "Guardar y salir".
 - **Diagnóstico de ejemplo:** `php artisan db:seed --class=DiagnosticoEjemploSeeder` publica en el sector Comidas un diagnóstico de EJEMPLO con 3 categorías ("Presencia en línea" con 7 preguntas de los tres tipos). No es de NuevasTIC y no lo carga la instalación.
 
