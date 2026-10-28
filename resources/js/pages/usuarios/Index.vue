@@ -156,7 +156,7 @@ const enlaceEliminar = 'text-aviso hover:underline';
 </script>
 
 <template>
-    <Head title="Usuarios y roles" />
+    <Head title="Usuarios" />
 
     <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
         <EncabezadoUsuarios class="shrink-0" pestana="usuarios">
