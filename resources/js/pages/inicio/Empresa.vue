@@ -364,7 +364,8 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     >
                         Ver el avance del análisis
                     </Boton>
-                    <template v-else>
+                    <!-- Solo la vencida pide una nueva fecha (HU-082). -->
+                    <template v-else-if="p.estado === 'vencida'">
                         <Boton
                             v-if="!p.solicitud_abierta"
                             variante="secundario"

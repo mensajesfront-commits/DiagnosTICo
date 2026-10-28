@@ -75,6 +75,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **Desactivar un rol (A5.1c)** bloquea a sus cuentas: no entran y se les cierra la sesión hasta que les asignes otro rol. Antes no se podía desactivar un rol con cuentas. Al desmarcar "Rol activo" sale el aviso con cuántas cuentas quedan fuera; en A5 esas cuentas dicen "Rol inactivo: no puede entrar". Nadie desactiva su propio rol.
 - **Páginas de cada colaborador (E12.1, E12.3):** la cuenta principal elige qué ve cada colaborador: "Responder el diagnóstico", "Resultados y Mi historial" y "Descargar el informe PDF" (pide también los resultados). La lista de E12 tiene la columna "Puede ver". Los colaboradores que ya existían conservan las tres (migración `paginas_por_colaborador`). Para agregar una página nueva basta con sumarla en `App\Support\PaginasColaborador`.
 - **El colaborador no cambia su perfil ni su contraseña (E11):** Mi perfil queda en solo lectura con un aviso; sin "Cambiar contraseña". "¿Olvidaste tu contraseña?" le manda un correo que dice que se la cambia la cuenta principal. El rol Colaborador queda sin permisos; las rutas de Mi perfil ahora piden "Editar su perfil" y "Cambiar su contraseña".
+- Corregido (E1): con una medición no iniciada o en curso también salían "Pedir una nueva fecha" y el correo de soporte; ahora solo salen cuando la medición venció (HU-082).
 - E1 sin "Responder" muestra "Tu empresa no te dio acceso para responder el diagnóstico."; sin "Resultados" no recibe puntajes.
 
 ### Cambiado (Usuarios y roles fija, 26 de octubre)
