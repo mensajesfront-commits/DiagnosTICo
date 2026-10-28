@@ -13,6 +13,8 @@ use Spatie\Permission\Models\Role;
  * cuenta y Crear rol con cuentas).
  *
  * - La cuenta del Administrador principal no cambia de rol.
+ * - Un colaborador no cambia de rol: solo lo desactivan o lo eliminan el
+ *   Administrador o la cuenta principal de su empresa (RN-025).
  * - Una cuenta de empresa que pasa a un rol interno (Administrador o uno
  *   creado) deja la empresa: los roles internos no tienen empresa. Se
  *   borra su contraseña y le llega la invitación para crear una nueva, como
@@ -28,6 +30,10 @@ final class CambioDeRol
     {
         if ($cuenta->administrador_principal) {
             throw ValidationException::withMessages([$campo => 'Es la cuenta principal del Administrador: nadie le puede quitar el rol.']);
+        }
+
+        if ($cuenta->hasRole('Colaborador')) {
+            throw ValidationException::withMessages([$campo => 'Los colaboradores no cambian de rol: solo se desactivan o se eliminan.']);
         }
     }
 

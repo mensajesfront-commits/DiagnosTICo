@@ -48,7 +48,11 @@ watch(
 
 const coincidentes = computed(() =>
     props.cuentas.filter(
-        (c) => !c.es_admin_principal && coincide(c, busqueda.value),
+        // Ni el Administrador principal ni los colaboradores cambian de rol.
+        (c) =>
+            !c.es_admin_principal &&
+            c.rol !== 'Colaborador' &&
+            coincide(c, busqueda.value),
     ),
 );
 const visibles = computed(() => coincidentes.value.slice(0, MOSTRAR));

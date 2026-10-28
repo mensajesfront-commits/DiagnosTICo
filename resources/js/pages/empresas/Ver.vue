@@ -931,8 +931,8 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         Sin cuenta principal
                     </h2>
                     <p class="text-alerta">
-                        Nadie puede entrar por esta empresa. Dale una cuenta:
-                        uno de sus colaboradores o una cuenta nueva.
+                        Nadie puede entrar por esta empresa. Dale una cuenta
+                        nueva: le llega un correo para crear su contraseña.
                     </p>
                     <Boton
                         v-if="puede('empresas.registrar')"
@@ -1043,7 +1043,6 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
         v-if="!principal"
         v-model:abierto="modalCuenta"
         :empresa="empresa"
-        :colaboradores="colaboradores"
     />
     <ModalDesactivarEmpresa
         v-model:abierto="modalDesactivar"

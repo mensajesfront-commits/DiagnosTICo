@@ -1,7 +1,6 @@
 <script setup lang="ts">
 /**
  * Opción de rol con radio, título y explicación (Invitar usuario y A5.5).
- * También la usa "Dar una cuenta principal" (A3.1d), con valores de texto.
  * Un rol inactivo se ve gris, no se puede elegir y lleva la etiqueta
  * "Próxima fase" (HU-050 CA-003).
  */
@@ -10,7 +9,7 @@ import { cn } from '@/lib/utils';
 
 defineProps<{
     nombre: string;
-    valor: number | string;
+    valor: number;
     titulo: string;
     descripcion?: string | null;
     deshabilitada?: boolean;
@@ -19,7 +18,7 @@ defineProps<{
     tonoEtiqueta?: 'neutro' | 'alerta';
 }>();
 
-const modelo = defineModel<number | string | null>({ required: true });
+const modelo = defineModel<number | null>({ required: true });
 </script>
 
 <template>

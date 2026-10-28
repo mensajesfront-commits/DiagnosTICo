@@ -256,8 +256,12 @@ function guardar(): void {
                     >
                         Administrador principal
                     </span>
+                    <!-- Los colaboradores no cambian de rol (RN-025). -->
                     <button
-                        v-else-if="puede('usuarios.gestionar')"
+                        v-else-if="
+                            puede('usuarios.gestionar') &&
+                            rol.nombre !== 'Colaborador'
+                        "
                         type="button"
                         class="text-sm text-marca hover:underline"
                         @click="emit('cambiarRol', cuenta.id)"
@@ -305,8 +309,9 @@ function guardar(): void {
                     </Link>
                 </template>
                 <template v-else-if="rol.nombre === 'Colaborador'">
-                    Los colaboradores los crea cada empresa desde su menú; aquí
-                    solo puedes verlos o desactivarlos.
+                    Los colaboradores los crea cada empresa desde su menú y no
+                    cambian de rol; aquí solo puedes verlos, desactivarlos o
+                    eliminarlos.
                     <Link
                         :href="rutas.usuarios.lista('Colaborador')"
                         class="text-marca underline underline-offset-2"

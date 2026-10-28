@@ -416,18 +416,32 @@ it('no deja desactivar el propio rol', function () {
     expect((bool) $rol->fresh()->getAttribute('activo'))->toBeTrue();
 });
 
-it('al pasar un colaborador a otro rol pierde las páginas que le dio su empresa', function () {
+it('un colaborador no cambia de rol por ningún camino; sí se desactiva y se elimina', function () {
     $laura = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole('Empresa');
     $andres = User::factory()->create(['empresa_id' => $laura->empresa_id])->assignRole('Colaborador');
-    $andres->givePermissionTo(['diagnostico.responder', 'resultados.ver']);
+    $andres->givePermissionTo(['diagnostico.responder']);
     $rol = Role::create(['name' => 'Solo lectura', 'guard_name' => 'web']);
     $rol->forceFill(['activo' => true])->save();
+    $mensaje = 'Los colaboradores no cambian de rol: solo se desactivan o se eliminan.';
 
-    $this->actingAs($this->admin)
-        ->put(route('usuarios.cambiar-rol', $andres), ['rol_id' => $rol->id])
-        ->assertSessionHasNoErrors();
+    $this->actingAs($this->admin)->put(route('usuarios.cambiar-rol', $andres), ['rol_id' => $rol->id])
+        ->assertSessionHasErrors(['rol_id' => $mensaje]);
+    $this->actingAs($this->admin)->put(route('usuarios.cambiar-rol', $andres), ['rol_id' => Role::findByName('Administrador')->id])
+        ->assertSessionHasErrors(['rol_id' => $mensaje]);
+    $this->actingAs($this->admin)->post(route('roles.asignar', $rol), ['cuenta_id' => $andres->id])
+        ->assertSessionHasErrors(['cuenta_id' => $mensaje]);
+    $this->actingAs($this->admin)->post(route('roles.store'), ['nombre' => 'Otro', 'activo' => true, 'permisos' => [], 'cuentas' => [$andres->id]])
+        ->assertSessionHasErrors(['cuentas' => $mensaje]);
 
-    expect($andres->fresh()->getDirectPermissions())->toBeEmpty();
+    $andres->refresh();
+    expect($andres->hasRole('Colaborador'))->toBeTrue()
+        ->and($andres->empresa_id)->toBe($laura->empresa_id)
+        ->and($andres->can('diagnostico.responder'))->toBeTrue();
+
+    $this->actingAs($this->admin)->post(route('usuarios.desactivar', $andres))->assertSessionHasNoErrors();
+    expect($andres->fresh()->activo)->toBeFalse();
+    $this->actingAs($this->admin)->delete(route('usuarios.eliminar', $andres), ['confirmacion' => $andres->email])->assertSessionHasNoErrors();
+    expect($andres->fresh()->trashed())->toBeTrue();
 });
 
 it('nadie le quita el rol, desactiva ni elimina al Administrador principal', function () {

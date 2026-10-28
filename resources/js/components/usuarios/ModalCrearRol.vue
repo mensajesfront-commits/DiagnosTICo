@@ -61,7 +61,8 @@ const sugerencias = computed(() =>
                   (c) =>
                       !form.cuentas.includes(c.id) &&
                       !c.es_tuya &&
-                      !c.es_admin_principal,
+                      !c.es_admin_principal &&
+                      c.rol !== 'Colaborador',
               )
               .filter((c) => coincide(c, busqueda.value))
               .slice(0, 5),

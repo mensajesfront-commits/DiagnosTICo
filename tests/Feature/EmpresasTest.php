@@ -240,7 +240,7 @@ it('da una cuenta principal nueva a una empresa que se quedó sin ella y le env�
         ->assertSessionHasErrors(['reactivar' => 'Esta empresa no tiene cuenta principal: dale una antes de reactivarla.']);
 
     $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), [
-        'origen' => 'nueva', 'usuario_nombre' => 'Sofía Rojas', 'email' => ' Sofia@LaEsquina.co ', 'cargo' => 'Gerente',
+        'usuario_nombre' => 'Sofía Rojas', 'email' => ' Sofia@LaEsquina.co ', 'cargo' => 'Gerente',
     ])->assertSessionHasNoErrors();
 
     $sofia = User::where('email', 'sofia@laesquina.co')->firstOrFail();
@@ -254,27 +254,19 @@ it('da una cuenta principal nueva a una empresa que se quedó sin ella y le env�
 
     // Ya tiene: no se le da otra.
     $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), [
-        'origen' => 'nueva', 'usuario_nombre' => 'Otra', 'email' => 'otra@laesquina.co',
+        'usuario_nombre' => 'Otra', 'email' => 'otra@laesquina.co',
     ])->assertStatus(422);
 });
 
-it('un colaborador de la empresa puede pasar a ser su cuenta principal', function () {
+it('un colaborador no pasa a ser la cuenta principal: se le da una cuenta nueva', function () {
     Notification::fake();
     $empresa = empresaSinCuenta($this->sector);
     $andres = User::factory()->create(['empresa_id' => $empresa->id])->assignRole('Colaborador');
-    $andres->givePermissionTo('diagnostico.responder');
-    $otro = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole('Colaborador');
 
-    $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), ['origen' => 'colaborador', 'colaborador_id' => $otro->id])
-        ->assertSessionHasErrors('colaborador_id');
+    $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), ['colaborador_id' => $andres->id])
+        ->assertSessionHasErrors(['usuario_nombre', 'email']);
 
-    $this->actingAs($this->admin)->post(route('empresas.cuenta-principal', $empresa), ['origen' => 'colaborador', 'colaborador_id' => $andres->id])
-        ->assertSessionHasNoErrors();
-
-    $andres->refresh();
-    expect($andres->hasRole('Empresa'))->toBeTrue()
-        ->and($andres->esPrincipal())->toBeTrue()
-        ->and($andres->getDirectPermissions())->toBeEmpty();
+    expect($andres->fresh()->hasRole('Colaborador'))->toBeTrue();
 });
 
 it('sin cuenta principal se pueden guardar los datos de la empresa sin los del usuario', function () {
