@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\ActividadEconomica;
+use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\CodigoVerificacionCorreo;
@@ -179,7 +180,7 @@ it('borra a los 7 días el registro sin verificar con su empresa; el verificado 
     $this->artisan('cuentas:purgar')->assertSuccessful();
 
     expect(User::withTrashed()->find($laura->id))->toBeNull()
-        ->and(App\Models\Empresa::withTrashed()->find($empresaId))->toBeNull()
+        ->and(Empresa::withTrashed()->find($empresaId))->toBeNull()
         ->and(User::find($verificada->id))->not->toBeNull()
         ->and(User::find($invitada->id))->not->toBeNull();
 

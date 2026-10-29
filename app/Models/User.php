@@ -10,12 +10,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -140,7 +140,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /** Su rol está desactivado (A5.1c). */
     public function rolInactivo(): bool
     {
-        return $this->roles->contains(fn (Role $rol): bool => ! (bool) ($rol->getAttribute('activo') ?? true));
+        return $this->roles->contains(fn (Model $rol): bool => ! (bool) ($rol->getAttribute('activo') ?? true));
     }
 
     /** Invitada que todavía no crea su contraseña (A5). */

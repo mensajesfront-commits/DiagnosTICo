@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  * Una vez que una empresa responde una versión de un diagnóstico (RN-015).
  *
  * @property int $id
- * @property int|null $empresa_id  null: la empresa se borró y la medición quedó sin nombre
+ * @property int|null $empresa_id null: la empresa se borró y la medición quedó sin nombre
  * @property int $version_diagnostico_id
  * @property int $numero
  * @property string $estado

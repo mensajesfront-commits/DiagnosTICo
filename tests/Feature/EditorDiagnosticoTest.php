@@ -1,6 +1,5 @@
 <?php
 
-use Spatie\Permission\Models\Role;
 use App\Models\Categoria;
 use App\Models\Diagnostico;
 use App\Models\DiagnosticoCategoria;
@@ -14,6 +13,7 @@ use App\Services\Diagnosticos\ContenidoDiagnostico;
 use App\Support\EstadoDiagnostico;
 use Database\Seeders\RolesYPermisosSeeder;
 use Inertia\Testing\AssertableInertia as Assert;
+use Spatie\Permission\Models\Role;
 
 /*
  * A2.1 · Editor del diagnóstico (HU-023 a HU-029).

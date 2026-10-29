@@ -2,17 +2,17 @@
 
 namespace App\Actions\Fortify;
 
-use Closure;
-use App\Rules\TelefonoValido;
-use App\Support\Captcha;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Rules\DepartamentoDelPais;
-use App\Support\Ubicaciones;
+use App\Rules\TelefonoValido;
+use App\Support\Captcha;
 use App\Support\HistorialContrasenas;
+use App\Support\Ubicaciones;
+use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;

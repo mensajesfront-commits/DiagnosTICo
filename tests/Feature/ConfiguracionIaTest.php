@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Cache;
 use App\Models\AnalisisCategoria;
 use App\Models\Diagnostico;
 use App\Models\Empresa;
@@ -13,6 +12,7 @@ use App\Services\Ia\Analizador;
 use App\Services\Ia\AnalizadorDePrueba;
 use App\Services\Ia\ArmadorPrompt;
 use Database\Seeders\RolesYPermisosSeeder;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /*

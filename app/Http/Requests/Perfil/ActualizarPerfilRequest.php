@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\Perfil;
 
-use App\Rules\CargoDelDueno;
-use App\Rules\TelefonoValido;
 use App\Concerns\ProfileValidationRules;
 use App\Models\ActividadEconomica;
 use App\Models\User;
+use App\Rules\CargoDelDueno;
 use App\Rules\DepartamentoDelPais;
+use App\Rules\TelefonoValido;
 use App\Support\OpcionesPerfil;
 use App\Support\Ubicaciones;
 use Illuminate\Contracts\Validation\ValidationRule;
