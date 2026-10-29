@@ -567,6 +567,17 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `inicio` | timestamp | Sí | `2026-10-26 10:00:00` | |
 | `fin` | timestamp | No | `2026-10-26 10:12:00` | `null` mientras siga mirando (RN-026) |
 
+### `contrasenas_anteriores`
+
+Las últimas 5 contraseñas de cada cuenta, para que la nueva no repita ninguna (22 de octubre de 2026, `HistorialContrasenas`). Nunca guarda el texto de la contraseña.
+
+| Campo | Tipo | Obligatorio | Ejemplo | Nota |
+|---|---|---|---|---|
+| `id` | bigint | Sí | `1` | |
+| `user_id` | bigint → `users.id` | Sí | `7` | Se borra con la cuenta |
+| `hash_minusculas` | varchar | Sí | `$2y$12$…` | La contraseña en minúsculas, cifrada con bcrypt: así se compara sin importar mayúsculas |
+| `created_at` | timestamp | No | `2026-10-22 09:15:00` | Cuándo se puso esa contraseña |
+
 ## Cada tabla con un ejemplo (T-064)
 
 Un solo caso de punta a punta: el restaurante «La Esquina» responde su segunda medición.
@@ -638,6 +649,8 @@ Lo que devuelve la IA para una categoría (etapa única, RN-021), ya validado (`
     { "id": "p41", "puntaje": null, "observacion": "Publica cada semana, pero sin un plan." },
     { "id": "p42", "puntaje": 30, "observacion": "Decide qué publicar el mismo día." }
   ],
+  "metodo": "VRIO",
+  "metodo_motivo": "Las respuestas hablan de lo que la empresa tiene: contenido y equipo.",
   "observacion_categoria": "Tienen presencia constante, pero sin un plan de contenidos.",
   "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "Tres publicaciones por semana; revisa cada mes cuáles funcionan." }
 }
@@ -655,6 +668,7 @@ Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 
     "ref": "c3", "nombre": "Contenido y publicaciones", "importancia": 25.0,
     "puntaje": 38, "nivel": "mejorar", "anterior": 33, "variacion": 5,
     "observacion": "Publicas sin un plan…",
+    "metodo": { "clave": "VRIO", "nombre": "VRIO", "motivo": "…" },
     "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "…" },
     "preguntas": [
       { "ref": "p41", "texto": "¿Con qué frecuencia publicas?", "tipo": "opcion_unica", "respuesta": "Varias veces por semana", "puntaje": 60, "observacion": "…" },

@@ -4,10 +4,11 @@
  *
  * La empresa cambia el nombre, el cargo y el correo (su usuario) y, si
  * marca "Cambiar su contraseña", define una nueva para compartirla (E12.2).
+ * También cambia las páginas que puede ver (SelectorPaginas).
  * Si cambia el correo o la contraseña, se cierran sus sesiones abiertas.
  *
- * Envía: PUT /colaboradores/{id} con name, cargo, email y password (vacía
- * si no se cambia).
+ * Envía: PUT /colaboradores/{id} con name, cargo, email, password (vacía
+ * si no se cambia) y paginas[].
  */
 import { useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
@@ -18,12 +19,20 @@ import Combobox from '@/components/base/Combobox.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
+import SelectorPaginas from '@/components/colaboradores/SelectorPaginas.vue';
 import { cargosSugeridos } from '@/lib/cargos';
 import { revisarContrasena } from '@/lib/contrasena';
 import { rutas } from '@/lib/rutas';
-import type { Colaborador, DatosDeAcceso } from '@/types/colaboradores';
+import type {
+    Colaborador,
+    DatosDeAcceso,
+    PaginaColaborador,
+} from '@/types/colaboradores';
 
-const props = defineProps<{ colaborador: Colaborador }>();
+const props = defineProps<{
+    colaborador: Colaborador;
+    paginas: PaginaColaborador[];
+}>();
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 
@@ -34,7 +43,13 @@ const emit = defineEmits<{
 
 const cambiarContrasena = ref(false);
 
-const form = useForm({ name: '', cargo: '', email: '', password: '' });
+const form = useForm({
+    name: '',
+    cargo: '',
+    email: '',
+    password: '',
+    paginas: [] as string[],
+});
 
 watch(
     abierto,
@@ -45,6 +60,7 @@ watch(
                 cargo: props.colaborador.cargo ?? '',
                 email: props.colaborador.correo,
                 password: '',
+                paginas: [...props.colaborador.paginas],
             });
             form.reset();
             form.clearErrors();
@@ -71,10 +87,13 @@ const listo = computed(
         form.name.trim() !== '' &&
         form.cargo.trim() !== '' &&
         form.email.trim() !== '' &&
+        form.paginas.length > 0 &&
         form.isDirty &&
         (!cambiarContrasena.value ||
-            revisarContrasena(form.password, '', { conConfirmacion: false })
-                .completa),
+            revisarContrasena(form.password, '', {
+                conConfirmacion: false,
+                correo: form.email,
+            }).completa),
 );
 
 function guardar(): void {
@@ -101,7 +120,7 @@ function guardar(): void {
     <Modal
         v-model:abierto="abierto"
         :titulo="`Editar a ${colaborador.nombre}`"
-        descripcion="Cambia sus datos o define una contraseña nueva."
+        descripcion="Cambia sus datos, las páginas que puede ver o define una contraseña nueva."
     >
         <form
             id="form-editar-colaborador"
@@ -161,6 +180,13 @@ function guardar(): void {
                 />
             </Campo>
 
+            <SelectorPaginas
+                v-model="form.paginas"
+                :paginas="paginas"
+                prefijo="editar-pagina"
+                :error="form.errors.paginas"
+            />
+
             <div class="flex flex-col gap-3 border-t border-linea pt-4">
                 <label class="flex items-center gap-2 text-sm font-medium">
                     <input
@@ -186,7 +212,10 @@ function guardar(): void {
                             :invalida="!!form.errors.password"
                         />
                     </Campo>
-                    <RequisitosContrasena :contrasena="form.password" />
+                    <RequisitosContrasena
+                        :contrasena="form.password"
+                        :correo="form.email"
+                    />
                     <p
                         class="rounded-md bg-lienzo-oscuro/60 px-3 py-2.5 text-xs text-tinta-suave"
                     >

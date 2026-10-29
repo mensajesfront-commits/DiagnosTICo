@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Notifications\RolCambiado;
+use App\Support\CambioDeRol;
 use App\Support\DatosUsuarios;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Http\RedirectResponse;
@@ -45,11 +46,15 @@ class RolesController extends Controller
 
         $cuentas = User::whereIn('id', $datos['cuentas'] ?? [])->get();
 
+        foreach ($cuentas as $cuenta) {
+            CambioDeRol::permitido($cuenta, 'cuentas');
+        }
+
         if ($cuentas->isNotEmpty() && ! $datos['activo']) {
             throw ValidationException::withMessages(['cuentas' => 'Un rol inactivo no se puede asignar. Actívalo o quita las cuentas.']);
         }
 
-        $rol = DB::transaction(function () use ($datos, $cuentas): Role {
+        $rol = DB::transaction(function () use ($datos): Role {
             /** @var Role $rol */
             $rol = Role::create(['name' => $datos['nombre'], 'guard_name' => 'web']);
             $rol->forceFill([
@@ -59,12 +64,12 @@ class RolesController extends Controller
             ])->save();
             $rol->syncPermissions($datos['permisos'] ?? []);
 
-            foreach ($cuentas as $cuenta) {
-                $cuenta->syncRoles([$rol]);
-            }
-
             return $rol;
         });
+
+        foreach ($cuentas as $cuenta) {
+            CambioDeRol::aplicar($cuenta, $rol, $request->user());
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Rol {$rol->name} creado."]);
 
@@ -78,8 +83,11 @@ class RolesController extends Controller
 
         $datos = $this->validar($request, $rol);
 
-        if (! $datos['activo'] && $rol->users()->exists()) {
-            throw ValidationException::withMessages(['activo' => 'Este rol tiene cuentas: pásalas a otro rol antes de desactivarlo.']);
+        $desactiva = ! $datos['activo'] && (bool) $rol->getAttribute('activo');
+
+        // Desactivarlo bloquea a sus cuentas; la propia no, para no quedar fuera.
+        if ($desactiva && $request->user()?->hasRole($rol)) {
+            throw ValidationException::withMessages(['activo' => 'No puedes desactivar tu propio rol.']);
         }
 
         DB::transaction(function () use ($rol, $datos): void {
@@ -93,7 +101,13 @@ class RolesController extends Controller
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Cambios guardados. Aplican a todas las cuentas con este rol.']);
+        // Sus cuentas no entran hasta tener otro rol; si tienen la sesión
+        // abierta, se cierra en la siguiente petición (CerrarSesionCuentaInactiva).
+        $cuentas = $desactiva ? $rol->users()->count() : 0;
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $cuentas > 0
+            ? 'Rol desactivado. '.($cuentas === 1 ? 'Su cuenta no podrá entrar hasta que le asignes otro rol.' : "Sus {$cuentas} cuentas no podrán entrar hasta que les asignes otro rol.")
+            : 'Cambios guardados. Aplican a todas las cuentas con este rol.']);
 
         return back();
     }
@@ -126,15 +140,17 @@ class RolesController extends Controller
 
         /** @var User $cuenta */
         $cuenta = User::query()->findOrFail($datos['cuenta_id']);
+        CambioDeRol::permitido($cuenta, 'cuenta_id');
         UsuariosController::validarRolParaCuenta($rol, $cuenta, 'cuenta_id');
 
-        $cuenta->syncRoles([$rol]);
+        $empresa = $cuenta->empresa?->nombre;
+        $saleDeLaEmpresa = CambioDeRol::aplicar($cuenta, $rol, $request->user());
 
-        if ($request->boolean('avisar')) {
+        if ($request->boolean('avisar') && ! $saleDeLaEmpresa) {
             $cuenta->notify(new RolCambiado($rol->name));
         }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => "{$cuenta->name} ahora tiene el rol {$rol->name}."]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => UsuariosController::mensajeCambio($cuenta, $rol, $saleDeLaEmpresa ? $empresa : null)]);
 
         return back();
     }

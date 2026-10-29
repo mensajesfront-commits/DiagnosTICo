@@ -13,6 +13,7 @@ import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import PreguntaResultado from '@/components/resultados/PreguntaResultado.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,8 @@ const props = defineProps<{
     inicial: string | null;
     interno: boolean;
 }>();
+
+const { puede } = usePermisos();
 
 const elegida = ref(
     props.categorias.some((c) => c.ref === props.inicial)
@@ -74,7 +77,11 @@ const subtitulo = computed(() =>
                 </h1>
                 <p class="mt-0.5 text-sm text-tinta-suave">{{ subtitulo }}</p>
             </div>
-            <Boton archivo :href="rutas.resultados.pdf(medicion.id)">
+            <Boton
+                v-if="puede('resultados.pdf')"
+                archivo
+                :href="rutas.resultados.pdf(medicion.id)"
+            >
                 Ver informe PDF
             </Boton>
         </header>

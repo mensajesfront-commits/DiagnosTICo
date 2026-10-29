@@ -10,11 +10,14 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\MedicionesController;
 use App\Http\Controllers\ResponderController;
+use App\Http\Controllers\ResultadoEjemploController;
 use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SectoresController;
 use App\Http\Controllers\UbicacionesController;
 use App\Http\Controllers\UsuariosController;
+use App\Http\Controllers\VerComoController;
+use App\Http\Controllers\VerificacionCorreoController;
 use Illuminate\Support\Facades\Route;
 
 // Al abrir el sistema se entra directo al inicio de sesión; con sesión
@@ -29,7 +32,21 @@ Route::get('ubicaciones/{pais}', [UbicacionesController::class, 'show'])
     ->middleware('throttle:60,1')
     ->name('ubicaciones.pais');
 
+// L2b · Verificar el correo con el código de 6 dígitos. Sin sesión: la
+// cuenta no entra hasta verificar. La ventana vive en L1 y L2.
+Route::post('verificar-correo', [VerificacionCorreoController::class, 'verificar'])
+    ->middleware('throttle:10,1')
+    ->name('verificacion.verificar');
+Route::post('verificar-correo/reenviar', [VerificacionCorreoController::class, 'reenviar'])
+    ->middleware('throttle:3,1')
+    ->name('verificacion.reenviar');
+Route::post('verificar-correo/cancelar', [VerificacionCorreoController::class, 'cancelar'])
+    ->name('verificacion.cancelar');
+
 Route::middleware(['auth', 'verified'])->group(function () {
+    // A5.4 · Salir de "Ver como" (el middleware VerComo la deja pasar).
+    Route::post('ver-como/salir', [VerComoController::class, 'salir'])->name('ver-como.salir');
+
     // T-048: /dashboard es la entrada después del login; cada cuenta va a su inicio.
     Route::get('dashboard', [InicioController::class, 'redirigir'])->name('dashboard');
     Route::get('inicio', [InicioController::class, 'administrador'])->name('inicio.administrador');
@@ -42,6 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('categorias', [CategoriasController::class, 'index'])->name('categorias.index');
         // A2.4 · vista previa del borrador o de una versión (?version=).
         Route::get('diagnosticos/{diagnostico}/vista-previa', [EditorDiagnosticoController::class, 'vistaPrevia'])->name('diagnosticos.vista-previa');
+        // A2.6 · Resultado de ejemplo (HU-030) y su PDF.
+        Route::get('diagnosticos/{diagnostico}/resultado-ejemplo', [ResultadoEjemploController::class, 'ver'])->name('diagnosticos.resultado-ejemplo');
+        Route::get('diagnosticos/{diagnostico}/resultado-ejemplo/pdf', [ResultadoEjemploController::class, 'pdf'])
+            ->middleware('throttle:20,1')->name('diagnosticos.resultado-ejemplo.pdf');
     });
 
     Route::middleware('permission:diagnosticos.editar')->group(function () {
@@ -49,6 +70,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('diagnosticos', [DiagnosticosController::class, 'guardar'])->name('diagnosticos.guardar');
         Route::post('diagnosticos/{diagnostico}/duplicar', [DiagnosticosController::class, 'duplicar'])->name('diagnosticos.duplicar');
         Route::post('diagnosticos/{diagnostico}/archivar', [DiagnosticosController::class, 'archivar'])->name('diagnosticos.archivar');
+        Route::post('diagnosticos/{diagnostico}/restaurar', [DiagnosticosController::class, 'restaurar'])->name('diagnosticos.restaurar');
+        Route::delete('diagnosticos/{diagnostico}/archivado', [DiagnosticosController::class, 'eliminarArchivado'])->name('diagnosticos.eliminar-archivado');
         Route::delete('diagnosticos', [DiagnosticosController::class, 'eliminarVarios'])->name('diagnosticos.eliminar-varios');
         Route::delete('diagnosticos/{diagnostico}/borrador', [DiagnosticosController::class, 'eliminarBorrador'])->name('diagnosticos.eliminar-borrador');
         Route::delete('diagnosticos/{diagnostico}', [DiagnosticosController::class, 'eliminar'])->name('diagnosticos.eliminar');
@@ -62,7 +85,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('diagnosticos/{diagnostico}/categorias', [EditorDiagnosticoController::class, 'agregarCategorias'])->name('diagnosticos.categorias.agregar');
         Route::get('diagnosticos/{diagnostico}/importancia', [EditorDiagnosticoController::class, 'importancia'])->name('diagnosticos.importancia');
         Route::put('diagnosticos/{diagnostico}/importancia', [EditorDiagnosticoController::class, 'guardarImportancia'])->name('diagnosticos.importancia.guardar');
-        Route::post('diagnosticos/{diagnostico}/publicar', [EditorDiagnosticoController::class, 'publicar'])->name('diagnosticos.publicar');
+        // Publicar pide además su propio permiso (A5.2: "Publicar versiones").
+        Route::post('diagnosticos/{diagnostico}/publicar', [EditorDiagnosticoController::class, 'publicar'])
+            ->middleware('permission:diagnosticos.publicar')->name('diagnosticos.publicar');
 
         Route::post('sectores', [SectoresController::class, 'store'])->name('sectores.store');
         Route::put('sectores/{sector}', [SectoresController::class, 'update'])->name('sectores.update');
@@ -87,6 +112,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('empresas/{empresa}', [EmpresasController::class, 'actualizar'])->name('empresas.actualizar');
         Route::post('empresas/{empresa}/desactivar', [EmpresasController::class, 'desactivar'])->name('empresas.desactivar');
         Route::post('empresas/{empresa}/reactivar', [EmpresasController::class, 'reactivar'])->name('empresas.reactivar');
+        // A3.1d · Empresa sin cuenta principal: una nueva o uno de sus colaboradores.
+        Route::post('empresas/{empresa}/cuenta-principal', [EmpresasController::class, 'cuentaPrincipal'])->name('empresas.cuenta-principal');
     });
 
     Route::middleware('permission:empresas.ver')->group(function () {
@@ -135,7 +162,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('usuarios/{usuario}', [UsuariosController::class, 'eliminar'])->name('usuarios.eliminar');
         Route::post('usuarios/{usuario}/recuperar', [UsuariosController::class, 'recuperar'])->withTrashed()->name('usuarios.recuperar');
         Route::put('usuarios/{usuario}/rol', [UsuariosController::class, 'cambiarRol'])->name('usuarios.cambiar-rol');
-        Route::post('usuarios/{usuario}/ver-como', [UsuariosController::class, 'verComo'])->name('usuarios.ver-como');
+        Route::post('usuarios/{usuario}/ver-como', [VerComoController::class, 'iniciar'])->name('usuarios.ver-como');
 
         Route::post('roles', [RolesController::class, 'store'])->name('roles.store');
         Route::put('roles/{rol}', [RolesController::class, 'update'])->name('roles.update');

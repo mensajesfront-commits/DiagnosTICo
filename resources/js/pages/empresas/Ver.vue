@@ -20,7 +20,9 @@
  * estado de la cuenta con sus colaboradores en solo lectura (HU-033 CA-003)
  * y las acciones "Ver como esta empresa", "Asignar medición" y "Desactivar
  * cuenta" (A3.1f) o "Reactivar cuenta". No existe "restablecer contraseña"
- * (RN-006).
+ * (RN-006). Si la empresa se quedó sin cuenta principal (pasó al equipo de
+ * NuevasTIC), "Dar una cuenta principal" abre ModalCuentaPrincipal; sin ella
+ * no se reactiva.
  *
  * La pendiente también tiene "Enviar recordatorio" o "Reenviar aviso" con su
  * último aviso (A3.1e, HU-008).
@@ -28,7 +30,7 @@
  * "Ver resultado" abre A3.3 (HU-038) y "Ver historial completo", A3.4
  * (HU-039).
  */
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
@@ -46,10 +48,12 @@ import type { FormularioEmpresa } from '@/components/empresas/CamposEmpresa.vue'
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
 import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
+import ModalCuentaPrincipal from '@/components/empresas/ModalCuentaPrincipal.vue';
 import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
+import SelectorEvolucion from '@/components/graficas/SelectorEvolucion.vue';
 import {
     diaYMes,
     fechaLocal,
@@ -57,6 +61,7 @@ import {
     mesYAnio,
     momento,
 } from '@/lib/fechas';
+import { usePermisos } from '@/composables/usePermisos';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
@@ -64,10 +69,22 @@ import type { FichaEmpresa } from '@/types/empresas';
 
 const props = defineProps<FichaEmpresa>();
 
+const { puede } = usePermisos();
+
+// "Ver:" de la gráfica: el puntaje total o el de una categoría.
+const verCategoria = ref('');
+const puntosEvolucion = computed(
+    () =>
+        props.evolucion_categorias.find((c) => c.nombre === verCategoria.value)
+            ?.puntos ?? props.evolucion,
+);
+
 type Pestana = 'historial' | 'cuenta';
 
+// Sale de la URL de Inertia y no de `window`: con SSR se arma en Node.
 const pestana = ref<Pestana>(
-    new URLSearchParams(window.location.search).get('pestana') === 'cuenta'
+    new URLSearchParams(usePage().url.split('?')[1] ?? '').get('pestana') ===
+        'cuenta'
         ? 'cuenta'
         : 'historial',
 );
@@ -128,7 +145,8 @@ function verComo(): void {
 }
 
 // --- Asignar otra medición (formulario corto de A3.1b) -----------------------
-const hoy = new Date().toLocaleDateString('en-CA');
+/** Fecha límite más cercana: 3 días, en la hora de la empresa (servidor). */
+const hoy = computed(() => props.fecha_minima);
 
 const asignacion = useForm({
     empresa_id: props.empresa.id,
@@ -209,6 +227,7 @@ function guardar(): void {
 }
 
 const verColaboradores = ref(false);
+const modalCuenta = ref(false);
 
 const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
 </script>
@@ -332,11 +351,23 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 <section
                     class="flex shrink-0 flex-col rounded-xl border border-linea bg-white px-5 py-4"
                 >
-                    <div class="flex items-baseline justify-between gap-2">
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-2"
+                    >
                         <h2 class="text-sm font-semibold">
-                            Evolución del puntaje total
+                            {{
+                                verCategoria
+                                    ? `Evolución de ${verCategoria}`
+                                    : 'Evolución del puntaje total'
+                            }}
                         </h2>
+                        <SelectorEvolucion
+                            v-model="verCategoria"
+                            class="ml-auto"
+                            :categorias="evolucion_categorias"
+                        />
                         <Link
+                            v-if="puede('resultados.ver')"
                             :href="rutas.historial.empresa(empresa.id)"
                             :class="cn(enlace, 'text-xs')"
                         >
@@ -345,8 +376,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     </div>
                     <EvolucionPuntaje
                         v-if="evolucion.length > 0"
+                        :key="verCategoria"
                         class="mt-2 h-44"
-                        :puntos="evolucion"
+                        :puntos="puntosEvolucion"
                     />
                     <p
                         v-else
@@ -447,7 +479,8 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                                 v-if="
                                                     pendiente &&
                                                     m.id === pendiente.id &&
-                                                    m.estado !== 'enviada'
+                                                    m.estado !== 'enviada' &&
+                                                    puede('mediciones.asignar')
                                                 "
                                                 type="button"
                                                 :class="enlace"
@@ -457,7 +490,8 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                             </button>
                                             <Link
                                                 v-else-if="
-                                                    m.estado === 'terminada'
+                                                    m.estado === 'terminada' &&
+                                                    puede('resultados.ver')
                                                 "
                                                 :href="
                                                     rutas.resultados.ver(m.id)
@@ -521,12 +555,26 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         </span>
                     </p>
                     <p
+                        v-if="pendiente.solicitud"
+                        class="mt-3 rounded-md bg-aviso-suave px-3 py-2 text-xs text-aviso"
+                        role="status"
+                    >
+                        <strong
+                            >Pidió una medición nueva
+                            {{ haceCuanto(pendiente.solicitud) }}.</strong
+                        >
+                        Asígnale otra abajo o dale una nueva fecha.
+                    </p>
+                    <p
                         v-if="pendiente.estado === 'enviada'"
                         class="mt-3 text-xs text-tinta-suave"
                     >
                         La IA está analizando sus respuestas.
                     </p>
-                    <div v-else class="mt-3 grid grid-cols-2 gap-2">
+                    <div
+                        v-else-if="puede('mediciones.asignar')"
+                        class="mt-3 grid grid-cols-2 gap-2"
+                    >
                         <Boton
                             variante="secundario"
                             class="px-2"
@@ -554,6 +602,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             }}
                         </span>
                         <button
+                            v-if="puede('mediciones.asignar')"
                             type="button"
                             :class="enlace"
                             @click="modalCorreo = true"
@@ -568,6 +617,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 </section>
 
                 <section
+                    v-if="puede('mediciones.asignar')"
                     class="shrink-0 rounded-xl border border-linea bg-white p-5 text-sm"
                 >
                     <h2 class="font-semibold">
@@ -692,20 +742,33 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 novalidate
                 @submit.prevent="guardar"
             >
-                <CamposEmpresa
-                    v-model:form="form"
-                    prefijo="cuenta"
-                    :opciones="opciones"
-                    :errores="form.errors"
-                    :sector-actual="empresa.sector_id"
-                />
+                <fieldset
+                    :disabled="!puede('empresas.registrar')"
+                    class="contents"
+                >
+                    <CamposEmpresa
+                        v-model:form="form"
+                        prefijo="cuenta"
+                        :opciones="opciones"
+                        :errores="form.errors"
+                        :sector-actual="empresa.sector_id"
+                        :sin-cuenta="!principal"
+                    />
+                </fieldset>
                 <p
                     class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
                 >
                     Cambiar el sector no modifica las mediciones ya hechas: las
                     próximas se asignan con diagnósticos del sector nuevo.
                 </p>
-                <div class="mt-auto flex justify-end gap-3 pt-2">
+                <p
+                    v-if="!puede('empresas.registrar')"
+                    class="mt-auto rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
+                >
+                    Solo lectura: tu rol no permite cambiar los datos de las
+                    empresas.
+                </p>
+                <div v-else class="mt-auto flex justify-end gap-3 pt-2">
                     <Boton
                         variante="secundario"
                         :disabled="!form.isDirty || form.processing"
@@ -736,6 +799,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             <dd>
                                 <Etiqueta v-if="!empresa.activa" tono="aviso">
                                     ⊘ Desactivada
+                                </Etiqueta>
+                                <Etiqueta v-else-if="!principal" tono="alerta">
+                                    Sin cuenta principal
                                 </Etiqueta>
                                 <Etiqueta
                                     v-else-if="principal?.invitacion_pendiente"
@@ -856,41 +922,81 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     </p>
                 </section>
 
+                <!-- La cuenta principal pasó al equipo de NuevasTIC. -->
                 <section
+                    v-if="!principal"
+                    class="flex flex-col gap-3 rounded-xl border border-alerta/40 bg-alerta-suave p-5 text-sm"
+                >
+                    <h2 class="font-semibold text-alerta">
+                        Sin cuenta principal
+                    </h2>
+                    <p class="text-alerta">
+                        Nadie puede entrar por esta empresa. Dale una cuenta
+                        nueva: le llega un correo para crear su contraseña.
+                    </p>
+                    <Boton
+                        v-if="puede('empresas.registrar')"
+                        @click="modalCuenta = true"
+                    >
+                        Dar una cuenta principal
+                    </Boton>
+                </section>
+
+                <section
+                    v-if="
+                        puede('usuarios.gestionar') ||
+                        puede('mediciones.asignar') ||
+                        puede('empresas.registrar')
+                    "
                     class="rounded-xl border border-linea bg-white p-5 text-sm"
                 >
                     <h2 class="font-semibold">Acciones</h2>
                     <div class="mt-3 flex flex-col gap-2">
                         <Boton
-                            v-if="principal && empresa.activa"
+                            v-if="
+                                principal &&
+                                empresa.activa &&
+                                puede('usuarios.gestionar')
+                            "
                             variante="secundario"
                             @click="verComo"
                         >
                             Ver como esta empresa
                         </Boton>
                         <Boton
-                            v-if="empresa.activa"
+                            v-if="empresa.activa && puede('mediciones.asignar')"
                             variante="secundario"
                             :href="rutas.mediciones.asignar(empresa.id)"
                         >
                             Asignar medición
                         </Boton>
-                        <Boton
-                            v-if="empresa.activa"
-                            variante="secundario"
-                            @click="modalDesactivar = true"
-                        >
-                            Desactivar cuenta
-                        </Boton>
-                        <Boton v-else @click="reactivar">
-                            Reactivar cuenta
-                        </Boton>
+                        <template v-if="puede('empresas.registrar')">
+                            <Boton
+                                v-if="empresa.activa"
+                                variante="secundario"
+                                @click="modalDesactivar = true"
+                            >
+                                Desactivar cuenta
+                            </Boton>
+                            <Boton
+                                v-else
+                                :disabled="!principal"
+                                @click="reactivar"
+                            >
+                                Reactivar cuenta
+                            </Boton>
+                        </template>
                     </div>
-                    <p class="mt-3 text-xs text-tinta-suave">
+                    <p
+                        v-if="puede('empresas.registrar')"
+                        class="mt-3 text-xs text-tinta-suave"
+                    >
                         {{
                             empresa.activa
                                 ? 'Desactivar impide entrar a la empresa; sus mediciones y resultados se conservan.'
-                                : 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar.'
+                                : !principal
+                                  ? 'Para reactivarla, primero dale una cuenta principal.'
+                                  : 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar.'
                         }}
                     </p>
                 </section>
@@ -933,6 +1039,11 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
             @confirmar="asignar(true)"
         />
     </template>
+    <ModalCuentaPrincipal
+        v-if="!principal"
+        v-model:abierto="modalCuenta"
+        :empresa="empresa"
+    />
     <ModalDesactivarEmpresa
         v-model:abierto="modalDesactivar"
         :empresa="empresa"

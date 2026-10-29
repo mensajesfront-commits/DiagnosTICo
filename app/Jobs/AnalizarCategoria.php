@@ -71,6 +71,8 @@ class AnalizarCategoria implements ShouldQueue
         $salida = $prompt['categoria']['preguntas'] === []
             ? [
                 'preguntas' => [],
+                'metodo' => 'CAME',
+                'metodo_motivo' => 'Sin respuestas, la única acción posible es responder la categoría.',
                 'observacion_categoria' => 'No respondiste ninguna pregunta de esta categoría.',
                 'recomendacion' => ['titulo' => 'Responde esta categoría', 'detalle' => 'En tu próxima medición responde sus preguntas para saber cómo vas en este tema.'],
             ]

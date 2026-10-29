@@ -31,13 +31,17 @@ withDefaults(
 
 <template>
     <header
-        class="sticky top-0 z-20 flex items-center gap-6 border-b border-linea bg-white px-6 py-3"
+        class="sticky top-0 z-20 flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-linea bg-white px-4 py-3 sm:flex-nowrap sm:px-6"
     >
         <span class="flex shrink-0 items-center gap-2 font-semibold">
             <Logo class="size-8" />
-            CAPTTER
+            <span class="hidden sm:inline">CAPTTER</span>
         </span>
-        <div v-if="titulo" class="min-w-0 flex-1">
+        <!-- En celular el avance pasa a un segundo renglón. -->
+        <div
+            v-if="titulo"
+            class="order-last min-w-0 basis-full sm:order-none sm:flex-1 sm:basis-auto"
+        >
             <div class="flex items-baseline justify-between gap-3 text-xs">
                 <span class="truncate font-medium">{{ titulo }}</span>
                 <span v-if="detalle" class="shrink-0 text-tinta-suave">
@@ -59,7 +63,8 @@ withDefaults(
                 />
             </div>
         </div>
-        <span v-else class="flex-1" />
+        <span class="flex-1 sm:hidden" />
+        <span v-if="!titulo" class="hidden flex-1 sm:block" />
         <span
             v-if="guardando"
             class="shrink-0 text-xs text-tinta-suave"
