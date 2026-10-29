@@ -18,6 +18,7 @@ import ModalCrearRol from '@/components/usuarios/ModalCrearRol.vue';
 import ModalEliminarRol from '@/components/usuarios/ModalEliminarRol.vue';
 import ModalInvitarUsuario from '@/components/usuarios/ModalInvitarUsuario.vue';
 import PanelRol from '@/components/usuarios/PanelRol.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { BloquePermisos, Cuenta, Rol } from '@/types/usuarios';
@@ -35,14 +36,7 @@ const props = withDefaults(
     { rolId: null },
 );
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            { title: 'Usuarios y roles', href: rutas.usuarios.lista() },
-            { title: 'Roles', href: rutas.usuarios.roles() },
-        ],
-    },
-});
+const { puede } = usePermisos();
 
 const elegidoId = ref<number | null>(props.rolId ?? props.roles[0]?.id ?? null);
 const elegido = computed(
@@ -83,15 +77,23 @@ const rolesInternos = computed(() =>
 <template>
     <Head title="Roles" />
 
-    <div class="flex flex-col gap-5 p-6">
-        <EncabezadoUsuarios pestana="roles">
-            <Boton @click="modalCrear = true">+ Crear rol</Boton>
+    <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
+        <EncabezadoUsuarios class="shrink-0" pestana="roles">
+            <Boton
+                v-if="puede('usuarios.gestionar')"
+                @click="modalCrear = true"
+            >
+                + Crear rol
+            </Boton>
         </EncabezadoUsuarios>
 
-        <div class="grid items-start gap-5 lg:grid-cols-[20rem_1fr]">
+        <!-- Página fija: la lista de roles y el panel bajan cada uno en su espacio. -->
+        <div
+            class="grid items-start gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[20rem_1fr] lg:grid-rows-[minmax(0,1fr)]"
+        >
             <nav
                 aria-label="Roles"
-                class="rounded-xl border border-linea bg-white p-3"
+                class="rounded-xl border border-linea bg-white p-3 lg:max-h-full lg:overflow-y-auto"
             >
                 <p class="px-3 pt-1 pb-2 text-xs text-tinta-suave">Roles</p>
                 <ul class="flex flex-col gap-1">
@@ -150,6 +152,7 @@ const rolesInternos = computed(() =>
 
             <PanelRol
                 v-if="elegido"
+                class="lg:max-h-full lg:overflow-y-auto"
                 :rol="elegido"
                 :bloques="bloques"
                 @asignar="modalAsignar = true"

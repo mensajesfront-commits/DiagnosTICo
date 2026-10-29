@@ -25,7 +25,7 @@ function respuestaIa(array $contenido): CreateResponse
     ]);
 }
 
-function analisisValido(int $puntajeAbierta = 45): array
+function analisisValido(int|float|string|null $puntajeAbierta = 45): array
 {
     return [
         'preguntas' => [
@@ -33,6 +33,8 @@ function analisisValido(int $puntajeAbierta = 45): array
             ['id' => 'p2', 'puntaje' => null, 'observacion' => 'Cada cliente espera una respuesta manual.'],
             ['id' => 'p3', 'puntaje' => $puntajeAbierta, 'observacion' => 'Responde, pero con demoras de hasta un día.'],
         ],
+        'metodo' => 'CAME',
+        'metodo_motivo' => 'El problema ya está claro: falta convertirlo en acciones.',
         'observacion_categoria' => 'Hoy tomas pedidos y reservas a mano por WhatsApp.',
         'recomendacion' => ['titulo' => 'Activa pedidos y respuestas automáticas', 'detalle' => 'Un menú digital con pedidos en WhatsApp Business.'],
     ];
@@ -98,3 +100,35 @@ it('muestra el JSON con el comando prueba:ia', function () {
         ->expectsOutputToContain('"observacion_categoria"')
         ->assertSuccessful();
 });
+
+it('acepta el puntaje de la abierta como 45.0 o "45"', function (float|string $valor) {
+    OpenAI::fake([respuestaIa(analisisValido(puntajeAbierta: $valor))]);
+
+    $resultado = app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+
+    expect($resultado['preguntas'][2]['puntaje'])->toBe(45);
+})->with([45.0, '45']);
+
+it('dice qué devolvió la IA si no calificó la abierta', function () {
+    OpenAI::fake([respuestaIa(analisisValido(puntajeAbierta: null))]);
+
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+})->throws(RespuestaIaInvalida::class, 'La IA no calificó la pregunta abierta p3 (devolvió null).');
+
+it('devuelve el método de análisis que eligió la IA', function () {
+    OpenAI::fake([respuestaIa(analisisValido())]);
+
+    $resultado = app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+
+    expect($resultado['metodo'])->toBe('CAME')
+        ->and($resultado['metodo_motivo'])->toContain('acciones')
+        ->and(AnalizadorDeCategoria::esquema()['properties']['metodo']['enum'])->toBe(['PESTEL', 'PORTER', 'VRIO', 'DOFA', 'CAME']);
+});
+
+it('rechaza una respuesta sin un método válido', function () {
+    $analisis = analisisValido();
+    $analisis['metodo'] = 'FODA';
+    OpenAI::fake([respuestaIa($analisis)]);
+
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+})->throws(RespuestaIaInvalida::class, 'La IA no dijo qué método usó');

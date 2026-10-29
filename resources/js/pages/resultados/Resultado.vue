@@ -16,7 +16,7 @@
  * Todo llega calculado y no cambia (RN-023). Sin FODA ni comparación con
  * promedios (RN-028).
  */
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -25,20 +25,66 @@ import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import RadarCategorias from '@/components/graficas/RadarCategorias.vue';
+import EtiquetaMetodo from '@/components/resultados/EtiquetaMetodo.vue';
 import PreguntaResultado from '@/components/resultados/PreguntaResultado.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal, mesYAnio } from '@/lib/fechas';
 import { niveles, ordenNiveles } from '@/lib/niveles';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
-import { empresa as inicioEmpresa } from '@/routes/inicio';
-import type { CabeceraResultado, Resultado } from '@/types/resultados';
+import {
+    administrador as inicioAdministrador,
+    empresa as inicioEmpresa,
+} from '@/routes/inicio';
+import type {
+    CabeceraResultado,
+    EjemploResultado,
+    Resultado,
+} from '@/types/resultados';
 
 const props = defineProps<{
     medicion: CabeceraResultado;
     resultado: Resultado;
     /** Lo abre el equipo de NuevasTIC (A3.3): vuelve a la ficha de la empresa. */
     interno: boolean;
+    /** A2.6 · Resultado de ejemplo de un diagnóstico (HU-030): datos de muestra. */
+    ejemplo?: EjemploResultado | null;
 }>();
+
+const { puede } = usePermisos();
+
+// --- A2.6 · Resultado de ejemplo -------------------------------------------------
+const casos = [
+    {
+        valor: 'mejor' as const,
+        etiqueta: 'Mejor caso',
+        texto: 'todas las respuestas cerca del máximo.',
+    },
+    {
+        valor: 'medio' as const,
+        etiqueta: 'Caso medio',
+        texto: 'respuestas intermedias.',
+    },
+    {
+        valor: 'peor' as const,
+        etiqueta: 'Peor caso',
+        texto: 'todas las respuestas cerca del mínimo.',
+    },
+];
+
+const casoActual = computed(() =>
+    casos.find((c) => c.valor === props.ejemplo?.caso),
+);
+
+function cambiarCaso(caso: string): void {
+    const url = new URL(props.ejemplo?.volver ?? '', 'http://x');
+    const version = url.searchParams.get('version');
+    router.get(
+        window.location.pathname,
+        { caso, ...(version ? { version } : {}) },
+        { preserveState: false, replace: true },
+    );
+}
 
 type Pestana = 'resumen' | 'categorias' | 'recomendaciones';
 
@@ -51,12 +97,16 @@ const pestanas = [
 const pestana = ref<Pestana>('resumen');
 
 const volver = computed(() =>
-    props.interno
-        ? {
-              href: rutas.empresas.ver(props.medicion.empresa.id),
-              texto: props.medicion.empresa.nombre,
-          }
-        : { href: inicioEmpresa(), texto: 'Inicio' },
+    props.ejemplo
+        ? { href: props.ejemplo.volver, texto: 'Volver a la vista previa' }
+        : props.interno
+          ? puede('empresas.ver')
+              ? {
+                    href: rutas.empresas.ver(props.medicion.empresa.id),
+                    texto: props.medicion.empresa.nombre,
+                }
+              : { href: inicioAdministrador(), texto: 'Inicio' }
+          : { href: inicioEmpresa(), texto: 'Inicio' },
 );
 
 const fechaEnvio = computed(() =>
@@ -117,7 +167,13 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
 </script>
 
 <template>
-    <Head :title="`Resultado · Medición ${medicion.numero}`" />
+    <Head
+        :title="
+            ejemplo
+                ? 'Resultado de ejemplo'
+                : `Resultado · Medición ${medicion.numero}`
+        "
+    />
 
     <div class="flex flex-col gap-4 p-6 lg:h-dvh lg:overflow-hidden">
         <header class="flex shrink-0 flex-wrap items-end justify-between gap-4">
@@ -129,30 +185,93 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                     <ArrowLeft class="size-4" aria-hidden="true" />
                     {{ volver.texto }}
                 </Link>
-                <h1 class="text-2xl font-semibold">
+                <h1
+                    v-if="ejemplo"
+                    class="flex flex-wrap items-center gap-2 text-2xl font-semibold"
+                >
+                    Así se vería el resultado
+                    <span
+                        class="rounded bg-nivel-mejorar-suave px-2 py-0.5 text-xs font-medium text-nivel-mejorar-texto"
+                        >{{ ejemplo.etiqueta }}</span
+                    >
+                </h1>
+                <h1 v-else class="text-2xl font-semibold">
                     Resultado del diagnóstico · Medición {{ medicion.numero }}
                 </h1>
                 <p class="mt-0.5 text-sm text-tinta-suave">{{ subtitulo }}</p>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
+            <div v-if="ejemplo" class="flex flex-wrap items-center gap-2">
+                <a
+                    :href="ejemplo.pdf"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex h-10 items-center rounded-md bg-marca px-4 text-sm font-medium text-white hover:bg-marca-hover"
+                >
+                    Ver formato del PDF
+                </a>
+            </div>
+            <div v-else class="flex flex-wrap items-center gap-2">
                 <Boton
                     variante="secundario"
                     :href="rutas.resultados.respuestas(medicion.id)"
                 >
                     {{ interno ? 'Ver respuestas' : 'Ver mis respuestas' }}
                 </Boton>
-                <Boton archivo :href="rutas.resultados.pdf(medicion.id)">
+                <Boton
+                    v-if="puede('resultados.pdf')"
+                    archivo
+                    :href="rutas.resultados.pdf(medicion.id)"
+                >
                     Ver informe PDF
                 </Boton>
             </div>
         </header>
 
-        <SelectorCompacto
-            v-model="pestana"
-            :opciones="pestanas"
-            etiqueta-accesible="Secciones del resultado"
-            class="shrink-0 self-start"
-        />
+        <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
+            <SelectorCompacto
+                v-model="pestana"
+                :opciones="pestanas"
+                etiqueta-accesible="Secciones del resultado"
+            />
+            <div
+                v-if="ejemplo"
+                class="flex flex-wrap items-center gap-2 rounded-lg border border-nivel-mejorar/40 bg-nivel-mejorar-suave/60 px-3 py-1.5 text-xs"
+            >
+                <span :title="casoActual?.texto">
+                    <strong class="text-nivel-mejorar-texto"
+                        >Datos de muestra</strong
+                    >
+                    que no se guardan ni llaman a la IA ·
+                </span>
+                <span
+                    class="flex items-center gap-1"
+                    role="radiogroup"
+                    aria-label="Respuestas de muestra"
+                >
+                    <button
+                        v-for="c in casos"
+                        :key="c.valor"
+                        type="button"
+                        role="radio"
+                        :aria-checked="ejemplo.caso === c.valor"
+                        :title="`Respuestas de muestra: ${c.texto}`"
+                        :class="
+                            cn(
+                                'rounded-md px-2.5 py-1',
+                                ejemplo.caso === c.valor
+                                    ? 'bg-marca font-medium text-white'
+                                    : 'bg-white hover:bg-lienzo',
+                            )
+                        "
+                        @click="
+                            ejemplo.caso !== c.valor && cambiarCaso(c.valor)
+                        "
+                    >
+                        {{ c.etiqueta }}
+                    </button>
+                </span>
+            </div>
+        </div>
 
         <!-- Resumen -->
         <div
@@ -186,7 +305,11 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                         </p>
                     </template>
                     <p v-else class="mt-3 text-xs text-tinta-suave">
-                        Es tu primera medición: será tu punto de partida.
+                        {{
+                            ejemplo
+                                ? 'Sin medición anterior: el ejemplo es una primera medición.'
+                                : 'Es tu primera medición: será tu punto de partida.'
+                        }}
                     </p>
                 </div>
                 <ul class="mt-auto grid grid-cols-4 gap-1 pt-5 text-[11px]">
@@ -242,6 +365,10 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                                     >
                                         {{ p.nombre }} · {{ p.puntaje }}
                                     </span>
+                                    <EtiquetaMetodo
+                                        v-if="p.metodo"
+                                        :metodo="p.metodo"
+                                    />
                                 </span>
                                 <span
                                     class="mt-1.5 block text-sm font-semibold"
@@ -394,6 +521,18 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                         :pregunta="p"
                         :interno="interno"
                     />
+                    <div
+                        v-if="categoria.metodo"
+                        class="flex flex-wrap items-center gap-2 text-sm"
+                    >
+                        <span class="text-tinta-suave">Analizado con</span>
+                        <EtiquetaMetodo :metodo="categoria.metodo" />
+                        <span
+                            v-if="categoria.metodo.motivo"
+                            class="text-xs text-tinta-suave"
+                            >{{ categoria.metodo.motivo }}</span
+                        >
+                    </div>
                     <div class="rounded-lg bg-lienzo px-4 py-3 text-sm">
                         <span
                             class="mr-2 rounded border border-linea bg-white px-1 font-mono text-[10px]"
@@ -444,6 +583,7 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                         >
                             {{ c.nombre }} · {{ c.puntaje }}
                         </span>
+                        <EtiquetaMetodo v-if="c.metodo" :metodo="c.metodo" />
                     </span>
                     <p class="mt-1.5 text-sm font-semibold">
                         {{ c.recomendacion.titulo }}
@@ -462,7 +602,11 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
             </ol>
         </section>
 
-        <p class="shrink-0 text-xs text-tinta-suave">
+        <p v-if="ejemplo" class="shrink-0 text-xs text-tinta-suave">
+            Datos de ejemplo: las observaciones y recomendaciones reales las
+            escribe la IA según las respuestas de cada empresa.
+        </p>
+        <p v-else class="shrink-0 text-xs text-tinta-suave">
             Publicado el
             {{ diaYMes(fechaLocal(resultado.publicado_en.slice(0, 10))) }}. El
             resultado ya no cambia.

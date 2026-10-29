@@ -6,7 +6,6 @@ use App\Models\Empresa;
 use App\Models\Medicion;
 use App\Models\SolicitudMedicion;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 
 /**
  * E1 · Inicio de la empresa y del colaborador (HU-057 a HU-059, HU-082),
@@ -49,15 +48,17 @@ class DatosInicioEmpresa
         }
 
         $ultima = $filas === [] ? null : $filas[count($filas) - 1];
+        // Un colaborador sin "Resultados" (E12.1) no recibe puntajes.
+        $veResultados = $usuario->can('resultados.ver');
 
         return [
             'nombre' => $usuario->name,
             'empresa' => ['nombre' => $empresa->nombre, 'sector' => $empresa->sector->nombre ?? ''],
             'realizadas' => count($filas),
             'pendiente' => $pendiente ? self::pendiente($pendiente, $filas === []) : null,
-            'ultima' => $ultima,
-            'mediciones' => array_reverse($filas),
-            'areas' => $ultima ? self::areas($terminadas->last()) : [],
+            'ultima' => $veResultados ? $ultima : null,
+            'mediciones' => $veResultados ? array_reverse($filas) : [],
+            'areas' => $veResultados && $ultima ? self::areas($terminadas->last()) : [],
             'soporte' => config('diagnostico.soporte_email'),
         ];
     }
@@ -79,7 +80,7 @@ class DatosInicioEmpresa
             'preguntas' => $avance['total'],
             'mensaje' => $m->mensaje,
             'fecha_limite' => $limite?->toDateString(),
-            'dias_restantes' => $limite ? (int) Carbon::today()->diffInDays($limite, false) : null,
+            'dias_restantes' => Plazos::diasRestantes($m),
             'avance' => [
                 'respondidas' => $avance['respondidas'],
                 'total' => $avance['total'],

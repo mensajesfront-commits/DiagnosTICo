@@ -5,6 +5,7 @@ namespace App\Services\Mediciones;
 use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
+use App\Models\SolicitudMedicion;
 use App\Models\User;
 use App\Support\DatosEmpresas;
 use Illuminate\Support\Facades\DB;
@@ -82,8 +83,7 @@ class AsignarMedicion
             $pendiente?->forceFill(['reemplazada_por' => $medicion->id])->save();
 
             // Una solicitud de nueva medición abierta queda atendida (HU-083).
-            DB::table('solicitudes_medicion')->where('empresa_id', $empresa->id)->where('estado', 'abierta')
-                ->update(['estado' => 'atendida', 'atendida_en' => now(), 'updated_at' => now()]);
+            SolicitudMedicion::atender($empresa->id);
 
             return $medicion;
         });
@@ -92,7 +92,7 @@ class AsignarMedicion
         // `ultimo_aviso_en`, y la pantalla ofrece "Reenviar aviso".
         if ($aviso) {
             try {
-                $this->enviarAviso->enviar($medicion);
+                $this->enviarAviso->enviar($medicion, alAsignar: true);
             } catch (ValidationException) {
             }
         }

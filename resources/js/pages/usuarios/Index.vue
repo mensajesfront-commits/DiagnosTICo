@@ -3,8 +3,9 @@
  * A5 · Usuarios y roles, pestaña Usuarios (HU-046, HU-047, HU-052).
  *
  * Lista de cuentas con búsqueda por nombre o correo y filtros de rol y
- * estado. La búsqueda, los filtros y las páginas de 12 se hacen aquí, con
- * todas las cuentas que entrega el servidor.
+ * estado. La búsqueda, los filtros y el paginado se hacen aquí, con todas
+ * las cuentas que entrega el servidor. La página queda fija sin importar
+ * cuántas cuentas haya: cada página muestra las filas que caben.
  *
  * Acciones por fila:
  * - La propia: "Tu cuenta · Mi perfil" (no se desactiva ni cambia de rol).
@@ -23,12 +24,15 @@ import { toast } from 'vue-sonner';
 import Boton from '@/components/base/Boton.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
+import Paginacion from '@/components/base/Paginacion.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import EncabezadoUsuarios from '@/components/usuarios/EncabezadoUsuarios.vue';
 import ModalCambiarRol from '@/components/usuarios/ModalCambiarRol.vue';
 import ModalDesactivarEliminar from '@/components/usuarios/ModalDesactivarEliminar.vue';
 import ModalInvitarUsuario from '@/components/usuarios/ModalInvitarUsuario.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes } from '@/lib/fechas';
+import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import { coincide } from '@/lib/usuarios';
 import { edit as perfil } from '@/routes/profile';
@@ -42,15 +46,7 @@ const props = defineProps<{
     >[];
 }>();
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            { title: 'Usuarios y roles', href: rutas.usuarios.lista() },
-        ],
-    },
-});
-
-const POR_PAGINA = 12;
+const { puede } = usePermisos();
 
 // "Ver todas en Usuarios" desde un rol llega con ?rol=Empresa.
 const page = usePage();
@@ -60,7 +56,6 @@ const rolInicial =
 const busqueda = ref('');
 const filtroRol = ref(rolInicial);
 const filtroEstado = ref<EstadoCuenta | ''>('');
-const pagina = ref(1);
 
 const estados: Record<EstadoCuenta, string> = {
     activa: 'Activa',
@@ -81,15 +76,19 @@ const filtradas = computed(() =>
     ),
 );
 
-watch([busqueda, filtroRol, filtroEstado], () => (pagina.value = 1));
+// --- Paginado con las filas que caben -------------------------------------------
+const contenedor = ref<HTMLElement | null>(null);
+const { porPagina, medir, ajustar } = useFilasQueCaben(contenedor);
+const { pagina, paginas, total, desde, visibles } = usePaginacion(
+    filtradas,
+    porPagina,
+);
 
-const paginas = computed(() =>
-    Math.max(1, Math.ceil(filtradas.value.length / POR_PAGINA)),
+watch(
+    () => filtradas.value.length > 0,
+    () => medir(),
 );
-const desde = computed(() => (pagina.value - 1) * POR_PAGINA);
-const visibles = computed(() =>
-    filtradas.value.slice(desde.value, desde.value + POR_PAGINA),
-);
+watch(visibles, ajustar);
 
 /** Roles internos para invitar: no Empresa ni Colaborador. */
 const rolesInternos = computed(() =>
@@ -157,14 +156,19 @@ const enlaceEliminar = 'text-aviso hover:underline';
 </script>
 
 <template>
-    <Head title="Usuarios y roles" />
+    <Head title="Usuarios" />
 
-    <div class="flex flex-col gap-5 p-6">
-        <EncabezadoUsuarios pestana="usuarios">
-            <Boton @click="modalInvitar = true">+ Invitar usuario</Boton>
+    <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
+        <EncabezadoUsuarios class="shrink-0" pestana="usuarios">
+            <Boton
+                v-if="puede('usuarios.gestionar')"
+                @click="modalInvitar = true"
+            >
+                + Invitar usuario
+            </Boton>
         </EncabezadoUsuarios>
 
-        <div class="grid gap-3 md:grid-cols-[1fr_13rem_13rem]">
+        <div class="grid shrink-0 gap-3 md:grid-cols-[1fr_13rem_13rem]">
             <div class="flex flex-col gap-1.5">
                 <label for="buscar-cuenta" class="text-xs font-medium">
                     Buscar
@@ -207,7 +211,10 @@ const enlaceEliminar = 'text-aviso hover:underline';
             </div>
         </div>
 
-        <p class="-mt-2 text-xs text-tinta-suave">
+        <p
+            v-if="puede('usuarios.gestionar')"
+            class="-mt-2 shrink-0 text-xs text-tinta-suave"
+        >
             Las cuentas de empresa se crean al registrar la empresa en
             <Link :href="rutas.empresas.lista()" class="text-marca underline">
                 Empresas</Link
@@ -222,8 +229,13 @@ const enlaceEliminar = 'text-aviso hover:underline';
             >. Para cambiar el rol de una cuenta, usa "Cambiar rol" en su fila.
         </p>
 
-        <section class="rounded-xl border border-linea bg-white">
-            <div class="overflow-x-auto">
+        <section
+            class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0 lg:flex-1"
+        >
+            <div
+                ref="contenedor"
+                class="min-h-0 flex-1 overflow-x-auto overflow-y-hidden"
+            >
                 <table class="w-full border-collapse text-sm">
                     <thead>
                         <tr class="border-b border-linea text-left">
@@ -251,6 +263,12 @@ const enlaceEliminar = 'text-aviso hover:underline';
                         >
                             <td class="px-5 py-3">
                                 <p class="font-medium">{{ cuenta.nombre }}</p>
+                                <p
+                                    v-if="cuenta.es_admin_principal"
+                                    class="text-xs font-medium text-marca"
+                                >
+                                    Administrador principal
+                                </p>
                                 <p class="text-xs text-tinta-suave">
                                     {{ cuenta.correo }}
                                 </p>
@@ -290,6 +308,12 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                 </Etiqueta>
                                 <Etiqueta v-else>○ Desactivada</Etiqueta>
                                 <p
+                                    v-if="cuenta.rol_inactivo"
+                                    class="mt-1 text-xs text-aviso"
+                                >
+                                    Rol inactivo: no puede entrar
+                                </p>
+                                <p
                                     v-if="
                                         cuenta.estado === 'eliminada' &&
                                         cuenta.se_borra_el
@@ -323,6 +347,19 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                         Mi perfil
                                     </Link>
                                 </template>
+                                <span
+                                    v-else-if="!puede('usuarios.gestionar')"
+                                    class="text-xs text-tinta-suave"
+                                >
+                                    Solo lectura
+                                </span>
+                                <!-- Nadie le quita el rol, la desactiva ni la elimina. -->
+                                <span
+                                    v-else-if="cuenta.es_admin_principal"
+                                    class="text-xs text-tinta-suave"
+                                >
+                                    Cuenta principal: no se modifica
+                                </span>
                                 <button
                                     v-else-if="cuenta.estado === 'eliminada'"
                                     type="button"
@@ -430,37 +467,14 @@ const enlaceEliminar = 'text-aviso hover:underline';
                 </table>
             </div>
 
-            <footer
-                class="flex flex-wrap items-center justify-between gap-3 border-t border-linea px-5 py-3"
-            >
-                <p class="text-sm text-tinta-suave">
-                    <template v-if="filtradas.length > 0">
-                        Mostrando {{ desde + 1 }}–{{
-                            desde + visibles.length
-                        }}
-                        de {{ filtradas.length }}
-                    </template>
-                    <template v-else>Sin resultados</template>
-                </p>
-                <div class="flex gap-2">
-                    <Boton
-                        variante="secundario"
-                        tamano="sm"
-                        :disabled="pagina === 1"
-                        @click="pagina--"
-                    >
-                        Anterior
-                    </Boton>
-                    <Boton
-                        variante="secundario"
-                        tamano="sm"
-                        :disabled="pagina >= paginas"
-                        @click="pagina++"
-                    >
-                        Siguiente
-                    </Boton>
-                </div>
-            </footer>
+            <Paginacion
+                v-model:pagina="pagina"
+                class="shrink-0"
+                :desde="desde"
+                :cantidad="visibles.length"
+                :total="total"
+                :paginas="paginas"
+            />
         </section>
     </div>
 

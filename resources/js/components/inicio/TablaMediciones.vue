@@ -8,7 +8,10 @@
  *
  * Acciones:
  * - Vencida: "Nueva fecha" (A1d, HU-009) y "Cancelar" (A3.1c) abren su
- *   modal aquí mismo; la medición conserva sus respuestas.
+ *   modal aquí mismo; la medición conserva sus respuestas. Si la empresa
+ *   pidió una medición nueva (HU-083), la fila lo dice y suma "Asignar
+ *   nueva", que abre A3.1b con la empresa elegida. Cualquiera de las tres
+ *   acciones deja la solicitud atendida.
  * - Terminada sin otra pendiente: "Asignar nueva" abre A3.1b con la empresa
  *   elegida (A1e).
  *
@@ -25,6 +28,7 @@ import Paginacion from '@/components/base/Paginacion.vue';
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
 import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal, haceCuanto } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
@@ -62,12 +66,33 @@ type Accion = {
     modal?: 'fecha' | 'cancelar' | 'correo';
 };
 
+const { puede } = usePermisos();
+
+/** Solo las acciones que el rol de la cuenta permite. */
 function acciones(f: FilaMedicion): Accion[] {
+    return todasLasAcciones(f).filter((a) =>
+        puede(
+            a.texto === 'Ver resultado'
+                ? 'resultados.ver'
+                : 'mediciones.asignar',
+        ),
+    );
+}
+
+function todasLasAcciones(f: FilaMedicion): Accion[] {
     const resultado = rutas.resultados.ver(f.id);
 
     switch (f.estado) {
         case 'vencida':
             return [
+                ...(f.solicitud
+                    ? [
+                          {
+                              texto: 'Asignar nueva',
+                              href: rutas.mediciones.asignar(f.empresa_id),
+                          },
+                      ]
+                    : []),
                 { texto: 'Nueva fecha', modal: 'fecha' },
                 { texto: 'Cancelar', peligro: true, modal: 'cancelar' },
             ];
@@ -76,7 +101,7 @@ function acciones(f: FilaMedicion): Accion[] {
         case 'no_iniciada':
             return [{ texto: 'Reenviar aviso', modal: 'correo' }];
         case 'terminada':
-            return f.pendiente_numero
+            return f.pendiente
                 ? [{ texto: 'Ver resultado', href: resultado }]
                 : [
                       { texto: 'Ver resultado', href: resultado },
@@ -111,9 +136,22 @@ const claseAccion = (a: Accion) =>
             : 'text-marca hover:text-marca-hover',
     );
 
+const comoVa = {
+    no_iniciada: 'sin iniciar',
+    en_curso: 'en curso',
+    enviada: 'en análisis',
+} as const;
+
 function nota(f: FilaMedicion): string | null {
     switch (f.estado) {
         case 'vencida':
+            if (f.solicitud) {
+                return `Pidió una medición nueva ${haceCuanto(f.solicitud)}`;
+            }
+
+            return f.ultimo_avance
+                ? `Último avance: ${haceCuanto(f.ultimo_avance)}`
+                : 'Sin respuestas todavía';
         case 'en_curso':
             return f.ultimo_avance
                 ? `Último avance: ${haceCuanto(f.ultimo_avance)}`
@@ -125,8 +163,8 @@ function nota(f: FilaMedicion): string | null {
                 ? `Último aviso: ${haceCuanto(f.ultimo_aviso)}`
                 : 'Sin aviso por correo';
         case 'terminada':
-            return f.pendiente_numero
-                ? `Tiene la medición ${f.pendiente_numero} en curso`
+            return f.pendiente
+                ? `Tiene la medición ${f.pendiente.numero} ${comoVa[f.pendiente.estado]}`
                 : null;
         default:
             return null;
@@ -168,11 +206,15 @@ const columnas = ['Empresa', 'Asignada', 'Vence', 'Estado', 'Acción'];
                     >
                         <td class="px-4 py-2.5">
                             <Link
+                                v-if="puede('empresas.ver')"
                                 :href="rutas.empresas.ver(fila.empresa_id)"
                                 class="font-medium hover:text-marca hover:underline"
                             >
                                 {{ fila.empresa }}
                             </Link>
+                            <span v-else class="font-medium">
+                                {{ fila.empresa }}
+                            </span>
                             <p class="text-xs text-tinta-suave">
                                 {{ fila.sector }}
                             </p>
@@ -266,7 +308,14 @@ const columnas = ['Empresa', 'Asignada', 'Vence', 'Estado', 'Acción'];
                             </p>
                             <p
                                 v-if="nota(fila)"
-                                class="text-xs text-tinta-suave"
+                                :class="
+                                    cn(
+                                        'text-xs',
+                                        fila.solicitud
+                                            ? 'font-medium text-aviso'
+                                            : 'text-tinta-suave',
+                                    )
+                                "
                             >
                                 {{ nota(fila) }}
                             </p>

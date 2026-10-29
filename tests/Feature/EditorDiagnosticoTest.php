@@ -9,9 +9,11 @@ use App\Models\Pregunta;
 use App\Models\Respuesta;
 use App\Models\Sector;
 use App\Models\User;
+use App\Services\Diagnosticos\ContenidoDiagnostico;
 use App\Support\EstadoDiagnostico;
 use Database\Seeders\RolesYPermisosSeeder;
 use Inertia\Testing\AssertableInertia as Assert;
+use Spatie\Permission\Models\Role;
 
 /*
  * A2.1 · Editor del diagnóstico (HU-023 a HU-029).
@@ -260,4 +262,46 @@ it('guarda una sola opción "Ninguna" que excluye a las demás, solo en selecci�
         'opciones' => [['texto' => 'Sí', 'puntaje' => 100, 'exclusiva' => true], ['texto' => 'No', 'puntaje' => 0]],
     ]))->assertSessionHasNoErrors();
     expect($pregunta->refresh()->opciones->pluck('exclusiva')->all())->toBe([false, false]);
+});
+
+it('guarda una sola opción "Otro" que pide escribir cuál y la congela al publicar', function () {
+    $pregunta = agregarPregunta($this, [
+        'tipo' => 'opcion_unica',
+        'opciones' => [
+            ['texto' => 'Instagram', 'puntaje' => 100],
+            ['texto' => 'Otro', 'puntaje' => 50, 'con_texto' => true],
+            ['texto' => 'Otra más', 'puntaje' => 0, 'con_texto' => true],
+        ],
+    ]);
+
+    expect($pregunta->opciones->pluck('con_texto')->all())->toBe([false, true, false]);
+
+    $congelada = collect(app(ContenidoDiagnostico::class)->congelar($this->diagnostico->fresh())['categorias'])
+        ->flatMap(fn ($c) => $c['preguntas'])->firstWhere('ref', 'p'.$pregunta->id);
+    expect(array_column($congelada['opciones'], 'con_texto'))->toBe([false, true, false]);
+});
+
+it('publicar pide su propio permiso: con solo "Editar" no se publica', function () {
+    $rol = Role::create(['name' => 'Editor de contenido', 'guard_name' => 'web']);
+    $rol->givePermissionTo(['diagnosticos.ver', 'diagnosticos.editar']);
+    $editor = User::factory()->create()->assignRole($rol);
+
+    $this->actingAs($editor)->get(route('diagnosticos.editar', $this->diagnostico))->assertOk();
+    $this->actingAs($editor)
+        ->post(route('diagnosticos.publicar', $this->diagnostico), ['nota' => 'v1', 'pendientes' => 'dejar'])
+        ->assertForbidden();
+
+    expect($this->diagnostico->fresh()->versiones()->exists())->toBeFalse();
+});
+
+it('comparte los permisos de la cuenta para ocultar los botones que no puede usar', function () {
+    $rol = Role::create(['name' => 'Consulta de empresas', 'guard_name' => 'web']);
+    $rol->givePermissionTo(['empresas.ver']);
+    $cristobal = User::factory()->create()->assignRole($rol);
+
+    $this->actingAs($cristobal)->get(route('empresas.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('auth.permisos', ['empresas.ver']));
+    $this->actingAs($cristobal)->get(route('empresas.crear'))->assertForbidden();
+    $this->actingAs($cristobal)->get(route('mediciones.crear'))->assertForbidden();
 });

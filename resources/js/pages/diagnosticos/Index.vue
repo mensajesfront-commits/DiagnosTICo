@@ -20,6 +20,7 @@ import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import ListaSectores from '@/components/diagnosticos/ListaSectores.vue';
+import ModalArchivados from '@/components/diagnosticos/modales/ModalArchivados.vue';
 import ModalArchivarDiagnostico from '@/components/diagnosticos/modales/ModalArchivarDiagnostico.vue';
 import ModalDuplicarDiagnostico from '@/components/diagnosticos/modales/ModalDuplicarDiagnostico.vue';
 import ModalEliminarDiagnostico from '@/components/diagnosticos/modales/ModalEliminarDiagnostico.vue';
@@ -30,9 +31,11 @@ import ModalReasignarSector from '@/components/diagnosticos/modales/ModalReasign
 import ModalSector from '@/components/diagnosticos/modales/ModalSector.vue';
 import ResumenDiagnosticos from '@/components/diagnosticos/ResumenDiagnosticos.vue';
 import TablaDiagnosticos from '@/components/diagnosticos/TablaDiagnosticos.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { rutas } from '@/lib/rutas';
 import { normalizar } from '@/lib/texto';
 import type {
+    DiagnosticoArchivado,
     DivisionCiiu,
     FilaDiagnostico,
     MedicionesPorEstado,
@@ -49,9 +52,15 @@ const props = withDefaults(
         diagnosticos: FilaDiagnostico[];
         /** Catálogo CIIU para elegir los subsectores de un sector (DEC-018). */
         divisionesCiiu?: DivisionCiiu[];
+        /** Archivados (HU-022): se restauran o se eliminan desde su ventana. */
+        archivados?: DiagnosticoArchivado[];
     }>(),
-    { sector: null, divisionesCiiu: () => [] },
+    { sector: null, divisionesCiiu: () => [], archivados: () => [] },
 );
+
+const { puede } = usePermisos();
+
+const modalArchivados = ref(false);
 
 const totalDiagnosticos = computed(() =>
     props.sectores.reduce((suma, s) => suma + s.diagnosticos, 0),
@@ -176,7 +185,10 @@ function elegir(
             <Boton variante="secundario" :href="rutas.categorias.catalogo()">
                 Catálogo de categorías
             </Boton>
-            <Boton :href="rutas.diagnosticos.crear(sector?.id)">
+            <Boton
+                v-if="puede('diagnosticos.editar')"
+                :href="rutas.diagnosticos.crear(sector?.id)"
+            >
                 + Crear diagnóstico
             </Boton>
         </EncabezadoPagina>
@@ -230,17 +242,26 @@ function elegir(
                             <button
                                 type="button"
                                 class="text-marca underline"
-                                @click="editarSector"
+                                @click="modalArchivados = true"
                             >
-                                Editar sector
+                                Archivados ({{ archivados.length }})
                             </button>
-                            <button
-                                type="button"
-                                class="text-marca underline"
-                                @click="modalEliminarSector = true"
-                            >
-                                Eliminar sector
-                            </button>
+                            <template v-if="puede('diagnosticos.editar')">
+                                <button
+                                    type="button"
+                                    class="text-marca underline"
+                                    @click="editarSector"
+                                >
+                                    Editar sector
+                                </button>
+                                <button
+                                    type="button"
+                                    class="text-marca underline"
+                                    @click="modalEliminarSector = true"
+                                >
+                                    Eliminar sector
+                                </button>
+                            </template>
                         </div>
                         <div
                             v-else
@@ -261,6 +282,13 @@ function elegir(
                                     <option value="nombre">Nombre (A–Z)</option>
                                 </Seleccion>
                             </label>
+                            <button
+                                type="button"
+                                class="text-marca underline"
+                                @click="modalArchivados = true"
+                            >
+                                Archivados ({{ archivados.length }})
+                            </button>
                             <label class="flex items-center gap-2">
                                 Estado
                                 <Seleccion
@@ -309,7 +337,10 @@ function elegir(
                             empresas de {{ sector.nombre }} recibirán solo
                             diagnósticos publicados de este sector.
                         </p>
-                        <div class="mt-4 flex flex-wrap justify-center gap-3">
+                        <div
+                            v-if="puede('diagnosticos.editar')"
+                            class="mt-4 flex flex-wrap justify-center gap-3"
+                        >
                             <Boton :href="rutas.diagnosticos.crear(sector.id)">
                                 + Crear diagnóstico para {{ sector.nombre }}
                             </Boton>
@@ -384,6 +415,12 @@ function elegir(
             @desactivar="modalEstado = true"
         />
     </template>
+
+    <ModalArchivados
+        v-model:abierto="modalArchivados"
+        :archivados="archivados"
+        :mostrar-sector="!sector"
+    />
 
     <ModalEliminarVarios
         v-model:abierto="modalEliminarVarios"

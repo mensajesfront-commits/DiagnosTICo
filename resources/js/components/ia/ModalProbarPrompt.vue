@@ -132,7 +132,10 @@ const resultadoDe = computed(
                 </Boton>
                 <span class="text-xs text-tinta-suave">
                     Gasta una llamada a la IA. Probar no afecta resultados
-                    reales: no se guarda nada.
+                    reales: no se guarda nada. Se permiten 100 pruebas al
+                    día<template v-if="prueba">
+                        · quedan {{ prueba.restantes }} hoy</template
+                    >.
                 </span>
             </div>
 
@@ -170,6 +173,15 @@ const resultadoDe = computed(
                             {{ resultadoDe.get(q.id)?.observacion }}
                         </li>
                     </ol>
+                    <h3 class="mt-3 text-xs font-semibold">
+                        Método de análisis
+                    </h3>
+                    <p>
+                        <strong>{{ prueba.resultado.metodo }}</strong>
+                        <span class="text-tinta-suave">
+                            · {{ prueba.resultado.metodo_motivo }}</span
+                        >
+                    </p>
                     <h3 class="mt-3 text-xs font-semibold">
                         Observación de la categoría
                     </h3>

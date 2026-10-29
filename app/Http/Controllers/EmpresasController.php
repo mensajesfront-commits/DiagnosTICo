@@ -8,12 +8,17 @@ use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\EmpresaDesactivada;
+use App\Rules\CargoDelDueno;
+use App\Rules\TelefonoValido;
 use App\Services\Mediciones\AsignarMedicion;
 use App\Support\DatosEmpresas;
 use App\Support\Invitaciones;
+use App\Support\Plazos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,7 +46,10 @@ class EmpresasController extends Controller
     /** A3.2 · Registrar empresa. */
     public function crear(): Response
     {
-        return Inertia::render('empresas/Registrar', ['opciones' => DatosEmpresas::opciones()]);
+        return Inertia::render('empresas/Registrar', [
+            'opciones' => DatosEmpresas::opciones(),
+            'fechaMinima' => Plazos::fechaMinima(null),
+        ]);
     }
 
     /**
@@ -139,9 +147,58 @@ class EmpresasController extends Controller
         return back();
     }
 
+    /**
+     * A3.1d · Dar una cuenta principal a una empresa que se quedó sin ella
+     * (su cuenta pasó al equipo de NuevasTIC, CambioDeRol). Es una cuenta
+     * nueva, que recibe el correo para crear su contraseña (RN-006). Sus
+     * colaboradores no se usan: no cambian de rol (RN-025).
+     */
+    public function cuentaPrincipal(Request $request, Empresa $empresa): RedirectResponse
+    {
+        abort_if(DatosEmpresas::principal($empresa) !== null, 422, 'Esta empresa ya tiene cuenta principal.');
+
+        /** @var User $admin */
+        $admin = $request->user();
+        $request->merge(['email' => mb_strtolower(trim((string) $request->input('email')))]);
+
+        $datos = $request->validate([
+            'usuario_nombre' => ['required', 'string', 'max:255'],
+            'cargo' => ['nullable', 'string', 'max:255', new CargoDelDueno($empresa->id, true)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)],
+            'usuario_telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
+        ], ['email.unique' => 'Ese correo ya es de otra cuenta.'], ['usuario_nombre' => 'nombre', 'email' => 'correo']);
+
+        $cuenta = DB::transaction(function () use ($datos, $empresa): User {
+            $cuenta = User::create([
+                'name' => trim((string) $datos['usuario_nombre']),
+                'cargo' => filled($datos['cargo'] ?? null) ? trim((string) $datos['cargo']) : null,
+                'email' => $datos['email'],
+                'telefono' => $datos['usuario_telefono'] ?? null,
+                'empresa_id' => $empresa->id,
+                'password' => null,
+            ]);
+            $cuenta->assignRole('Empresa');
+
+            return $cuenta;
+        });
+        Invitaciones::enviar($cuenta, 'Empresa', null, $admin->name);
+
+        $mensaje = "Enviamos a {$cuenta->email} el enlace para crear su contraseña.";
+        Inertia::flash('toast', ['type' => 'success', 'message' => $empresa->activa
+            ? $mensaje
+            : $mensaje.' La empresa sigue desactivada: reactívala para que pueda entrar.']);
+
+        return back();
+    }
+
     /** Reactivar desde la misma ficha (HU-035 CA-006). */
     public function reactivar(Empresa $empresa): RedirectResponse
     {
+        // Sin cuenta principal nadie podría entrar: primero se le da una.
+        if (DatosEmpresas::principal($empresa) === null) {
+            throw ValidationException::withMessages(['reactivar' => 'Esta empresa no tiene cuenta principal: dale una antes de reactivarla.']);
+        }
+
         DB::transaction(function () use ($empresa): void {
             $empresa->update(['activa' => true, 'desactivada_en' => null, 'motivo_desactivacion' => null]);
             DatosEmpresas::principal($empresa)?->forceFill(['activo' => true])->save();

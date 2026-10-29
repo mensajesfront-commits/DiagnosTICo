@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Diagnostico;
 use App\Models\Empresa;
+use App\Models\Medicion;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\InvitacionCuenta;
@@ -52,7 +54,24 @@ it('muestra la lista de cuentas al Administrador', function () {
     $principal = $cuentas->firstWhere('id', $laura->id);
     expect($principal['es_principal'])->toBeTrue()
         ->and($principal['colaboradores_activos'])->toBe(1)
-        ->and($principal['empresa'])->toBe('Restaurante La Esquina');
+        ->and($principal['empresa'])->toBe('Restaurante La Esquina')
+        ->and($principal['medicion_pendiente'])->toBeNull();
+});
+
+it('dice qué medición pendiente tiene la cuenta principal de una empresa', function () {
+    $laura = cuentaPrincipal();
+    $diagnostico = Diagnostico::factory()->publicado()->create(['sector_id' => $laura->empresa->sector_id]);
+    Medicion::factory()->create([
+        'empresa_id' => $laura->empresa_id,
+        'version_diagnostico_id' => $diagnostico->versiones()->firstOrFail()->id,
+        'numero' => 4,
+        'estado' => 'no_iniciada',
+        'fecha_limite' => '2099-10-20',
+    ]);
+
+    $cuentas = collect($this->actingAs($this->admin)->get(route('usuarios.index'))->viewData('page')['props']['cuentas']);
+    expect($cuentas->firstWhere('id', $laura->id)['medicion_pendiente'])->toBe('medición 4 no iniciada (vence el 20 de octubre)')
+        ->and($cuentas->firstWhere('id', $this->admin->id)['medicion_pendiente'])->toBeNull();
 });
 
 it('no deja entrar a una cuenta de empresa (RN-007)', function () {
@@ -361,4 +380,127 @@ it('una cuenta de empresa no puede eliminar cuentas', function () {
     $this->actingAs(cuentaPrincipal())
         ->delete(route('usuarios.eliminar', $otra), ['confirmacion' => $otra->email])
         ->assertForbidden();
+});
+
+it('al desactivar un rol, sus cuentas no entran hasta tener otro rol', function () {
+    $rol = Role::create(['name' => 'Consulta de empresas', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+    $cristobal = User::factory()->create(['password' => 'Clave-Segura-2026'])->assignRole($rol);
+
+    $this->actingAs($this->admin)
+        ->put(route('roles.update', $rol), ['nombre' => 'Consulta de empresas', 'activo' => false, 'permisos' => ['empresas.ver']])
+        ->assertSessionHasNoErrors();
+
+    expect($cristobal->fresh()->puedeEntrar())->toBeFalse();
+
+    // Con la sesión abierta, se cierra en la siguiente petición.
+    $this->actingAs($cristobal->fresh())->get(route('dashboard'))->assertRedirect(route('login'));
+    $this->assertGuest();
+
+    // Con otro rol vuelve a entrar.
+    $this->actingAs($this->admin)
+        ->put(route('usuarios.cambiar-rol', $cristobal), ['rol_id' => Role::findByName('Administrador')->id])
+        ->assertSessionHasNoErrors();
+    expect($cristobal->fresh()->puedeEntrar())->toBeTrue();
+});
+
+it('no deja desactivar el propio rol', function () {
+    $rol = Role::create(['name' => 'Equipo interno', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+    $rol->syncPermissions(['usuarios.ver', 'usuarios.gestionar']);
+    $yo = User::factory()->create()->assignRole($rol);
+
+    $this->actingAs($yo)
+        ->put(route('roles.update', $rol), ['nombre' => 'Equipo interno', 'activo' => false, 'permisos' => ['usuarios.ver', 'usuarios.gestionar']])
+        ->assertSessionHasErrors(['activo' => 'No puedes desactivar tu propio rol.']);
+    expect((bool) $rol->fresh()->getAttribute('activo'))->toBeTrue();
+});
+
+it('un colaborador no cambia de rol por ningún camino; sí se desactiva y se elimina', function () {
+    $laura = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole('Empresa');
+    $andres = User::factory()->create(['empresa_id' => $laura->empresa_id])->assignRole('Colaborador');
+    $andres->givePermissionTo(['diagnostico.responder']);
+    $rol = Role::create(['name' => 'Solo lectura', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+    $mensaje = 'Los colaboradores no cambian de rol: solo se desactivan o se eliminan.';
+
+    $this->actingAs($this->admin)->put(route('usuarios.cambiar-rol', $andres), ['rol_id' => $rol->id])
+        ->assertSessionHasErrors(['rol_id' => $mensaje]);
+    $this->actingAs($this->admin)->put(route('usuarios.cambiar-rol', $andres), ['rol_id' => Role::findByName('Administrador')->id])
+        ->assertSessionHasErrors(['rol_id' => $mensaje]);
+    $this->actingAs($this->admin)->post(route('roles.asignar', $rol), ['cuenta_id' => $andres->id])
+        ->assertSessionHasErrors(['cuenta_id' => $mensaje]);
+    $this->actingAs($this->admin)->post(route('roles.store'), ['nombre' => 'Otro', 'activo' => true, 'permisos' => [], 'cuentas' => [$andres->id]])
+        ->assertSessionHasErrors(['cuentas' => $mensaje]);
+
+    $andres->refresh();
+    expect($andres->hasRole('Colaborador'))->toBeTrue()
+        ->and($andres->empresa_id)->toBe($laura->empresa_id)
+        ->and($andres->can('diagnostico.responder'))->toBeTrue();
+
+    $this->actingAs($this->admin)->post(route('usuarios.desactivar', $andres))->assertSessionHasNoErrors();
+    expect($andres->fresh()->activo)->toBeFalse();
+    $this->actingAs($this->admin)->delete(route('usuarios.eliminar', $andres), ['confirmacion' => $andres->email])->assertSessionHasNoErrors();
+    expect($andres->fresh()->trashed())->toBeTrue();
+});
+
+it('nadie le quita el rol, desactiva ni elimina al Administrador principal', function () {
+    $principal = User::factory()->create(['email' => 'admin@nuevastic.co'])->assignRole('Administrador');
+    $principal->forceFill(['administrador_principal' => true])->save();
+    $rol = Role::create(['name' => 'Solo lectura', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+
+    $this->actingAs($this->admin)
+        ->put(route('usuarios.cambiar-rol', $principal), ['rol_id' => $rol->id])
+        ->assertSessionHasErrors(['rol_id' => 'Es la cuenta principal del Administrador: nadie le puede quitar el rol.']);
+    $this->actingAs($this->admin)
+        ->post(route('roles.asignar', $rol), ['cuenta_id' => $principal->id])
+        ->assertSessionHasErrors('cuenta_id');
+    $this->actingAs($this->admin)
+        ->post(route('roles.store'), ['nombre' => 'Otro', 'activo' => true, 'permisos' => [], 'cuentas' => [$principal->id]])
+        ->assertSessionHasErrors('cuentas');
+    $this->actingAs($this->admin)->post(route('usuarios.desactivar', $principal))->assertForbidden();
+    $this->actingAs($this->admin)->delete(route('usuarios.eliminar', $principal), ['confirmacion' => 'admin@nuevastic.co'])->assertForbidden();
+
+    $principal->refresh();
+    expect($principal->hasRole('Administrador'))->toBeTrue()
+        ->and($principal->activo)->toBeTrue()
+        ->and($principal->trashed())->toBeFalse();
+
+    $this->actingAs($this->admin)->get(route('usuarios.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('cuentas', fn ($cuentas) => collect($cuentas)->firstWhere('id', $principal->id)['es_admin_principal'] === true));
+});
+
+it('la cuenta principal de una empresa que pasa a Administrador deja la empresa y crea una contraseña nueva', function () {
+    Notification::fake();
+    $laura = cuentaPrincipal();
+    $laura->forceFill(['cargo' => 'Gerente'])->save();
+    $empresa = $laura->empresa;
+
+    $this->actingAs($this->admin)
+        ->put(route('usuarios.cambiar-rol', $laura), ['rol_id' => Role::findByName('Administrador')->id, 'avisar' => true])
+        ->assertSessionHasNoErrors();
+
+    $laura->refresh();
+    expect($laura->hasRole('Administrador'))->toBeTrue()
+        ->and($laura->empresa_id)->toBeNull()
+        ->and($laura->cargo)->toBeNull()
+        ->and($laura->password)->toBeNull()
+        ->and($laura->invitacionPendiente())->toBeTrue()
+        ->and($empresa->fresh()->activa)->toBeFalse();
+
+    Notification::assertSentTo($laura, InvitacionCuenta::class);
+    Notification::assertNotSentTo($laura, RolCambiado::class);
+});
+
+it('una cuenta interna que cambia de rol conserva su contraseña', function () {
+    Notification::fake();
+    $ana = User::factory()->create()->assignRole('Administrador');
+    $rol = Role::create(['name' => 'Solo lectura', 'guard_name' => 'web']);
+    $rol->forceFill(['activo' => true])->save();
+
+    $this->actingAs($this->admin)->put(route('usuarios.cambiar-rol', $ana), ['rol_id' => $rol->id])->assertSessionHasNoErrors();
+
+    expect($ana->fresh()->password)->not->toBeNull();
+    Notification::assertNotSentTo($ana, InvitacionCuenta::class);
 });

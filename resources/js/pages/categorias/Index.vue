@@ -20,6 +20,7 @@ import { usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { Categoria, DiagnosticoBorrador } from '@/types/diagnosticos';
+import { usePermisos } from '@/composables/usePermisos';
 
 type Filtro = 'todas' | 'en-uso' | 'archivadas';
 
@@ -33,6 +34,8 @@ const props = withDefaults(
     }>(),
     { borradores: () => [] },
 );
+
+const { puede } = usePermisos();
 
 const filtro = ref<Filtro>('todas');
 
@@ -118,7 +121,12 @@ function restaurar(categoria: Categoria): void {
                 texto: 'Diagnósticos',
             }"
         >
-            <Boton @click="modalCrear = true">+ Crear categoría</Boton>
+            <Boton
+                v-if="puede('diagnosticos.editar')"
+                @click="modalCrear = true"
+            >
+                + Crear categoría
+            </Boton>
         </EncabezadoPagina>
 
         <section class="rounded-xl border border-linea bg-white">
@@ -206,7 +214,13 @@ function restaurar(categoria: Categoria): void {
                                     ✓ En uso
                                 </Etiqueta>
                             </td>
-                            <td class="px-5 py-3 whitespace-nowrap">
+                            <td
+                                v-if="!puede('diagnosticos.editar')"
+                                class="px-5 py-3 text-xs text-tinta-suave"
+                            >
+                                Solo lectura
+                            </td>
+                            <td v-else class="px-5 py-3 whitespace-nowrap">
                                 <button
                                     v-if="categoria.archivada"
                                     type="button"

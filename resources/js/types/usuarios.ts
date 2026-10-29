@@ -24,10 +24,14 @@ export type Cuenta = {
     colaboradores_activos: number;
     /** Medición pendiente de su empresa ("Medición 4 no iniciada (vence el 20 oct)"). */
     medicion_pendiente: string | null;
+    /** Su rol está desactivado: no entra hasta tener otro rol (A5.1c). */
+    rol_inactivo: boolean;
     estado: EstadoCuenta;
     invitacion_enviada_en: string | null;
     /** La cuenta con la que se entró: no se desactiva ni cambia su rol. */
     es_tuya: boolean;
+    /** Administrador principal: nadie le quita el rol, la desactiva ni la elimina. */
+    es_admin_principal: boolean;
     /** Cuándo se eliminó; null si no está eliminada. */
     eliminada_en: string | null;
     /** Último día para recuperarla; después se borra para siempre. */
@@ -45,6 +49,7 @@ export type CuentaDelRol = {
     /** Empresa o correo, lo que se muestra al lado del nombre. */
     detalle: string;
     es_tuya: boolean;
+    es_admin_principal: boolean;
 };
 
 export type Rol = {

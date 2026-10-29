@@ -23,10 +23,8 @@ class Niveles
 
     /**
      * Frase que explica el nivel en el resultado (HU-064 CA-001) y en el PDF.
-     * La de "mejorar" es la del wireframe E6.
-     *
-     * [INFORMACIÓN PENDIENTE] NuevasTIC aprueba las frases de los otros tres
-     * niveles; estas son una propuesta del equipo.
+     * La de "mejorar" es la del wireframe E6; NuevasTIC aprobó las demás
+     * (23 de octubre de 2026).
      *
      * @var array<string, string>
      */

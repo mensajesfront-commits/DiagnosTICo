@@ -5,9 +5,12 @@ namespace App\Http\Requests\Empresas;
 use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
+use App\Rules\CargoDelDueno;
 use App\Rules\DepartamentoDelPais;
+use App\Rules\TelefonoValido;
 use App\Support\DatosEmpresas;
 use App\Support\OpcionesPerfil;
+use App\Support\Plazos;
 use App\Support\Ubicaciones;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -40,6 +43,7 @@ class DatosEmpresaRequest extends FormRequest
         $empresa = $this->route('empresa');
         $principal = $empresa ? DatosEmpresas::principal($empresa) : null;
         $sectorId = is_numeric($this->input('sector_id')) ? (int) $this->input('sector_id') : null;
+        $conCuenta = $empresa === null || $principal !== null;
         $conActividades = $sectorId !== null && ActividadEconomica::where('sector_id', $sectorId)->where('activo', true)->exists();
 
         $reglas = [
@@ -58,20 +62,24 @@ class DatosEmpresaRequest extends FormRequest
             'pais' => ['required', 'string', Rule::in(Ubicaciones::nombresDePaises())],
             'departamento' => ['required', 'string', new DepartamentoDelPais($this->string('pais')->value())],
             'ciudad' => ['required', 'string', 'min:2', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:30'],
+            'telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
             'sitio_web' => ['nullable', 'string', 'url', 'max:255'],
             'numero_empleados' => ['nullable', 'string', Rule::in(OpcionesPerfil::RANGOS_EMPLEADOS)],
-            'usuario_nombre' => ['required', 'string', 'max:255'],
-            'cargo' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($principal?->id)->withoutTrashed()],
-            'usuario_telefono' => ['nullable', 'string', 'max:30'],
+            // Sin cuenta principal (pasó al equipo de NuevasTIC) no se piden:
+            // se le da una con "Dar una cuenta principal".
+            'usuario_nombre' => [Rule::requiredIf($conCuenta), 'nullable', 'string', 'max:255'],
+            // Cargo del usuario principal: ningún colaborador puede tenerlo.
+            'cargo' => array_filter(['nullable', 'string', 'max:255', $empresa ? new CargoDelDueno($empresa->id, true, $principal?->id) : null]),
+            'email' => [Rule::requiredIf($conCuenta), 'nullable', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($principal?->id)->withoutTrashed()],
+            'usuario_telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
         ];
 
         if ($empresa === null) {
             $reglas += [
                 'asignar_medicion' => ['boolean'],
                 'diagnostico_id' => ['required_if_accepted:asignar_medicion', 'nullable', 'integer'],
-                'fecha_limite' => ['nullable', 'date', 'after_or_equal:today'],
+                // Empresa nueva: aún no tiene zona; se usa la del sistema.
+                'fecha_limite' => Plazos::reglas(null),
             ];
         }
 
@@ -86,7 +94,7 @@ class DatosEmpresaRequest extends FormRequest
         return [
             'email.unique' => 'Ese correo ya es de otra cuenta.',
             'diagnostico_id.required_if_accepted' => 'Elige el diagnóstico de la primera medición.',
-            'fecha_limite.after_or_equal' => 'La fecha límite no puede ser anterior a hoy.',
+            'fecha_limite.after_or_equal' => Plazos::mensaje(null),
         ];
     }
 

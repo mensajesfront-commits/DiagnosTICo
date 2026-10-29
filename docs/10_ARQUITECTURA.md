@@ -1,6 +1,6 @@
 # Arquitectura
 
-**Estado:** EN CURSO (T-063). Describe lo que ya existe y cómo se organizan los módulos que faltan.
+**Estado:** COMPLETO (T-063). Describe la arquitectura tal como quedó (14 de octubre de 2026). El detalle por clase está en `11_DISENO_TECNICO.md`.
 
 ## En una frase
 
@@ -50,7 +50,7 @@ El bot de WhatsApp está aplazado. Si se retoma, vive en la misma aplicación pe
 | **Validación** | Reglas de cada formulario y mensajes en español | `app/Http/Requests`, `app/Rules`, `lang/es` |
 | **Servicios y acciones** | Las reglas de negocio: crear la empresa, calcular puntajes, armar el prompt, publicar el resultado | `app/Actions`, `app/Services` |
 | **Modelos** | Tablas, relaciones y consultas | `app/Models` |
-| **Trabajos y tareas** | Lo que corre en segundo plano (RNF-004) o a una hora fija | `app/Jobs` (por crear), `routes/console.php` |
+| **Trabajos y tareas** | Lo que corre en segundo plano (RNF-004) o a una hora fija | `app/Jobs`, `routes/console.php` |
 | **Datos** | Tablas, versiones congeladas en JSONB | PostgreSQL, `database/migrations` |
 
 ## Regla de reparto entre Laravel y Vue
@@ -78,12 +78,12 @@ Cada épica de `05_REQUISITOS_FUNCIONALES.md` es un módulo. Un módulo tiene su
 | Acceso | EP-001 | L1–L4 | `pages/auth` | Fortify, `app/Actions/Fortify`, `FortifyServiceProvider` |
 | Mi perfil | EP-009 | A6, E11 | `pages/perfil` | `PerfilController` |
 | Sectores, categorías y diagnósticos | EP-003 a EP-005 | A2–A2.7 | `pages/diagnosticos`, `pages/categorias` | `DiagnosticosController`, `SectoresController`, `CategoriasController`, `app/Services/Diagnosticos` |
-| Inicio del Administrador | EP-002 | A1 | `pages/inicio/Administrador.vue` (bienvenida) | `InicioController` (redirección por rol, T-048) |
-| Empresas y mediciones | EP-006 | A3 | Por crear | Por crear |
-| Configuración de la IA | EP-007 | A4 | Por crear | `app/Services/Ia` (prueba técnica) |
+| Inicio del Administrador | EP-002 | A1 | `pages/inicio/Administrador.vue`, `components/inicio` | `InicioController`, `DatosInicio` |
+| Empresas y mediciones | EP-006 | A3–A3.5 | `pages/empresas`, `pages/mediciones`, `pages/historial`, `components/empresas` | `EmpresasController`, `MedicionesController`, `HistorialController`, `app/Services/Mediciones`, `DatosEmpresas` |
+| Configuración de la IA | EP-007 | A4–A4.9 | `pages/configuracion-ia`, `components/ia` | `ConfiguracionIaController`, `app/Services/Ia`, `DatosConfiguracionIa` |
 | Usuarios y roles | EP-008 | A5 | `pages/usuarios` | `UsuariosController`, `RolesController`, `RolesYPermisosSeeder` |
-| Experiencia de la empresa | EP-010, EP-011 | E1–E12 | `pages/inicio/Empresa.vue` (bienvenida), `pages/colaboradores` (E12) | `InicioController`, `ColaboradoresController`; el resto por crear |
-| Cálculo, IA y tareas | EP-012 | — | — | Trabajos y tareas programadas (semana 5) |
+| Experiencia de la empresa | EP-010, EP-011 | E1–E12 | `pages/inicio/Empresa.vue`, `pages/responder`, `pages/resultados`, `pages/historial`, `pages/colaboradores` | `InicioController`, `ResponderController`, `ResultadosController`, `HistorialController`, `ColaboradoresController` |
+| Cálculo, IA y tareas | EP-012 | E4 | `pages/responder/Enviado.vue` | `app/Jobs`, `app/Services/Resultados`, tareas programadas (`routes/console.php`) |
 
 ## Mapa de carpetas
 

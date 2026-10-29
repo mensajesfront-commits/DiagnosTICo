@@ -6,9 +6,143 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Agregado (cierre funcional, 14 de octubre)
+
+- **HU-083 · Atender las solicitudes de nueva medición:**
+  - aviso en A1 ("N empresas pidieron una medición nueva"), con esas filas primero en Vencidas y "Asignar nueva";
+  - aviso en A3, en la ficha, en A3.4 y en Asignar medición.
+  - Asignar otra medición, darle nueva fecha a la vencida o cancelarla deja la solicitud atendida.
+- **Opción "Otro" que pide escribir cuál:** se elige en A2.1b (se marca sola si empieza por "Otro"). En E2 aparece "¿Cuál?" y la IA lee "Otro: lo que escribió". Columna `opciones.con_texto`.
+- **"Ver:" en la gráfica de evolución** (A3.1, A3.4, E8): puntaje total o una categoría.
+- **A5:** la cuenta principal de una empresa dice qué medición pendiente tiene, para el aviso al desactivarla o cambiarle el rol.
+- **Avisos de Mi perfil (A6, E11):**
+  - cada correo respeta lo que eligió quien lo recibe;
+  - correo nuevo "Una empresa envió su diagnóstico";
+  - resumen semanal de mediciones pendientes (`mediciones:resumen`, lunes 07:50).
+- **Documentos nuevos:**
+  - 07 Reglas de negocio;
+  - 11 Diseño técnico;
+  - 13 API e integraciones;
+  - 16 Infraestructura;
+  - 19 Pruebas;
+  - 20 Despliegue;
+  - 21 Mantenimiento;
+  - 25 Roadmap;
+  - 29 Funcionalidades;
+  - 31 Manual de usuario.
+- Estado de cada historia actualizado en `05_REQUISITOS_FUNCIONALES.md`.
+
+### Agregado (verificación del correo, 16 de octubre)
+
+- **L2b · Verifica tu correo** (DEC-020):
+  - **Captcha** (Cloudflare Turnstile) antes de "Registrar empresa".
+  - Al registrarse no se entra al sistema: se abre una ventana para escribir el **código de 6 dígitos** que llega por correo. Vence en 15 minutos, admite 5 intentos y tiene "Reenviar código".
+  - Al acertar, lleva a Iniciar sesión con el correo escrito.
+  - Si se intenta entrar sin verificar, se abre la misma ventana en L1.
+  - Los registros sin verificar se borran a los 7 días (`cuentas:purgar`).
+  - **Mi perfil:** cambiar el correo también pide el código, enviado al correo nuevo.
+
+### Agregado (diagnósticos archivados, 16 de octubre)
+
+- **A2 · Archivados (N):** junto al título de la tabla se abre la ventana con los diagnósticos archivados del sector o de todos.
+  - **Restaurar** los devuelve a publicados.
+  - **Eliminar** los borra para siempre, con su historial de versiones y doble confirmación. Solo se puede si ninguna empresa los respondió, porque esos resultados se hicieron con ese diagnóstico (RN-010, RN-023).
+
+### Agregado (cargo del dueño único, 16 de octubre)
+
+- **El cargo del dueño de la empresa no se repite.** Ningún colaborador puede tener el cargo de la cuenta principal, ni al crearlo o editarlo (E12) ni desde su Mi perfil (E11). Tampoco el dueño puede tomar el cargo de un colaborador (E11, A3.1d). Se compara sin mayúsculas, tildes ni espacios de más (regla `CargoDelDueno`). Los cargos de los demás colaboradores sí se pueden repetir.
+
+### Agregado (términos de uso y política de datos, 16 de octubre)
+
+- **Borrador de los términos de uso y de la política de tratamiento de datos** (Ley 1581 de 2012), escrito con lo que el sistema hace de verdad: qué datos guarda, que las respuestas van a OpenAI sin el nombre de la empresa, Cloudflare en el captcha, los 7 días sin verificar, los 90 días para recuperar una cuenta, "Ver como" y los plazos para consultas y reclamos.
+- Solo están en L2: se abren en una ventana sin salir del formulario.
+- Lo que NuevasTIC no ha entregado (razón social, NIT, domicilio, vigencia, costo, proveedores) va marcado y resaltado como [INFORMACIÓN PENDIENTE].
+
+### Agregado (contraseña nueva más segura, 17 de octubre)
+
+- **La contraseña no puede tener partes del correo.** De "juan.perez1102@empresa.co" no se pueden usar "juan", "perez", "1102" ni "empresa", sin importar mayúsculas ni tildes. Las partes de menos de 3 caracteres no cuentan. Aplica en el registro (L2), la contraseña nueva (L4), Mi perfil y los colaboradores (E12). La lista de requisitos lo marca en vivo ("Sin partes de tu correo").
+- **La contraseña nueva debe ser distinta de la anterior** (L4, Mi perfil y editar colaborador). Esto lo revisa solo el servidor.
+- El correo de "¿Olvidaste tu contraseña?" ahora dice "Cambia tu contraseña" y su botón, "Cambiar contraseña".
+
+### Cambiado (botones según los permisos, 26 de octubre)
+
+- Cada pantalla oculta los botones que el rol de la cuenta no permite (`usePermisos`): Empresas (lista, ficha y Datos de la cuenta en solo lectura), Inicio, Diagnósticos, catálogo, editor y vista previa, resultados y PDF, Usuarios y roles.
+- Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
+- Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
+
+### Cambiado (responder el diagnóstico más fácil de leer, 28 de octubre)
+
+- **E2 · Responder:** el cuestionario usa casi todo el ancho (hasta 64rem, antes 48rem); la pregunta va en 18 px y las opciones en 16 px; cada opción es un recuadro grande con borde (también las de "Marca todas las que apliquen"), con el foco del teclado visible; "Cómo responder" en un recuadro; número de la pregunta en un círculo que pasa a ✓ y la marca "Respondida". Pedido del equipo para leer mejor, también con baja visión.
+- **E3 · Revisa antes de enviar:** el mismo diseño que E2: hasta 64rem de ancho, nombres de categoría en 18 px, avance en 16 px y botones grandes "Completar" o "Revisar" en cada categoría.
+- **E4 · Diagnóstico enviado:** mismo estilo: tarjeta más ancha (48rem), título de 30 px, pasos en recuadros con círculos grandes, barra de avance más gruesa y botón "Ir a mi inicio".
+- **Barra de arriba (E2–E4) en celular:** el avance pasa a un segundo renglón y ya no se monta sobre "Guardado" ni "Guardar y salir".
+- **Diagnóstico de ejemplo:** `php artisan db:seed --class=DiagnosticoEjemploSeeder` publica en el sector Comidas un diagnóstico de EJEMPLO con 3 categorías ("Presencia en línea" con 7 preguntas de los tres tipos). No es de NuevasTIC y no lo carga la instalación.
+
+### Cambiado (administrador principal, teléfono y cuentas que pasan al equipo, 28 de octubre)
+
+- **Administrador principal (A5):** la cuenta del Administrador creada al instalar (columna `users.administrador_principal`; en una base que ya existía, la cuenta de Administrador más antigua) dice "Administrador principal". Ningún otro Administrador le cambia el rol, se lo asigna a otro rol, la desactiva ni la elimina. Es la cuenta de `ADMIN_EMAIL`, que define NuevasTIC al lanzar el proyecto (el seeder la marca aunque ya exista). Solo ella se elimina a sí misma, desde Mi perfil ("Eliminar mi cuenta"): elige a otro Administrador activo como nueva cuenta principal y escribe su correo; se puede recuperar durante 90 días.
+- **Los colaboradores no cambian de rol:** ni con "Cambiar rol", ni con "Asignar a una cuenta", ni al crear un rol con cuentas, ni como cuenta principal de su empresa. Solo los desactivan o eliminan el Administrador (A5) o la cuenta principal de su empresa (E12). Las listas para asignar rol ya no los ofrecen (`CambioDeRol::permitido`).
+- **Contraseña de la cuenta principal:** el seeder crea la cuenta de `ADMIN_EMAIL` **sin contraseña** y le envía "Crear mi contraseña" (RN-006): nadie más la conoce. Si el correo falla, la terminal muestra el enlace. `php artisan admin:invitar` lo reenvía (`App\Support\AdministradorPrincipal`). Se quitó `ADMIN_PASSWORD` del `.env`.
+- **Teléfono en Mi perfil (A6, E11):** el teléfono nuevo se confirma con un código de 6 dígitos, como el correo. El código llega al correo actual o, si también cambia el correo, al correo nuevo (un solo código para los dos). Hasta confirmarlo se mantiene el anterior. Quitar el teléfono no pide código. Columna `users.telefono_pendiente`.
+- **Cuenta de empresa que pasa a un rol interno (A5.5):** deja la empresa (los roles internos no tienen empresa), se borran su contraseña, su cargo y sus avisos, y le llega la invitación para crear una contraseña nueva, como a cualquier cuenta interna. Si era la cuenta principal, la empresa queda desactivada con sus mediciones y resultados. El modal de cambiar o asignar rol lo avisa antes (`App\Support\CambioDeRol`).
+- **Dar una cuenta principal (A3.1d):** una empresa sin cuenta principal muestra "Sin cuenta principal" y el botón "Dar una cuenta principal". Es una cuenta nueva, que recibe la invitación para crear su contraseña. Sin cuenta principal la empresa no se reactiva, y sus datos se guardan sin los del usuario. Ruta `POST /empresas/{id}/cuenta-principal` (permiso `empresas.registrar`).
+
+### Cambiado (roles y colaboradores, 26 de octubre)
+
+- **Desactivar un rol (A5.1c)** bloquea a sus cuentas: no entran y se les cierra la sesión hasta que les asignes otro rol. Antes no se podía desactivar un rol con cuentas. Al desmarcar "Rol activo" sale el aviso con cuántas cuentas quedan fuera; en A5 esas cuentas dicen "Rol inactivo: no puede entrar". Nadie desactiva su propio rol.
+- **Páginas de cada colaborador (E12.1, E12.3):** la cuenta principal elige qué ve cada colaborador: "Responder el diagnóstico", "Resultados y Mi historial" y "Descargar el informe PDF" (pide también los resultados). La lista de E12 tiene la columna "Puede ver". Los colaboradores que ya existían conservan las tres (migración `paginas_por_colaborador`). Para agregar una página nueva basta con sumarla en `App\Support\PaginasColaborador`.
+- **El colaborador no cambia su perfil ni su contraseña (E11):** Mi perfil queda en solo lectura con un aviso; sin "Cambiar contraseña". "¿Olvidaste tu contraseña?" le manda un correo que dice que se la cambia la cuenta principal. El rol Colaborador queda sin permisos; las rutas de Mi perfil ahora piden "Editar su perfil" y "Cambiar su contraseña".
+- Corregido (E1): con una medición no iniciada o en curso también salían "Pedir una nueva fecha" y el correo de soporte; ahora solo salen cuando la medición venció (HU-082).
+- E1 sin "Responder" muestra "Tu empresa no te dio acceso para responder el diagnóstico."; sin "Resultados" no recibe puntajes.
+
+### Cambiado (Usuarios y roles fija, 26 de octubre)
+
+- **A5 · Usuarios:** la página queda fija sin importar cuántas cuentas haya. La tabla muestra las filas que caben en la pantalla y el paginado de Empresas (`useFilasQueCaben`), en lugar de 12 por página con desplazamiento.
+- **A5.2 · Roles:** también fija; la lista de roles y el panel del rol bajan cada uno en su espacio.
+- Se quitó la ruta pequeña "Usuarios y roles" de arriba, que repetía el título.
+
+### Cambiado (decisiones de NuevasTIC, 23 de octubre)
+
+- **Preguntas opcionales:** respondidas son un dato extra. La IA las lee (van marcadas como `dato_extra`), pero no cuentan en el puntaje; el resultado las muestra como "Dato extra".
+- **"Probar con un ejemplo":** 100 pruebas al día entre todos los administradores (PA-003). La ventana dice cuántas quedan.
+- **Al borrar para siempre una empresa**, sus mediciones terminadas se conservan sin nombre para estadísticas (`App\Support\Anonimizar`, migración `2026_10_23_000002`). Se borran el texto libre de las respuestas, el prompt guardado, el mensaje de la asignación y el PDF; se conservan sector, versión, fechas, puntajes y niveles. Las mediciones sin terminar se borran.
+- RN-028 ajustada: la IA puede usar DOFA y los demás métodos. Frases de los cuatro niveles, lista de sectores, carácter especial de la contraseña y resumen semanal (lunes 7:50 a. m.) confirmados.
+- `.env.example`: `OPENAI_MODEL="gpt-4.1-mini"`, el modelo que paga NuevasTIC.
+
+### Agregado (nada igual a la contraseña actual, 22 de octubre)
+
+- **En Mi perfil, la contraseña nueva no puede repetir partes de la actual:** ningún trozo de 4 caracteres seguidos o más, sin importar mayúsculas ni tildes ("Mesa-47-Sol" → "Mesa-99-Luna" no pasa). La lista de requisitos lo marca en vivo ("Nada igual a la contraseña actual"). Regla `SinPartesDeLaAnterior`.
+- Al recuperar la contraseña (L4) y cuando la empresa cambia la de un colaborador no se conocen las partes de la anterior, porque está cifrada. Ahí, y también en Mi perfil, la nueva **no puede ser ninguna de las últimas 5**, aunque cambien mayúsculas y minúsculas (tabla `contrasenas_anteriores`, `HistorialContrasenas`). L4 lo avisa debajo de los requisitos. Las cuentas de antes de este cambio empiezan su historial con la próxima contraseña.
+
+### Agregado (plazo de las mediciones, 22 de octubre)
+
+- **Mínimo 3 días para responder.** Al asignar una medición (A3.1b, A3.2, ficha) o darle nueva fecha, la fecha límite más cercana que se acepta es dentro de 3 días. El calendario no deja elegir antes y el servidor lo valida. Se cambia con `PLAZO_MINIMO_DIAS`.
+- **La fecha límite se cuenta en la hora de cada empresa:** vale hasta las 11:59 p. m. en la zona horaria de su cuenta principal (Mi perfil). La tarea `mediciones:vencer` corre cada hora para que cada empresa venza a su medianoche. E1 dice "Vence hoy a las 11:59 p. m.".
+
+### Corregido (hora del sistema, 22 de octubre)
+
+- El sistema contaba el día en hora UTC: en Colombia, una medición con fecha límite de hoy dejaba de poderse responder a las 7 p. m., y después de las 7 p. m. no se podía elegir "hoy" como fecha. Ahora usa la hora de cada empresa.
+- La limpieza de cuentas (03:10) y el resumen semanal (lunes 07:50) corrían en hora UTC; ahora corren en hora de Colombia (`ZONA_HORARIA_POR_DEFECTO`).
+
+### Corregido
+
+- **Teléfono (L2, A3.2, A3.1d, A6, E11):** se elige el indicativo del país y el campo solo acepta los dígitos de ese país (Colombia 10, Argentina 11…). Se guarda como "+57 3001234567" y el servidor valida el largo (`TelefonoValido`, `App\Support\Telefonos`).
+- **Informe PDF:** las etiquetas largas del radar se cortaban en el borde; ahora se parten en dos líneas. La página 1 suma "Tus categorías por nivel" y lo más fuerte y lo más débil, y la página 3 lista, después de las 3 prioridades, las demás categorías con su recomendación.
+- A1 decía "Tiene la medición N en curso" aunque la pendiente no estuviera iniciada.
+
+### Agregado (métodos de análisis y resultado de ejemplo, 14 de octubre)
+
+- **La IA elige el método** de cada categoría según las respuestas (PESTEL, 5 Fuerzas de Porter, VRIO, DOFA o CAME) y el resultado y el PDF muestran cuál usó y por qué (DEC-019).
+- **A2.6 · Resultado de ejemplo** (HU-030): mejor caso, caso medio y peor caso con el mismo cálculo que un resultado real, y el formato del PDF.
+- La IA acepta el puntaje de las abiertas como `45.0` o `"45"` y el error dice qué devolvió si no la califica.
+
 ### Agregado (opción "Ninguna", 13 de octubre)
 
 - En selección múltiple, una opción puede excluir a las demás ("Ninguna", "Nada"): al marcarla se desmarcan las otras, y el servidor no las acepta juntas. Columna `opciones.exclusiva`.
+
+### Agregado ("Ver como", 13 de octubre)
+
+- **A5.4 · "Ver como"** (HU-053, HU-054): desde Usuarios (A5) o la ficha de la empresa (A3.1), el Administrador ve el sistema como otra cuenta, con su menú y sus datos, en solo lectura, con la franja de aviso y "Salir de Ver como". Queda registrado quién lo usó y cuándo (RN-026).
 
 ### Agregado (historial, 13 de octubre)
 

@@ -9,7 +9,11 @@
  * "Reactivar". "+ Agregar colaborador" abre E12.1; al crear o cambiar una
  * contraseña se abre E12.2 con los datos para compartir.
  *
- * Props: empresa (nombre) y colaboradores (la cuenta principal primero).
+ * Cada colaborador ve solo las páginas que la cuenta principal le marca
+ * (columna "Puede ver") y no cambia su perfil ni su contraseña.
+ *
+ * Props: empresa (nombre), colaboradores (la cuenta principal primero) y
+ * paginas (las que se le pueden dar a un colaborador).
  * Contrato en docs/14_FRONTEND.md.
  */
 import { Head, router } from '@inertiajs/vue3';
@@ -23,12 +27,23 @@ import ModalDesactivarEliminarColaborador from '@/components/colaboradores/Modal
 import { rutas } from '@/lib/rutas';
 import { iniciales } from '@/lib/usuarios';
 import { cn } from '@/lib/utils';
-import type { Colaborador, DatosDeAcceso } from '@/types/colaboradores';
+import type {
+    Colaborador,
+    DatosDeAcceso,
+    PaginaColaborador,
+} from '@/types/colaboradores';
 
 const props = defineProps<{
     empresa: string;
     colaboradores: Colaborador[];
+    paginas: PaginaColaborador[];
 }>();
+
+const puedeVer = (colaborador: Colaborador) =>
+    props.paginas
+        .filter((p) => colaborador.paginas.includes(p.clave))
+        .map((p) => p.titulo)
+        .join(' · ') || 'Solo Inicio';
 
 defineOptions({
     layout: {
@@ -127,16 +142,17 @@ const enlaceEliminar =
             <div>
                 <h2 class="font-semibold">Un colaborador puede</h2>
                 <p class="mt-1 text-tinta-suave">
-                    Responder y enviar diagnósticos, ver el historial y los
-                    resultados, descargar el informe en PDF y cambiar su propia
-                    contraseña.
+                    Ver las páginas que tú le marques: responder el diagnóstico,
+                    ver los resultados y el historial o descargar el informe en
+                    PDF.
                 </p>
             </div>
             <div>
                 <h2 class="font-semibold">Un colaborador no puede</h2>
                 <p class="mt-1 text-tinta-suave">
-                    Agregar o desactivar colaboradores ni cambiar los datos de
-                    la empresa. Eso solo lo hace la cuenta principal.
+                    Agregar o desactivar colaboradores, cambiar los datos de la
+                    empresa ni cambiar su perfil o su contraseña. Eso solo lo
+                    hace la cuenta principal.
                 </p>
             </div>
         </section>
@@ -151,6 +167,7 @@ const enlaceEliminar =
                                     'Persona',
                                     'Cargo',
                                     'Rol',
+                                    'Puede ver',
                                     'Estado',
                                 ]"
                                 :key="columna"
@@ -209,6 +226,13 @@ const enlaceEliminar =
                                     colaborador.es_principal
                                         ? 'Cuenta principal · Tú'
                                         : 'Colaborador'
+                                }}
+                            </td>
+                            <td class="max-w-64 px-5 py-3 text-xs">
+                                {{
+                                    colaborador.es_principal
+                                        ? 'Todo'
+                                        : puedeVer(colaborador)
                                 }}
                             </td>
                             <td class="px-5 py-3">
@@ -308,12 +332,14 @@ const enlaceEliminar =
 
     <ModalAgregarColaborador
         v-model:abierto="modalAgregar"
+        :paginas="paginas"
         @creado="mostrarDatos($event, false)"
     />
     <template v-if="elegido">
         <ModalEditarColaborador
             v-model:abierto="modalEditar"
             :colaborador="elegido"
+            :paginas="paginas"
             @guardado="alGuardar"
         />
         <ModalDesactivarEliminarColaborador

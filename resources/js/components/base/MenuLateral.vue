@@ -27,6 +27,7 @@ import {
     rolesDeEmpresa,
 } from '@/lib/menu';
 import type { ItemMenu } from '@/lib/menu';
+import { rutas } from '@/lib/rutas';
 import { cn, toUrl } from '@/lib/utils';
 import { logout } from '@/routes';
 import { edit as perfil } from '@/routes/profile';
@@ -92,6 +93,14 @@ const claseItem = (esActivo: boolean) =>
 
 function cerrarSesion(): void {
     router.flushAll();
+}
+
+// A5.4 · "Ver como" activo.
+const verComo = computed(() => page.props.verComo);
+
+function salirVerComo(): void {
+    router.flushAll();
+    router.post(rutas.verComo.salir());
 }
 </script>
 
@@ -224,7 +233,18 @@ function cerrarSesion(): void {
                 {{ usuario.name.charAt(0).toUpperCase() }}
                 <span class="sr-only">Mi perfil</span>
             </Link>
+            <button
+                v-if="verComo"
+                type="button"
+                title="Salir de Ver como"
+                class="rounded-md p-1.5 text-[#f0c27a] hover:bg-menu-activo/60"
+                @click="salirVerComo"
+            >
+                <LogOut class="size-5" />
+                <span class="sr-only">Salir de Ver como</span>
+            </button>
             <Link
+                v-else
                 :href="logout()"
                 as="button"
                 title="Cerrar sesión"
@@ -253,7 +273,17 @@ function cerrarSesion(): void {
                     Mi perfil
                 </Link>
             </p>
+            <!-- En "Ver como" no se cierra la sesión del Administrador: se sale de la vista. -->
+            <button
+                v-if="verComo"
+                type="button"
+                class="mt-3 font-semibold text-[#f0c27a] hover:text-white"
+                @click="salirVerComo"
+            >
+                Salir de Ver como
+            </button>
             <Link
+                v-else
                 :href="logout()"
                 as="button"
                 class="mt-3 text-menu-texto hover:text-white"
