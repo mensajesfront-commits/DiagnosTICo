@@ -70,6 +70,10 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Corregido (29 de octubre)
+
+- **Barra de arriba de E2–E4:** al marcar una respuesta, "✓ Guardado 8:25 p. m." cambiaba a "Guardando…", que es más corto, y la barra de avance con el porcentaje y la categoría se estiraba y volvía a encogerse. Ahora ese aviso tiene un ancho fijo y nada se mueve al guardar.
+
 ### Cambiado (responder el diagnóstico más fácil de leer, 28 de octubre)
 
 - **E2 · Responder:** el cuestionario usa casi todo el ancho (hasta 64rem, antes 48rem); la pregunta va en 18 px y las opciones en 16 px; cada opción es un recuadro grande con borde (también las de "Marca todas las que apliquen"), con el foco del teclado visible; "Cómo responder" en un recuadro; número de la pregunta en un círculo que pasa a ✓ y la marca "Respondida". Pedido del equipo para leer mejor, también con baja visión.

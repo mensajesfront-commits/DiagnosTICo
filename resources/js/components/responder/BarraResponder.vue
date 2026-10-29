@@ -65,19 +65,25 @@ withDefaults(
         </div>
         <span class="flex-1 sm:hidden" />
         <span v-if="!titulo" class="hidden flex-1 sm:block" />
+        <!--
+            Ancho fijo: "Guardando…" y "✓ Guardado 10:42 p. m." ocupan lo
+            mismo, así la barra de avance y los textos no se mueven al guardar.
+        -->
         <span
-            v-if="guardando"
-            class="shrink-0 text-xs text-tinta-suave"
+            v-if="titulo"
+            :class="[
+                'w-40 shrink-0 text-right text-xs',
+                guardando ? 'text-tinta-suave' : 'text-exito',
+            ]"
             aria-live="polite"
         >
-            Guardando…
-        </span>
-        <span
-            v-else-if="guardado"
-            class="shrink-0 text-xs text-exito"
-            aria-live="polite"
-        >
-            ✓ Guardado {{ guardado }}
+            {{
+                guardando
+                    ? 'Guardando…'
+                    : guardado
+                      ? `✓ Guardado ${guardado}`
+                      : ''
+            }}
         </span>
         <Link
             v-if="conSalir"
