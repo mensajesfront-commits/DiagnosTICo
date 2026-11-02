@@ -11,6 +11,10 @@
  * Si alguna categoría falló tras los 3 intentos (RN-021), avisa y deja
  * reintentar solo esas (CA-004); el Administrador ya recibió un correo.
  *
+ * Suele tardar 1 o 2 minutos, según cuántas categorías tenga. Muestra cuánto
+ * lleva esperando y, pasados 3 minutos sin terminar, avisa que está tardando
+ * más de lo normal: puede salir, le llega un correo, y a quién escribir.
+ *
  * Mismo estilo que E2 y E3 para leer fácil: tarjeta más ancha (48rem), letra
  * de 16 a 18 px, pasos con círculos grandes y barra de avance gruesa.
  */
@@ -35,15 +39,46 @@ const props = defineProps<{
         /** Nombres de las categorías que fallaron tras los 3 intentos. */
         fallidas: string[];
     };
+    /** Correo de soporte, por si tarda más de lo normal. */
+    soporte?: string | null;
 }>();
+
+/** Pasados estos minutos sin terminar, se avisa que tarda más de lo normal. */
+const MINUTOS_NORMALES = 3;
+const ahora = ref(Date.now());
+
+const minutosEsperando = computed(() =>
+    props.enviadaEn
+        ? Math.max(
+              0,
+              Math.floor(
+                  (ahora.value - new Date(props.enviadaEn).getTime()) / 60000,
+              ),
+          )
+        : 0,
+);
+
+const esperando = computed(() =>
+    minutosEsperando.value < 1
+        ? 'Enviado hace menos de un minuto'
+        : `Enviado hace ${minutosEsperando.value} ${minutosEsperando.value === 1 ? 'minuto' : 'minutos'}`,
+);
 
 const listo = computed(() => props.estado === 'terminada');
 const fallo = computed(() => props.analisis.fallidas.length > 0);
+const tarda = computed(
+    () =>
+        !listo.value &&
+        !fallo.value &&
+        minutosEsperando.value >= MINUTOS_NORMALES,
+);
 
 let reloj: ReturnType<typeof setInterval> | null = null;
 
 onMounted(() => {
     reloj = setInterval(() => {
+        ahora.value = Date.now();
+
         // Sin "only": si ya terminó, el servidor redirige al resultado.
         if (!listo.value && !fallo.value) {
             router.reload();
@@ -124,7 +159,7 @@ function reintentar(): void {
                 {{
                     listo
                         ? 'Ya puedes ver tu puntaje, tu nivel y tus recomendaciones.'
-                        : 'Suele tardar menos de un minuto; si tarda más, te avisamos por correo.'
+                        : 'Suele tardar 1 o 2 minutos, según cuántas categorías tenga tu diagnóstico. Cuando esté listo te avisamos por correo.'
                 }}
             </p>
             <div
@@ -146,6 +181,13 @@ function reintentar(): void {
                     :style="{ width: `${Math.max(8, porcentaje)}%` }"
                 />
             </div>
+            <p
+                v-if="!listo && enviadaEn"
+                class="mt-2 text-sm text-tinta-suave"
+                aria-live="polite"
+            >
+                {{ esperando }}
+            </p>
             <ul class="mt-6 flex flex-col gap-3 text-base">
                 <li
                     v-for="paso in pasos"
@@ -184,6 +226,21 @@ function reintentar(): void {
                     </span>
                 </li>
             </ul>
+            <Aviso v-if="tarda" tono="info" class="mt-6 text-base">
+                <p>
+                    Está tardando más de lo normal. Tus respuestas están
+                    guardadas y el análisis sigue en curso: puedes salir y te
+                    avisaremos por correo cuando esté listo.
+                </p>
+                <p v-if="soporte" class="mt-2">
+                    Si en un rato no te llega, escríbenos a
+                    <a
+                        :href="`mailto:${soporte}`"
+                        class="font-medium underline"
+                        >{{ soporte }}</a
+                    >.
+                </p>
+            </Aviso>
             <Aviso v-if="fallo" tono="error" class="mt-6 text-base">
                 <p>
                     No pudimos terminar el análisis de algunas categorías:

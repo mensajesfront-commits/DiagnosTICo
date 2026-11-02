@@ -22,8 +22,8 @@ Los datos de PostgreSQL viven en el volumen `sail-pgsql`. Con `./vendor/bin/sail
 ./vendor/bin/sail up -d                 # levantar
 ./vendor/bin/sail artisan migrate       # migraciones
 ./vendor/bin/sail npm run dev           # Vite con recarga
-./vendor/bin/sail artisan queue:work    # cola (correos e IA en segundo plano)
-./vendor/bin/sail artisan schedule:work # tareas programadas (vencimientos)
+./vendor/bin/sail restart queue scheduler # la cola y las tareas programadas ya arrancan con up; reiniciar tras cambiar PHP
+./vendor/bin/sail logs -f queue         # ver qué hace la cola (análisis de la IA, correos)
 ./vendor/bin/sail artisan test          # pruebas del backend
 ./vendor/bin/sail down                  # apagar
 ```
@@ -53,7 +53,7 @@ Todas están explicadas en `.env.example`.
 - Cada desarrollador pone su clave en `OPENAI_API_KEY` y el modelo en `OPENAI_MODEL`.
 - `php artisan prueba:ia` hace una llamada real para comprobar que todo funciona (gasta una llamada).
 - Sin clave, `IA_DE_PRUEBA=true` analiza con textos y puntajes de prueba (`App\Services\Ia\AnalizadorDePrueba`) para recorrer todo el flujo. Nunca en producción.
-- El análisis corre en la cola: hace falta `queue:work` para que una medición enviada pase a "Terminada".
+- El análisis corre en la cola. El servicio `queue` de `compose.yaml` arranca solo con `sail up`; sin él, una medición enviada se queda en "Estamos analizando". Con la cola corriendo tarda 1 o 2 minutos (una llamada por categoría).
 - **[INFORMACIÓN PENDIENTE]** Falta saber quién aporta la clave y el saldo para el desarrollo (propuesta técnica, sección 5).
 
 ## WhatsApp (aplazado)

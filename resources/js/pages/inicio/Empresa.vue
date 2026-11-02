@@ -264,7 +264,7 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     v-else-if="p.estado === 'enviada'"
                     class="text-sm text-tinta-suave"
                 >
-                    Suele tardar menos de un minuto; si tarda más, te avisamos
+                    Suele tardar 1 o 2 minutos; cuando esté listo te avisamos
                     por correo.
                 </p>
                 <p

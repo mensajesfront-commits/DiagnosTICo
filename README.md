@@ -81,12 +81,12 @@ Mientras programas, usa `./vendor/bin/sail npm run dev` en lugar de `npm run bui
 
 ### 7. Colas y tareas programadas
 
-El envío de correos y el análisis de la IA corren en segundo plano. Para que funcionen, deja abiertas dos terminales:
+El envío de correos y el análisis de la IA corren en segundo plano. `./vendor/bin/sail up -d` levanta solos dos servicios para eso (`compose.yaml`):
 
-```bash
-./vendor/bin/sail artisan queue:work      # procesa la cola
-./vendor/bin/sail artisan schedule:work   # tareas diarias (marcar mediciones vencidas)
-```
+- `queue`: procesa la cola (`queue:work`). Sin él, un diagnóstico enviado se queda en "Estamos analizando".
+- `scheduler`: tareas programadas (`schedule:work`): mediciones vencidas, cuentas por borrar y el resumen semanal.
+
+Si cambias código de PHP, reinícialos para que lo tomen: `./vendor/bin/sail restart queue scheduler`. Para ver qué están haciendo: `./vendor/bin/sail logs -f queue`.
 
 ## Comprobar la instalación
 

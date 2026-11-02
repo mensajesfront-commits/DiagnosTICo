@@ -196,6 +196,8 @@ class ResponderController extends Controller
             'medicion' => $this->cabecera($medicion),
             'estado' => $medicion->estado,
             'enviadaEn' => $medicion->enviada_en?->toIso8601String(),
+            // Si tarda más de lo normal, a quién escribir.
+            'soporte' => config('diagnostico.soporte_email'),
             'analisis' => fn () => $this->avanceAnalisis($medicion),
         ]);
     }

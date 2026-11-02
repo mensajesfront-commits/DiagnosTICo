@@ -73,6 +73,8 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 ### Corregido (29 de octubre)
 
 - **Barra de arriba de E2–E4:** al marcar una respuesta, "✓ Guardado 8:25 p. m." cambiaba a "Guardando…", que es más corto, y la barra de avance con el porcentaje y la categoría se estiraba y volvía a encogerse. Ahora ese aviso tiene un ancho fijo y nada se mueve al guardar.
+- **El análisis ya no se queda esperando:** `compose.yaml` tiene los servicios `queue` (`queue:work`) y `scheduler` (`schedule:work`), que arrancan con `sail up`. Antes había que dejarlos corriendo en otra terminal; si no, un diagnóstico enviado se quedaba en "Estamos analizando".
+- **E4 · Espera del análisis:** dice "Suele tardar 1 o 2 minutos" (antes "menos de un minuto"), muestra hace cuánto se envió y, pasados 3 minutos, avisa que tarda más de lo normal, que puede salir porque le llegará un correo, y el correo de soporte.
 - **Aviso de guardado sin parpadeo (E2–E4):** ya no pasa a "Guardando…" y vuelve en cada respuesta. Se queda "✓ Guardado 10:42 p. m." y solo cambia la hora cuando cambia el minuto. "Guardando…" sale solo si todavía no se ha guardado nada.
 
 ### Cambiado (responder el diagnóstico más fácil de leer, 28 de octubre)

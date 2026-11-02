@@ -269,7 +269,7 @@ const hora = computed(() =>
         <p class="text-base">
             Después de enviarlo
             <strong>no podrás cambiar tus respuestas</strong>. Empezaremos a
-            analizarlas: suele tardar menos de un minuto; si tarda más, te
+            analizarlas: suele tardar 1 o 2 minutos y, cuando esté listo, te
             avisamos por correo.
         </p>
         <template #pie>
