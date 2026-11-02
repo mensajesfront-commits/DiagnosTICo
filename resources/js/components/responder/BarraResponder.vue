@@ -66,22 +66,22 @@ withDefaults(
         <span class="flex-1 sm:hidden" />
         <span v-if="!titulo" class="hidden flex-1 sm:block" />
         <!--
-            Ancho fijo: "Guardando…" y "✓ Guardado 10:42 p. m." ocupan lo
-            mismo, así la barra de avance y los textos no se mueven al guardar.
+            Ancho fijo y sin parpadeo: se queda "✓ Guardado 10:42 p. m." y
+            solo cambia la hora cuando cambia el minuto. "Guardando…" sale
+            únicamente si todavía no se ha guardado nada.
         -->
         <span
             v-if="titulo"
             :class="[
                 'w-40 shrink-0 text-right text-xs',
-                guardando ? 'text-tinta-suave' : 'text-exito',
+                guardado ? 'text-exito' : 'text-tinta-suave',
             ]"
-            aria-live="polite"
         >
             {{
-                guardando
-                    ? 'Guardando…'
-                    : guardado
-                      ? `✓ Guardado ${guardado}`
+                guardado
+                    ? `✓ Guardado ${guardado}`
+                    : guardando
+                      ? 'Guardando…'
                       : ''
             }}
         </span>
