@@ -72,6 +72,12 @@ class DatosResultado
             'tiene_pdf' => $tienePdf,
             'categorias' => $categorias,
             'prioridades' => self::prioridades($categorias),
+            // Resumen de E6: cuántas categorías quedaron en cada nivel y la más fuerte.
+            'por_nivel' => array_map(fn (string $clave) => [
+                'clave' => $clave,
+                'cantidad' => count(array_filter($categorias, fn (array $c) => $c['nivel'] === $clave)),
+            ], array_keys(Niveles::NIVELES)),
+            'mas_fuerte' => count($categorias) > 1 ? (array_reverse(self::ordenadas($categorias))[0] ?? null) : null,
         ];
     }
 

@@ -70,6 +70,17 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E6 / A3.3 · diseño del resultado, 2 de noviembre)
+
+- **Resumen:**
+  - un encabezado con el anillo grande, el nivel, la frase y la variación;
+  - una barra con cuántas categorías hay en cada nivel;
+  - las tarjetas «Lo que más urge» y «Lo más fuerte».
+  - Debajo, «Qué hacer ahora» (número de color según el nivel, pasos y plazo) y «Tus categorías» en barras de colores o en el mapa (radar), con un selector. Todo lleva al análisis de la categoría.
+- **Categorías:** la tabla pasa a ser una lista de tarjetas con el puntaje grande y una barra de color. El detalle tiene un encabezado con anillo, nivel, importancia y variación. En el celular, al elegir una categoría la pantalla baja sola al detalle.
+- **Recomendaciones:** borde y número del color del nivel de cada categoría.
+- **Datos nuevos:** `DatosResultado::pagina()` agrega `por_nivel` y `mas_fuerte` (los cálculos siguen en el backend).
+
 ### Cambiado (E4 · espera del análisis, 2 de noviembre)
 
 - Anillo de avance con el porcentaje analizado en el centro. Mientras trabaja, un halo y un arco giran a su alrededor; al terminar se pone verde con un check y aparece «Ver mi resultado».

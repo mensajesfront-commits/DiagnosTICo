@@ -401,3 +401,17 @@ it('el PDF del resultado de ejemplo lo dice en la portada', function () {
 
     expect(view('pdf.informe', ['informe' => $informe])->render())->toContain('Informe de ejemplo: los datos y textos son ilustrativos');
 });
+
+it('el resumen de E6 trae cuántas categorías hay por nivel y la más fuerte', function () {
+    $categorias = [
+        ['ref' => 'c1', 'nombre' => 'Uno', 'puntaje' => 20, 'importancia' => 50.0, 'nivel' => 'critico', 'recomendacion' => ['titulo' => 'A', 'detalle' => '']],
+        ['ref' => 'c2', 'nombre' => 'Dos', 'puntaje' => 85, 'importancia' => 30.0, 'nivel' => 'sigue', 'recomendacion' => ['titulo' => 'B', 'detalle' => '']],
+        ['ref' => 'c3', 'nombre' => 'Tres', 'puntaje' => 25, 'importancia' => 20.0, 'nivel' => 'critico', 'recomendacion' => ['titulo' => 'C', 'detalle' => '']],
+    ];
+
+    $pagina = DatosResultado::pagina(['puntaje_total' => 41, 'nivel' => 'mejorar', 'variacion' => null, 'por_categoria' => $categorias], null, now(), false);
+
+    expect(collect($pagina['por_nivel'])->pluck('cantidad', 'clave')->all())->toBe(['critico' => 2, 'mejorar' => 0, 'camino' => 0, 'sigue' => 1])
+        ->and($pagina['mas_fuerte']['nombre'])->toBe('Dos')
+        ->and($pagina['prioridades'][0]['nombre'])->toBe('Uno');
+});

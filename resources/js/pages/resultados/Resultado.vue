@@ -3,22 +3,30 @@
  * E6 · Resultado del diagnóstico (HU-064) y A3.3 · el mismo resultado visto
  * por el Administrador desde la ficha de la empresa (HU-038).
  *
- * Tres pestañas, para que la página quepa sin scroll:
- * - Resumen: puntaje total con su nivel, la frase que lo explica y la
- *   variación (RN-020; no hay en la primera medición), las 3 recomendaciones
- *   de las categorías más débiles y el radar actual vs. anterior.
- * - Categorías: la tabla con importancia, puntaje, nivel y "vs. anterior";
- *   al elegir una fila se ve su detalle: cada pregunta con la respuesta y la
- *   observación de la IA, la observación y la recomendación de la categoría.
- * - Recomendaciones: las de todas las categorías, de la más débil a la más
- *   fuerte.
+ * Tres pestañas:
+ * - Resumen: encabezado con el anillo, el nivel, la frase, la variación
+ *   (RN-020; no hay en la primera medición), la barra de categorías por
+ *   nivel y las tarjetas "Lo que más urge" y "Lo más fuerte". Debajo, "Qué
+ *   hacer ahora" (las 3 categorías más débiles) y "Tus categorías" en barras
+ *   o en el mapa (radar actual vs. anterior). Todo lleva al detalle.
+ * - Categorías: lista con puntaje, barra, nivel e importancia; al elegir una
+ *   se ve su análisis completo y cada pregunta con lo que dijo la IA. En el
+ *   celular, la pantalla baja sola al detalle.
+ * - Recomendaciones: la principal de cada categoría, de la más débil a la
+ *   más fuerte, con un borde del color de su nivel.
  *
  * Todo llega calculado y no cambia (RN-023). Sin FODA ni comparación con
  * promedios (RN-028).
  */
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ArrowLeft } from '@lucide/vue';
-import { computed, ref } from 'vue';
+import {
+    ArrowLeft,
+    CalendarClock,
+    ChevronRight,
+    TrendingDown,
+    TrendingUp,
+} from '@lucide/vue';
+import { computed, nextTick, ref, useTemplateRef } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
@@ -31,7 +39,7 @@ import PreguntaResultado from '@/components/resultados/PreguntaResultado.vue';
 import TarjetaRecomendacion from '@/components/resultados/TarjetaRecomendacion.vue';
 import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal, mesYAnio } from '@/lib/fechas';
-import { niveles, ordenNiveles } from '@/lib/niveles';
+import { niveles } from '@/lib/niveles';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import {
@@ -99,6 +107,28 @@ const pestanas = [
 
 const pestana = ref<Pestana>('resumen');
 
+// Resumen: las categorías en barras (por defecto) o en el mapa (radar).
+const vistas = [
+    { valor: 'barras' as const, etiqueta: 'Barras' },
+    { valor: 'mapa' as const, etiqueta: 'Mapa' },
+];
+const vistaCategorias = ref<'barras' | 'mapa'>('barras');
+
+// Barra de distribución por nivel: solo los niveles con categorías.
+const distribucionCompleta = computed(() => props.resultado.por_nivel ?? []);
+const distribucion = computed(() => {
+    const total = props.resultado.categorias.length || 1;
+
+    return distribucionCompleta.value
+        .filter((d) => d.cantidad > 0)
+        .map((d) => ({ ...d, ancho: (d.cantidad * 100) / total }));
+});
+const distribucionTexto = computed(() =>
+    distribucionCompleta.value
+        .map((d) => `${d.cantidad} en ${niveles[d.clave].nombre}`)
+        .join(', '),
+);
+
 const volver = computed(() =>
     props.ejemplo
         ? { href: props.ejemplo.volver, texto: 'Volver a la vista previa' }
@@ -163,6 +193,24 @@ function masRecomendaciones(c: CategoriaResultado): number {
     return Math.max(0, (c.recomendaciones?.length ?? 1) - 1);
 }
 
+// En pantallas angostas el detalle queda debajo de la lista: se baja a él.
+const detalle = useTemplateRef<HTMLElement>('detalle');
+
+function elegir(ref: string): void {
+    elegida.value = ref;
+
+    if (!window.matchMedia('(min-width: 1024px)').matches) {
+        nextTick(() =>
+            detalle.value?.scrollIntoView({
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)')
+                    .matches
+                    ? 'auto'
+                    : 'smooth',
+            }),
+        );
+    }
+}
+
 function abrirCategoria(ref: string): void {
     elegida.value = ref;
     pestana.value = 'categorias';
@@ -170,8 +218,6 @@ function abrirCategoria(ref: string): void {
 
 const porcentaje = (n: number) =>
     `${Number.isInteger(n) ? n : n.toFixed(2).replace(/\.?0+$/, '')}%`;
-
-const numero = (i: number) => String(i + 1).padStart(2, '0');
 </script>
 
 <template>
@@ -284,136 +330,297 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
         <!-- Resumen -->
         <div
             v-if="pestana === 'resumen'"
-            class="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[320px_1fr] lg:grid-rows-[minmax(0,1fr)]"
+            class="flex flex-col gap-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
         >
+            <!-- Encabezado: calificación, nivel, distribución y extremos -->
             <section
-                class="flex flex-col rounded-xl border border-linea bg-white p-5 lg:min-h-0 lg:overflow-y-auto"
+                class="grid shrink-0 gap-6 overflow-hidden rounded-2xl border border-linea bg-linear-to-br from-marca-suave/70 via-white to-white p-6 md:grid-cols-[auto_minmax(0,1fr)] xl:grid-cols-[auto_minmax(0,1fr)_minmax(0,18rem)]"
             >
-                <h2 class="text-xs text-tinta-suave">Puntaje total</h2>
-                <div class="mt-3 flex flex-col items-center text-center">
-                    <AnilloPuntaje
-                        :puntaje="resultado.puntaje"
+                <div class="flex flex-col items-center text-center">
+                    <div class="relative">
+                        <AnilloPuntaje
+                            :puntaje="resultado.puntaje"
+                            :nivel="resultado.nivel"
+                            :tamano="160"
+                        />
+                    </div>
+                    <EtiquetaNivel
                         :nivel="resultado.nivel"
-                        :tamano="148"
+                        class="mt-2 text-sm"
                     />
-                    <p class="-mt-1 text-xs text-tinta-suave">de 100</p>
-                    <EtiquetaNivel :nivel="resultado.nivel" class="mt-3" />
-                    <p class="mt-3 text-sm leading-relaxed">
+                </div>
+
+                <div class="flex min-w-0 flex-col justify-center">
+                    <h2
+                        class="text-xs font-medium tracking-wide text-tinta-suave uppercase"
+                    >
+                        Calificación general
+                    </h2>
+                    <p class="mt-1 text-lg leading-snug font-medium">
                         {{ resultado.frase }}
                     </p>
-                    <template v-if="resultado.anterior">
-                        <p class="mt-3 text-sm font-medium">
-                            <Variacion :valor="resultado.variacion" />
-                            vs. medición anterior
-                        </p>
-                        <p class="text-xs text-tinta-suave">
-                            Medición {{ resultado.anterior.numero }} ·
-                            {{ mesYAnio(resultado.anterior.fecha) }} ·
-                            {{ resultado.anterior.puntaje }} pts
-                        </p>
-                    </template>
-                    <p v-else class="mt-3 text-xs text-tinta-suave">
+                    <p
+                        v-if="resultado.anterior"
+                        class="mt-2 text-sm text-tinta-suave"
+                    >
+                        <Variacion :valor="resultado.variacion" />
+                        frente a la medición {{ resultado.anterior.numero }} ({{
+                            mesYAnio(resultado.anterior.fecha)
+                        }}
+                        · {{ resultado.anterior.puntaje }} pts)
+                    </p>
+                    <p v-else class="mt-2 text-sm text-tinta-suave">
                         {{
                             ejemplo
                                 ? 'Sin medición anterior: el ejemplo es una primera medición.'
                                 : 'Es tu primera medición: será tu punto de partida.'
                         }}
                     </p>
+
+                    <!-- Cuántas categorías hay en cada nivel -->
+                    <div v-if="distribucion.length" class="mt-4">
+                        <div
+                            class="flex h-3 overflow-hidden rounded-full bg-lienzo-oscuro"
+                            role="img"
+                            :aria-label="distribucionTexto"
+                        >
+                            <span
+                                v-for="d in distribucion"
+                                :key="d.clave"
+                                :class="niveles[d.clave].barra"
+                                :style="{ width: `${d.ancho}%` }"
+                            />
+                        </div>
+                        <ul
+                            class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-tinta-suave"
+                        >
+                            <li
+                                v-for="d in distribucionCompleta"
+                                :key="d.clave"
+                                class="inline-flex items-center gap-1.5"
+                            >
+                                <span
+                                    :class="
+                                        cn(
+                                            'size-2.5 rounded-full',
+                                            niveles[d.clave].barra,
+                                        )
+                                    "
+                                    aria-hidden="true"
+                                />
+                                <span class="font-semibold text-tinta">{{
+                                    d.cantidad
+                                }}</span>
+                                {{ niveles[d.clave].nombre }}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <ul class="mt-auto grid grid-cols-4 gap-1 pt-5 text-[11px]">
-                    <li
-                        v-for="n in ordenNiveles.filter((n) => n !== 'sin')"
-                        :key="n"
-                        class="text-tinta-suave"
+
+                <div
+                    class="grid gap-3 md:col-span-2 md:grid-cols-2 xl:col-span-1 xl:grid-cols-1"
+                >
+                    <button
+                        v-if="resultado.prioridades[0]"
+                        type="button"
+                        class="rounded-xl border border-nivel-critico/25 bg-white/80 px-4 py-3 text-left transition hover:border-nivel-critico/50 hover:shadow-sm"
+                        @click="abrirCategoria(resultado.prioridades[0].ref)"
                     >
                         <span
-                            :class="
-                                cn(
-                                    'mb-1 block h-1.5 rounded-full',
-                                    niveles[n].barra,
-                                )
-                            "
-                        />
-                        {{ niveles[n].nombre }}<br />{{ niveles[n].rango }}
-                    </li>
-                </ul>
+                            class="inline-flex items-center gap-1.5 text-xs font-medium text-nivel-critico-texto"
+                        >
+                            <TrendingDown class="size-4" aria-hidden="true" />
+                            Lo que más urge
+                        </span>
+                        <span
+                            class="mt-1 flex items-baseline justify-between gap-2"
+                        >
+                            <span class="truncate font-semibold">{{
+                                resultado.prioridades[0].nombre
+                            }}</span>
+                            <span class="font-mono text-lg font-semibold">{{
+                                resultado.prioridades[0].puntaje
+                            }}</span>
+                        </span>
+                    </button>
+                    <button
+                        v-if="resultado.mas_fuerte"
+                        type="button"
+                        class="rounded-xl border border-nivel-sigue/30 bg-white/80 px-4 py-3 text-left transition hover:border-nivel-sigue/60 hover:shadow-sm"
+                        @click="abrirCategoria(resultado.mas_fuerte.ref)"
+                    >
+                        <span
+                            class="inline-flex items-center gap-1.5 text-xs font-medium text-nivel-sigue-texto"
+                        >
+                            <TrendingUp class="size-4" aria-hidden="true" />
+                            Lo más fuerte
+                        </span>
+                        <span
+                            class="mt-1 flex items-baseline justify-between gap-2"
+                        >
+                            <span class="truncate font-semibold">{{
+                                resultado.mas_fuerte.nombre
+                            }}</span>
+                            <span class="font-mono text-lg font-semibold">{{
+                                resultado.mas_fuerte.puntaje
+                            }}</span>
+                        </span>
+                    </button>
+                </div>
             </section>
 
-            <div class="flex flex-col gap-4 lg:min-h-0">
-                <section class="shrink-0">
-                    <div class="flex flex-wrap items-baseline justify-between">
-                        <h2 class="font-semibold">
-                            Qué hacer ahora: recomendaciones priorizadas
-                        </h2>
+            <div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                <!-- Qué hacer ahora -->
+                <section class="rounded-2xl border border-linea bg-white p-5">
+                    <div
+                        class="flex flex-wrap items-baseline justify-between gap-2"
+                    >
+                        <h2 class="text-lg font-semibold">Qué hacer ahora</h2>
                         <span class="text-xs text-tinta-suave">
                             De la categoría más débil a la más fuerte
                         </span>
                     </div>
-                    <ol class="mt-2 grid gap-2 xl:grid-cols-3">
+                    <ol class="mt-3 flex flex-col gap-3">
                         <li
                             v-for="(p, i) in resultado.prioridades"
                             :key="p.ref"
                         >
                             <button
                                 type="button"
-                                class="h-full w-full rounded-xl border border-linea bg-white px-4 py-3 text-left hover:border-marca/40"
+                                class="group flex w-full gap-4 rounded-xl border border-linea bg-white p-4 text-left transition hover:border-marca/40 hover:shadow-sm"
                                 @click="abrirCategoria(p.ref)"
                             >
-                                <span class="flex items-center gap-2">
-                                    <span class="font-mono text-marca">{{
-                                        numero(i)
-                                    }}</span>
+                                <span
+                                    :class="
+                                        cn(
+                                            'flex size-10 shrink-0 items-center justify-center rounded-full font-mono text-lg font-semibold text-white',
+                                            niveles[p.nivel].barra,
+                                        )
+                                    "
+                                    aria-hidden="true"
+                                    >{{ i + 1 }}</span
+                                >
+                                <span class="min-w-0 flex-1">
                                     <span
-                                        :class="
-                                            cn(
-                                                'rounded px-1.5 py-0.5 text-[11px] font-medium',
-                                                niveles[p.nivel].etiqueta,
-                                            )
-                                        "
+                                        class="block text-base leading-snug font-semibold"
                                     >
-                                        {{ p.nombre }} · {{ p.puntaje }}
+                                        {{ p.recomendacion.titulo }}
                                     </span>
-                                    <EtiquetaMetodo
-                                        v-if="p.metodo"
-                                        :metodo="p.metodo"
-                                    />
+                                    <span
+                                        class="mt-1 flex flex-wrap items-center gap-2 text-xs"
+                                    >
+                                        <span
+                                            :class="
+                                                cn(
+                                                    'rounded px-1.5 py-0.5 font-medium',
+                                                    niveles[p.nivel].etiqueta,
+                                                )
+                                            "
+                                            >{{ p.nombre }} ·
+                                            {{ p.puntaje }}</span
+                                        >
+                                        <span
+                                            v-if="p.principal?.plazo"
+                                            class="inline-flex items-center gap-1 text-tinta-suave"
+                                        >
+                                            <CalendarClock
+                                                class="size-3.5"
+                                                aria-hidden="true"
+                                            />
+                                            {{ p.principal.pasos.length }} pasos
+                                            ·
+                                            {{ p.principal.plazo }}
+                                        </span>
+                                    </span>
+                                    <span
+                                        class="mt-1.5 line-clamp-2 block text-sm text-tinta-suave"
+                                    >
+                                        {{ p.recomendacion.detalle }}
+                                    </span>
                                 </span>
-                                <span
-                                    class="mt-1.5 block text-sm font-semibold"
-                                >
-                                    {{ p.recomendacion.titulo }}
-                                </span>
-                                <span
-                                    v-if="p.principal?.plazo"
-                                    class="mt-0.5 block text-xs font-medium text-marca"
-                                >
-                                    {{ p.principal.pasos.length }} pasos ·
-                                    {{ p.principal.plazo }}
-                                </span>
-                                <span
-                                    class="mt-0.5 line-clamp-3 block text-xs text-tinta-suave"
-                                >
-                                    {{ p.recomendacion.detalle }}
-                                </span>
+                                <ChevronRight
+                                    class="mt-2 size-5 shrink-0 text-tinta-suave transition group-hover:translate-x-0.5 group-hover:text-marca"
+                                    aria-hidden="true"
+                                />
                             </button>
                         </li>
                     </ol>
                 </section>
 
+                <!-- Tus categorías: barras o mapa -->
                 <section
-                    class="flex min-h-72 flex-col rounded-xl border border-linea bg-white p-5 lg:min-h-0 lg:flex-1"
+                    class="flex flex-col rounded-2xl border border-linea bg-white p-5"
                 >
-                    <h2 class="font-semibold">
-                        Mapa de las {{ resultado.categorias.length }}
-                        categorías
-                    </h2>
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-2"
+                    >
+                        <h2 class="text-lg font-semibold">
+                            Tus {{ resultado.categorias.length }} categorías
+                        </h2>
+                        <SelectorCompacto
+                            v-model="vistaCategorias"
+                            :opciones="vistas"
+                            etiqueta-accesible="Cómo ver las categorías"
+                        />
+                    </div>
+                    <ul
+                        v-if="vistaCategorias === 'barras'"
+                        class="mt-3 flex flex-col gap-1"
+                    >
+                        <li v-for="c in resultado.categorias" :key="c.ref">
+                            <button
+                                type="button"
+                                class="w-full rounded-lg px-2 py-2 text-left hover:bg-lienzo"
+                                @click="abrirCategoria(c.ref)"
+                            >
+                                <span
+                                    class="flex items-baseline justify-between gap-3 text-sm"
+                                >
+                                    <span class="truncate font-medium">{{
+                                        c.nombre
+                                    }}</span>
+                                    <span
+                                        class="flex shrink-0 items-baseline gap-2"
+                                    >
+                                        <Variacion
+                                            v-if="c.variacion !== null"
+                                            :valor="c.variacion"
+                                            class="text-xs"
+                                        />
+                                        <span class="font-mono font-semibold">{{
+                                            c.puntaje
+                                        }}</span>
+                                    </span>
+                                </span>
+                                <span
+                                    class="mt-1.5 block h-2.5 overflow-hidden rounded-full bg-lienzo-oscuro"
+                                >
+                                    <span
+                                        :class="
+                                            cn(
+                                                'block h-full rounded-full transition-[width] duration-700',
+                                                niveles[c.nivel].barra,
+                                            )
+                                        "
+                                        :style="{
+                                            width: `${Math.max(2, c.puntaje)}%`,
+                                        }"
+                                    />
+                                </span>
+                            </button>
+                        </li>
+                    </ul>
                     <RadarCategorias
-                        class="min-h-0 flex-1"
-                        alto="h-72 lg:h-full lg:min-h-48"
+                        v-else
+                        class="mt-2"
+                        alto="h-80"
                         :etiquetas="radar.etiquetas"
                         :actual="radar.actual"
                         :anterior="radar.anterior"
                     />
+                    <p class="mt-auto pt-3 text-xs text-tinta-suave">
+                        Toca una categoría para ver su análisis completo.
+                    </p>
                 </section>
             </div>
         </div>
@@ -424,108 +631,123 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
             class="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)]"
         >
             <section
-                class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0"
+                class="flex flex-col rounded-2xl border border-linea bg-white lg:min-h-0"
             >
-                <header
-                    class="flex flex-wrap items-baseline justify-between gap-2 px-5 pt-4"
-                >
-                    <h2 class="font-semibold">Puntaje por categoría</h2>
-                    <span class="text-xs text-tinta-suave">
+                <header class="px-5 pt-4 pb-2">
+                    <h2 class="text-lg font-semibold">Puntaje por categoría</h2>
+                    <p class="text-xs text-tinta-suave">
                         La importancia indica cuánto aporta cada categoría al
-                        total
-                    </span>
+                        total. Elige una para ver su análisis.
+                    </p>
                 </header>
-                <div class="mt-2 overflow-x-auto lg:min-h-0 lg:overflow-y-auto">
-                    <table class="w-full text-sm">
-                        <thead
-                            class="sticky top-0 bg-white text-left text-xs text-tinta-suave"
+                <ul
+                    class="flex flex-col gap-2 px-3 pb-3 lg:min-h-0 lg:overflow-y-auto"
+                    role="listbox"
+                    aria-label="Categorías"
+                >
+                    <li
+                        v-for="c in resultado.categorias"
+                        :key="c.ref"
+                        role="option"
+                        :aria-selected="c.ref === elegida"
+                    >
+                        <button
+                            type="button"
+                            :class="
+                                cn(
+                                    'w-full rounded-xl border-l-4 px-4 py-3 text-left transition',
+                                    c.ref === elegida
+                                        ? 'border-marca bg-marca-suave/60 shadow-sm'
+                                        : 'border-transparent hover:bg-lienzo',
+                                )
+                            "
+                            @click="elegir(c.ref)"
                         >
-                            <tr class="border-b border-linea">
-                                <th class="py-2 pl-5 font-normal">Categoría</th>
-                                <th class="px-2 py-2 font-normal">Import.</th>
-                                <th class="px-2 py-2 font-normal">Puntaje</th>
-                                <th class="px-2 py-2 font-normal">Nivel</th>
-                                <th
-                                    class="py-2 pr-5 pl-2 font-normal whitespace-nowrap"
-                                >
-                                    vs. anterior
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="c in resultado.categorias"
-                                :key="c.ref"
-                                :class="
-                                    cn(
-                                        'cursor-pointer border-b border-lienzo-oscuro hover:bg-lienzo',
-                                        c.ref === elegida &&
-                                            'bg-marca-suave/60',
-                                    )
-                                "
-                                :aria-selected="c.ref === elegida"
-                                @click="elegida = c.ref"
+                            <span
+                                class="flex items-center justify-between gap-3"
                             >
-                                <td class="py-2.5 pl-5">
-                                    <button
-                                        type="button"
-                                        class="text-left hover:text-marca"
-                                        @click.stop="elegida = c.ref"
+                                <span class="min-w-0">
+                                    <span
+                                        class="block truncate font-semibold"
+                                        >{{ c.nombre }}</span
                                     >
-                                        {{ c.nombre }}
-                                    </button>
-                                </td>
-                                <td class="px-2 font-mono text-xs">
-                                    {{ porcentaje(c.importancia) }}
-                                </td>
-                                <td class="px-2">
-                                    <div class="flex items-center gap-2">
+                                    <span
+                                        class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-tinta-suave"
+                                    >
+                                        <EtiquetaNivel :nivel="c.nivel" />
                                         <span
-                                            class="hidden h-1.5 w-20 overflow-hidden rounded-full bg-lienzo-oscuro sm:block"
+                                            >Importancia
+                                            {{
+                                                porcentaje(c.importancia)
+                                            }}</span
                                         >
-                                            <span
-                                                :class="
-                                                    cn(
-                                                        'block h-full rounded-full',
-                                                        niveles[c.nivel].barra,
-                                                    )
-                                                "
-                                                :style="{
-                                                    width: `${c.puntaje}%`,
-                                                }"
-                                            />
-                                        </span>
-                                        <span class="font-mono font-semibold">
-                                            {{ c.puntaje }}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-2">
-                                    <EtiquetaNivel :nivel="c.nivel" />
-                                </td>
-                                <td class="pr-5 pl-2 font-mono text-xs">
-                                    <Variacion :valor="c.variacion" />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                        <Variacion
+                                            v-if="c.variacion !== null"
+                                            :valor="c.variacion"
+                                        />
+                                    </span>
+                                </span>
+                                <span
+                                    :class="
+                                        cn(
+                                            'shrink-0 font-mono text-2xl font-semibold',
+                                            c.ref === elegida && 'text-marca',
+                                        )
+                                    "
+                                    >{{ c.puntaje }}</span
+                                >
+                            </span>
+                            <span
+                                class="mt-2 block h-2 overflow-hidden rounded-full bg-lienzo-oscuro"
+                            >
+                                <span
+                                    :class="
+                                        cn(
+                                            'block h-full rounded-full',
+                                            niveles[c.nivel].barra,
+                                        )
+                                    "
+                                    :style="{
+                                        width: `${Math.max(2, c.puntaje)}%`,
+                                    }"
+                                />
+                            </span>
+                        </button>
+                    </li>
+                </ul>
             </section>
 
             <section
                 v-if="categoria"
-                class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0"
+                ref="detalle"
+                class="flex scroll-mt-4 flex-col overflow-hidden rounded-2xl border border-linea bg-white lg:min-h-0"
             >
                 <header
-                    class="flex items-center justify-between gap-3 border-b border-linea px-5 py-3"
+                    class="flex items-center gap-4 border-b border-linea bg-linear-to-r from-marca-suave/60 to-white px-5 py-4"
                 >
-                    <h2 class="font-semibold">{{ categoria.nombre }}</h2>
-                    <span class="flex items-center gap-2">
-                        <span class="font-mono font-semibold">{{
-                            categoria.puntaje
-                        }}</span>
-                        <EtiquetaNivel :nivel="categoria.nivel" />
-                    </span>
+                    <AnilloPuntaje
+                        :puntaje="categoria.puntaje"
+                        :nivel="categoria.nivel"
+                        :tamano="64"
+                    />
+                    <div class="min-w-0 flex-1">
+                        <h2 class="text-xl leading-tight font-semibold">
+                            {{ categoria.nombre }}
+                        </h2>
+                        <p
+                            class="mt-1 flex flex-wrap items-center gap-2 text-xs text-tinta-suave"
+                        >
+                            <EtiquetaNivel :nivel="categoria.nivel" />
+                            <span
+                                >Importancia
+                                {{ porcentaje(categoria.importancia) }}</span
+                            >
+                            <span v-if="categoria.variacion !== null"
+                                ><Variacion :valor="categoria.variacion" /> vs.
+                                anterior</span
+                            >
+                        </p>
+                    </div>
                 </header>
                 <div
                     class="flex flex-col gap-4 p-5 lg:min-h-0 lg:overflow-y-auto"
@@ -569,12 +791,24 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                 <li
                     v-for="(c, i) in ordenadas"
                     :key="c.ref"
-                    class="rounded-xl border border-linea bg-white px-4 py-3"
+                    :class="
+                        cn(
+                            'rounded-2xl border border-l-4 border-linea bg-white px-4 py-3',
+                            niveles[c.nivel].borde,
+                        )
+                    "
                 >
                     <span class="flex items-center gap-2">
-                        <span class="font-mono text-marca">{{
-                            numero(i)
-                        }}</span>
+                        <span
+                            :class="
+                                cn(
+                                    'flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold text-white',
+                                    niveles[c.nivel].barra,
+                                )
+                            "
+                            aria-hidden="true"
+                            >{{ i + 1 }}</span
+                        >
                         <span
                             :class="
                                 cn(

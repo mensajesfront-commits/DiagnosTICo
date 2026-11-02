@@ -97,4 +97,8 @@ export type Resultado = {
     categorias: CategoriaResultado[];
     /** Las 3 categorías más débiles con su recomendación. */
     prioridades: Prioridad[];
+    /** Cuántas categorías quedaron en cada nivel. */
+    por_nivel?: { clave: Exclude<Nivel, 'sin'>; cantidad: number }[];
+    /** La categoría con mayor puntaje; null si hay una sola. */
+    mas_fuerte?: Prioridad | null;
 };
