@@ -70,6 +70,21 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A2.3 · Catálogo de categorías y A2.5 · Crear diagnóstico, 2 de noviembre)
+
+- **A2.3 · Catálogo de categorías:**
+  - Arriba, tres cifras: categorías en uso, archivadas y preguntas en total.
+  - El texto de ayuda va en una franja con ícono.
+  - Búsqueda por nombre con lupa (nueva) y filtro Todas / En uso / Archivadas en chips con conteo.
+  - Cada fila tiene un ícono y la descripción de la categoría bajo el nombre. La columna «Se usa en» muestra «N de M diagnósticos» con una barra. El estado va en una píldora.
+  - Editar, Archivar y Eliminar son botones con ícono (con su nombre al pasar el mouse y para lectores de pantalla). «Restaurar» es un botón con ícono.
+- **A2.5 · Crear diagnóstico:**
+  - El formulario va en dos pasos numerados: «1 · Datos del diagnóstico» y «2 · Punto de partida».
+  - El punto de partida se elige con dos tarjetas («En blanco» y «Copiar uno publicado»).
+  - Las categorías se marcan en recuadros, con el conteo «N de M elegidas» y «Elegir todas» / «Quitar todas» (nuevo).
+  - La importancia inicial se ve en una franja verde. La copia muestra un resumen con ícono y sus categorías en píldoras.
+  - «Qué pasa al crearlo» es una línea de pasos numerados.
+
 ### Cambiado (A2 · diseño de Diagnósticos, 2 de noviembre)
 
 - **Encabezado de la tabla:** ícono, título y conteo («1 diagnóstico · 1 empresa»). «Archivados», «Editar sector» y «Eliminar sector» llevan ícono y dejan de ser enlaces subrayados.
