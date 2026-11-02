@@ -21,6 +21,7 @@ class DatosHistorial
         $pendiente = $ficha['pendiente'];
         /** @var list<array<string, mixed>> $mediciones */
         $mediciones = $ficha['mediciones'];
+        $terminadas = array_values(array_filter($mediciones, fn (array $m) => $m['puntaje'] !== null));
 
         return [
             'empresa' => [
@@ -31,9 +32,36 @@ class DatosHistorial
             'pendiente' => $pendiente === null ? null : array_intersect_key($pendiente, array_flip([
                 'id', 'numero', 'estado', 'avance', 'diagnostico', 'version', 'asignada', 'vence', 'fecha_minima', 'tiene_respuestas', 'solicitud',
             ])),
-            'mediciones' => array_values(array_filter($mediciones, fn (array $m) => $m['puntaje'] !== null)),
+            'mediciones' => $terminadas,
+            'resumen' => self::resumen($terminadas),
             'evolucion' => $ficha['evolucion'],
             'evolucion_categorias' => $ficha['evolucion_categorias'],
+        ];
+    }
+
+    /**
+     * Las cifras de arriba de E8: la última medición, el cambio desde la
+     * primera y la mejor. Null si aún no hay mediciones terminadas.
+     *
+     * @param  list<array<string, mixed>>  $terminadas  de la más reciente a la primera
+     * @return array{cantidad: int, ultima: array<string, mixed>, primera: array<string, mixed>, cambio: int|null, mejor: array<string, mixed>}|null
+     */
+    private static function resumen(array $terminadas): ?array
+    {
+        if ($terminadas === []) {
+            return null;
+        }
+
+        $ultima = $terminadas[0];
+        $primera = $terminadas[count($terminadas) - 1];
+        $mejor = collect($terminadas)->sortByDesc('puntaje')->first();
+
+        return [
+            'cantidad' => count($terminadas),
+            'ultima' => $ultima,
+            'primera' => $primera,
+            'cambio' => count($terminadas) > 1 ? (int) $ultima['puntaje'] - (int) $primera['puntaje'] : null,
+            'mejor' => $mejor,
         ];
     }
 }

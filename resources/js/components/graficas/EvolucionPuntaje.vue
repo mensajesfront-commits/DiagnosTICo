@@ -122,6 +122,8 @@ const fuente = { family: 'IBM Plex Mono', size: 11 };
 const opciones: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    // Espacio arriba para la etiqueta de un puntaje cerca de 100.
+    layout: { padding: { top: 16 } },
     plugins: { legend: { display: false } },
     scales: {
         y: {

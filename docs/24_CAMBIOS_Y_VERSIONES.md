@@ -70,6 +70,20 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E8 / A3.4 · diseño del historial, 2 de noviembre)
+
+- **Arriba, cuatro cifras:**
+  - última calificación con su anillo y nivel;
+  - cambio desde la primera medición (+97 pts, en verde o rojo);
+  - mejor calificación;
+  - mediciones terminadas.
+  - Las arma `DatosHistorial` en `resumen`.
+- **Medición pendiente:** franja azul con ícono, estado, fecha y su botón.
+- **Gráfica de evolución:** más grande, al lado de la lista en pantallas anchas. Sin datos, muestra un ícono y una explicación.
+- **Mediciones terminadas:** la tabla pasa a ser una lista con anillo, nivel, «Más reciente» y la variación en una píldora de color. «Ver resultado» es un botón; respuestas y PDF son íconos con su nombre para lectores de pantalla. En el celular los botones van en su propia línea.
+- `useFilasQueCaben` acepta qué contar como fila (`fila`, `encabezado`), para paginar tarjetas además de tablas.
+- La gráfica de evolución deja espacio arriba para la etiqueta de un puntaje cerca de 100.
+
 ### Cambiado (E6 / A3.3 · diseño del resultado, 2 de noviembre)
 
 - **Resumen:**

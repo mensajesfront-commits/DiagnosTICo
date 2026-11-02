@@ -72,7 +72,19 @@ export function usePaginacion<T>(
  */
 export function useFilasQueCaben(
     contenedor: Ref<HTMLElement | null>,
-    { movil = 10, minimo = 3 }: { movil?: number; minimo?: number } = {},
+    {
+        movil = 10,
+        minimo = 3,
+        fila = 'tbody tr',
+        encabezado = 'thead',
+    }: {
+        movil?: number;
+        minimo?: number;
+        /** Qué se cuenta como fila: filas de tabla o tarjetas de una lista. */
+        fila?: string;
+        /** Encabezado fijo dentro del contenedor; null si no hay. */
+        encabezado?: string | null;
+    } = {},
 ) {
     const porPagina = ref(movil);
     let observador: ResizeObserver | null = null;
@@ -94,13 +106,18 @@ export function useFilasQueCaben(
         // número de filas no salta.
         let altoFila = 0;
 
-        for (const fila of caja.querySelectorAll('tbody tr')) {
-            altoFila = Math.max(altoFila, fila.getBoundingClientRect().height);
+        for (const elemento of caja.querySelectorAll(fila)) {
+            altoFila = Math.max(
+                altoFila,
+                elemento.getBoundingClientRect().height,
+            );
         }
 
-        const encabezado = caja.querySelector('thead')?.clientHeight ?? 40;
+        const altoEncabezado = encabezado
+            ? (caja.querySelector(encabezado)?.clientHeight ?? 40)
+            : 0;
         porPagina.value = filasQueCaben(
-            caja.clientHeight - encabezado,
+            caja.clientHeight - altoEncabezado,
             altoFila || 72,
             minimo,
         );

@@ -51,7 +51,12 @@ it('muestra a la empresa sus mediciones terminadas, la evolución y la pendiente
             ->where('evolucion_categorias.0.puntos.1.puntaje', 59)
             ->where('pendiente.numero', 3)
             ->where('pendiente.estado', 'en_curso')
-            ->missing('pendiente.ultimo_aviso'));
+            ->missing('pendiente.ultimo_aviso')
+            // Cifras de arriba: la última (49), +8 desde la primera (41) y la mejor.
+            ->where('resumen.cantidad', 2)
+            ->where('resumen.ultima.numero', 2)
+            ->where('resumen.cambio', 8)
+            ->where('resumen.mejor.puntaje', 49));
 });
 
 it('el Administrador ve el mismo historial de cualquier empresa; la empresa no ve el de otra', function () {
@@ -64,4 +69,12 @@ it('el Administrador ve el mismo historial de cualquier empresa; la empresa no v
 
     $this->actingAs($this->laura)->get(route('empresas.historial', $this->empresa))->assertForbidden();
     $this->actingAs($this->admin)->get(route('historial.mio'))->assertNotFound();
+});
+
+it('sin mediciones terminadas el resumen viene vacío', function () {
+    Resultado::query()->delete();
+    Medicion::where('estado', 'terminada')->update(['estado' => 'cancelada']);
+
+    $this->actingAs($this->laura)->get(route('historial.mio'))
+        ->assertInertia(fn (Assert $p) => $p->where('resumen', null)->has('mediciones', 0));
 });
