@@ -14,9 +14,14 @@ defineProps<{ sectores: SectorInicio[] }>();
 
 <template>
     <section
-        class="flex min-h-0 flex-col rounded-xl border border-linea bg-white p-4"
+        class="flex min-h-0 flex-col rounded-2xl border border-linea bg-white p-5"
     >
-        <h2 class="shrink-0 text-sm font-semibold">Diagnósticos por sector</h2>
+        <h2 class="shrink-0 text-base font-semibold">
+            Diagnósticos por sector
+        </h2>
+        <p class="shrink-0 text-xs text-tinta-suave">
+            Versión publicada y empresas de cada sector
+        </p>
 
         <p v-if="sectores.length === 0" class="mt-3 text-sm text-tinta-suave">
             No hay sectores activos.
@@ -26,27 +31,38 @@ defineProps<{ sectores: SectorInicio[] }>();
             <li
                 v-for="sector in sectores"
                 :key="sector.id"
-                class="flex items-center justify-between gap-2 border-b border-linea py-2.5 text-sm last:border-b-0"
+                class="border-b border-linea last:border-b-0"
             >
                 <Link
                     :href="rutas.diagnosticos.sector(sector.id)"
-                    class="min-w-0 truncate font-medium hover:text-marca hover:underline"
+                    class="flex items-center gap-3 rounded-lg px-1 py-2.5 hover:bg-lienzo"
                 >
-                    {{ sector.nombre }}
-                </Link>
-                <span class="flex shrink-0 items-center gap-2">
-                    <span class="text-xs text-tinta-suave">
-                        {{ sector.empresas }}
-                        {{ sector.empresas === 1 ? 'empresa' : 'empresas' }}
+                    <span
+                        :class="[
+                            'size-2.5 shrink-0 rounded-full',
+                            sector.version || sector.publicados > 1
+                                ? 'bg-nivel-sigue'
+                                : 'bg-nivel-mejorar',
+                        ]"
+                        aria-hidden="true"
+                    />
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-sm leading-snug font-medium">{{
+                            sector.nombre
+                        }}</span>
+                        <span class="block text-xs text-tinta-suave">
+                            {{ sector.empresas }}
+                            {{ sector.empresas === 1 ? 'empresa' : 'empresas' }}
+                        </span>
                     </span>
                     <Etiqueta v-if="sector.version" tono="exito">
-                        ✓ v{{ sector.version }} publicada
+                        v{{ sector.version }} publicada
                     </Etiqueta>
                     <Etiqueta v-else-if="sector.publicados > 1" tono="exito">
-                        ✓ {{ sector.publicados }} publicados
+                        {{ sector.publicados }} publicados
                     </Etiqueta>
                     <Etiqueta v-else tono="alerta">Sin publicar</Etiqueta>
-                </span>
+                </Link>
             </li>
         </ul>
     </section>

@@ -70,6 +70,17 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A1 · diseño del inicio del Administrador, 2 de noviembre)
+
+- **Encabezado:** la fecha de hoy.
+- **Indicadores con ícono y color:**
+  - «Mediciones pendientes» lleva una barra de sin iniciar, en curso y vencidas;
+  - «Puntaje promedio» lleva un anillo del color de su nivel.
+- **Franja «Requiere tu atención»** cuando hay mediciones vencidas o empresas que pidieron una nueva (HU-083): lleva a la pestaña Vencidas. Reemplaza el aviso junto al título de la tabla.
+- **Empresas por nivel:** una barra de colores con su leyenda.
+- **Diagnósticos por sector:** el nombre completo (antes se cortaba), un punto verde o naranja y el número de empresas debajo; toda la fila lleva al sector.
+- **Corregido:** en el celular la página medía 654 px y se salía hacia la derecha por la tabla; ahora la tabla se desliza dentro de su recuadro.
+
 ### Cambiado (E1 · diseño del inicio de la empresa, 2 de noviembre)
 
 - **Encabezado:** saludo más grande y la fecha de hoy.
