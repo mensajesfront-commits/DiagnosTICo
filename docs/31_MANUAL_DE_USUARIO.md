@@ -185,7 +185,13 @@ En el resultado (E6) ves:
 Además:
 
 - **Ver mis respuestas** (E9): lo que respondiste, con una observación por pregunta.
-- **Ver informe PDF** (E10): un informe de 3 páginas para guardar o compartir.
+- **Ver informe PDF** (E10): un informe completo para guardar, imprimir o compartir. Trae:
+  - la portada con el puntaje;
+  - cómo leerlo: cómo se calcula el puntaje, los niveles y los métodos de análisis;
+  - el resumen con el mapa y la tabla;
+  - una página por categoría;
+  - el plan de acción para marcar lo que se va haciendo;
+  - los próximos pasos y un glosario.
 
 ## B.5 Tu historial
 

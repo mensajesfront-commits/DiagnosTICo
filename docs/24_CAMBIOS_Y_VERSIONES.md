@@ -70,6 +70,18 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (informe PDF completo, 2 de noviembre)
+
+- El PDF deja de ser un resumen de 3 páginas y pasa a ser un informe que se entiende sin la pantalla:
+  - **Portada:** puntaje, nivel, frase y contenido.
+  - **1 · Cómo leer este informe:** qué mide el diagnóstico, cómo se calcula el puntaje (con un ejemplo con los datos de la empresa), qué significa cada nivel, cómo hizo el análisis la IA y los 5 métodos (PESTEL, Porter, VRIO, DOFA, CAME) con sus grupos y en qué categorías se usó cada uno.
+  - **2 · Resumen de resultados:** el puntaje en palabras, las categorías por nivel, el radar y la tabla, cada uno con cómo leerlo. La tabla suma el aporte al total y la prioridad.
+  - **3 · Análisis por categoría:** una página por categoría con importancia, aporte, variación, qué significa su nivel, el diagnóstico, el método y lo que encontró por grupos, lo que ya se hace bien, las recomendaciones con pasos, plazo e indicador, y las respuestas con lo que dijo la IA de cada una.
+  - **4 · Plan de acción:** todas las recomendaciones en tres partes (Primero, Después, Más adelante), con casilla para marcar y espacio para el responsable.
+  - **5 · Próximos pasos y glosario.**
+- Encabezado y "Página N de M" en cada hoja (`pdf/encabezado.blade.php`, `pdf/pie.blade.php`), márgenes más amplios.
+- Textos nuevos: `MetodosAnalisis::EXPLICACION_GRUPOS` y `Niveles::EN_CATEGORIA`.
+
 ### Cambiado (análisis de la IA más completo, 2 de noviembre)
 
 - **Cada categoría trae ahora**, en E6, A3.3, el resultado de ejemplo (A2.6) y "Probar" (A4.7):
@@ -77,7 +89,6 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
   - **lo que encontró el método**, por sus grupos (DOFA: Fortalezas, Oportunidades, Debilidades, Amenazas; PESTEL, Porter, VRIO y CAME con los suyos);
   - **lo que ya hace bien** (0 a 2 frases);
   - **2 o 3 recomendaciones en orden**, cada una con 3 pasos, plazo y "Cómo saber si funcionó".
-- El PDF agrega los pasos, el plazo y el indicador a las 3 recomendaciones priorizadas, sin pasar de 3 páginas.
 - `AnalizadorDeCategoria` pide y valida el formato nuevo: descarta grupos de otro método y reintenta si no hay hallazgos o recomendaciones con pasos.
 - Los resultados publicados antes no cambian (RN-023): se siguen viendo con la observación y una recomendación.
 

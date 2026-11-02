@@ -10,9 +10,9 @@ use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\LaravelPdf\PdfBuilder;
 
 /**
- * Informe PDF del resultado (E10, HU-066, RN-024): 3 páginas (portada y
- * puntaje; radar y puntaje por categoría; recomendaciones). Sale solo de lo
- * guardado en el resultado: nunca vuelve a llamar a la IA.
+ * Informe PDF del resultado (E10, HU-066, RN-024): portada, cómo leerlo,
+ * resumen, una página por categoría, plan de acción y glosario. Sale solo
+ * de lo guardado en el resultado: nunca vuelve a llamar a la IA.
  *
  * Se guarda en el disco local (storage/app/private/informes) y la ruta queda
  * en `resultados.pdf_ruta`.
@@ -40,9 +40,14 @@ class InformePdf
      */
     public static function desde(array $informe): PdfBuilder
     {
+        $titulo = "{$informe['empresa']['nombre']} · Medición {$informe['numero']}";
+
         return Pdf::view('pdf.informe', ['informe' => $informe])
+            // Encabezado y número de página en cada hoja: el largo depende de las categorías.
+            ->headerView('pdf.encabezado', ['titulo' => $titulo])
+            ->footerView('pdf.pie')
             ->format(Format::Letter)
-            ->margins(14, 14, 14, 14)
+            ->margins(20, 18, 18, 18)
             // La plantilla marca window.radarListo cuando Chart.js terminó de dibujar.
             ->waitUntilReady('window.radarListo === true');
     }

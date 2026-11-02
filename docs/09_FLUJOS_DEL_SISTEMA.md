@@ -58,7 +58,7 @@ sequenceDiagram
     C->>L: PublicarResultado (cuando no queda ninguna pendiente)
     L->>L: Promedio por categoría, total ponderado, nivel y variación (RN-018 a RN-020)
     L->>BD: resultados (inmutable) · medición → Terminada
-    L->>L: Genera el PDF de 3 páginas (Chromium)
+    L->>L: Genera el informe PDF (Chromium)
     L->>BD: Guarda la ruta del PDF
     L->>M: "Tu resultado está listo"
     V->>L: E5 consulta el avance

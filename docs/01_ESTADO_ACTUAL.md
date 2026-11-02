@@ -26,7 +26,7 @@ Lo construido, de punta a punta:
   - respuestas, PDF, historial y colaboradores (E1–E12).
 - **Automático:**
   - cálculo de puntajes y análisis de la IA por categoría con 3 intentos;
-  - resultado inmutable y PDF de 3 páginas;
+  - resultado inmutable e informe PDF completo;
   - avisos por correo según Mi perfil;
   - tareas diarias y resumen semanal.
 
@@ -68,7 +68,7 @@ Lo construido, de punta a punta:
 - **[INFORMACIÓN PENDIENTE]** El correo de soporte (`SOPORTE_EMAIL`).
 - **[INFORMACIÓN PENDIENTE]** Las llaves reales de Cloudflare Turnstile (el captcha del registro).
 - **[INFORMACIÓN PENDIENTE]** Los datos del responsable en la política de datos (razón social, NIT, domicilio, vigencia).
-- **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Lo vigente es una etapa por categoría y un PDF de 3 páginas.
+- **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Lo vigente es una etapa por categoría y el informe PDF completo de RN-024.
 
 ## Cómo verificar lo hecho
 

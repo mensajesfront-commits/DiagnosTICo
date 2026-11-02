@@ -84,7 +84,7 @@ Ruta (routes/web.php, con su permiso)
 | `Services\Ia\Analizador` | Interfaz con dos versiones: `AnalizadorDeCategoria` (OpenAI, salida JSON estricta) y `AnalizadorDePrueba` (sin conexión, `IA_DE_PRUEBA=true`). |
 | `Services\Resultados\CalculadoraPuntajes` | Funciones puras del cálculo (RN-018) y el texto de cada respuesta. |
 | `Services\Resultados\PublicarResultado` | Consolida y publica el resultado una sola vez, avisa a la empresa y manda a generar el PDF. |
-| `Jobs\GenerarInformePdf` e `InformePdf` | PDF de 3 páginas con Chromium (RN-024). |
+| `Jobs\GenerarInformePdf` e `InformePdf` | Informe PDF con Chromium, con encabezado y número de página en cada hoja (RN-024). |
 | `Support\Niveles` y `Support\MetodosAnalisis` | Niveles con su frase (RN-019) y los cinco métodos de análisis (DEC-019). |
 
 ### Ver como

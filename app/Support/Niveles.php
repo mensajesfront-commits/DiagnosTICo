@@ -35,6 +35,23 @@ class Niveles
         'sigue' => 'Tu marketing digital está sólido. Mantén lo que haces y mide cada mes para no perder terreno.',
     ];
 
+    /**
+     * Qué quiere decir el nivel en una sola categoría (informe PDF).
+     *
+     * @var array<string, string>
+     */
+    public const array EN_CATEGORIA = [
+        'critico' => 'En este tema casi no hay prácticas digitales todavía. Es donde un cambio pequeño se nota más rápido.',
+        'mejorar' => 'Hay algunas prácticas, pero les falta constancia, un plan o medir los resultados.',
+        'camino' => 'Lo básico funciona. Falta afinar lo que se hace y medirlo para crecer.',
+        'sigue' => 'Este tema está sólido. El reto es mantenerlo y revisarlo cada mes.',
+    ];
+
+    public static function enCategoria(string $clave): string
+    {
+        return self::EN_CATEGORIA[$clave] ?? '';
+    }
+
     /** Clave del nivel de un puntaje de 0 a 100. */
     public static function de(int|float $puntaje): string
     {

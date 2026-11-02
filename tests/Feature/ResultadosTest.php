@@ -16,6 +16,7 @@ use App\Services\Ia\Analizador;
 use App\Services\Ia\AnalizadorDePrueba;
 use App\Services\Ia\ArmadorPrompt;
 use App\Services\Resultados\CalculadoraPuntajes;
+use App\Services\Resultados\InformePdf;
 use App\Support\DatosResultado;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Facades\Notification;
@@ -268,7 +269,7 @@ it('descarga el PDF guardado; si falta, lo vuelve a generar sin llamar a la IA',
         ->assertDownload('informe_la_esquina_m1.pdf');
 });
 
-it('la plantilla del PDF tiene 3 páginas con radar, tabla y recomendaciones', function () {
+it('el informe PDF explica cómo leerlo, analiza cada categoría y arma el plan de acción', function () {
     responderYEnviar($this, $this->medicion);
     $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
 
@@ -276,8 +277,16 @@ it('la plantilla del PDF tiene 3 páginas con radar, tabla y recomendaciones', f
 
     expect($html)
         ->toContain('Marketing digital de La Esquina')
-        ->toContain('Página 3 de 3')
+        ->toContain('Cómo leer este informe')
+        ->toContain('Cómo se calcula el puntaje')
+        ->toContain('Los métodos de análisis')
+        ->toContain('5 Fuerzas de Porter')
         ->toContain('Recomendaciones priorizadas')
+        ->toContain('Análisis por categoría')
+        ->toContain('Lo que encontró el análisis DOFA')
+        ->toContain('Cómo saber si funcionó')
+        ->toContain('Plan de acción')
+        ->toContain('Glosario')
         ->toContain('Mejora Automatización')
         ->toContain('new Chart(')
         ->not->toContain('cdn.');
@@ -329,4 +338,26 @@ it('al borrar para siempre la empresa conserva sus mediciones terminadas sin nom
 
     // Nadie la ve como resultado de una empresa.
     $this->actingAs($this->admin)->get(route('resultados.ver', $medicion))->assertNotFound();
+});
+
+it('el plan de acción del PDF pone primero la principal de las 3 categorías más débiles', function () {
+    responderYEnviar($this, $this->medicion);
+    $informe = DatosResultado::informe(Resultado::where('medicion_id', $this->medicion->id)->firstOrFail());
+
+    $primeras = array_column(array_slice($informe['prioridades'], 0, 3), 'nombre');
+
+    expect(array_column($informe['plan']['primero'], 'categoria'))->toBe($primeras)
+        ->and($informe['plan']['luego'])->not->toBeEmpty()
+        ->and(collect($informe['categorias'])->sum('aporte'))->toEqualWithDelta($informe['puntaje'], 1);
+});
+
+it('el PDF lleva encabezado y número de página en cada hoja', function () {
+    responderYEnviar($this, $this->medicion);
+    $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
+
+    $pdf = InformePdf::construir($resultado);
+
+    expect($pdf->footerViewName)->toBe('pdf.pie')
+        ->and($pdf->headerViewName)->toBe('pdf.encabezado')
+        ->and(view('pdf.pie')->render())->toContain('class="pageNumber"')->toContain('class="totalPages"');
 });

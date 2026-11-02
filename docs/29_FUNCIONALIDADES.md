@@ -101,7 +101,7 @@
 | Ver el avance del análisis y reintentar una categoría fallida | E4 | HU-063 |
 | Resultado: puntaje, nivel, variación, radar, por categoría con el método de análisis, observaciones y recomendaciones | E6 | HU-064 |
 | Ver sus respuestas con la observación de la IA | E9 | HU-065 |
-| Descargar el informe PDF de 3 páginas | E10 | HU-066 |
+| Descargar el informe PDF | E10 | HU-066 |
 | Historial con la evolución total o por categoría | E8 | HU-067 |
 | Colaboradores: agregar, editar, desactivar, reactivar y eliminar (solo la empresa) | E12 | HU-076 a HU-079 |
 

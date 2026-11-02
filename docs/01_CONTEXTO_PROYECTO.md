@@ -29,7 +29,7 @@ Un sistema web con dos lados:
 - **La empresa (y sus colaboradores):**
   - Responde el diagnóstico a su ritmo; las respuestas se guardan solas.
   - Revisa y envía.
-  - Recibe su resultado: puntaje de 0 a 100, nivel, puntaje por categoría, observaciones y recomendaciones de la IA, y un informe PDF de 3 páginas.
+  - Recibe su resultado: puntaje de 0 a 100, nivel, puntaje por categoría, observaciones y recomendaciones de la IA, y un informe PDF completo que explica cada resultado.
   - Puede repetir la medición y ver su evolución.
 
 Los cuatro niveles del resultado son:

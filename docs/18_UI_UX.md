@@ -124,7 +124,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | E8 / A3.4 | Mi historial e historial de una empresa | `pages/historial/Historial.vue` | Hecha y conectada |
 | E6 / A3.3 | Resultado: resumen, categorías y recomendaciones | `pages/resultados/Resultado.vue`, `components/resultados/PreguntaResultado.vue` | Hecha y conectada |
 | E9 / A3.5 | Mis respuestas | `pages/resultados/Respuestas.vue` | Hecha y conectada |
-| E10 / E7 | Informe PDF de 3 páginas | `resources/views/pdf/informe.blade.php` | Hecho (se descarga desde E1, E6 y E9) |
+| E10 / E7 | Informe PDF completo | `resources/views/pdf/informe.blade.php` | Hecho (se descarga desde E1, E6 y E9) |
 | E11 | Mi perfil de la empresa (y del colaborador) | `pages/perfil/MiPerfil.vue` | Hecha y conectada |
 | E12 | Colaboradores de la empresa | `pages/colaboradores/Index.vue` | Hecha y conectada |
 | E12.1 | Agregar colaborador | `components/colaboradores/ModalAgregarColaborador.vue` | Hecha |
