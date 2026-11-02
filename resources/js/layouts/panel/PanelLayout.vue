@@ -51,7 +51,11 @@ router.on('navigate', () => {
             />
         </div>
 
-        <main class="flex min-w-0 flex-1 flex-col">
+        <!-- relative + overflow-clip: los textos sr-only (posición absoluta) de
+             las tarjetas con scroll propio no estiran la página por debajo de la
+             ventana (se veía un espacio vacío bajo el menú). "clip" no crea un
+             contenedor de scroll, así que lo pegajoso (sticky) sigue funcionando. -->
+        <main class="relative flex min-w-0 flex-1 flex-col lg:overflow-clip">
             <div
                 class="flex items-center gap-3 border-b border-linea bg-white px-4 py-3 lg:hidden"
             >

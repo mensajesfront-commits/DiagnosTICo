@@ -80,6 +80,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **Categorías:** la tabla pasa a ser una lista de tarjetas con el puntaje grande y una barra de color. El detalle tiene un encabezado con anillo, nivel, importancia y variación. En el celular, al elegir una categoría la pantalla baja sola al detalle.
 - **Recomendaciones:** borde y número del color del nivel de cada categoría.
 - **Datos nuevos:** `DatosResultado::pagina()` agrega `por_nivel` y `mas_fuerte` (los cálculos siguen en el backend).
+- **Corregido:** en las pantallas fijas del panel quedaba un espacio vacío debajo del menú y toda la página bajaba. Lo causaban los textos para lectores de pantalla (`sr-only`, en posición absoluta) dentro de recuadros con scroll propio. El `<main>` de `PanelLayout` ahora es `relative` con `lg:overflow-clip`.
 
 ### Cambiado (E4 · espera del análisis, 2 de noviembre)
 
