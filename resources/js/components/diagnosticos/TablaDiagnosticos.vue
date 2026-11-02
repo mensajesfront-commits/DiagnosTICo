@@ -9,7 +9,11 @@
  * Acciones por fila: "Editar ▾" abre un menú con Editar diagnóstico,
  * Duplicar, Archivar (si tiene una versión publicada) o Eliminar (si nunca se
  * publicó) y "Eliminar borrador" (si hay un borrador pendiente sobre la
- * versión publicada). Al lado queda "Vista previa".
+ * versión publicada). Al lado, el ojo abre la "Vista previa".
+ *
+ * Cada fila: un ícono verde (publicado) o ámbar (borrador), el nombre con sus
+ * categorías y preguntas, el estado en píldoras y el "Uso" (empresas y
+ * mediciones).
  *
  * Selección: la casilla de cada fila elige los diagnósticos que nunca se
  * publicaron, para eliminar varios a la vez (los publicados se archivan, no
@@ -23,7 +27,7 @@
  * la página 1 al buscar, filtrar u ordenar.
  */
 import { Link, router } from '@inertiajs/vue3';
-import { ChevronDown } from '@lucide/vue';
+import { ChevronDown, Eye, FileCheck2, FilePen } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
@@ -104,24 +108,17 @@ function alternar(id: number): void {
 }
 
 function detalle(fila: FilaDiagnostico): string {
-    const partes = [
+    return [
         `${fila.categorias} ${fila.categorias === 1 ? 'categoría' : 'categorías'}`,
-    ];
-
-    if (fila.borrador_pendiente && fila.version_publicada) {
-        partes.push(`v${fila.version_publicada} publicada`);
-    }
-
-    return partes.join(' · ');
+        `${fila.preguntas} ${fila.preguntas === 1 ? 'pregunta' : 'preguntas'}`,
+    ].join(' · ');
 }
 
 const columnas = computed(() => [
     'Diagnóstico',
     ...(props.mostrarSector ? ['Sector'] : []),
     'Estado',
-    'Preguntas',
-    'Empresas',
-    'Mediciones',
+    'Uso',
     'Acciones',
 ]);
 </script>
@@ -134,7 +131,7 @@ const columnas = computed(() => [
         >
             <table class="w-full border-collapse text-sm">
                 <thead>
-                    <tr class="border-y border-linea bg-[#f9f8f4] text-left">
+                    <tr class="border-y border-linea bg-lienzo/60 text-left">
                         <th
                             v-if="puede('diagnosticos.editar')"
                             scope="col"
@@ -153,7 +150,7 @@ const columnas = computed(() => [
                             v-for="columna in columnas"
                             :key="columna"
                             scope="col"
-                            class="px-4 py-2.5 text-xs font-normal text-tinta-suave"
+                            class="px-4 py-2.5 text-xs font-medium text-tinta-suave"
                         >
                             {{ columna }}
                         </th>
@@ -164,17 +161,19 @@ const columnas = computed(() => [
                         v-for="fila in visibles"
                         :key="fila.id"
                         :class="[
-                            'border-b border-linea last:border-b-0',
-                            seleccion.includes(fila.id) && 'bg-marca-suave',
+                            'border-b border-linea transition-colors last:border-b-0',
+                            seleccion.includes(fila.id)
+                                ? 'bg-marca-suave'
+                                : 'hover:bg-lienzo/40',
                         ]"
                     >
                         <td
                             v-if="puede('diagnosticos.editar')"
-                            class="w-10 py-3 pr-0 pl-4 align-top"
+                            class="w-10 py-3 pr-0 pl-4 align-middle"
                         >
                             <input
                                 type="checkbox"
-                                class="mt-0.5 size-4 accent-marca disabled:opacity-40"
+                                class="size-4 accent-marca disabled:opacity-40"
                                 :aria-label="`Elegir ${fila.nombre}`"
                                 :title="
                                     seElimina(fila)
@@ -186,52 +185,90 @@ const columnas = computed(() => [
                                 @change="alternar(fila.id)"
                             />
                         </td>
-                        <td class="px-4 py-3 align-top">
-                            <p class="min-w-44 font-medium">
-                                {{ fila.nombre }}
-                            </p>
-                            <p class="text-xs text-tinta-suave">
-                                {{ detalle(fila) }}
-                            </p>
+                        <td class="px-4 py-3">
+                            <div class="flex min-w-52 items-center gap-3">
+                                <span
+                                    :class="[
+                                        'flex size-9 shrink-0 items-center justify-center rounded-xl',
+                                        fila.version_publicada
+                                            ? 'bg-exito-suave text-exito'
+                                            : 'bg-alerta-suave text-alerta',
+                                    ]"
+                                    aria-hidden="true"
+                                >
+                                    <FileCheck2
+                                        v-if="fila.version_publicada"
+                                        class="size-4"
+                                    />
+                                    <FilePen v-else class="size-4" />
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="leading-snug font-medium">
+                                        {{ fila.nombre }}
+                                    </p>
+                                    <p class="text-xs text-tinta-suave">
+                                        {{ detalle(fila) }}
+                                    </p>
+                                </div>
+                            </div>
                         </td>
-                        <td v-if="mostrarSector" class="px-4 py-3 align-top">
+                        <td v-if="mostrarSector" class="px-4 py-3">
                             <Link
                                 :href="
                                     rutas.diagnosticos.sector(fila.sector_id)
                                 "
-                                class="text-tinta hover:text-marca hover:underline"
+                                class="inline-block max-w-52 rounded-lg bg-lienzo px-2.5 py-1 text-xs leading-snug text-tinta transition hover:bg-marca-suave hover:text-marca"
                             >
                                 {{ fila.sector_nombre }}
                             </Link>
                         </td>
-                        <td class="px-4 py-3 align-top">
+                        <td class="px-4 py-3">
                             <div class="flex flex-col items-start gap-1">
                                 <Etiqueta
                                     v-if="fila.version_publicada"
                                     tono="exito"
+                                    class="rounded-full"
                                 >
-                                    Publicado · v{{ fila.version_publicada }}
+                                    ● Publicado · v{{ fila.version_publicada }}
                                 </Etiqueta>
-                                <Etiqueta v-else tono="alerta">
-                                    Borrador
+                                <Etiqueta
+                                    v-else
+                                    tono="alerta"
+                                    class="rounded-full"
+                                >
+                                    ● Borrador
                                 </Etiqueta>
-                                <Etiqueta v-if="fila.borrador_pendiente">
+                                <Etiqueta
+                                    v-if="fila.borrador_pendiente"
+                                    class="rounded-full"
+                                >
                                     ✎ Borrador v{{ fila.borrador_pendiente }}
                                     pendiente
                                 </Etiqueta>
                             </div>
                         </td>
-                        <td class="px-4 py-3 align-top font-mono">
-                            {{ fila.preguntas }}
+                        <td class="px-4 py-3 text-xs whitespace-nowrap">
+                            <p>
+                                <span class="font-mono font-semibold">{{
+                                    fila.empresas
+                                }}</span>
+                                {{
+                                    fila.empresas === 1 ? 'empresa' : 'empresas'
+                                }}
+                            </p>
+                            <p class="text-tinta-suave">
+                                <span class="font-mono">{{
+                                    fila.mediciones
+                                }}</span>
+                                {{
+                                    fila.mediciones === 1
+                                        ? 'medición'
+                                        : 'mediciones'
+                                }}
+                            </p>
                         </td>
-                        <td class="px-4 py-3 align-top font-mono">
-                            {{ fila.empresas }}
-                        </td>
-                        <td class="px-4 py-3 align-top font-mono">
-                            {{ fila.mediciones }}
-                        </td>
-                        <td class="px-4 py-3 align-top">
-                            <div class="flex gap-2">
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
                                 <DropdownMenu
                                     v-if="puede('diagnosticos.editar')"
                                     :modal="false"
@@ -292,15 +329,16 @@ const columnas = computed(() => [
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
-                                <Boton
-                                    tamano="sm"
-                                    variante="secundario"
+                                <Link
                                     :href="
                                         rutas.diagnosticos.vistaPrevia(fila.id)
                                     "
+                                    class="flex size-8 items-center justify-center rounded-lg border border-linea text-tinta-suave transition hover:border-marca hover:text-marca"
+                                    :title="`Vista previa de ${fila.nombre}`"
+                                    :aria-label="`Vista previa de ${fila.nombre}`"
                                 >
-                                    Vista previa
-                                </Boton>
+                                    <Eye class="size-4" aria-hidden="true" />
+                                </Link>
                             </div>
                         </td>
                     </tr>

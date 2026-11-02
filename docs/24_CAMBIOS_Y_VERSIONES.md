@@ -70,6 +70,19 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A2 · diseño de Diagnósticos, 2 de noviembre)
+
+- **Encabezado de la tabla:** ícono, título y conteo («1 diagnóstico · 1 empresa»). «Archivados», «Editar sector» y «Eliminar sector» llevan ícono y dejan de ser enlaces subrayados.
+- **Búsqueda con lupa y filtro de estado en chips** con su conteo (Todos, Publicados, Borradores), ahora también dentro de un sector. «Ordenar por» queda solo en «Todos».
+- **Tabla:**
+  - ícono verde (publicado) o ámbar (borrador) y, bajo el nombre, sus categorías y preguntas;
+  - el sector en una etiqueta;
+  - el estado en píldoras;
+  - una columna «Uso» con las empresas y las mediciones, que reemplaza las tres columnas de números;
+  - «Vista previa» pasa a un botón con un ojo. Antes, en «Todos», se cortaba por el borde derecho.
+- **Sectores:** el elegido se resalta en azul y cada conteo va en una píldora. «Crear sector» lleva ícono.
+- **Resumen:** las cuatro cifras van en tarjetas con ícono y el estado del sector en una etiqueta. «Última medición de cada empresa» es una barra apilada con su leyenda.
+
 ### Cambiado (A3.1 · diseño de la ficha de la empresa, 2 de noviembre)
 
 - **Encabezado:** círculo con las iniciales, el sector en una etiqueta con ícono y el estado de la cuenta con un punto verde o gris.
