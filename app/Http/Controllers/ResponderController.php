@@ -230,7 +230,7 @@ class ResponderController extends Controller
      * Paso 1 (puntajes) listo cuando existen los análisis; paso 2, cuántas
      * categorías terminó la IA y cuáles fallaron.
      *
-     * @return array{total: int, terminadas: int, puntajes_listos: bool, fallidas: array<int, string>}
+     * @return array{total: int, terminadas: int, puntajes_listos: bool, fallidas: array<int, string>, categorias: list<array{nombre: string, estado: string}>}
      */
     private function avanceAnalisis(Medicion $medicion): array
     {
@@ -245,6 +245,12 @@ class ResponderController extends Controller
             'terminadas' => $analisis->where('estado', 'terminado')->count(),
             'puntajes_listos' => $analisis->isNotEmpty(),
             'fallidas' => $analisis->where('estado', 'fallido')->map(fn ($a) => (string) ($nombres[$a->categoria_ref] ?? $a->categoria_ref))->values()->all(),
+            // Cada categoría, en el orden del diagnóstico, con su estado
+            // (terminado, fallido o pendiente: en cola o analizándose).
+            'categorias' => array_map(fn (array $c) => [
+                'nombre' => (string) $c['nombre'],
+                'estado' => (string) ($analisis->firstWhere('categoria_ref', $c['ref'])->estado ?? 'pendiente'),
+            ], $categorias),
         ];
     }
 

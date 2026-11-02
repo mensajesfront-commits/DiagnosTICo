@@ -70,6 +70,13 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E4 · espera del análisis, 2 de noviembre)
+
+- Anillo de avance con el porcentaje analizado en el centro. Mientras trabaja, un halo y un arco giran a su alrededor; al terminar se pone verde con un check y aparece «Ver mi resultado».
+- Lista de categorías en vivo, cada una con su estado: lista ✓, analizando (girando), en espera o con error. El servidor la manda en `analisis.categorias`.
+- «Mientras esperas»: seis datos sobre lo que hace la IA, que cambian cada 7 segundos.
+- Las animaciones se apagan si el sistema pide reducir el movimiento (`motion-safe`).
+
 ### Cambiado (diseño de los correos, 2 de noviembre)
 
 - Todos los correos usan el tema `captter` (`resources/views/vendor/mail/html/themes/captter.css`, activado en `config/mail.php`). Antes usaban la plantilla gris genérica de Laravel. Ahora tienen:

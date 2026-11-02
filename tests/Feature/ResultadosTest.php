@@ -209,7 +209,9 @@ it('si una categoría falla queda fallida, avisa al administrador y la empresa l
         ->assertInertia(fn (Assert $p) => $p->component('responder/Enviado')
             ->where('analisis.total', 2)
             ->where('analisis.terminadas', 1)
-            ->where('analisis.fallidas', ['Automatización']));
+            ->where('analisis.fallidas', ['Automatización'])
+            ->where('analisis.categorias.0.estado', 'terminado')
+            ->where('analisis.categorias.1', ['nombre' => 'Automatización', 'estado' => 'fallido']));
 
     app()->bind(Analizador::class, fn () => new AnalizadorFalso);
     $this->actingAs($this->laura)->post(route('responder.reintentar', $this->medicion))
