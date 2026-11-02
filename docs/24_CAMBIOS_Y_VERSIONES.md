@@ -70,6 +70,15 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (diseño de los correos, 2 de noviembre)
+
+- Todos los correos usan el tema `captter` (`resources/views/vendor/mail/html/themes/captter.css`, activado en `config/mail.php`). Antes usaban la plantilla gris genérica de Laravel. Ahora tienen:
+  - encabezado azul con el nombre CAPTTER y «Diagnóstico de marketing digital · NuevasTIC»;
+  - tarjeta blanca con una franja verde arriba y botón grande en el azul de la marca;
+  - pie que explica por qué llega el correo.
+- El código de verificación (registro, cambio de correo y de teléfono en Mi perfil) va en una caja destacada con letras grandes.
+- Sin imágenes en el encabezado, porque Gmail a veces las bloquea; todo funciona con tablas y estilos en línea, también en el celular.
+
 ### Corregido (informe y análisis de prueba, 2 de noviembre)
 
 - **Sin IA de prueba en la aplicación:** se quitó `IA_DE_PRUEBA`. El análisis usa siempre OpenAI; el analizador falso pasó a `tests/Support/AnalizadorFalso.php` y solo lo usan las pruebas automáticas, para no gastar saldo. Un resultado publicado antes en modo de prueba conserva sus textos «Prueba:» (RN-023); para tener uno real hay que asignar una medición nueva.

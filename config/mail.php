@@ -115,4 +115,23 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Diseño de los correos
+    |--------------------------------------------------------------------------
+    |
+    | Tema propio con los colores de Captter:
+    | resources/views/vendor/mail/html/themes/captter.css. Las plantillas
+    | (encabezado, botón, pie) están en resources/views/vendor/mail.
+    |
+    */
+
+    'markdown' => [
+        'theme' => env('MAIL_MARKDOWN_THEME', 'captter'),
+
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
+
 ];
