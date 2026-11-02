@@ -2243,7 +2243,7 @@ Permite medir un tema nuevo agregando una categoría al catálogo y sumándola a
 - RN-009 — El nombre de una categoría es obligatorio, de máximo 40 caracteres y único; una categoría con respuestas se archiva en lugar de borrarse.
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
 - RN-011 — La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -2471,7 +2471,7 @@ Da el cuestionario que responderán las empresas de un sector, en blanco o a par
 
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
 - RN-011 — La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -2922,7 +2922,7 @@ Permite medir algo nuevo con preguntas abiertas, de opción única o de selecci�
 ### Reglas de negocio
 
 - RN-013 — Pregunta: abierta, opción única o selección múltiple; opciones con puntaje 0–100; la indicación para responder es obligatoria; “Ten en cuenta” por respuesta es opcional (máx. 200 caracteres), no lo ve la empresa y solo se usa si esa respuesta fue elegida; la abierta tiene un único criterio de calificación; texto abierto de máximo 1000 caracteres.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -3154,7 +3154,7 @@ Permite ampliar lo que mide un diagnóstico tomando categorías del catálogo.
 
 - RN-009 — El nombre de una categoría es obligatorio, de máximo 40 caracteres y único; una categoría con respuestas se archiva en lugar de borrarse.
 - RN-011 — La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -3372,7 +3372,7 @@ Permite revisar el diagnóstico como lo verá la empresa y saber qué falta para
 
 ### Reglas de negocio
 
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -3380,7 +3380,7 @@ Permite revisar el diagnóstico como lo verá la empresa y saber qué falta para
 - Cada opción tiene puntaje.
 - La importancia suma 100%.
 - Todas las preguntas tienen indicación.
-- Las selecciones múltiples pueden llegar a 100 puntos.
+- Las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás).
 
 ### Casos alternativos
 
@@ -3498,7 +3498,7 @@ Permite que las empresas respondan una versión corregida del diagnóstico sin a
 ### Reglas de negocio
 
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -9703,7 +9703,7 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 | RN-009 | El nombre de una categoría es obligatorio, de máximo 40 caracteres y único; una categoría con respuestas se archiva en lugar de borrarse. | HU-017, HU-018, HU-019, HU-026 |
 | RN-010 | Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron. Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (decisión del equipo, 8 de octubre de 2026). | HU-010, HU-018, HU-020, HU-021, HU-022, HU-023, HU-025, HU-029, HU-084 |
 | RN-011 | La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%. | HU-018, HU-019, HU-020, HU-026, HU-027, HU-068 |
-| RN-012 | Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos. | HU-018, HU-020, HU-024, HU-026, HU-028, HU-029 |
+| RN-012 | Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»). | HU-018, HU-020, HU-024, HU-026, HU-028, HU-029 |
 | RN-013 | Pregunta: abierta, opción única o selección múltiple; opciones con puntaje 0–100; la indicación para responder es obligatoria; “Ten en cuenta” por respuesta es opcional (máx. 200 caracteres), no lo ve la empresa y solo se usa si esa respuesta fue elegida; la abierta tiene un único criterio de calificación; texto abierto de máximo 1000 caracteres. | HU-024, HU-025, HU-081 |
 | RN-014 | Solo hay una medición pendiente por empresa y solo se asignan diagnósticos publicados del sector de la empresa. | HU-009, HU-010, HU-032, HU-036, HU-058, HU-083 |
 | RN-015 | Estados de la medición: No iniciada, En curso, Enviada (mientras la IA analiza), Terminada (resultado publicado) y Vencida. | HU-007, HU-036, HU-058, HU-060, HU-062, HU-070, HU-082, HU-084 |

@@ -14,7 +14,8 @@ namespace App\Support;
  * 2. cada pregunta de opciones tiene al menos 2 opciones, todas con puntaje;
  * 3. la importancia suma 100%;
  * 4. toda pregunta tiene indicación para responder;
- * 5. cada selección múltiple puede llegar a 100 puntos.
+ * 5. cada selección múltiple suma exactamente 100 puntos si se marcan todas
+ *    (sin contar la opción que excluye a las demás, como «Ninguna»).
  */
 class EstadoDiagnostico
 {
@@ -38,8 +39,8 @@ class EstadoDiagnostico
         $sinPreguntas = 0;
         $sinOpciones = 0;
         $sinIndicacion = 0;
-        /** @var list<int> $sumasCortas */
-        $sumasCortas = [];
+        /** @var list<int> $sumasMalas */
+        $sumasMalas = [];
         $importancia = 0.0;
         /** @var array<string, list<string>> $porCategoria */
         $porCategoria = [];
@@ -66,7 +67,7 @@ class EstadoDiagnostico
                     match ($clave) {
                         'indicacion' => $sinIndicacion++,
                         'opciones' => $sinOpciones++,
-                        default => $sumasCortas[] = self::sumaMaxima($pregunta),
+                        default => $sumasMalas[] = self::sumaMaxima($pregunta),
                     };
                 }
 
@@ -89,11 +90,11 @@ class EstadoDiagnostico
                 'detalle' => $sumaOk ? null : 'suma '.self::numero($importancia).'%'],
             ['clave' => 'indicacion', 'texto' => 'Todas las preguntas tienen indicación para responder', 'ok' => $sinIndicacion === 0,
                 'detalle' => $sinIndicacion ? 'faltan '.$sinIndicacion : null],
-            ['clave' => 'multiple', 'texto' => 'Las selecciones múltiples pueden llegar a 100 puntos', 'ok' => $sumasCortas === [],
-                'detalle' => match (count($sumasCortas)) {
+            ['clave' => 'multiple', 'texto' => 'Las selecciones múltiples suman exactamente 100 puntos', 'ok' => $sumasMalas === [],
+                'detalle' => match (count($sumasMalas)) {
                     0 => null,
-                    1 => '1 suma solo '.$sumasCortas[0],
-                    default => count($sumasCortas).' no llegan a 100',
+                    1 => $sumasMalas[0] < 100 ? '1 suma solo '.$sumasMalas[0] : '1 suma '.$sumasMalas[0],
+                    default => count($sumasMalas).' no suman 100',
                 }],
         ];
 
@@ -132,8 +133,12 @@ class EstadoDiagnostico
                 $problemas['opciones'] = 'Necesita al menos 2 opciones con puntaje';
             }
 
-            if (($pregunta['tipo'] ?? '') === 'seleccion_multiple' && count($opciones) >= 2 && self::sumaMaxima($pregunta) < 100) {
-                $problemas['multiple'] = 'La selección múltiple suma solo '.self::sumaMaxima($pregunta);
+            $suma = self::sumaMaxima($pregunta);
+
+            if (($pregunta['tipo'] ?? '') === 'seleccion_multiple' && count($opciones) >= 2 && $suma !== 100) {
+                $problemas['multiple'] = $suma < 100
+                    ? 'La selección múltiple suma solo '.$suma
+                    : 'La selección múltiple suma '.$suma.': se pasa de 100';
             }
         }
 
@@ -141,7 +146,8 @@ class EstadoDiagnostico
     }
 
     /**
-     * Lo más que puede sumar una selección múltiple (todas marcadas), hasta 100.
+     * Lo que suma una selección múltiple con todas marcadas. No cuenta la
+     * opción que excluye a las demás («Ninguna»): no se marca junto a otras.
      *
      * @param  array<string, mixed>  $pregunta
      */
@@ -149,8 +155,9 @@ class EstadoDiagnostico
     {
         /** @var list<array<string, mixed>> $opciones */
         $opciones = $pregunta['opciones'] ?? [];
+        $normales = array_filter($opciones, fn (array $o) => ! ($o['exclusiva'] ?? false));
 
-        return (int) array_sum(array_map(fn (array $o) => (int) ($o['puntaje'] ?? 0), $opciones));
+        return (int) array_sum(array_map(fn (array $o) => (int) ($o['puntaje'] ?? 0), $normales));
     }
 
     private static function plural(int $n, string $uno, string $varios): string

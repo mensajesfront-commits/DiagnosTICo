@@ -12,6 +12,7 @@ use App\Notifications\SectorReasignado;
 use App\Services\Resultados\ResultadoEjemplo;
 use App\Support\DatosDiagnosticos;
 use App\Support\DatosResultado;
+use App\Support\EstadoDiagnostico;
 use Database\Seeders\CategoriasSeeder;
 use Database\Seeders\CiiuSeeder;
 use Database\Seeders\DiagnosticoEjemploSeeder;
@@ -323,7 +324,8 @@ it('el diagnóstico de ejemplo se publica en Comidas con 7 preguntas en Presenci
         ->and($contenido['categorias'][0]['nombre'])->toBe('Presencia en línea')
         ->and($contenido['categorias'][0]['preguntas'])->toHaveCount(7)
         ->and(collect($contenido['categorias'][0]['preguntas'])->pluck('tipo')->unique()->sort()->values()->all())
-        ->toBe(['abierta', 'opcion_unica', 'seleccion_multiple']);
+        ->toBe(['abierta', 'opcion_unica', 'seleccion_multiple'])
+        ->and(EstadoDiagnostico::calcular($contenido)['publicable'])->toBeTrue();
 });
 
 it('el diagnóstico de prueba de software crea su sector, suma 100 % y su informe de ejemplo se arma', function () {
@@ -342,7 +344,8 @@ it('el diagnóstico de prueba de software crea su sector, suma 100 % y su inform
         ->and($contenido['categorias'])->toHaveCount(6)
         ->and(collect($contenido['categorias'])->sum('importancia'))->toEqual(100)
         ->and($preguntas)->toHaveCount(30)
-        ->and($preguntas->where('tipo', 'abierta')->every(fn ($p) => filled($p['criterio_ia'])))->toBeTrue();
+        ->and($preguntas->where('tipo', 'abierta')->every(fn ($p) => filled($p['criterio_ia'])))->toBeTrue()
+        ->and(EstadoDiagnostico::calcular($contenido)['publicable'])->toBeTrue();
 
     // El informe PDF de ejemplo se arma con este diagnóstico.
     $datos = DatosResultado::pagina(ResultadoEjemplo::calcular($contenido, 'medio'), null, now(), false);
@@ -368,4 +371,22 @@ it('si el diagnóstico de prueba ya existe sin las notas, publica la versión si
     expect($versiones)->toHaveCount(2)
         ->and($versiones->last()->numero)->toBe(2)
         ->and($nunca['ten_en_cuenta'])->toContain('revisión corta y fija');
+});
+
+it('si el diagnóstico de prueba ya existe con puntajes viejos, publica la versión siguiente con los nuevos', function () {
+    $this->seed([CategoriasSeeder::class, DiagnosticoProgramacionSeeder::class]);
+    $diagnostico = Diagnostico::where('nombre', DiagnosticoProgramacionSeeder::NOMBRE)->sole();
+
+    // Como estaba antes: Google Play valía 30 y la pregunta sumaba 105.
+    Opcion::where('texto', 'Google Play')->update(['puntaje' => 30]);
+
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+
+    $versiones = $diagnostico->versiones()->get();
+    $ultima = $versiones->last();
+
+    expect($versiones)->toHaveCount(2)
+        ->and($ultima->nota_cambios)->toContain('sumar exactamente 100')
+        ->and(EstadoDiagnostico::calcular($ultima->contenido)['publicable'])->toBeTrue()
+        ->and(Opcion::where('texto', 'Google Play')->value('puntaje'))->toBe(25);
 });

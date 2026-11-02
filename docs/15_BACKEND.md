@@ -132,7 +132,7 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | POST | `/diagnosticos/{id}/publicar` | HU-029 · nueva versión congelada; el diagnóstico queda publicado y sin borrador | `nota` (obligatoria, máx. 500), `pendientes` (`dejar` · `pasar`: las no iniciadas o vencidas sin respuestas pasan a la nueva) |
 
 - **Borrador (RN-010):** cada cambio va al borrador. Si el diagnóstico está publicado y no tiene borrador, el primer cambio abre el siguiente (`version_borrador` = última + 1). Las versiones publicadas no se tocan. Uno archivado no se edita.
-- **Requisitos para publicar (RN-012):** cada categoría con al menos 1 pregunta; cada pregunta de opciones con al menos 2 opciones con puntaje; la importancia suma 100%; toda pregunta con indicación; cada selección múltiple puede llegar a 100. Si falta alguno, publicar responde un error en `nota`.
+- **Requisitos para publicar (RN-012):** cada categoría con al menos 1 pregunta; cada pregunta de opciones con al menos 2 opciones con puntaje; la importancia suma 100%; toda pregunta con indicación; cada selección múltiple suma exactamente 100 con todas marcadas (`EstadoDiagnostico::sumaMaxima` no cuenta la opción `exclusiva`). Si falta alguno, publicar responde un error en `nota`.
 - La pregunta, las preguntas de otro diagnóstico o una parte de otro diagnóstico dan 404.
 
 ## Catálogo de categorías (T-049)

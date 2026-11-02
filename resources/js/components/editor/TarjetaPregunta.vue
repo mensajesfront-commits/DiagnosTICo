@@ -2,7 +2,8 @@
 /**
  * Una pregunta en el editor (A2.1): número, texto, tipo, indicación para
  * responder y opciones con su puntaje, con lo que le falta resaltado
- * ("⚠ Falta la indicación", "Suma máxima: 80 / 100 ⚠").
+ * ("⚠ Falta la indicación", "Suma con todas marcadas: 80 / 100 ⚠"; debe
+ * sumar exactamente 100, RN-012).
  *
  * El asa ⋮⋮ se arrastra para cambiar el orden (HU-023 CA-004); con el
  * teclado, flecha arriba o abajo sobre el asa.
@@ -81,8 +82,11 @@ const detalle = computed(() => {
 
 const sinIndicacion = computed(() => !props.pregunta.indicacion.trim());
 
+/** Con todas marcadas, sin la opción que excluye a las demás. */
 const suma = computed(() =>
-    props.pregunta.opciones.reduce((s, o) => s + o.puntaje, 0),
+    props.pregunta.opciones
+        .filter((o) => !o.exclusiva)
+        .reduce((s, o) => s + o.puntaje, 0),
 );
 
 /** Problemas que no se muestran en otro lugar de la tarjeta. */
@@ -283,14 +287,27 @@ function teclas(e: KeyboardEvent): void {
                     </li>
                 </ul>
                 <p
-                    v-if="pregunta.tipo === 'seleccion_multiple' && suma < 100"
-                    class="mt-3 flex flex-wrap items-center gap-2 rounded-lg bg-alerta-suave px-3 py-2 text-xs text-alerta"
+                    v-if="
+                        pregunta.tipo === 'seleccion_multiple' && suma !== 100
+                    "
+                    :class="
+                        cn(
+                            'mt-3 flex flex-wrap items-center gap-2 rounded-lg px-3 py-2 text-xs',
+                            suma < 100
+                                ? 'bg-alerta-suave text-alerta'
+                                : 'bg-aviso-suave text-aviso',
+                        )
+                    "
                 >
                     <span class="font-mono font-semibold">
-                        Suma máxima: {{ suma }} / 100 ⚠
+                        Suma con todas marcadas: {{ suma }} / 100
+                        {{ suma < 100 ? '⚠' : '✗' }}
                     </span>
-                    Si marca todas llega a {{ suma }}: sube algún puntaje para
-                    que pueda llegar a 100.
+                    {{
+                        suma < 100
+                            ? `Faltan ${100 - suma} puntos: sube algún puntaje para que sume 100.`
+                            : `Se pasa por ${suma - 100} puntos: baja algún puntaje para que sume 100.`
+                    }}
                 </p>
                 <p
                     v-if="pregunta.tipo === 'abierta'"

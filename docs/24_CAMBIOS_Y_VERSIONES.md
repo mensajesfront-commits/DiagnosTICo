@@ -70,6 +70,16 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (RN-012 · la selección múltiple suma exactamente 100, 2 de noviembre)
+
+- **Antes:** una selección múltiple solo debía «poder llegar a 100». Si sumaba más (por ejemplo 158), se aceptaba en verde y el puntaje de la pregunta se cortaba en 100. Así, marcar todas daba lo mismo que marcar solo algunas.
+- **Ahora:** con todas marcadas debe sumar **exactamente 100**. No cuenta la opción que excluye a las demás («Ninguna»), porque no se marca junto a otras. Decisión de Cristian, 2 de noviembre.
+  - `EstadoDiagnostico`: con menos de 100 sigue diciendo «suma solo 80»; con más de 100 dice «suma 110: se pasa de 100». En los dos casos no deja publicar.
+  - Ventana de la pregunta (A2.1b / A2.1e): «Suma con todas marcadas» en verde si da 100, en ámbar si faltan puntos y en rojo si se pasa, con cuántos puntos faltan o sobran.
+  - La tarjeta de la pregunta en A2.1 muestra el mismo aviso.
+- **Datos de prueba:** siete preguntas sumaban 110 (por la opción «Otro») o 90. Se ajustaron los puntajes en `DiagnosticoProgramacionSeeder` y `DiagnosticoEjemploSeeder`. Si el diagnóstico de prueba ya existe, `php artisan db:seed --class=DiagnosticoProgramacionSeeder` publica la versión siguiente con los puntajes nuevos. Las versiones ya publicadas no cambian (RN-010).
+- Documentos actualizados: 05, 07, 08 y 15.
+
 ### Cambiado (A2.1 · diseño del editor de diagnóstico, 2 de noviembre)
 
 - **Encabezado:**

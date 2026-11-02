@@ -35,7 +35,7 @@ class DiagnosticoEjemploSeeder extends Seeder
                 ['Sí, y la actualizamos seguido', 100], ['Sí, pero está desactualizada', 50], ['No tenemos', 0],
             ]],
             ['¿En qué redes sociales tiene perfil tu negocio?', 'seleccion_multiple', true, 'Marca solo las que usan para el negocio, no las personales.', [
-                ['Facebook', 20], ['Instagram', 20], ['TikTok', 20], ['WhatsApp Business', 20], ['Google Mi Negocio', 20], ['Otra', 10, 'otro'], ['Ninguna', 0, 'ninguna'],
+                ['Facebook', 20], ['Instagram', 20], ['TikTok', 15], ['WhatsApp Business', 20], ['Google Mi Negocio', 15], ['Otra', 10, 'otro'], ['Ninguna', 0, 'ninguna'],
             ]],
             ['¿Con qué frecuencia publican en redes sociales?', 'opcion_unica', true, 'Piensa en los últimos tres meses.', [
                 ['Varias veces por semana', 100], ['Una vez por semana', 70], ['Una o dos veces al mes', 40], ['Casi nunca', 0],
@@ -56,7 +56,7 @@ class DiagnosticoEjemploSeeder extends Seeder
                 ['Una persona o agencia dedicada a eso', 100], ['Alguien del equipo, cuando tiene tiempo', 50], ['Nadie en particular', 0],
             ]],
             ['¿Qué tipo de contenido publican?', 'seleccion_multiple', true, 'Marca todos los que publicaron en el último mes.', [
-                ['Fotos de los productos', 25], ['Videos cortos', 25], ['Promociones y descuentos', 25], ['Opiniones de clientes', 25], ['Otro', 10, 'otro'],
+                ['Fotos de los productos', 25], ['Videos cortos', 25], ['Promociones y descuentos', 20], ['Opiniones de clientes', 20], ['Otro', 10, 'otro'],
             ]],
             ['¿Tienen un calendario de publicaciones?', 'opcion_unica', false, 'Un calendario dice qué se publica y cuándo.', [
                 ['Sí, lo seguimos', 100], ['Lo tenemos, pero no lo seguimos', 40], ['No', 0],
@@ -67,7 +67,7 @@ class DiagnosticoEjemploSeeder extends Seeder
                 ['Sí, tenemos una base de datos', 100], ['Los conocemos de vista', 50], ['No', 0],
             ]],
             ['¿Cómo recogen las opiniones de sus clientes?', 'seleccion_multiple', true, 'Marca todas las que usan.', [
-                ['Encuestas', 30], ['Reseñas en Google', 30], ['Comentarios en redes', 30], ['No las recogemos', 0, 'ninguna'],
+                ['Encuestas', 35], ['Reseñas en Google', 35], ['Comentarios en redes', 30], ['No las recogemos', 0, 'ninguna'],
             ]],
             ['Describe a tu cliente ideal: quién es y qué busca.', 'abierta', false, 'Por ejemplo: edad, dónde vive, qué le gusta y por qué te compra.', []],
         ]],

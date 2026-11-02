@@ -5,8 +5,10 @@
  * - Tipo: abierta, opción única o selección múltiple. Pasar a abierta quita
  *   las opciones.
  * - Opciones con puntaje 0–100, para subir, bajar o quitar; mínimo 2.
- * - Selección múltiple: muestra en vivo cuánto suma si marcan todas (debe
- *   poder llegar a 100 para publicar, RN-012).
+ * - Selección múltiple: muestra en vivo cuánto suma si marcan todas, sin
+ *   contar la opción que excluye a las demás. Debe sumar exactamente 100
+ *   para publicar (RN-012): en verde si da 100, en ámbar si falta y en rojo
+ *   si se pasa.
  * - Indicación para responder: obligatoria; la empresa la ve.
  * - "Qué debe tener en cuenta la IA" por opción (máx. 200, opcional): la
  *   empresa no lo ve; solo se usa si elige esa opción (RN-013). En una
@@ -161,9 +163,36 @@ const ayudaTipo = computed(() => {
     }[form.tipo];
 });
 
+/** Con todas marcadas, sin la opción que excluye a las demás («Ninguna»). */
 const sumaMaxima = computed(() =>
-    form.opciones.reduce((s, o) => s + (Number(o.puntaje) || 0), 0),
+    form.opciones
+        .filter((o) => !o.exclusiva)
+        .reduce((s, o) => s + (Number(o.puntaje) || 0), 0),
 );
+
+const estadoSuma = computed(() => {
+    const suma = sumaMaxima.value;
+
+    if (suma === 100) {
+        return {
+            clase: 'bg-exito-suave text-exito',
+            icono: '✓',
+            texto: 'Si marca todas llega justo a 100.',
+        };
+    }
+
+    return suma < 100
+        ? {
+              clase: 'bg-alerta-suave text-alerta',
+              icono: '⚠',
+              texto: `Faltan ${100 - suma} puntos: sube algún puntaje para que sume 100.`,
+          }
+        : {
+              clase: 'bg-aviso-suave text-aviso',
+              icono: '✗',
+              texto: `Se pasa por ${suma - 100} puntos: baja algún puntaje para que sume 100.`,
+          };
+});
 
 function mover(i: number, paso: -1 | 1): void {
     const lista = [...form.opciones];
@@ -516,24 +545,21 @@ const claseSelect =
                 <div
                     v-if="form.tipo === 'seleccion_multiple'"
                     :class="
-                        cn(
-                            'rounded-xl px-3 py-2 text-xs',
-                            sumaMaxima >= 100
-                                ? 'bg-exito-suave text-exito'
-                                : 'bg-alerta-suave text-alerta',
-                        )
+                        cn('rounded-xl px-3 py-2 text-xs', estadoSuma.clase)
                     "
+                    role="status"
                 >
                     <p class="flex justify-between font-semibold">
-                        Suma máxima
+                        Suma con todas marcadas
                         <span class="font-mono">
-                            {{ sumaMaxima }} / 100
-                            {{ sumaMaxima >= 100 ? '✓' : '⚠' }}
+                            {{ sumaMaxima }} / 100 {{ estadoSuma.icono }}
                         </span>
                     </p>
+                    <p class="mt-1">{{ estadoSuma.texto }}</p>
                     <p class="mt-1 opacity-80">
-                        Selección múltiple: la suma de todas las opciones debe
-                        poder llegar a 100 para publicar.
+                        Selección múltiple: las opciones deben sumar exactamente
+                        100 para publicar. No cuenta la opción que excluye a las
+                        demás.
                     </p>
                 </div>
                 <p v-else class="text-xs text-tinta-suave">

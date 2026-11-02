@@ -113,8 +113,8 @@ function resumen(c: CategoriaVistaPrevia): string {
             : []),
         ...otros.map((p) =>
             p.replace(
-                'La selección múltiple suma solo',
-                '1 selección múltiple suma',
+                /^La selección múltiple suma (solo )?/,
+                '1 selección múltiple suma ',
             ),
         ),
     ];
