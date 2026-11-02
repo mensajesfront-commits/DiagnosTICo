@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ActividadEconomica;
 use App\Models\Categoria;
 use App\Models\Diagnostico;
 use App\Models\Empresa;
@@ -7,9 +8,13 @@ use App\Models\Medicion;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\SectorReasignado;
+use App\Services\Resultados\ResultadoEjemplo;
 use App\Support\DatosDiagnosticos;
+use App\Support\DatosResultado;
 use Database\Seeders\CategoriasSeeder;
+use Database\Seeders\CiiuSeeder;
 use Database\Seeders\DiagnosticoEjemploSeeder;
+use Database\Seeders\DiagnosticoProgramacionSeeder;
 use Database\Seeders\RolesYPermisosSeeder;
 use Database\Seeders\SectoresSeeder;
 use Illuminate\Support\Facades\Notification;
@@ -318,4 +323,29 @@ it('el diagnóstico de ejemplo se publica en Comidas con 7 preguntas en Presenci
         ->and($contenido['categorias'][0]['preguntas'])->toHaveCount(7)
         ->and(collect($contenido['categorias'][0]['preguntas'])->pluck('tipo')->unique()->sort()->values()->all())
         ->toBe(['abierta', 'opcion_unica', 'seleccion_multiple']);
+});
+
+it('el diagnóstico de prueba de software crea su sector, suma 100 % y su informe de ejemplo se arma', function () {
+    $this->seed([CategoriasSeeder::class, CiiuSeeder::class]);
+
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+
+    $diagnostico = Diagnostico::where('nombre', DiagnosticoProgramacionSeeder::NOMBRE)->sole();
+    $contenido = $diagnostico->versiones()->firstOrFail()->contenido;
+    $preguntas = collect($contenido['categorias'])->flatMap(fn ($c) => $c['preguntas']);
+
+    expect($diagnostico->sector->nombre)->toBe('Programación y consultoría informática')
+        ->and($diagnostico->estado)->toBe(Diagnostico::PUBLICADO)
+        ->and(ActividadEconomica::where('sector_id', $diagnostico->sector_id)->pluck('codigo')->all())->toContain('6211')
+        ->and($contenido['categorias'])->toHaveCount(6)
+        ->and(collect($contenido['categorias'])->sum('importancia'))->toEqual(100)
+        ->and($preguntas)->toHaveCount(30)
+        ->and($preguntas->where('tipo', 'abierta')->every(fn ($p) => filled($p['criterio_ia'])))->toBeTrue();
+
+    // El informe PDF de ejemplo se arma con este diagnóstico.
+    $datos = DatosResultado::pagina(ResultadoEjemplo::calcular($contenido, 'medio'), null, now(), false);
+    $informe = DatosResultado::informeDe(['id' => null, 'numero' => 1, 'empresa' => ['id' => null, 'nombre' => 'Empresa de ejemplo'], 'sector' => 'Programación y consultoría informática', 'diagnostico' => $diagnostico->nombre, 'version' => 1], $datos, null, now(), null, true);
+
+    expect(view('pdf.informe', ['informe' => $informe])->render())->toContain('Medición de KPIs')->toContain('Plan estratégico de marketing');
 });

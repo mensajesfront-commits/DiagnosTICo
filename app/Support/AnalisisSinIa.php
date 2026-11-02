@@ -19,7 +19,8 @@ final class AnalisisSinIa
     public static function partes(string $categoria, string $metodo, string $tipo): array
     {
         $marca = $tipo === 'de prueba' ? 'Prueba:' : 'Ejemplo:';
-        $tema = mb_strtolower($categoria);
+        // Solo la primera letra en minúscula: «Medición de KPIs» → «medición de KPIs».
+        $tema = mb_strtolower(mb_substr($categoria, 0, 1)).mb_substr($categoria, 1);
 
         $hallazgos = array_map(fn (string $grupo) => [
             'grupo' => $grupo,

@@ -70,6 +70,13 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Agregado (diagnóstico de prueba para software, 2 de noviembre)
+
+- `php artisan db:seed --class=DiagnosticoProgramacionSeeder` publica «Diagnóstico de prueba · Software y apps» en el sector «Programación y consultoría informática»; si el sector no existe, lo crea con las actividades CIIU de la división 62.
+- Trae 6 categorías del catálogo (Presencia en línea, Análisis del cliente, Contenido y publicaciones, Análisis de la competencia, Herramientas de automatización y Medición de KPIs) y 30 preguntas de los tres tipos, pensadas para una empresa que vende una app, por ejemplo una que ayuda a organizar el tiempo según los hobbies y las responsabilidades.
+- Las respuestas «No sé» llevan un «Ten en cuenta» para que la IA lo marque como información faltante, y las abiertas llevan criterio de calificación. Sirve para probar el análisis y el informe PDF.
+- No es un diagnóstico de NuevasTIC y no lo carga la instalación. `DiagnosticoEjemploSeeder` y este usan el trait `CreaDiagnosticoPublicado`.
+
 ### Cambiado (informe PDF según la propuesta de reestructuración, 2 de noviembre)
 
 Fase 1 de la «Propuesta de reestructuración del Informe de Diagnóstico y Estrategia de Marketing Digital»: todo lo que sale de las respuestas y del análisis de la IA.

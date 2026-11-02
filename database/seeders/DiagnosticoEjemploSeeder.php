@@ -2,16 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Categoria;
 use App\Models\Diagnostico;
-use App\Models\DiagnosticoCategoria;
-use App\Models\Opcion;
-use App\Models\Pregunta;
 use App\Models\Sector;
-use App\Models\VersionDiagnostico;
-use App\Services\Diagnosticos\ContenidoDiagnostico;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Diagnóstico de EJEMPLO para ver cómo se responde (E2): sector Comidas, 3
@@ -24,6 +17,8 @@ use Illuminate\Support\Facades\DB;
  */
 class DiagnosticoEjemploSeeder extends Seeder
 {
+    use CreaDiagnosticoPublicado;
+
     public const string NOMBRE = 'Diagnóstico de ejemplo';
 
     /**
@@ -94,56 +89,7 @@ class DiagnosticoEjemploSeeder extends Seeder
             return;
         }
 
-        DB::transaction(function () use ($sector): void {
-            $diagnostico = Diagnostico::create([
-                'sector_id' => $sector->id,
-                'nombre' => self::NOMBRE,
-                'descripcion' => 'Ejemplo para ver cómo responde una empresa. No es un diagnóstico de NuevasTIC.',
-                'estado' => Diagnostico::PUBLICADO,
-                'version_borrador' => null,
-            ]);
-
-            $orden = 0;
-
-            foreach (self::CONTENIDO as $nombre => [$importancia, $preguntas]) {
-                $categoria = Categoria::firstOrCreate(['nombre' => $nombre]);
-                $parte = DiagnosticoCategoria::create([
-                    'diagnostico_id' => $diagnostico->id,
-                    'categoria_id' => $categoria->id,
-                    'importancia' => $importancia,
-                    'orden' => $orden++,
-                ]);
-
-                foreach ($preguntas as $i => [$texto, $tipo, $obligatoria, $indicacion, $opciones]) {
-                    $pregunta = Pregunta::create([
-                        'diagnostico_categoria_id' => $parte->id,
-                        'texto' => $texto,
-                        'tipo' => $tipo,
-                        'indicacion' => $indicacion,
-                        'obligatoria' => $obligatoria,
-                        'orden' => $i,
-                    ]);
-
-                    foreach ($opciones as $j => $opcion) {
-                        Opcion::create([
-                            'pregunta_id' => $pregunta->id,
-                            'texto' => $opcion[0],
-                            'puntaje' => $opcion[1],
-                            'con_texto' => ($opcion[2] ?? null) === 'otro',
-                            'exclusiva' => ($opcion[2] ?? null) === 'ninguna',
-                            'orden' => $j,
-                        ]);
-                    }
-                }
-            }
-
-            VersionDiagnostico::create([
-                'diagnostico_id' => $diagnostico->id,
-                'numero' => 1,
-                'contenido' => app(ContenidoDiagnostico::class)->congelar($diagnostico),
-                'publicada_en' => now(),
-            ]);
-        });
+        $this->crearDiagnostico($sector, self::NOMBRE, 'Ejemplo para ver cómo responde una empresa. No es un diagnóstico de NuevasTIC.', self::CONTENIDO);
 
         $this->command->info('Diagnóstico de ejemplo publicado en el sector Comidas. Asígnalo a una empresa de ese sector para responderlo.');
     }
