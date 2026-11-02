@@ -13,10 +13,15 @@
  *   abierta, un único criterio de calificación.
  * - Al editar, "Eliminar pregunta" abre la confirmación.
  *
+ * Diseño: arriba, el texto y la indicación lado a lado; luego el tipo y
+ * "Obligatoria". Cada opción va en su tarjeta: letra, texto a lo ancho,
+ * puntaje, subir/bajar/quitar y, debajo, su "Ten en cuenta" para la IA. Al
+ * final, la opción que excluye a las demás y la que pide escribir cuál.
+ *
  * Envía: POST /diagnosticos/{id}/preguntas o PUT …/preguntas/{pregunta}.
  */
 import { useForm } from '@inertiajs/vue3';
-import { ArrowDown, ArrowUp, X } from '@lucide/vue';
+import { ArrowDown, ArrowUp, Lightbulb, Plus, Sparkles, X } from '@lucide/vue';
 import { computed, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
@@ -222,7 +227,10 @@ function guardar(): void {
 }
 
 const botonIcono =
-    'flex size-8 items-center justify-center rounded-md border border-linea-fuerte text-tinta-suave hover:bg-lienzo disabled:opacity-40';
+    'flex size-8 items-center justify-center rounded-lg text-tinta-suave transition hover:bg-lienzo hover:text-tinta disabled:pointer-events-none disabled:opacity-30';
+
+const claseSelect =
+    'h-9 w-full rounded-lg border border-linea-fuerte bg-white px-2 text-xs focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none';
 </script>
 
 <template>
@@ -245,11 +253,11 @@ const botonIcono =
 
         <form
             id="form-pregunta"
-            class="grid gap-6 lg:grid-cols-2"
+            class="flex flex-col gap-5"
             novalidate
             @submit.prevent="guardar"
         >
-            <div class="flex flex-col gap-4">
+            <div class="grid gap-4 lg:grid-cols-2">
                 <Campo
                     obligatorio
                     etiqueta="Texto de la pregunta"
@@ -259,199 +267,11 @@ const botonIcono =
                     <AreaTexto
                         id="pregunta-texto"
                         v-model="form.texto"
-                        rows="2"
+                        rows="3"
                         maxlength="500"
                         :invalida="!!form.errors.texto"
                     />
                 </Campo>
-
-                <div class="flex flex-col gap-1.5">
-                    <span class="text-xs font-medium">Tipo de respuesta</span>
-                    <SelectorCompacto
-                        v-model="form.tipo"
-                        estilo="relleno"
-                        :opciones="tipos"
-                        etiqueta-accesible="Tipo de respuesta"
-                    />
-                    <p class="text-xs text-tinta-suave">{{ ayudaTipo }}</p>
-                </div>
-
-                <div v-if="conOpciones" class="flex flex-col gap-2">
-                    <div
-                        class="grid grid-cols-[1rem_1fr_6rem_6.5rem] gap-2 text-xs font-medium"
-                    >
-                        <span />
-                        <span>Opciones</span>
-                        <span>Puntaje (0–100)</span>
-                    </div>
-                    <div
-                        v-for="(opcion, i) in form.opciones"
-                        :key="i"
-                        class="grid grid-cols-[1rem_1fr_6rem_6.5rem] items-start gap-2"
-                    >
-                        <span class="pt-2.5 text-xs text-tinta-suave">
-                            {{ LETRAS[i] }}
-                        </span>
-                        <div>
-                            <Entrada
-                                v-model="opcion.texto"
-                                maxlength="255"
-                                @blur="revisarNinguna(i)"
-                                :aria-label="`Opción ${LETRAS[i]}`"
-                                :invalida="!!errores[`opciones.${i}.texto`]"
-                            />
-                            <p
-                                v-if="errores[`opciones.${i}.texto`]"
-                                class="mt-1 text-xs text-aviso"
-                            >
-                                {{ errores[`opciones.${i}.texto`] }}
-                            </p>
-                        </div>
-                        <div>
-                            <input
-                                v-model.number="opcion.puntaje"
-                                type="number"
-                                min="0"
-                                max="100"
-                                :aria-label="`Puntaje de la opción ${LETRAS[i]}`"
-                                :aria-invalid="
-                                    !!errores[`opciones.${i}.puntaje`] ||
-                                    undefined
-                                "
-                                :class="
-                                    cn(
-                                        'h-10 w-full rounded-md border border-linea-fuerte bg-white px-3 text-right font-mono text-sm focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none',
-                                        errores[`opciones.${i}.puntaje`] &&
-                                            'border-aviso',
-                                    )
-                                "
-                            />
-                            <p
-                                v-if="errores[`opciones.${i}.puntaje`]"
-                                class="mt-1 text-xs text-aviso"
-                            >
-                                {{ errores[`opciones.${i}.puntaje`] }}
-                            </p>
-                        </div>
-                        <div class="flex gap-1 pt-1">
-                            <button
-                                type="button"
-                                :class="botonIcono"
-                                :disabled="i === 0"
-                                aria-label="Subir opción"
-                                @click="mover(i, -1)"
-                            >
-                                <ArrowUp class="size-3.5" />
-                            </button>
-                            <button
-                                type="button"
-                                :class="botonIcono"
-                                :disabled="i === form.opciones.length - 1"
-                                aria-label="Bajar opción"
-                                @click="mover(i, 1)"
-                            >
-                                <ArrowDown class="size-3.5" />
-                            </button>
-                            <button
-                                type="button"
-                                :class="botonIcono"
-                                :disabled="form.opciones.length <= 2"
-                                aria-label="Quitar opción"
-                                @click="quitar(i)"
-                            >
-                                <X class="size-3.5" />
-                            </button>
-                        </div>
-                    </div>
-                    <button
-                        v-if="form.opciones.length < MAX_OPCIONES"
-                        type="button"
-                        class="w-fit text-sm text-marca hover:underline"
-                        @click="form.opciones.push(vacia())"
-                    >
-                        + Agregar opción
-                    </button>
-                    <p v-if="errores.opciones" class="text-xs text-aviso">
-                        {{ errores.opciones }}
-                    </p>
-
-                    <label
-                        v-if="form.tipo === 'seleccion_multiple'"
-                        class="flex flex-wrap items-center gap-2 text-xs"
-                    >
-                        Opción que excluye a las demás
-                        <select
-                            v-model.number="exclusiva"
-                            class="h-8 rounded-md border border-linea-fuerte bg-white px-2 text-xs"
-                        >
-                            <option :value="-1">Ninguna</option>
-                            <option
-                                v-for="(o, i) in form.opciones"
-                                :key="i"
-                                :value="i"
-                            >
-                                {{ LETRAS[i] }} · {{ o.texto || 'sin texto' }}
-                            </option>
-                        </select>
-                        <span class="w-full text-tinta-suave">
-                            Como «Ninguna» o «Nada»: si la empresa la marca, se
-                            desmarcan las otras.
-                        </span>
-                    </label>
-
-                    <label class="flex flex-wrap items-center gap-2 text-xs">
-                        Opción que pide escribir cuál
-                        <select
-                            v-model.number="conTexto"
-                            class="h-8 rounded-md border border-linea-fuerte bg-white px-2 text-xs"
-                        >
-                            <option :value="-1">Ninguna</option>
-                            <option
-                                v-for="(o, i) in form.opciones"
-                                :key="i"
-                                :value="i"
-                            >
-                                {{ LETRAS[i] }} · {{ o.texto || 'sin texto' }}
-                            </option>
-                        </select>
-                        <span class="w-full text-tinta-suave">
-                            Como «Otro»: si la empresa la elige, escribe cuál
-                            («¿Cuál otro canal?») y la IA lo lee.
-                        </span>
-                    </label>
-
-                    <div
-                        v-if="form.tipo === 'seleccion_multiple'"
-                        :class="
-                            cn(
-                                'rounded-md px-3 py-2 text-xs',
-                                sumaMaxima >= 100
-                                    ? 'bg-lienzo'
-                                    : 'bg-alerta-suave text-alerta',
-                            )
-                        "
-                    >
-                        <p class="flex justify-between font-semibold">
-                            Suma máxima
-                            <span class="font-mono">
-                                {{ sumaMaxima }} / 100
-                                {{ sumaMaxima >= 100 ? '✓' : '⚠' }}
-                            </span>
-                        </p>
-                        <p class="mt-1 text-tinta-suave">
-                            Selección múltiple: la suma de todas las opciones
-                            debe poder llegar a 100 para publicar.
-                        </p>
-                    </div>
-                    <p v-else class="text-xs text-tinta-suave">
-                        Opción única: el puntaje de la pregunta es el de la
-                        opción elegida. Usa 0 para la peor respuesta y 100 para
-                        la mejor.
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex flex-col gap-4">
                 <Campo
                     obligatorio
                     etiqueta="Indicación para responder"
@@ -467,54 +287,274 @@ const botonIcono =
                         :invalida="!!form.errors.indicacion"
                     />
                 </Campo>
+            </div>
 
-                <template v-if="conOpciones">
-                    <div class="flex flex-col gap-1">
-                        <span class="text-xs font-medium">
-                            Qué debe tener en cuenta la IA según la respuesta
-                            <span class="font-normal text-tinta-suave">
-                                (opcional)
-                            </span>
+            <div
+                class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 rounded-xl bg-lienzo/60 p-3"
+            >
+                <div class="flex min-w-0 flex-col gap-1.5">
+                    <span class="text-xs font-medium">Tipo de respuesta</span>
+                    <SelectorCompacto
+                        v-model="form.tipo"
+                        estilo="relleno"
+                        :opciones="tipos"
+                        etiqueta-accesible="Tipo de respuesta"
+                    />
+                    <p class="text-xs text-tinta-suave">{{ ayudaTipo }}</p>
+                </div>
+                <label
+                    class="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm"
+                >
+                    <input
+                        v-model="form.obligatoria"
+                        type="checkbox"
+                        class="size-4 accent-marca"
+                    />
+                    Respuesta obligatoria para la empresa
+                </label>
+            </div>
+
+            <section v-if="conOpciones" class="flex flex-col gap-3">
+                <div
+                    class="flex flex-wrap items-baseline justify-between gap-2"
+                >
+                    <h3 class="text-sm font-semibold">
+                        Opciones
+                        <span class="font-normal text-tinta-suave">
+                            · puntaje de 0 a 100
                         </span>
-                        <p class="text-xs text-tinta-suave">
-                            La empresa no lo ve. Se agrega al prompt como "Ten
-                            en cuenta: …" solo si elige esa opción. Puedes pedir
-                            un método, por ejemplo FODA o PESTEL.
-                        </p>
-                    </div>
-                    <div
-                        v-for="(opcion, i) in form.opciones"
-                        :key="`t-${i}`"
-                        class="grid grid-cols-[1rem_1fr_3rem] items-start gap-2"
-                    >
-                        <span class="pt-2 text-xs text-tinta-suave">
-                            {{ LETRAS[i] }}
-                        </span>
-                        <AreaTexto
-                            v-model="opcion.ten_en_cuenta"
-                            rows="2"
-                            class="min-h-0"
-                            :maxlength="MAX_TEN_EN_CUENTA"
-                            :placeholder="`Opcional · ${opcion.texto || `opción ${LETRAS[i]}`}`"
-                            :aria-label="`Indicación para la IA de la opción ${LETRAS[i]}`"
-                        />
-                        <span
-                            class="pt-2 text-right font-mono text-xs text-tinta-suave"
-                        >
-                            {{ opcion.ten_en_cuenta.length }}/{{
-                                MAX_TEN_EN_CUENTA
-                            }}
-                        </span>
-                    </div>
+                    </h3>
                     <p class="text-xs text-tinta-suave">
-                        {{ conIndicacion }} de {{ form.opciones.length }}
-                        opciones con indicación · máx.
-                        {{ MAX_TEN_EN_CUENTA }} caracteres cada una
+                        {{ conIndicacion }} de {{ form.opciones.length }} con
+                        «Ten en cuenta» para la IA
                     </p>
-                    <div
-                        v-if="ejemplo"
-                        class="rounded-md border border-marca/20 bg-marca-suave/40 px-3 py-2 text-xs"
+                </div>
+
+                <ol class="flex flex-col gap-2">
+                    <li
+                        v-for="(opcion, i) in form.opciones"
+                        :key="i"
+                        class="rounded-xl border border-linea p-3"
                     >
+                        <div
+                            class="flex flex-wrap items-start gap-2 sm:flex-nowrap"
+                        >
+                            <span
+                                class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-marca-suave font-mono text-xs font-semibold text-marca"
+                                aria-hidden="true"
+                            >
+                                {{ LETRAS[i] }}
+                            </span>
+                            <div
+                                class="min-w-0 flex-1 basis-[calc(100%-2.75rem)] sm:basis-0"
+                            >
+                                <Entrada
+                                    v-model="opcion.texto"
+                                    maxlength="255"
+                                    class="h-9"
+                                    placeholder="Texto de la opción"
+                                    @blur="revisarNinguna(i)"
+                                    :aria-label="`Opción ${LETRAS[i]}`"
+                                    :invalida="!!errores[`opciones.${i}.texto`]"
+                                />
+                                <p
+                                    v-if="errores[`opciones.${i}.texto`]"
+                                    class="mt-1 text-xs text-aviso"
+                                >
+                                    {{ errores[`opciones.${i}.texto`] }}
+                                </p>
+                            </div>
+                            <div class="ml-11 w-20 shrink-0 sm:ml-0">
+                                <input
+                                    v-model.number="opcion.puntaje"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    :aria-label="`Puntaje de la opción ${LETRAS[i]}`"
+                                    :aria-invalid="
+                                        !!errores[`opciones.${i}.puntaje`] ||
+                                        undefined
+                                    "
+                                    :class="
+                                        cn(
+                                            'h-9 w-full rounded-lg border border-linea-fuerte bg-white px-2 text-right font-mono text-sm focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none',
+                                            errores[`opciones.${i}.puntaje`] &&
+                                                'border-aviso',
+                                        )
+                                    "
+                                />
+                                <p
+                                    v-if="errores[`opciones.${i}.puntaje`]"
+                                    class="mt-1 text-xs text-aviso"
+                                >
+                                    {{ errores[`opciones.${i}.puntaje`] }}
+                                </p>
+                            </div>
+                            <div class="flex shrink-0 gap-0.5 pt-0.5">
+                                <button
+                                    type="button"
+                                    :class="botonIcono"
+                                    :disabled="i === 0"
+                                    :aria-label="`Subir la opción ${LETRAS[i]}`"
+                                    title="Subir"
+                                    @click="mover(i, -1)"
+                                >
+                                    <ArrowUp class="size-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    :class="botonIcono"
+                                    :disabled="i === form.opciones.length - 1"
+                                    :aria-label="`Bajar la opción ${LETRAS[i]}`"
+                                    title="Bajar"
+                                    @click="mover(i, 1)"
+                                >
+                                    <ArrowDown class="size-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    :class="
+                                        cn(
+                                            botonIcono,
+                                            'hover:bg-aviso-suave hover:text-aviso',
+                                        )
+                                    "
+                                    :disabled="form.opciones.length <= 2"
+                                    :aria-label="`Quitar la opción ${LETRAS[i]}`"
+                                    title="Quitar"
+                                    @click="quitar(i)"
+                                >
+                                    <X class="size-4" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 flex items-start gap-2 sm:pl-11">
+                            <Lightbulb
+                                class="mt-2 size-4 shrink-0 text-alerta"
+                                aria-hidden="true"
+                            />
+                            <div class="min-w-0 flex-1">
+                                <AreaTexto
+                                    v-model="opcion.ten_en_cuenta"
+                                    rows="1"
+                                    class="field-sizing-content min-h-9 py-1.5 text-xs"
+                                    :maxlength="MAX_TEN_EN_CUENTA"
+                                    placeholder="Ten en cuenta para la IA (opcional): qué debe considerar si eligen esta opción"
+                                    :aria-label="`Ten en cuenta para la IA de la opción ${LETRAS[i]}`"
+                                />
+                            </div>
+                            <span
+                                class="hidden w-14 shrink-0 pt-2 text-right font-mono text-[11px] text-tinta-suave sm:block"
+                            >
+                                {{ opcion.ten_en_cuenta.length }}/{{
+                                    MAX_TEN_EN_CUENTA
+                                }}
+                            </span>
+                        </div>
+                    </li>
+                </ol>
+
+                <button
+                    v-if="form.opciones.length < MAX_OPCIONES"
+                    type="button"
+                    class="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-dashed border-linea-fuerte text-sm text-tinta-suave transition hover:border-marca hover:bg-marca-suave/40 hover:text-marca"
+                    @click="form.opciones.push(vacia())"
+                >
+                    <Plus class="size-4" aria-hidden="true" />
+                    Agregar opción
+                </button>
+                <p v-if="errores.opciones" class="text-xs text-aviso">
+                    {{ errores.opciones }}
+                </p>
+
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <label
+                        v-if="form.tipo === 'seleccion_multiple'"
+                        class="flex flex-col gap-1 text-xs"
+                    >
+                        <span class="font-medium">
+                            Opción que excluye a las demás
+                        </span>
+                        <select v-model.number="exclusiva" :class="claseSelect">
+                            <option :value="-1">Ninguna</option>
+                            <option
+                                v-for="(o, i) in form.opciones"
+                                :key="i"
+                                :value="i"
+                            >
+                                {{ LETRAS[i] }} · {{ o.texto || 'sin texto' }}
+                            </option>
+                        </select>
+                        <span class="text-tinta-suave">
+                            Como «Ninguna» o «Nada»: si la empresa la marca, se
+                            desmarcan las otras.
+                        </span>
+                    </label>
+
+                    <label class="flex flex-col gap-1 text-xs">
+                        <span class="font-medium">
+                            Opción que pide escribir cuál
+                        </span>
+                        <select v-model.number="conTexto" :class="claseSelect">
+                            <option :value="-1">Ninguna</option>
+                            <option
+                                v-for="(o, i) in form.opciones"
+                                :key="i"
+                                :value="i"
+                            >
+                                {{ LETRAS[i] }} · {{ o.texto || 'sin texto' }}
+                            </option>
+                        </select>
+                        <span class="text-tinta-suave">
+                            Como «Otro»: si la empresa la elige, escribe cuál
+                            («¿Cuál otro canal?») y la IA lo lee.
+                        </span>
+                    </label>
+                </div>
+
+                <div
+                    v-if="form.tipo === 'seleccion_multiple'"
+                    :class="
+                        cn(
+                            'rounded-xl px-3 py-2 text-xs',
+                            sumaMaxima >= 100
+                                ? 'bg-exito-suave text-exito'
+                                : 'bg-alerta-suave text-alerta',
+                        )
+                    "
+                >
+                    <p class="flex justify-between font-semibold">
+                        Suma máxima
+                        <span class="font-mono">
+                            {{ sumaMaxima }} / 100
+                            {{ sumaMaxima >= 100 ? '✓' : '⚠' }}
+                        </span>
+                    </p>
+                    <p class="mt-1 opacity-80">
+                        Selección múltiple: la suma de todas las opciones debe
+                        poder llegar a 100 para publicar.
+                    </p>
+                </div>
+                <p v-else class="text-xs text-tinta-suave">
+                    Opción única: el puntaje de la pregunta es el de la opción
+                    elegida. Usa 0 para la peor respuesta y 100 para la mejor.
+                </p>
+
+                <p class="text-xs text-tinta-suave">
+                    «Ten en cuenta»: la empresa no lo ve. Se agrega al prompt
+                    solo si elige esa opción. Puedes pedir un método, por
+                    ejemplo FODA o PESTEL.
+                </p>
+                <div
+                    v-if="ejemplo"
+                    class="flex gap-2 rounded-xl border border-marca/20 bg-marca-suave/40 px-3 py-2.5 text-xs"
+                >
+                    <Sparkles
+                        class="mt-px size-4 shrink-0 text-marca"
+                        aria-hidden="true"
+                    />
+                    <div>
                         <p class="font-semibold text-marca">
                             Así lo verá la IA si elige la opción
                             {{ ejemplo.letra }}
@@ -531,34 +571,25 @@ const botonIcono =
                             {{ ejemplo.opcion.ten_en_cuenta }}
                         </p>
                     </div>
-                </template>
+                </div>
+            </section>
 
-                <Campo
-                    v-else
-                    etiqueta="Criterio para calificarla"
-                    para="pregunta-criterio"
-                    opcional
-                    ayuda="La empresa no lo ve. La IA califica la respuesta de 0 a 100 con este criterio; sin él, usa el de la categoría."
-                    :error="form.errors.criterio_ia"
-                >
-                    <AreaTexto
-                        id="pregunta-criterio"
-                        v-model="form.criterio_ia"
-                        rows="4"
-                        maxlength="1000"
-                        placeholder="Ej. 100 si nombra una queja concreta y cómo la resuelve; 0 si no responde."
-                    />
-                </Campo>
-
-                <label class="mt-auto flex items-center gap-2 text-sm">
-                    <input
-                        v-model="form.obligatoria"
-                        type="checkbox"
-                        class="size-4 accent-marca"
-                    />
-                    Respuesta obligatoria para la empresa
-                </label>
-            </div>
+            <Campo
+                v-else
+                etiqueta="Criterio para calificarla"
+                para="pregunta-criterio"
+                opcional
+                ayuda="La empresa no lo ve. La IA califica la respuesta de 0 a 100 con este criterio; sin él, usa el de la categoría."
+                :error="form.errors.criterio_ia"
+            >
+                <AreaTexto
+                    id="pregunta-criterio"
+                    v-model="form.criterio_ia"
+                    rows="4"
+                    maxlength="1000"
+                    placeholder="Ej. 100 si nombra una queja concreta y cómo la resuelve; 0 si no responde."
+                />
+            </Campo>
         </form>
 
         <template #pie>

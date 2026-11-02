@@ -70,6 +70,32 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A2.1 · diseño del editor de diagnóstico, 2 de noviembre)
+
+- **Encabezado:**
+  - el sector, «Versiones», el estado («Listo para publicar» o «Incompleto») y «Borrador guardado» van en píldoras con ícono;
+  - «Vista previa y estado» y «Publicar versión N» llevan ícono;
+  - en el celular los botones bajan de línea en lugar de salirse de la pantalla.
+- **Categorías:**
+  - conteo «N de M completas»;
+  - cada categoría muestra ✓ o el número de cosas por corregir en un círculo, su importancia con una barra y sus preguntas;
+  - la elegida se resalta en azul;
+  - el total de importancia lleva una barra verde (o roja si no suma 100%);
+  - «Editar importancia» y «Agregar categoría» llevan ícono.
+- **Cabecera de las preguntas:** una tarjeta con la categoría, su importancia, sus preguntas y «Arrastra el número para ordenar». Al final de la lista hay un botón «Agregar otra pregunta a…».
+- **Tarjeta de pregunta:**
+  - número en un círculo (es el asa para arrastrar);
+  - tipo con ícono y «Obligatoria / Opcional» en píldoras;
+  - «Cómo responder» en un recuadro;
+  - cada opción con su letra, su puntaje en color (verde 100, azul desde 50, ámbar por debajo, gris 0) y una barra;
+  - la nota «Ten en cuenta» de la opción se ve debajo, en una línea;
+  - el criterio de la IA de las abiertas va en un recuadro.
+- **A2.1b / A2.1e · Ventana de la pregunta:**
+  - arriba, el texto y la indicación lado a lado; luego el tipo y «Obligatoria»;
+  - cada opción va en su tarjeta, con el texto a lo ancho (antes se cortaba), el puntaje, subir/bajar/quitar y, justo debajo, su «Ten en cuenta» para la IA (antes estaba en otra columna);
+  - «Opción que excluye a las demás» y «Opción que pide escribir cuál» ya no se salen de su columna;
+  - en el celular, el texto de la opción ocupa toda la fila.
+
 ### Cambiado (A2.3 · Catálogo de categorías y A2.5 · Crear diagnóstico, 2 de noviembre)
 
 - **A2.3 · Catálogo de categorías:**
