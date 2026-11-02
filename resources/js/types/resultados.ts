@@ -97,4 +97,6 @@ export type Resultado = {
     categorias: CategoriaResultado[];
     /** Las 3 categorías más débiles con su recomendación. */
     prioridades: Prioridad[];
+    /** Se analizó con IA_DE_PRUEBA (sin OpenAI): la pantalla lo avisa. */
+    sin_ia?: boolean;
 };

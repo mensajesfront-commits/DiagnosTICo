@@ -155,6 +155,8 @@ class PublicarResultado
                 // recomendaciones con pasos, plazo e indicador. Vacíos en
                 // resultados anteriores a estos campos.
                 'impacto' => (string) ($ia['impacto'] ?? ''),
+                // Analizada con IA_DE_PRUEBA (sin OpenAI): el resultado lo avisa.
+                'sin_ia' => (bool) ($ia['sin_ia'] ?? false),
                 'hallazgos' => array_values((array) ($ia['hallazgos'] ?? [])),
                 'fortalezas' => array_values((array) ($ia['fortalezas'] ?? [])),
                 'debilidades' => array_values((array) ($ia['debilidades'] ?? [])),

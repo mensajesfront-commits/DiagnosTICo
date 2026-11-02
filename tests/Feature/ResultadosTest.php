@@ -399,3 +399,14 @@ it('el PDF del resultado de ejemplo lo dice en la portada', function () {
 
     expect(view('pdf.informe', ['informe' => $informe])->render())->toContain('Informe de ejemplo: los datos y textos son ilustrativos');
 });
+
+it('un resultado analizado con la IA de prueba lo avisa en la pantalla y en el PDF', function () {
+    responderYEnviar($this, $this->medicion);
+    $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
+
+    $informe = DatosResultado::informe($resultado);
+
+    expect($resultado->por_categoria[0]['sin_ia'])->toBeTrue()
+        ->and($informe['sin_ia'])->toBeTrue()
+        ->and(view('pdf.informe', ['informe' => $informe])->render())->toContain('Análisis de prueba: las respuestas son reales, pero no las analizó la IA');
+});

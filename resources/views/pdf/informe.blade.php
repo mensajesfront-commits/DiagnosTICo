@@ -176,6 +176,8 @@
         </dl>
         @if ($i['ejemplo'])
             <div class="aviso-ejemplo">Informe de ejemplo: los datos y textos son ilustrativos y no corresponden a una empresa real.</div>
+        @elseif (! empty($i['sin_ia']))
+            <div class="aviso-ejemplo">Análisis de prueba: las respuestas son reales, pero no las analizó la IA (modo de prueba). Los textos que empiezan por «Prueba:» no son un análisis.</div>
         @endif
         <div class="calificacion">
             <b>{{ $i['puntaje'] }}</b>
@@ -192,6 +194,10 @@
         <h2><span class="n">1</span>Ficha técnica y alcance</h2>
         <p class="bajada">Qué empresa se evaluó, con qué información y qué quedó fuera de la evaluación.</p>
 
+        @if (! $i['ejemplo'] && ! empty($i['sin_ia']))
+            <div class="alerta"><b>Análisis de prueba.</b> Este resultado se publicó con el modo de prueba de Captter (IA_DE_PRUEBA), que no consulta a la IA.
+                Las calificaciones de las preguntas cerradas son reales; los textos que empiezan por «Prueba:» y las calificaciones de las abiertas no lo son.</div>
+        @endif
         @if ($i['ejemplo'])
             <div class="alerta"><b>Informe de ejemplo.</b> Muestra cómo se verá el informe real. Los textos que empiezan por «Ejemplo:» los escribe la IA a partir de las respuestas de cada empresa.</div>
         @endif
@@ -304,13 +310,20 @@
             @endforeach
         </div>
 
-        <h3>Tres recomendaciones prioritarias</h3>
-        @foreach (array_slice(array_values(array_filter($i['fichas'], fn ($f) => $f['tipo'] === 'prioritaria')), 0, 3) as $f)
-            <div class="reco">
-                <div class="t"><b>{{ $f['numero'] }}. {{ $f['titulo'] }}</b><span class="nota">{{ $f['plazo'] !== '' ? 'Plazo: '.$f['plazo'] : '' }}</span></div>
-                <div class="nota">{{ $f['categoria'] }} · {{ $nombreNivel($f['nivel']) }}{{ $f['objetivo'] !== '' ? ' · Objetivo: '.$f['objetivo'] : '' }}</div>
-            </div>
-        @endforeach
+        <div class="bloque">
+            <h3>Tres recomendaciones prioritarias</h3>
+            <p class="nota">
+                La acción más importante de las 3 categorías con menor calificación, en el orden en que conviene empezar.
+                La ficha completa de cada una (pasos, responsable, indicador y meta) está en la sección 9.
+            </p>
+            @foreach (array_slice(array_values(array_filter($i['fichas'], fn ($f) => $f['tipo'] === 'prioritaria')), 0, 3) as $f)
+                <div class="reco">
+                    <div class="t"><b>{{ $f['numero'] }}. {{ $f['titulo'] }}</b><span class="nota">{{ $f['plazo'] !== '' ? 'Plazo: '.$f['plazo'] : '' }}</span></div>
+                    <div class="nota">{{ $f['categoria'] }} · {{ $nombreNivel($f['nivel']) }}{{ in_array($f['nivel'], ['camino', 'sigue'], true) ? ' (para seguir mejorando)' : '' }}</div>
+                    @if ($f['objetivo'] !== '')<p style="margin: 2pt 0 0"><b>Objetivo:</b> {{ $f['objetivo'] }}</p>@endif
+                </div>
+            @endforeach
+        </div>
     </section>
 
     {{-- 3 · Metodología y criterios --}}
@@ -452,7 +465,14 @@
                         <td>{{ $c['nombre'] }}</td>
                         <td class="r">{{ $c['puntaje'] }}</td>
                         <td class="r">{{ $num($c['importancia']) }} %</td>
-                        <td>{{ $nombreNivel($c['nivel']) }}.{{ $c['impacto'] !== '' ? ' '.$c['impacto'] : '' }}{!! $c['desempate'] !== '' ? ' <span class="nota">'.e($c['desempate']).'</span>' : '' !!}</td>
+                        <td>
+                            @if (in_array($c['nivel'], ['critico', 'mejorar'], true))
+                                {{ $nombreNivel($c['nivel']) }}: requiere intervención.{{ $c['impacto'] !== '' ? ' '.$c['impacto'] : '' }}
+                            @else
+                                {{ $nombreNivel($c['nivel']) }}: no requiere intervención inmediata; se trata de mantener lo logrado y seguir midiendo.
+                            @endif
+                            {!! $c['desempate'] !== '' ? '<span class="nota">'.e($c['desempate']).'</span>' : '' !!}
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

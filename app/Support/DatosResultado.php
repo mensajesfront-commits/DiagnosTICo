@@ -72,6 +72,8 @@ class DatosResultado
             'tiene_pdf' => $tienePdf,
             'categorias' => $categorias,
             'prioridades' => self::prioridades($categorias),
+            // Alguna categoría se analizó sin IA (IA_DE_PRUEBA): E6 y el PDF lo avisan.
+            'sin_ia' => collect($categorias)->contains(fn (array $c) => ! empty($c['sin_ia'])),
         ];
     }
 

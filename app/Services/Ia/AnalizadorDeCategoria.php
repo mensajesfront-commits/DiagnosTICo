@@ -153,7 +153,7 @@ class AnalizadorDeCategoria implements Analizador
      * que el trabajo en cola reintente esa categoría (RN-021).
      *
      * @param  array{preguntas: list<array<string, mixed>>}  $categoria
-     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, metodo: string, metodo_motivo: string, observacion_categoria: string, impacto: string, hallazgos: list<array{grupo: string, puntos: list<string>}>, fortalezas: list<string>, debilidades: list<string>, oportunidades: list<string>, amenazas: list<string>, faltante: list<string>, recomendaciones: list<array<string, mixed>>, recomendacion: array{titulo: string, detalle: string}}
+     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, metodo: string, metodo_motivo: string, observacion_categoria: string, impacto: string, hallazgos: list<array{grupo: string, puntos: list<string>}>, fortalezas: list<string>, debilidades: list<string>, oportunidades: list<string>, amenazas: list<string>, faltante: list<string>, recomendaciones: list<array<string, mixed>>, recomendacion: array{titulo: string, detalle: string}, sin_ia?: bool}
      */
     public static function validar(string $contenido, array $categoria): array
     {

@@ -40,6 +40,8 @@ class AnalizadorDePrueba implements Analizador
             'metodo_motivo' => 'Método de prueba elegido por el nombre de la categoría.',
             'observacion_categoria' => "Observación de prueba de {$categoria['nombre']}: analizada sin conexión a la IA.",
             ...AnalisisSinIa::partes($categoria['nombre'], $metodo, 'de prueba'),
+            // El resultado y el PDF avisan que no lo analizó la IA.
+            'sin_ia' => true,
         ];
     }
 }

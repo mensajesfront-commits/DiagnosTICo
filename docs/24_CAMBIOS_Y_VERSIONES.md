@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Corregido (informe y análisis de prueba, 2 de noviembre)
+
+- **Resultado analizado sin IA:** si se publicó con `IA_DE_PRUEBA=true`, cada categoría queda marcada (`sin_ia`). E6, A3.3 y el PDF (portada y ficha técnica) avisan «Análisis de prueba: las respuestas son reales, pero no las analizó la IA». Antes no se distinguía de un análisis real.
+- **Comparación y priorización:** la justificación ya no repite el impacto en todas las filas. Las categorías en Crítico o Requiere mejora dicen que requieren intervención y por qué; las demás, que basta con mantener lo logrado.
+- **Tres recomendaciones prioritarias:** ahora explican qué son, marcan «para seguir mejorando» si la categoría ya está bien y no se parten entre dos páginas.
+
 ### Agregado (diagnóstico de prueba para software, 2 de noviembre)
 
 - `php artisan db:seed --class=DiagnosticoProgramacionSeeder` publica «Diagnóstico de prueba · Software y apps» en el sector «Programación y consultoría informática»; si el sector no existe, lo crea con las actividades CIIU de la división 62.

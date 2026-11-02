@@ -19,6 +19,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import Aviso from '@/components/base/Aviso.vue';
 import Boton from '@/components/base/Boton.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
@@ -234,6 +235,17 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                 </Boton>
             </div>
         </header>
+
+        <Aviso
+            v-if="!ejemplo && resultado.sin_ia"
+            tono="error"
+            titulo="Análisis de prueba"
+            class="shrink-0"
+        >
+            Este resultado se publicó con el modo de prueba de Captter
+            (IA_DE_PRUEBA): las respuestas son reales, pero no las analizó la
+            IA. Los textos que empiezan por «Prueba:» no son un análisis.
+        </Aviso>
 
         <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
             <SelectorCompacto
