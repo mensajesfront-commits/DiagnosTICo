@@ -80,7 +80,7 @@ Las rutas completas, con su controlador y permiso, están en `15_BACKEND.md`. La
 
 ### Sin clave
 
-- Con `IA_DE_PRUEBA=true`, `AnalizadorDePrueba` devuelve textos y puntajes de prueba sin conexión. Sirve para programar; nunca en producción.
+- La aplicación no tiene modo sin IA: sin clave, el análisis falla y la categoría queda «fallido» tras 3 intentos. Solo las pruebas automáticas usan `Tests\Support\AnalizadorFalso`.
 - Las pruebas automáticas no llaman a OpenAI (`OpenAI::fake()` o el analizador de prueba).
 - `php artisan prueba:ia` hace una llamada real para comprobar la clave y el modelo.
 

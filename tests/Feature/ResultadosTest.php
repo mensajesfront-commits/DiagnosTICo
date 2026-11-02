@@ -13,7 +13,6 @@ use App\Models\User;
 use App\Notifications\AnalisisFallido;
 use App\Notifications\ResultadoListo;
 use App\Services\Ia\Analizador;
-use App\Services\Ia\AnalizadorDePrueba;
 use App\Services\Ia\ArmadorPrompt;
 use App\Services\Resultados\CalculadoraPuntajes;
 use App\Services\Resultados\InformePdf;
@@ -24,11 +23,12 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\LaravelPdf\Facades\Pdf;
+use Tests\Support\AnalizadorFalso;
 
 /*
  * HU-068 puntajes, HU-069 análisis por categoría, HU-084 publicar, E4 avance
  * y reintento (HU-063), E6 resultado, E9 respuestas y PDF (HU-064 a HU-066).
- * La IA es AnalizadorDePrueba (IA_DE_PRUEBA=true en phpunit.xml): la abierta
+ * La IA es AnalizadorFalso (tests/Pest.php): la abierta
  * vale 20 + largo/4.
  */
 
@@ -184,7 +184,7 @@ it('arma el prompt por capas: general, sector y empresa, con el formato fijo al 
 
 it('si una categoría falla queda fallida, avisa al administrador y la empresa la reintenta sola', function () {
     // Falla solo "Automatización".
-    app()->bind(Analizador::class, fn () => new class extends AnalizadorDePrueba
+    app()->bind(Analizador::class, fn () => new class extends AnalizadorFalso
     {
         public function analizar(string $instrucciones, array $categoria): array
         {
@@ -211,7 +211,7 @@ it('si una categoría falla queda fallida, avisa al administrador y la empresa l
             ->where('analisis.terminadas', 1)
             ->where('analisis.fallidas', ['Automatización']));
 
-    app()->bind(Analizador::class, fn () => new AnalizadorDePrueba);
+    app()->bind(Analizador::class, fn () => new AnalizadorFalso);
     $this->actingAs($this->laura)->post(route('responder.reintentar', $this->medicion))
         ->assertRedirect(route('responder.enviado', $this->medicion));
 
@@ -398,15 +398,4 @@ it('el PDF del resultado de ejemplo lo dice en la portada', function () {
     $informe = DatosResultado::informeDe(['id' => null, 'numero' => 1, 'empresa' => ['id' => null, 'nombre' => 'Empresa de ejemplo'], 'sector' => 'Comidas', 'diagnostico' => 'D', 'version' => 1], DatosResultado::resultado(Resultado::firstOrFail()), null, now(), null, true);
 
     expect(view('pdf.informe', ['informe' => $informe])->render())->toContain('Informe de ejemplo: los datos y textos son ilustrativos');
-});
-
-it('un resultado analizado con la IA de prueba lo avisa en la pantalla y en el PDF', function () {
-    responderYEnviar($this, $this->medicion);
-    $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
-
-    $informe = DatosResultado::informe($resultado);
-
-    expect($resultado->por_categoria[0]['sin_ia'])->toBeTrue()
-        ->and($informe['sin_ia'])->toBeTrue()
-        ->and(view('pdf.informe', ['informe' => $informe])->render())->toContain('Análisis de prueba: las respuestas son reales, pero no las analizó la IA');
 });

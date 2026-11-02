@@ -42,11 +42,4 @@ return [
     'plazo_minimo_dias' => (int) env('PLAZO_MINIMO_DIAS', 3),
     'zona_horaria' => env('ZONA_HORARIA_POR_DEFECTO', 'America/Bogota'),
 
-    /*
-    | Análisis de la IA sin conexión (App\Services\Ia\AnalizadorDePrueba):
-    | puntajes y textos de prueba, sin gastar llamadas a OpenAI. Solo para
-    | programar y para las pruebas automáticas; en producción va en false.
-    */
-    'ia_de_prueba' => (bool) env('IA_DE_PRUEBA', false),
-
 ];

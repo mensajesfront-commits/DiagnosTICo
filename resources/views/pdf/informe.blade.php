@@ -176,8 +176,6 @@
         </dl>
         @if ($i['ejemplo'])
             <div class="aviso-ejemplo">Informe de ejemplo: los datos y textos son ilustrativos y no corresponden a una empresa real.</div>
-        @elseif (! empty($i['sin_ia']))
-            <div class="aviso-ejemplo">Análisis de prueba: las respuestas son reales, pero no las analizó la IA (modo de prueba). Los textos que empiezan por «Prueba:» no son un análisis.</div>
         @endif
         <div class="calificacion">
             <b>{{ $i['puntaje'] }}</b>
@@ -194,10 +192,6 @@
         <h2><span class="n">1</span>Ficha técnica y alcance</h2>
         <p class="bajada">Qué empresa se evaluó, con qué información y qué quedó fuera de la evaluación.</p>
 
-        @if (! $i['ejemplo'] && ! empty($i['sin_ia']))
-            <div class="alerta"><b>Análisis de prueba.</b> Este resultado se publicó con el modo de prueba de Captter (IA_DE_PRUEBA), que no consulta a la IA.
-                Las calificaciones de las preguntas cerradas son reales; los textos que empiezan por «Prueba:» y las calificaciones de las abiertas no lo son.</div>
-        @endif
         @if ($i['ejemplo'])
             <div class="alerta"><b>Informe de ejemplo.</b> Muestra cómo se verá el informe real. Los textos que empiezan por «Ejemplo:» los escribe la IA a partir de las respuestas de cada empresa.</div>
         @endif

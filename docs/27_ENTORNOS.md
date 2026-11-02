@@ -40,7 +40,6 @@ Todas están explicadas en `.env.example`.
 | `MAIL_MAILER` | `smtp` hacia `mailpit:1025` | `array` (no envía) |
 | `QUEUE_CONNECTION` | `database` | `sync` |
 | `OPENAI_API_KEY` | La de cada desarrollador | No se usa: las pruebas simulan OpenAI (`OpenAI::fake()`) |
-| `IA_DE_PRUEBA` | `false` con clave; `true` para analizar sin OpenAI | `true`: el análisis usa `AnalizadorDePrueba` |
 | `LARAVEL_PDF_CHROME_PATH` | `/usr/local/bin/chromium` | No se usa: las pruebas simulan el PDF (`Pdf::fake()`) |
 
 ## Correo
@@ -52,7 +51,7 @@ Todas están explicadas en `.env.example`.
 
 - Cada desarrollador pone su clave en `OPENAI_API_KEY` y el modelo en `OPENAI_MODEL`.
 - `php artisan prueba:ia` hace una llamada real para comprobar que todo funciona (gasta una llamada).
-- Sin clave, `IA_DE_PRUEBA=true` analiza con textos y puntajes de prueba (`App\Services\Ia\AnalizadorDePrueba`) para recorrer todo el flujo. Nunca en producción.
+- Sin clave no se puede analizar: no hay modo de prueba en la aplicación. Las pruebas automáticas usan `Tests\Support\AnalizadorFalso` y no gastan saldo.
 - El análisis corre en la cola. El servicio `queue` de `compose.yaml` arranca solo con `sail up`; sin él, una medición enviada se queda en "Estamos analizando". Con la cola corriendo tarda 1 o 2 minutos (una llamada por categoría).
 - **[INFORMACIÓN PENDIENTE]** Falta saber quién aporta la clave y el saldo para el desarrollo (propuesta técnica, sección 5).
 

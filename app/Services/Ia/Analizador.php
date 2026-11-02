@@ -4,8 +4,8 @@ namespace App\Services\Ia;
 
 /**
  * Analiza una categoría del diagnóstico (RN-021: una sola etapa por
- * categoría). Hay dos: la real con OpenAI (AnalizadorDeCategoria) y una de
- * prueba sin conexión (AnalizadorDePrueba, IA_DE_PRUEBA=true en el .env).
+ * categoría). La aplicación usa AnalizadorDeCategoria (OpenAI); las pruebas
+ * automáticas, Tests\Support\AnalizadorFalso.
  *
  * `$categoria` es la capa "preguntas con respuestas" del prompt (RN-022);
  * cada pregunta trae `id` (su referencia, p. ej. "p12") y `tipo`.
@@ -17,7 +17,7 @@ interface Analizador
 {
     /**
      * @param  array{nombre: string, preguntas: list<array<string, mixed>>}  $categoria
-     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, metodo: string, metodo_motivo: string, observacion_categoria: string, impacto: string, hallazgos: list<array{grupo: string, puntos: list<string>}>, fortalezas: list<string>, debilidades: list<string>, oportunidades: list<string>, amenazas: list<string>, faltante: list<string>, recomendaciones: list<array<string, mixed>>, recomendacion: array{titulo: string, detalle: string}, sin_ia?: bool}
+     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, metodo: string, metodo_motivo: string, observacion_categoria: string, impacto: string, hallazgos: list<array{grupo: string, puntos: list<string>}>, fortalezas: list<string>, debilidades: list<string>, oportunidades: list<string>, amenazas: list<string>, faltante: list<string>, recomendaciones: list<array<string, mixed>>, recomendacion: array{titulo: string, detalle: string}}
      */
     public function analizar(string $instrucciones, array $categoria): array;
 }

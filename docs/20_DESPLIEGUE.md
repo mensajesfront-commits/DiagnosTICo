@@ -44,7 +44,6 @@ Después:
 - **Tareas programadas:** el cron `* * * * * php artisan schedule:run`.
 - **Variables obligatorias en producción:**
   - `OPENAI_API_KEY` y `OPENAI_MODEL`;
-  - `IA_DE_PRUEBA=false`;
   - `MAIL_*` con el servidor SMTP real;
   - `LARAVEL_PDF_CHROME_PATH`;
   - `ADMIN_EMAIL` para la cuenta principal del Administrador (la elige NuevasTIC). Configura `MAIL_*` antes de `db:seed`: a ese correo le llega "Crear mi contraseña". Si no llega, `php artisan admin:invitar` lo reenvía o muestra el enlace.

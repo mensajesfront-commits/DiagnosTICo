@@ -9,11 +9,11 @@ use App\Models\Respuesta;
 use App\Models\Sector;
 use App\Models\User;
 use App\Services\Ia\Analizador;
-use App\Services\Ia\AnalizadorDePrueba;
 use App\Services\Ia\ArmadorPrompt;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Support\AnalizadorFalso;
 
 /*
  * A4 · Configuración de la IA (HU-041 a HU-045, HU-080).
@@ -138,7 +138,7 @@ it('prueba el prompt con un ejemplo sin guardar nada; si la IA falla, muestra el
 
     expect(Prompt::count())->toBe(0)->and(AnalisisCategoria::count())->toBe(0);
 
-    app()->bind(Analizador::class, fn () => new class extends AnalizadorDePrueba
+    app()->bind(Analizador::class, fn () => new class extends AnalizadorFalso
     {
         public function analizar(string $instrucciones, array $categoria): array
         {

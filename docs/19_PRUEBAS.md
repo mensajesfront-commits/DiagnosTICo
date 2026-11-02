@@ -18,7 +18,7 @@ En Sail se antepone `./vendor/bin/sail`.
 
 - **Base de datos real.** Las pruebas usan PostgreSQL (la base `testing`) con `RefreshDatabase`, igual que CI. Así se prueban los JSONB y las consultas tal como corren de verdad.
 - **Sin servicios externos.**
-  - **IA:** `OpenAI::fake()`, o `AnalizadorDePrueba` con `IA_DE_PRUEBA=true`.
+  - **IA:** `OpenAI::fake()`, o `Tests\Support\AnalizadorFalso`, que `tests/Pest.php` pone en lugar de OpenAI en todas las pruebas de `Feature`.
   - **PDF:** `Pdf::fake()` en todas las pruebas (`tests/Pest.php`); Chromium no se abre.
   - **Correo:** `Notification::fake()` y `MAIL_MAILER=array`.
   - **Cola:** `QUEUE_CONNECTION=sync`, o `Queue::fake()` cuando se quiere ver qué se mandó a la cola.

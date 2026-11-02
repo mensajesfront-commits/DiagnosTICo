@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /**
- * El análisis cuando no hay IA: el modo de prueba (IA_DE_PRUEBA), el
+ * El análisis cuando no hay IA: las pruebas automáticas (AnalizadorFalso), el
  * resultado de ejemplo (HU-030) y la categoría sin respuestas.
  *
  * Los textos son ilustrativos y empiezan por "Ejemplo:" o "Prueba:", para que

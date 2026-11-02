@@ -81,7 +81,7 @@ Ruta (routes/web.php, con su permiso)
 | `Jobs\AnalizarMedicion` | Calcula las preguntas cerradas y manda una tarea por categoría a la cola. |
 | `Jobs\AnalizarCategoria` | Arma el prompt, llama al analizador y guarda la respuesta. Tres intentos (15 s y 60 s de espera); después queda fallida y avisa (`AnalisisFallido`). |
 | `Services\Ia\ArmadorPrompt` | Arma el prompt por capas (RN-022) con las variables `{sector}`, `{contexto_sector}`, `{categoria}` y `{respuestas_categoria}`. |
-| `Services\Ia\Analizador` | Interfaz con dos versiones: `AnalizadorDeCategoria` (OpenAI, salida JSON estricta) y `AnalizadorDePrueba` (sin conexión, `IA_DE_PRUEBA=true`). |
+| `Services\Ia\Analizador` | Interfaz. La aplicación usa `AnalizadorDeCategoria` (OpenAI, salida JSON estricta); las pruebas automáticas, `Tests\Support\AnalizadorFalso`. |
 | `Services\Resultados\CalculadoraPuntajes` | Funciones puras del cálculo (RN-018) y el texto de cada respuesta. |
 | `Services\Resultados\PublicarResultado` | Consolida y publica el resultado una sola vez, avisa a la empresa y manda a generar el PDF. |
 | `Jobs\GenerarInformePdf` e `InformePdf` | Informe PDF con Chromium, con encabezado y número de página en cada hoja (RN-024). |

@@ -78,7 +78,7 @@ Lo construido, de punta a punta:
 ./vendor/bin/sail composer ci:check   # todo lo que corre CI
 ```
 
-**Para recorrer el flujo completo sin clave de OpenAI**, pon `IA_DE_PRUEBA=true` en `.env` y deja corriendo `./vendor/bin/sail artisan queue:work`.
+**Para recorrer el flujo completo** hace falta la clave de OpenAI en `.env` (`OPENAI_API_KEY` y `OPENAI_MODEL`) y la cola corriendo (el servicio `queue` de `compose.yaml`). No hay modo sin IA: cada medición gasta una llamada por categoría.
 
 ## Semanas anteriores
 

@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Services\Ia;
+namespace Tests\Support;
 
+use App\Services\Ia\Analizador;
 use App\Support\AnalisisSinIa;
 use App\Support\MetodosAnalisis;
 
 /**
- * Analizador sin conexión para programar y probar sin clave de OpenAI
- * (IA_DE_PRUEBA=true en el .env; también lo usan las pruebas automáticas).
+ * Analizador falso SOLO para las pruebas automáticas: no llama a OpenAI ni
+ * gasta saldo. La aplicación usa siempre AnalizadorDeCategoria (OpenAI).
  *
  * Devuelve siempre lo mismo para la misma entrada: la abierta vale según el
- * largo de la respuesta (más detalle, más puntaje) y los textos dicen que son
- * de prueba. Nunca se usa en producción.
+ * largo de la respuesta (más detalle, más puntaje) y los textos empiezan por
+ * "Prueba:".
  */
-class AnalizadorDePrueba implements Analizador
+class AnalizadorFalso implements Analizador
 {
     public function analizar(string $instrucciones, array $categoria): array
     {
@@ -40,8 +41,6 @@ class AnalizadorDePrueba implements Analizador
             'metodo_motivo' => 'Método de prueba elegido por el nombre de la categoría.',
             'observacion_categoria' => "Observación de prueba de {$categoria['nombre']}: analizada sin conexión a la IA.",
             ...AnalisisSinIa::partes($categoria['nombre'], $metodo, 'de prueba'),
-            // El resultado y el PDF avisan que no lo analizó la IA.
-            'sin_ia' => true,
         ];
     }
 }
