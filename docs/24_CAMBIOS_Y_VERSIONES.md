@@ -70,6 +70,18 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A3 · diseño de Empresas, 2 de noviembre)
+
+- **Accesos rápidos** con su conteo (Todas, En curso, Vencidas, Sin diagnóstico, Desactivadas): aplican el filtro con un toque y se marcan cuando está activo.
+- **Búsqueda y filtros** en una tarjeta, con ícono de lupa, «N de M empresas» y «Quitar filtros».
+- **Filas:**
+  - un círculo con las iniciales y el sector bajo el nombre (ya no hay columna de sector);
+  - el último puntaje en un anillo con su nivel, o un círculo punteado si no tiene;
+  - la variación en una píldora de color;
+  - la cuenta con un punto verde o gris; las desactivadas se ven en gris;
+  - «Ver ›» en lugar del enlace subrayado.
+- **Corregido:** en el celular la página se ensanchaba a 925 px por el texto `sr-only` de «Ver» dentro de la tabla con scroll. El `<main>` de `PanelLayout` ahora recorta en horizontal (`overflow-x-clip`) también en el celular.
+
 ### Cambiado (A1 · diseño del inicio del Administrador, 2 de noviembre)
 
 - **Encabezado:** la fecha de hoy.
