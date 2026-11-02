@@ -70,6 +70,26 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A2.4 · diseño de la vista previa y estado, 2 de noviembre)
+
+- **Encabezado:**
+  - «Vista previa» con ícono sobre el nombre;
+  - el estado (borrador completo o incompleto, o versión publicada en solo lectura) y el sector en píldoras;
+  - «Editar» y «Publicar versión N» llevan ícono y bajan de línea en el celular.
+- **Estado del diagnóstico:**
+  - un anillo con las categorías completas («6/6»), verde si está listo para publicar y ámbar si no, con «Listo para publicar» o «Faltan N requisitos»;
+  - cada requisito en su recuadro con ✓ o !, y el detalle debajo;
+  - las categorías por corregir en tarjetas con «Ver aquí» (abre esa categoría en el cuestionario) y «Corregir en el editor».
+- **Cuestionario:**
+  - «Cuestionario» y «Resultado de ejemplo» en pestañas con ícono;
+  - las categorías en chips numerados con ⚠ si tienen algo por corregir; antes era una lista desplegable;
+  - una cabecera con la categoría y cuántas preguntas se respondieron de prueba.
+- **Preguntas con el mismo estilo de E2:**
+  - número en un círculo, que se vuelve ✓ al responder;
+  - «Obligatoria», y «Cómo responder» en un recuadro;
+  - opciones grandes con su círculo o casilla. Son controles reales: se usan con teclado y lector de pantalla, y «Ninguna» desmarca las demás.
+- **Navegación:** «Categoría anterior» y «Siguiente categoría» al final.
+
 ### Cambiado (RN-012 · la selección múltiple suma exactamente 100, 2 de noviembre)
 
 - **Antes:** una selección múltiple solo debía «poder llegar a 100». Si sumaba más (por ejemplo 158), se aceptaba en verde y el puntaje de la pregunta se cortaba en 100. Así, marcar todas daba lo mismo que marcar solo algunas.
