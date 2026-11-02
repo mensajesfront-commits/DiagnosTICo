@@ -70,6 +70,19 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E1 · diseño del inicio de la empresa, 2 de noviembre)
+
+- **Encabezado:** saludo más grande y la fecha de hoy.
+- **Medición pendiente**, en una tarjeta destacada:
+  - con fondo azul suave (rojizo si venció);
+  - un anillo con el porcentaje respondido, o un ícono si no ha empezado o se está analizando;
+  - datos con íconos (categorías y preguntas, avance guardado, moverse entre categorías);
+  - a la derecha, una cuenta regresiva grande («5 días»), naranja con 3 días o menos y roja el último día o vencida, con el botón principal a todo el ancho.
+- **Cómo funciona:** tres pasos con íconos unidos por una línea punteada.
+- **Último resultado:** anillo más grande, variación en una píldora de color y botones «Ver resultado completo» e «Informe PDF».
+- **Áreas a trabajar:** tarjetas con borde y barra del color del nivel.
+- **Mis mediciones:** lista con anillo, nivel y variación, como en Mi historial.
+
 ### Cambiado (E8 / A3.4 · diseño del historial, 2 de noviembre)
 
 - **Arriba, cuatro cifras:**

@@ -13,25 +13,46 @@
  * - Enviada: la IA analiza las respuestas.
  * - Sin pendiente: "No tienes diagnósticos pendientes".
  *
- * Abajo, el último resultado con su variación y evolución, y las 3 áreas a
- * trabajar o la lista de mediciones.
+ * La pendiente va en una tarjeta destacada: anillo con el porcentaje
+ * respondido (o un ícono según el estado), datos con íconos y, a la derecha,
+ * la cuenta regresiva (naranja con 3 días o menos, roja el último día) y el
+ * botón principal.
+ *
+ * Abajo, el último resultado (anillo, nivel, variación, botones al resultado
+ * y al PDF, evolución) y las 3 áreas a trabajar con barra de color, o la
+ * lista de mediciones. La primera vez, "Cómo funciona" con íconos.
  *
  * "Ver resultado" abre E6 y "Ver informe PDF" descarga el PDF guardado.
  *
  * "Ver historial completo" abre E8 (HU-067).
  */
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { CalendarDays, Mail } from '@lucide/vue';
+import {
+    ArrowLeftRight,
+    CalendarDays,
+    ChartColumnIncreasing,
+    ChevronRight,
+    CircleAlert,
+    CircleCheck,
+    ClipboardPen,
+    FileDown,
+    Layers,
+    LoaderCircle,
+    Mail,
+    Rocket,
+    Save,
+    Sparkles,
+} from '@lucide/vue';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EtiquetaEstado from '@/components/base/EtiquetaEstado.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
-import Variacion from '@/components/empresas/Variacion.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import MiniEvolucion from '@/components/graficas/MiniEvolucion.vue';
 import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
+import { niveles } from '@/lib/niveles';
 import { cn } from '@/lib/utils';
 import type { InicioEmpresa } from '@/types/responder';
 
@@ -104,7 +125,41 @@ function pedirNueva(): void {
     );
 }
 
-const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
+// Cuenta regresiva: naranja con 3 días o menos, roja el último día o vencida.
+const urgencia = computed(() => {
+    const d = p.value?.dias_restantes;
+
+    if (p.value?.estado === 'vencida' || d === 0) {
+        return 'roja';
+    }
+
+    return d !== null && d !== undefined && d <= 3 ? 'naranja' : 'normal';
+});
+
+const hoyTexto = new Date().toLocaleDateString('es-CO', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+});
+const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
+
+const pasos = [
+    {
+        icono: ClipboardPen,
+        titulo: 'Respondes',
+        texto: 'Preguntas sobre las áreas del marketing digital de tu negocio. Puedes pausar cuando quieras.',
+    },
+    {
+        icono: Sparkles,
+        titulo: 'Analizamos',
+        texto: 'El sistema calcula tu puntaje y la IA analiza tus respuestas, categoría por categoría.',
+    },
+    {
+        icono: ChartColumnIncreasing,
+        titulo: 'Recibes tu resultado',
+        texto: 'Tu puntaje de 0 a 100, tu nivel y un plan de acción con pasos, en pantalla y en PDF.',
+    },
+];
 
 // A5.4 · En "Ver como" no se responde ni se piden fechas (solo lectura).
 const enVerComo = computed(() => !!usePage().props.verComo);
@@ -114,14 +169,22 @@ const enVerComo = computed(() => !!usePage().props.verComo);
     <Head title="Inicio" />
 
     <div class="flex flex-col gap-5 p-6">
-        <header>
-            <h1 class="text-2xl font-semibold">Hola, {{ nombre }}</h1>
-            <p class="mt-1 text-sm text-tinta-suave">{{ subtitulo }}</p>
+        <header class="flex flex-wrap items-end justify-between gap-3">
+            <div>
+                <h1 class="text-3xl font-semibold">Hola, {{ nombre }}</h1>
+                <p class="mt-1 text-sm text-tinta-suave">{{ subtitulo }}</p>
+            </div>
+            <p
+                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-sm text-tinta-suave ring-1 ring-linea"
+            >
+                <CalendarDays class="size-4" aria-hidden="true" />
+                {{ hoy }}
+            </p>
         </header>
 
         <p
             v-if="sinEmpresa"
-            class="rounded-xl border border-dashed border-linea-fuerte bg-white p-6 text-sm text-tinta-suave"
+            class="rounded-2xl border border-dashed border-linea-fuerte bg-white p-6 text-sm text-tinta-suave"
         >
             Tu cuenta todavía no está vinculada a una empresa. Escríbele al
             equipo de NuevasTIC.
@@ -132,208 +195,273 @@ const enVerComo = computed(() => !!usePage().props.verComo);
             v-if="p"
             :class="
                 cn(
-                    'grid gap-6 rounded-xl border-2 bg-white p-6 md:grid-cols-[1fr_auto]',
-                    p.estado === 'vencida' ? 'border-aviso' : 'border-marca',
+                    'grid overflow-hidden rounded-2xl border bg-white shadow-sm md:grid-cols-[minmax(0,1fr)_17rem]',
+                    p.estado === 'vencida'
+                        ? 'border-aviso/50'
+                        : 'border-marca/30',
                 )
             "
         >
-            <div class="flex flex-col gap-3">
-                <p class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="font-semibold">Medición {{ p.numero }}</span>
-                    <EtiquetaEstado :estado="p.estado" />
-                    <span
-                        v-if="p.estado === 'en_curso'"
-                        class="text-tinta-suave"
+            <div
+                :class="
+                    cn(
+                        'flex flex-col gap-4 p-6 sm:flex-row sm:items-center',
+                        p.estado === 'vencida'
+                            ? 'bg-linear-to-br from-nivel-critico-suave/70 to-white'
+                            : 'bg-linear-to-br from-marca-suave/80 to-white',
+                    )
+                "
+            >
+                <!-- Anillo del avance o ícono según el estado -->
+                <div class="relative size-28 shrink-0" aria-hidden="true">
+                    <template
+                        v-if="p.estado === 'en_curso' || p.estado === 'vencida'"
                     >
-                        {{ p.avance.porcentaje }}% respondido · Categoría
-                        {{ p.avance.categoria_numero }} de {{ p.categorias }}
-                    </span>
+                        <svg viewBox="0 0 120 120" class="size-28">
+                            <circle
+                                cx="60"
+                                cy="60"
+                                r="50"
+                                fill="white"
+                                stroke="var(--color-lienzo-oscuro)"
+                                stroke-width="11"
+                            />
+                            <circle
+                                cx="60"
+                                cy="60"
+                                r="50"
+                                fill="none"
+                                :stroke="
+                                    p.estado === 'vencida'
+                                        ? 'var(--color-tinta-suave)'
+                                        : 'var(--color-marca)'
+                                "
+                                stroke-width="11"
+                                stroke-linecap="round"
+                                :stroke-dasharray="2 * Math.PI * 50"
+                                :stroke-dashoffset="
+                                    2 *
+                                    Math.PI *
+                                    50 *
+                                    (1 - Math.max(3, p.avance.porcentaje) / 100)
+                                "
+                                transform="rotate(-90 60 60)"
+                            />
+                        </svg>
+                        <span
+                            class="absolute inset-0 flex flex-col items-center justify-center"
+                        >
+                            <span class="font-mono text-2xl font-semibold"
+                                >{{ p.avance.porcentaje }}%</span
+                            >
+                            <span class="text-[11px] text-tinta-suave"
+                                >respondido</span
+                            >
+                        </span>
+                    </template>
                     <span
-                        v-else-if="p.estado === 'no_iniciada'"
-                        class="text-tinta-suave"
+                        v-else
+                        :class="
+                            cn(
+                                'flex size-28 items-center justify-center rounded-full',
+                                p.estado === 'enviada'
+                                    ? 'bg-white text-marca ring-8 ring-marca-suave'
+                                    : 'bg-marca text-white ring-8 ring-marca-suave',
+                            )
+                        "
                     >
-                        {{
-                            p.primera
-                                ? 'Tu primer diagnóstico'
-                                : 'Nueva medición disponible'
-                        }}
+                        <LoaderCircle
+                            v-if="p.estado === 'enviada'"
+                            class="size-12 motion-safe:animate-spin"
+                        />
+                        <Rocket v-else class="size-12" />
                     </span>
-                    <span
-                        v-if="p.estado === 'vencida' && p.solicitud_abierta"
-                        class="rounded bg-alerta-suave px-2 py-0.5 font-medium text-alerta"
-                    >
-                        Nueva medición solicitada
-                    </span>
-                </p>
+                </div>
 
-                <template v-if="p.estado === 'no_iniciada'">
-                    <h2 class="text-xl font-semibold">
-                        {{
+                <div class="flex min-w-0 flex-1 flex-col gap-2">
+                    <p class="flex flex-wrap items-center gap-2 text-xs">
+                        <span class="font-semibold"
+                            >Medición {{ p.numero }}</span
+                        >
+                        <EtiquetaEstado :estado="p.estado" />
+                        <span
+                            v-if="p.estado === 'no_iniciada'"
+                            class="text-tinta-suave"
+                        >
+                            {{
+                                p.primera
+                                    ? 'Tu primer diagnóstico'
+                                    : 'Nueva medición disponible'
+                            }}
+                        </span>
+                        <span
+                            v-if="p.estado === 'vencida' && p.solicitud_abierta"
+                            class="rounded bg-alerta-suave px-2 py-0.5 font-medium text-alerta"
+                        >
+                            Nueva medición solicitada
+                        </span>
+                    </p>
+
+                    <h2 class="text-2xl leading-tight font-semibold">
+                        <template v-if="p.estado === 'no_iniciada'">{{
                             p.primera
                                 ? 'Descubre en qué punto está tu empresa'
                                 : 'Es momento de medir cómo vas'
-                        }}
+                        }}</template>
+                        <template v-else-if="p.estado === 'en_curso'"
+                            >Continúa donde lo dejaste</template
+                        >
+                        <template v-else-if="p.estado === 'vencida'"
+                            >La fecha límite de esta medición ya pasó</template
+                        >
+                        <template v-else
+                            >Estamos analizando tus respuestas</template
+                        >
                     </h2>
-                    <p v-if="p.primera" class="text-sm text-tinta-suave">
+
+                    <p
+                        v-if="p.estado === 'no_iniciada' && p.primera"
+                        class="text-sm text-tinta-suave"
+                    >
                         Este primer resultado será tu punto de partida. En los
                         próximos diagnósticos podrás ver cómo mejoras.
                     </p>
-                </template>
-                <h2
-                    v-else-if="p.estado === 'en_curso'"
-                    class="text-xl font-semibold"
-                >
-                    Continúa donde lo dejaste
-                </h2>
-                <h2
-                    v-else-if="p.estado === 'vencida'"
-                    class="text-xl font-semibold"
-                >
-                    La fecha límite de esta medición ya pasó
-                </h2>
-                <h2 v-else class="text-xl font-semibold">
-                    Estamos analizando tus respuestas
-                </h2>
+                    <p
+                        v-else-if="
+                            p.estado === 'en_curso' && p.avance.categoria
+                        "
+                        class="text-sm text-tinta-suave"
+                    >
+                        Vas en
+                        <strong class="text-tinta">{{
+                            p.avance.categoria
+                        }}</strong>
+                        (categoría {{ p.avance.categoria_numero }} de
+                        {{ p.categorias }}) · {{ p.avance.respondidas }} de
+                        {{ p.avance.total }} preguntas.
+                    </p>
+                    <p
+                        v-else-if="p.estado === 'vencida'"
+                        class="text-sm text-tinta-suave"
+                    >
+                        <template v-if="p.solicitud_abierta">
+                            Ya le pediste al equipo de NuevasTIC una nueva
+                            fecha: te escribirán cuando la asignen.
+                        </template>
+                        <template v-else>
+                            Respondiste el {{ p.avance.porcentaje }}%. Pide una
+                            nueva fecha al equipo de NuevasTIC.
+                        </template>
+                    </p>
+                    <p
+                        v-else-if="p.estado === 'enviada'"
+                        class="text-sm text-tinta-suave"
+                    >
+                        Suele tardar 1 o 2 minutos; cuando esté listo te
+                        avisamos por correo.
+                    </p>
 
-                <p
-                    v-if="p.mensaje && p.estado !== 'enviada'"
-                    class="rounded-md bg-lienzo px-4 py-3 text-sm"
-                >
-                    <strong>Mensaje del equipo de NuevasTIC:</strong>
-                    {{ p.mensaje }}
-                </p>
+                    <p
+                        v-if="p.mensaje && p.estado !== 'enviada'"
+                        class="rounded-lg border-l-4 border-marca bg-white/80 px-4 py-2.5 text-sm"
+                    >
+                        <strong>Mensaje del equipo de NuevasTIC:</strong>
+                        {{ p.mensaje }}
+                    </p>
 
-                <template
-                    v-if="p.estado === 'en_curso' || p.estado === 'vencida'"
-                >
-                    <div>
-                        <p
-                            class="flex justify-between text-xs text-tinta-suave"
-                        >
-                            <span
-                                v-if="
-                                    p.estado === 'en_curso' &&
-                                    p.avance.categoria
-                                "
-                            >
-                                Vas en
-                                <strong class="text-tinta">{{
-                                    p.avance.categoria
-                                }}</strong>
-                                · {{ p.avance.respondidas }} de
-                                {{ p.avance.total }} preguntas
-                            </span>
-                            <span v-else>
-                                {{ p.avance.respondidas }} de
-                                {{ p.avance.total }} preguntas respondidas
-                            </span>
-                            <span class="font-mono"
-                                >{{ p.avance.porcentaje }}%</span
-                            >
-                        </p>
-                        <div class="mt-1.5 h-2 rounded-full bg-lienzo-oscuro">
-                            <div
-                                :class="
-                                    cn(
-                                        'h-2 rounded-full',
-                                        p.estado === 'vencida'
-                                            ? 'bg-tinta-suave'
-                                            : 'bg-marca',
-                                    )
-                                "
-                                :style="{ width: `${p.avance.porcentaje}%` }"
-                            />
-                        </div>
-                    </div>
-                </template>
-
-                <p
-                    v-if="p.estado === 'vencida'"
-                    class="text-sm text-tinta-suave"
-                >
-                    <template v-if="p.solicitud_abierta">
-                        Ya le pediste al equipo de NuevasTIC una nueva fecha: te
-                        escribirán cuando la asignen.
-                    </template>
-                    <template v-else>
-                        Respondiste el {{ p.avance.porcentaje }}%. Pide una
-                        nueva fecha al equipo de NuevasTIC.
-                    </template>
-                </p>
-                <p
-                    v-else-if="p.estado === 'enviada'"
-                    class="text-sm text-tinta-suave"
-                >
-                    Suele tardar 1 o 2 minutos; cuando esté listo te avisamos
-                    por correo.
-                </p>
-                <p
-                    v-else
-                    class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-tinta-suave"
-                >
-                    <span>
-                        {{ plural(p.categorias, 'categoría', 'categorías') }} ·
-                        {{ plural(p.preguntas, 'pregunta', 'preguntas') }}
-                    </span>
-                    <span v-if="p.estado === 'en_curso'">
-                        ✓ Tu avance se guarda automáticamente
-                    </span>
-                    <span>
-                        {{
+                    <ul
+                        v-if="
+                            p.estado === 'no_iniciada' ||
                             p.estado === 'en_curso'
-                                ? 'Puedes moverte entre categorías cuando quieras'
-                                : 'Puedes pausar y continuar después'
-                        }}
-                    </span>
-                </p>
+                        "
+                        class="mt-1 flex flex-wrap gap-2 text-xs text-tinta-suave"
+                    >
+                        <li
+                            class="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 ring-1 ring-linea"
+                        >
+                            <Layers class="size-3.5" aria-hidden="true" />
+                            {{
+                                plural(p.categorias, 'categoría', 'categorías')
+                            }}
+                            ·
+                            {{ plural(p.preguntas, 'pregunta', 'preguntas') }}
+                        </li>
+                        <li
+                            class="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 ring-1 ring-linea"
+                        >
+                            <Save class="size-3.5" aria-hidden="true" />
+                            {{
+                                p.estado === 'en_curso'
+                                    ? 'Tu avance se guarda solo'
+                                    : 'Puedes pausar y seguir después'
+                            }}
+                        </li>
+                        <li
+                            v-if="p.estado === 'en_curso'"
+                            class="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 ring-1 ring-linea"
+                        >
+                            <ArrowLeftRight
+                                class="size-3.5"
+                                aria-hidden="true"
+                            />
+                            Muévete entre categorías
+                        </li>
+                    </ul>
+                </div>
             </div>
 
+            <!-- Fecha límite y acción -->
             <div
-                class="flex min-w-60 flex-col justify-center gap-3 md:border-l md:border-linea md:pl-6"
+                class="flex flex-col justify-center gap-4 border-t border-linea p-6 md:border-t-0 md:border-l"
             >
-                <div v-if="p.fecha_limite" class="flex items-start gap-2">
-                    <CalendarDays
+                <div v-if="p.fecha_limite">
+                    <p class="text-xs font-medium text-tinta-suave">
+                        Fecha límite
+                    </p>
+                    <p
+                        v-if="
+                            p.estado !== 'vencida' &&
+                            p.dias_restantes !== null &&
+                            p.dias_restantes !== undefined
+                        "
                         :class="
                             cn(
-                                'mt-0.5 size-5',
-                                p.estado === 'vencida'
+                                'mt-1 font-mono text-4xl leading-none font-semibold',
+                                urgencia === 'roja'
                                     ? 'text-aviso'
-                                    : 'text-tinta-suave',
+                                    : urgencia === 'naranja'
+                                      ? 'text-alerta'
+                                      : 'text-marca',
                             )
                         "
-                        aria-hidden="true"
-                    />
-                    <div>
-                        <p class="text-xs text-tinta-suave">Fecha límite</p>
-                        <p
-                            :class="
-                                cn(
-                                    'text-lg font-semibold',
-                                    p.estado === 'vencida' && 'text-aviso',
-                                )
-                            "
+                    >
+                        {{ p.dias_restantes === 0 ? 'Hoy' : p.dias_restantes }}
+                        <span
+                            v-if="p.dias_restantes > 0"
+                            class="font-sans text-base font-medium"
+                            >{{ p.dias_restantes === 1 ? 'día' : 'días' }}</span
                         >
-                            {{ fechaLarga(p.fecha_limite) }}
-                        </p>
-                        <p
-                            v-if="p.estado === 'vencida'"
-                            class="text-xs font-medium text-aviso"
-                        >
-                            ⚠ Vencida
-                        </p>
-                        <p
-                            v-else-if="quedan"
-                            class="text-xs font-medium text-alerta"
-                        >
-                            {{ quedan }}
-                        </p>
-                    </div>
+                    </p>
+                    <p
+                        v-else-if="p.estado === 'vencida'"
+                        class="mt-1 flex items-center gap-1.5 text-lg font-semibold text-aviso"
+                    >
+                        <CircleAlert class="size-5" aria-hidden="true" />
+                        Vencida
+                    </p>
+                    <p class="mt-1 text-sm text-tinta-suave">
+                        {{
+                            p.dias_restantes === 0
+                                ? 'Vence hoy a las 11:59 p. m.'
+                                : fechaLarga(p.fecha_limite)
+                        }}
+                    </p>
                 </div>
 
                 <!-- Colaborador sin "Responder el diagnóstico" (E12.1). -->
                 <p
                     v-if="!puede('diagnostico.responder')"
-                    class="text-center text-xs text-tinta-suave"
+                    class="text-xs text-tinta-suave"
                 >
                     Tu empresa no te dio acceso para responder el diagnóstico.
                 </p>
@@ -341,6 +469,7 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     v-else-if="
                         p.estado === 'no_iniciada' || p.estado === 'en_curso'
                     "
+                    class="w-full"
                     :href="rutas.responder.mostrar(p.id)"
                     :disabled="enVerComo"
                 >
@@ -359,7 +488,7 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     </p>
                     <Boton
                         v-else-if="p.estado === 'enviada'"
-                        variante="secundario"
+                        class="w-full"
                         :href="rutas.responder.enviado(p.id)"
                     >
                         Ver el avance del análisis
@@ -368,7 +497,7 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     <template v-else-if="p.estado === 'vencida'">
                         <Boton
                             v-if="!p.solicitud_abierta"
-                            variante="secundario"
+                            class="w-full"
                             :cargando="pidiendo"
                             :disabled="enVerComo"
                             @click="pedirNueva"
@@ -387,24 +516,24 @@ const enVerComo = computed(() => !!usePage().props.verComo);
             </div>
         </section>
 
+        <!-- Sin pendiente -->
         <section
             v-else-if="!sinEmpresa"
-            class="flex flex-wrap items-center gap-5 rounded-xl border border-dashed border-linea-fuerte bg-white p-6"
+            class="flex flex-wrap items-center gap-5 rounded-2xl border border-nivel-sigue/30 bg-linear-to-br from-exito-suave/70 to-white p-6"
         >
-            <span
-                class="flex size-12 shrink-0 items-center justify-center rounded-full bg-exito-suave text-xl text-exito"
+            <CircleCheck
+                class="size-12 shrink-0 text-nivel-sigue"
                 aria-hidden="true"
-                >✓</span
-            >
+            />
             <div class="min-w-0 flex-1">
-                <h2 class="text-lg font-semibold">
+                <h2 class="text-xl font-semibold">
                     No tienes diagnósticos pendientes
                 </h2>
                 <p class="text-sm text-tinta-suave">
                     Cuando el equipo de NuevasTIC te asigne una nueva medición,
                     aparecerá aquí.<template v-if="ultima">
-                        Mientras tanto, trabaja en las recomendaciones de tu
-                        medición {{ ultima.numero }}, la más reciente.</template
+                        Mientras tanto, trabaja en el plan de acción de tu
+                        medición {{ ultima.numero }}.</template
                     >
                 </p>
             </div>
@@ -419,59 +548,64 @@ const enVerComo = computed(() => !!usePage().props.verComo);
 
         <!-- Primera vez: cómo funciona -->
         <template v-if="!ultima && !sinEmpresa">
-            <section>
-                <h2 class="mb-3 text-sm font-semibold">Cómo funciona</h2>
-                <ol class="grid gap-4 md:grid-cols-3">
+            <section class="rounded-2xl border border-linea bg-white p-6">
+                <h2 class="text-lg font-semibold">Cómo funciona</h2>
+                <ol class="relative mt-5 grid gap-6 md:grid-cols-3">
+                    <!-- Línea que une los pasos -->
+                    <span
+                        class="absolute top-6 right-[16%] left-[16%] hidden border-t-2 border-dashed border-marca/25 md:block"
+                        aria-hidden="true"
+                    />
                     <li
-                        v-for="(paso, i) in [
-                            {
-                                t: 'Respondes',
-                                d: 'Preguntas sobre las áreas del marketing digital de tu negocio.',
-                            },
-                            {
-                                t: 'Analizamos',
-                                d: 'El sistema calcula tu puntaje y la IA analiza todas tus respuestas.',
-                            },
-                            {
-                                t: 'Recibes tu resultado',
-                                d: 'Puntaje de 0 a 100, tu nivel y recomendaciones priorizadas, descargables en PDF.',
-                            },
-                        ]"
-                        :key="paso.t"
-                        class="rounded-xl border border-linea bg-white p-5 text-sm"
+                        v-for="(paso, i) in pasos"
+                        :key="paso.titulo"
+                        class="relative flex flex-col items-center text-center"
                     >
                         <span
-                            class="flex size-8 items-center justify-center rounded-full bg-marca-suave font-semibold text-marca"
-                            >{{ i + 1 }}</span
+                            class="flex size-12 items-center justify-center rounded-full bg-marca text-white ring-8 ring-white"
                         >
-                        <p class="mt-3 font-semibold">{{ paso.t }}</p>
-                        <p class="mt-1 text-tinta-suave">{{ paso.d }}</p>
+                            <component
+                                :is="paso.icono"
+                                class="size-6"
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <p class="mt-3 font-semibold">
+                            {{ i + 1 }}. {{ paso.titulo }}
+                        </p>
+                        <p class="mt-1 max-w-xs text-sm text-tinta-suave">
+                            {{ paso.texto }}
+                        </p>
                     </li>
                 </ol>
             </section>
-            <p
+            <section
                 v-if="puede('resultados.ver')"
-                class="rounded-xl border border-dashed border-linea-fuerte bg-white p-6 text-center text-sm"
+                class="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-linea-fuerte bg-white/60 p-8 text-center"
             >
-                <strong>Aquí verás tus resultados</strong>
-                <span class="block text-tinta-suave">
+                <ChartColumnIncreasing
+                    class="size-10 text-marca/50"
+                    aria-hidden="true"
+                />
+                <p class="font-semibold">Aquí verás tus resultados</p>
+                <p class="max-w-md text-sm text-tinta-suave">
                     Tu puntaje, tu nivel y tu evolución aparecerán cuando
                     completes el primer diagnóstico.
-                </span>
-            </p>
+                </p>
+            </section>
         </template>
 
         <!-- Último resultado -->
         <div
             v-else-if="ultima"
-            class="grid items-start gap-5 lg:grid-cols-[1fr_1.4fr]"
+            class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]"
         >
-            <section class="rounded-xl border border-linea bg-white p-5">
-                <h2 class="text-sm font-semibold">
+            <section class="rounded-2xl border border-linea bg-white p-5">
+                <h2 class="text-lg font-semibold">
                     {{
                         realizadas === 1
-                            ? 'Resultado de tu primera medición'
-                            : 'Resultado de tu medición más reciente'
+                            ? 'Tu primera medición'
+                            : 'Tu medición más reciente'
                     }}
                 </h2>
                 <p class="text-xs text-tinta-suave">
@@ -484,28 +618,57 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     <AnilloPuntaje
                         :puntaje="ultima.puntaje"
                         :nivel="ultima.nivel"
+                        :tamano="112"
                     />
-                    <div class="flex flex-col items-start gap-2 text-sm">
+                    <div
+                        class="flex min-w-0 flex-col items-start gap-2 text-sm"
+                    >
                         <EtiquetaNivel :nivel="ultima.nivel" />
-                        <span v-if="ultima.variacion !== null">
-                            <Variacion :valor="ultima.variacion" />
-                            <span class="text-xs text-exito">
-                                vs. medición anterior</span
-                            >
+                        <span
+                            v-if="ultima.variacion !== null"
+                            :class="
+                                cn(
+                                    'rounded-full px-2.5 py-0.5 text-xs font-medium',
+                                    ultima.variacion > 0
+                                        ? 'bg-nivel-sigue-suave text-nivel-sigue-texto'
+                                        : ultima.variacion < 0
+                                          ? 'bg-nivel-critico-suave text-nivel-critico-texto'
+                                          : 'bg-lienzo-oscuro text-tinta-suave',
+                                )
+                            "
+                        >
+                            {{
+                                ultima.variacion > 0
+                                    ? `▲ +${ultima.variacion}`
+                                    : ultima.variacion < 0
+                                      ? `▼ ${ultima.variacion}`
+                                      : '= 0'
+                            }}
+                            vs. medición anterior
                         </span>
                         <span v-else class="text-xs text-tinta-suave">
-                            Primera medición
+                            Primera medición: tu punto de partida
                         </span>
-                        <Link
-                            :href="rutas.resultados.ver(ultima.id)"
-                            :class="enlace"
-                        >
-                            Ver resultado completo
-                        </Link>
                     </div>
                 </div>
-                <div class="mt-4 border-t border-linea pt-3">
-                    <p class="text-xs text-tinta-suave">Evolución</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <Boton :href="rutas.resultados.ver(ultima.id)">
+                        Ver resultado completo
+                    </Boton>
+                    <Boton
+                        v-if="puede('resultados.pdf')"
+                        variante="secundario"
+                        archivo
+                        :href="rutas.resultados.pdf(ultima.id)"
+                    >
+                        <FileDown class="size-4" aria-hidden="true" />
+                        Informe PDF
+                    </Boton>
+                </div>
+                <div class="mt-5 border-t border-linea pt-3">
+                    <p class="text-xs font-medium text-tinta-suave">
+                        Evolución
+                    </p>
                     <MiniEvolucion
                         v-if="evolucion.length > 1"
                         :puntajes="evolucion"
@@ -513,7 +676,7 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     />
                     <p
                         v-else
-                        class="mt-2 rounded-md border border-dashed border-linea-fuerte px-3 py-2 text-xs text-tinta-suave"
+                        class="mt-2 rounded-lg bg-lienzo px-3 py-2 text-xs text-tinta-suave"
                     >
                         La variación y la gráfica de evolución aparecen desde tu
                         segunda medición.
@@ -523,128 +686,141 @@ const enVerComo = computed(() => !!usePage().props.verComo);
 
             <section
                 v-if="p && areas && areas.length"
-                class="rounded-xl border border-linea bg-white p-5"
+                class="rounded-2xl border border-linea bg-white p-5"
             >
-                <div class="flex items-baseline justify-between">
-                    <h2 class="text-sm font-semibold">
+                <div
+                    class="flex flex-wrap items-baseline justify-between gap-2"
+                >
+                    <h2 class="text-lg font-semibold">
                         Tus {{ areas.length }} áreas a trabajar
                     </h2>
                     <span class="text-xs text-tinta-suave"
-                        >Del último diagnóstico</span
+                        >Las de menor puntaje en tu último diagnóstico</span
                     >
                 </div>
-                <ul class="mt-2 divide-y divide-linea">
+                <ul class="mt-3 flex flex-col gap-3">
                     <li
-                        v-for="a in areas"
+                        v-for="(a, i) in areas"
                         :key="a.nombre"
-                        class="flex items-center justify-between gap-3 py-3"
+                        :class="
+                            cn(
+                                'rounded-xl border border-l-4 border-linea px-4 py-3',
+                                niveles[a.nivel].borde,
+                            )
+                        "
                     >
-                        <span>
-                            <span class="block text-sm font-medium">{{
-                                a.nombre
-                            }}</span>
-                            <span
-                                v-if="a.recomendacion"
-                                class="text-xs text-tinta-suave"
-                            >
-                                {{ a.recomendacion }}
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="font-semibold">
+                                    <span class="mr-1 text-tinta-suave"
+                                        >{{ i + 1 }}.</span
+                                    >{{ a.nombre }}
+                                </p>
+                                <p
+                                    v-if="a.recomendacion"
+                                    class="mt-0.5 text-sm text-tinta-suave"
+                                >
+                                    {{ a.recomendacion }}
+                                </p>
+                            </div>
+                            <span class="flex shrink-0 items-center gap-2">
+                                <strong class="font-mono text-xl">{{
+                                    a.puntaje
+                                }}</strong>
+                                <EtiquetaNivel :nivel="a.nivel" />
                             </span>
-                        </span>
-                        <span class="flex items-center gap-2">
-                            <strong class="font-mono">{{ a.puntaje }}</strong>
-                            <EtiquetaNivel :nivel="a.nivel" />
+                        </div>
+                        <span
+                            class="mt-2 block h-2 overflow-hidden rounded-full bg-lienzo-oscuro"
+                        >
+                            <span
+                                :class="
+                                    cn(
+                                        'block h-full rounded-full',
+                                        niveles[a.nivel].barra,
+                                    )
+                                "
+                                :style="{ width: `${Math.max(2, a.puntaje)}%` }"
+                            />
                         </span>
                     </li>
                 </ul>
-                <p class="mt-2 text-xs text-tinta-suave">
+                <p class="mt-3 text-xs text-tinta-suave">
                     Tu próximo diagnóstico mostrará si estas áreas mejoraron.
                 </p>
             </section>
 
-            <section v-else class="rounded-xl border border-linea bg-white">
-                <div class="flex items-baseline justify-between px-5 py-4">
-                    <h2 class="text-sm font-semibold">Mis mediciones</h2>
+            <section
+                v-else
+                class="flex flex-col rounded-2xl border border-linea bg-white"
+            >
+                <div
+                    class="flex items-baseline justify-between gap-2 px-5 pt-4 pb-2"
+                >
+                    <h2 class="text-lg font-semibold">Mis mediciones</h2>
                     <Link
                         :href="rutas.historial.mio()"
-                        :class="cn(enlace, 'text-xs')"
+                        class="inline-flex items-center gap-0.5 text-sm font-medium text-marca hover:text-marca-hover"
                     >
                         Ver historial completo
+                        <ChevronRight class="size-4" aria-hidden="true" />
                     </Link>
                 </div>
-                <table class="w-full border-collapse text-sm">
-                    <thead>
-                        <tr
-                            class="border-y border-linea bg-[#f9f8f4] text-left"
+                <ol class="flex flex-col px-3 pb-3">
+                    <li
+                        v-for="m in mediciones"
+                        :key="m.id"
+                        class="border-b border-linea last:border-b-0"
+                    >
+                        <Link
+                            :href="rutas.resultados.ver(m.id)"
+                            class="flex items-center gap-4 rounded-xl px-2 py-2.5 hover:bg-lienzo"
                         >
-                            <th
-                                v-for="c in [
-                                    'Medición',
-                                    'Puntaje y nivel',
-                                    'vs. anterior',
-                                    '',
-                                ]"
-                                :key="c"
-                                scope="col"
-                                class="px-5 py-2 text-xs font-normal text-tinta-suave"
-                            >
-                                {{ c }}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="m in mediciones"
-                            :key="m.id"
-                            class="border-b border-linea last:border-b-0"
-                        >
-                            <td class="px-5 py-2">
-                                <p class="font-medium">
-                                    Medición {{ m.numero }}
-                                </p>
-                                <p
-                                    v-if="m.fecha"
-                                    class="text-xs text-tinta-suave"
+                            <AnilloPuntaje
+                                :puntaje="m.puntaje"
+                                :nivel="m.nivel"
+                                :tamano="48"
+                            />
+                            <span class="min-w-0 flex-1">
+                                <span class="block font-semibold"
+                                    >Medición {{ m.numero }}</span
                                 >
-                                    {{ diaYMes(fechaLocal(m.fecha)) }}
-                                </p>
-                            </td>
-                            <td class="px-5 py-2">
-                                <span class="flex items-center gap-2">
-                                    <strong class="font-mono">{{
-                                        m.puntaje
-                                    }}</strong>
+                                <span
+                                    class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-tinta-suave"
+                                >
+                                    <span v-if="m.fecha">{{
+                                        diaYMes(fechaLocal(m.fecha))
+                                    }}</span>
                                     <EtiquetaNivel :nivel="m.nivel" />
+                                    <span
+                                        v-if="m.variacion !== null"
+                                        :class="
+                                            cn(
+                                                'rounded-full px-2 py-0.5 font-medium',
+                                                m.variacion > 0
+                                                    ? 'bg-nivel-sigue-suave text-nivel-sigue-texto'
+                                                    : m.variacion < 0
+                                                      ? 'bg-nivel-critico-suave text-nivel-critico-texto'
+                                                      : 'bg-lienzo-oscuro',
+                                            )
+                                        "
+                                        >{{
+                                            m.variacion > 0
+                                                ? `▲ +${m.variacion}`
+                                                : m.variacion < 0
+                                                  ? `▼ ${m.variacion}`
+                                                  : '= 0'
+                                        }}</span
+                                    >
                                 </span>
-                            </td>
-                            <td class="px-5 py-2">
-                                <Variacion
-                                    v-if="m.variacion !== null"
-                                    :valor="m.variacion"
-                                />
-                                <span v-else class="text-xs text-tinta-suave">
-                                    Primera medición
-                                </span>
-                            </td>
-                            <td
-                                class="px-5 py-2 text-right text-xs whitespace-nowrap"
-                            >
-                                <Link
-                                    :href="rutas.resultados.ver(m.id)"
-                                    :class="enlace"
-                                >
-                                    Ver resultado
-                                </Link>
-                                <a
-                                    v-if="puede('resultados.pdf')"
-                                    :href="rutas.resultados.pdf(m.id)"
-                                    :class="cn(enlace, 'ml-3')"
-                                >
-                                    Ver informe PDF
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </span>
+                            <ChevronRight
+                                class="size-5 shrink-0 text-tinta-suave"
+                                aria-hidden="true"
+                            />
+                        </Link>
+                    </li>
+                </ol>
             </section>
         </div>
     </div>
