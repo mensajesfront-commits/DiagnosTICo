@@ -5,6 +5,7 @@ use App\Models\Categoria;
 use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
+use App\Models\Opcion;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\SectorReasignado;
@@ -348,4 +349,23 @@ it('el diagnóstico de prueba de software crea su sector, suma 100 % y su inform
     $informe = DatosResultado::informeDe(['id' => null, 'numero' => 1, 'empresa' => ['id' => null, 'nombre' => 'Empresa de ejemplo'], 'sector' => 'Programación y consultoría informática', 'diagnostico' => $diagnostico->nombre, 'version' => 1], $datos, null, now(), null, true);
 
     expect(view('pdf.informe', ['informe' => $informe])->render())->toContain('Medición de KPIs')->toContain('Plan estratégico de marketing');
+});
+
+it('si el diagnóstico de prueba ya existe sin las notas, publica la versión siguiente con ellas', function () {
+    $this->seed([CategoriasSeeder::class, DiagnosticoProgramacionSeeder::class]);
+    $diagnostico = Diagnostico::where('nombre', DiagnosticoProgramacionSeeder::NOMBRE)->sole();
+
+    // Como estaba la versión 1 que ya se cargó: sin la nota en "Nunca".
+    Opcion::where('texto', 'Nunca')->update(['ten_en_cuenta' => null]);
+
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+
+    $versiones = $diagnostico->versiones()->get();
+    $nunca = collect($versiones->last()->contenido['categorias'])->flatMap(fn ($c) => $c['preguntas'])
+        ->flatMap(fn ($p) => $p['opciones'])->firstWhere('texto', 'Nunca');
+
+    expect($versiones)->toHaveCount(2)
+        ->and($versiones->last()->numero)->toBe(2)
+        ->and($nunca['ten_en_cuenta'])->toContain('revisión corta y fija');
 });

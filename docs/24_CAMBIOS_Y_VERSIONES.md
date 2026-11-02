@@ -76,6 +76,8 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Trae 6 categorías del catálogo (Presencia en línea, Análisis del cliente, Contenido y publicaciones, Análisis de la competencia, Herramientas de automatización y Medición de KPIs) y 30 preguntas de los tres tipos, pensadas para una empresa que vende una app, por ejemplo una que ayuda a organizar el tiempo según los hobbies y las responsabilidades.
 - Las respuestas «No sé» llevan un «Ten en cuenta» para que la IA lo marque como información faltante, y las abiertas llevan criterio de calificación. Sirve para probar el análisis y el informe PDF.
 - No es un diagnóstico de NuevasTIC y no lo carga la instalación. `DiagnosticoEjemploSeeder` y este usan el trait `CreaDiagnosticoPublicado`.
+- La respuesta más baja de cada pregunta cerrada lleva una nota «Ten en cuenta» para la IA (25 en total), por ejemplo «No miden ningún dato: la primera recomendación debe ser empezar a medir». Las dos preguntas de selección múltiple que no tienen una respuesta de cero quedan sin nota.
+- Si el diagnóstico ya estaba cargado, al correr de nuevo el seeder se agregan las notas que falten y se publica la versión siguiente (la publicada no se toca, RN-010). Las mediciones pendientes sin respuestas pasan a la versión nueva.
 
 ### Cambiado (informe PDF según la propuesta de reestructuración, 2 de noviembre)
 
