@@ -70,6 +70,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A3.1 · diseño de la ficha de la empresa, 2 de noviembre)
+
+- **Encabezado:** círculo con las iniciales, el sector en una etiqueta con ícono y el estado de la cuenta con un punto verde o gris.
+- **Cifras de arriba** en tres tarjetas: el último puntaje en un anillo con su nivel, la variación en grande y en color, y la medición pendiente con su ícono.
+- **Tabla de mediciones:** «Medición N», el puntaje en un anillo (o un círculo punteado si no tiene) y la variación en una píldora de color.
+- La gráfica sin mediciones muestra un estado vacío con ícono. Las tarjetas de la medición pendiente y de «Asignar otra medición» llevan ícono en el título.
+- **Corregido:** en el celular «Consultores · Próximamente» se salía por la derecha; ahora baja de línea.
+
 ### Cambiado (A3 · diseño de Empresas, 2 de noviembre)
 
 - **Accesos rápidos** con su conteo (Todas, En curso, Vencidas, Sin diagnóstico, Desactivadas): aplican el filtro con un toque y se marcan cuando está activo.
