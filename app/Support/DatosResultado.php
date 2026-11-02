@@ -114,114 +114,33 @@ class DatosResultado
      */
     public static function informe(Resultado $resultado): array
     {
-        $resultado->loadMissing('medicion');
+        $resultado->loadMissing(['medicion.empresa.actividadEconomica']);
+        $empresa = $resultado->medicion->empresa;
 
         return self::informeDe(
             self::cabecera($resultado->medicion),
             self::resultado($resultado),
             $resultado->medicion->enviada_en,
             $resultado->publicado_en,
+            [
+                'descripcion' => (string) $empresa->descripcion,
+                'actividad' => $empresa->actividadEconomica ? "{$empresa->actividadEconomica->codigo} · {$empresa->actividadEconomica->nombre}" : '',
+                'ubicacion' => collect([$empresa->ciudad, $empresa->departamento, $empresa->pais])->filter()->join(', '),
+                'sitio_web' => (string) $empresa->sitio_web,
+                'empleados' => (string) $empresa->numero_empleados,
+            ],
         );
     }
 
     /**
      * @param  array<string, mixed>  $cabecera  como `cabecera()`
      * @param  array<string, mixed>  $datos  como `pagina()`
+     * @param  array<string, string>|null  $empresa  datos de la ficha técnica; null en el resultado de ejemplo
+     * @param  bool  $ejemplo  resultado de ejemplo (HU-030): el PDF lo dice en cada página
      * @return array<string, mixed>
      */
-    public static function informeDe(array $cabecera, array $datos, ?CarbonInterface $enviada, CarbonInterface $generado): array
+    public static function informeDe(array $cabecera, array $datos, ?CarbonInterface $enviada, CarbonInterface $generado, ?array $empresa = null, bool $ejemplo = false): array
     {
-        /** @var list<array<string, mixed>> $categorias */
-        $categorias = $datos['categorias'];
-        $orden = self::ordenadas($categorias);
-        $prioridad = array_flip(array_column($orden, 'ref'));
-        $pesos = array_sum(array_column($categorias, 'importancia')) ?: 1;
-
-        // Cada categoría con lo que el informe explica: prioridad, cuánto
-        // aporta al total, qué significa su nivel y el método explicado.
-        $detalladas = array_map(function (array $c) use ($prioridad, $pesos) {
-            $preguntas = (array) ($c['preguntas'] ?? []);
-
-            return [
-                ...$c,
-                'prioridad' => $prioridad[$c['ref']] + 1,
-                'aporte' => round($c['puntaje'] * $c['importancia'] / $pesos, 1),
-                'significado' => Niveles::enCategoria((string) $c['nivel']),
-                'metodo_explicado' => isset($c['metodo']['clave']) ? MetodosAnalisis::explicado((string) $c['metodo']['clave']) : null,
-                'hallazgos' => (array) ($c['hallazgos'] ?? []),
-                'fortalezas' => (array) ($c['fortalezas'] ?? []),
-                // Los resultados viejos solo traen una recomendación sin pasos.
-                'recomendaciones' => ($c['recomendaciones'] ?? []) !== [] ? $c['recomendaciones'] : [$c['recomendacion']],
-                'respondidas' => count(array_filter($preguntas, fn ($q) => is_array($q) && $q['respuesta'] !== null)),
-            ];
-        }, $categorias);
-
-        $porPrioridad = $detalladas;
-        usort($porPrioridad, fn (array $a, array $b) => $a['prioridad'] <=> $b['prioridad']);
-
-        return [
-            ...$cabecera,
-            ...$datos,
-            'categorias' => $detalladas,
-            'preguntas_total' => array_sum(array_map(fn (array $c) => count((array) ($c['preguntas'] ?? [])), $detalladas)),
-            'preguntas_respondidas' => array_sum(array_column($detalladas, 'respondidas')),
-            // Ejemplo del cálculo con la categoría que más pesa.
-            'ejemplo_calculo' => collect($detalladas)->sortByDesc('importancia')->first(),
-            'metodos' => array_map(fn (string $clave) => [
-                ...(array) MetodosAnalisis::explicado($clave),
-                'usado_en' => array_values(array_map(fn (array $c) => $c['nombre'], array_filter($detalladas, fn (array $c) => ($c['metodo']['clave'] ?? null) === $clave))),
-            ], MetodosAnalisis::claves()),
-            'plan' => self::plan($porPrioridad),
-            'soporte' => (string) config('diagnostico.soporte_email'),
-            'nivel_nombre' => Niveles::nombre((string) $datos['nivel']),
-            'niveles' => collect(Niveles::NIVELES)->map(fn (array $n, string $clave) => ['clave' => $clave, 'nombre' => $n[0], 'rango' => "{$n[1]}–{$n[2]}"])->values()->all(),
-            'fecha_respuesta' => $enviada ? CorreoAviso::fecha($enviada) : null,
-            'fecha_generado' => CorreoAviso::fecha($generado),
-            // Hasta 2 y 2, sin repetir una categoría en las dos listas.
-            'fuertes' => array_slice(array_reverse($orden), 0, min(2, intdiv(count($orden), 2))),
-            'debiles' => array_slice($orden, 0, min(2, intdiv(count($orden), 2))),
-            // Página 1: cuántas categorías quedaron en cada nivel.
-            'por_nivel' => collect(Niveles::NIVELES)->map(fn (array $n, string $clave) => [
-                'clave' => $clave,
-                'nombre' => $n[0],
-                'cantidad' => count(array_filter($categorias, fn (array $c) => $c['nivel'] === $clave)),
-            ])->values()->all(),
-            // Página 3: después de las 3 prioridades, el resto de la más débil a la más fuerte.
-            'otras' => array_slice($orden, 3),
-            'radar' => [
-                'etiquetas' => array_column($categorias, 'nombre'),
-                'actual' => array_column($categorias, 'puntaje'),
-                'anterior' => $datos['variacion'] === null ? null : array_map(fn (array $c) => $c['anterior'], $categorias),
-            ],
-        ];
-    }
-
-    /**
-     * Plan de acción del PDF en tres partes: primero la recomendación
-     * principal de las 3 categorías más débiles, después la principal de las
-     * demás y más adelante las otras recomendaciones de cada categoría.
-     *
-     * @param  list<array<string, mixed>>  $categorias  de la más débil a la más fuerte
-     * @return array{primero: list<array<string, mixed>>, despues: list<array<string, mixed>>, luego: list<array<string, mixed>>}
-     */
-    private static function plan(array $categorias): array
-    {
-        $plan = ['primero' => [], 'despues' => [], 'luego' => []];
-
-        foreach ($categorias as $n => $c) {
-            foreach (array_values((array) $c['recomendaciones']) as $i => $r) {
-                $fila = [
-                    'categoria' => $c['nombre'],
-                    'nivel' => $c['nivel'],
-                    'titulo' => (string) ($r['titulo'] ?? ''),
-                    'plazo' => (string) ($r['plazo'] ?? ''),
-                    'indicador' => (string) ($r['indicador'] ?? ''),
-                ];
-
-                $plan[$i > 0 ? 'luego' : ($n < 3 ? 'primero' : 'despues')][] = $fila;
-            }
-        }
-
-        return $plan;
+        return [...DatosInforme::armar($cabecera, $datos, $enviada, $generado, $empresa), 'ejemplo' => $ejemplo];
     }
 }

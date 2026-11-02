@@ -71,8 +71,10 @@ class ArmadorPrompt
         2. Califica de 0 a 100 solo las preguntas de tipo "abierta", según su "criterio". En las demás devuelve puntaje null: su puntaje ya está calculado y no lo cambias.
         3. Escribe el diagnóstico de la categoría en 2 o 3 frases: qué pasa, por qué pasa y qué le cuesta a la empresa (clientes, ventas, tiempo o dinero).
         4. Elige un método de análisis y escribe lo que encontraste con él, en sus grupos: de 1 a 3 frases cortas por grupo, solo en los grupos donde las respuestas digan algo.
-        5. Escribe 1 o 2 cosas que la empresa ya hace bien en este tema. Si no hay ninguna, déjalo vacío; no inventes.
-        6. Escribe 2 o 3 recomendaciones, de la más a la menos importante. Cada una con un título corto en imperativo, una frase de por qué hacerla, 3 pasos concretos en orden, el plazo (por ejemplo "4 semanas") y cómo saber si funcionó (algo que se pueda contar o revisar). Que se puedan hacer en 1 a 3 meses con pocos recursos.
+        5. Escribe el impacto: por qué importa, qué le cuesta o qué riesgo trae para la presencia, la comunicación o la captación de clientes.
+        6. Clasifica lo encontrado en fortalezas y debilidades (internas) y oportunidades y amenazas (externas), de 0 a 2 cada una. Si no hay, déjalo vacío; no inventes.
+        7. Escribe 2 o 3 recomendaciones, de la más a la menos importante. Cada una es una ficha de acción: título corto en imperativo, por qué hacerla, el problema que resuelve, el objetivo, 3 pasos concretos en orden, el rol responsable, los recursos, el plazo (texto y en semanas, de 1 a 12), el indicador de éxito (KPI) con su fórmula, línea base, meta, frecuencia y fuente, y la evidencia que prueba que se hizo. Que se puedan hacer en 1 a 3 meses con pocos recursos.
+        8. Si las respuestas no alcanzan para concluir algo, dilo en "faltante" y explica cómo obtener esa información.
         TXT,
         'detalles' => <<<'TXT'
         - Criterios para las abiertas: 0–29 la práctica no existe o la respuesta no aplica; 30–59 existe pero es informal; 60–79 está definida y tiene algo de medición; 80–100 está definida, se mide y se mejora con datos.
@@ -86,6 +88,9 @@ class ArmadorPrompt
           Si una respuesta trae "ten_en_cuenta" que pide un método, usa ese.
         - La primera recomendación ataca la debilidad más importante que muestre el método elegido.
         - Cada frase de lo que encontraste, de lo que hace bien y de las recomendaciones debe salir de una respuesta concreta de la empresa. No uses frases que sirvan para cualquier empresa.
+        - No inventes información, datos de competidores, presupuestos ni resultados esperados. Lo que respondió la empresa es información declarada: no la presentes como verificada.
+        - La línea base del KPI solo va si la empresa dio ese dato en sus respuestas; si no, déjala vacía. La meta solo va si hay línea base que la justifique; si no, déjala vacía.
+        - No confundas actividad con resultado: "publicar 12 veces" mide ejecución; "mensajes o ventas que llegan por Instagram" mide resultado. Prefiere indicadores de resultado.
         - Escribe en español de Colombia, en segunda persona (tú), con frases cortas y sin palabras técnicas ni siglas. Basa todo en lo que la empresa respondió, sin suponer; no compares con otras empresas ni con promedios.
         TXT,
         'ejemplos' => <<<'TXT'
@@ -97,7 +102,7 @@ class ArmadorPrompt
 
     /** Capa 5: formato fijo; la salida estructurada lo exige igual (AnalizadorDeCategoria::esquema). */
     public const string FORMATO = <<<'TXT'
-    Responde solo con un objeto JSON con: "preguntas" (una entrada por cada pregunta recibida, con su "id", "puntaje" —0 a 100 en las abiertas, null en las demás— y "observacion"), "metodo" (el método de análisis que usaste según las respuestas: PESTEL, PORTER, VRIO, DOFA o CAME), "metodo_motivo" (una frase: por qué ese método encaja con lo que respondió la empresa), "observacion_categoria" (el diagnóstico de 2 o 3 frases), "hallazgos" (lista de grupos del método elegido, cada uno con "grupo" y "puntos"), "fortalezas" (lista de 0 a 2 frases) y "recomendaciones" (2 o 3, cada una con "titulo", "detalle", "pasos", "plazo" e "indicador").
+    Responde solo con un objeto JSON con: "preguntas" (una entrada por cada pregunta recibida, con su "id", "puntaje" —0 a 100 en las abiertas, null en las demás— y "observacion"), "metodo" (el método de análisis que usaste según las respuestas: PESTEL, PORTER, VRIO, DOFA o CAME), "metodo_motivo" (una frase: por qué ese método encaja con lo que respondió la empresa), "observacion_categoria" (el diagnóstico de 2 o 3 frases), "hallazgos" (lista de grupos del método elegido, cada uno con "grupo" y "puntos"), "impacto", "fortalezas", "debilidades", "oportunidades" y "amenazas" (listas de 0 a 2 frases), "faltante" (lista; vacía si la información alcanza) y "recomendaciones" (2 o 3, cada una con "titulo", "detalle", "problema", "objetivo", "pasos", "responsable", "recursos", "plazo", "semanas", "indicador", "kpi" —con "formula", "linea_base", "meta", "frecuencia" y "fuente"— y "evidencia").
     TXT;
 
     /**

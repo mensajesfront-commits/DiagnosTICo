@@ -185,13 +185,16 @@ En el resultado (E6) ves:
 Además:
 
 - **Ver mis respuestas** (E9): lo que respondiste, con una observación por pregunta.
-- **Ver informe PDF** (E10): un informe completo para guardar, imprimir o compartir. Trae:
-  - la portada con el puntaje;
-  - cómo leerlo: cómo se calcula el puntaje, los niveles y los métodos de análisis;
-  - el resumen con el mapa y la tabla;
-  - una página por categoría;
-  - el plan de acción para marcar lo que se va haciendo;
+- **Ver informe PDF** (E10): el «Informe de Diagnóstico y Estrategia de Marketing Digital», para guardar, imprimir o compartir. Trae:
+  - la portada y la ficha técnica;
+  - el resumen ejecutivo;
+  - la metodología: cómo se calcula la calificación, los niveles y los métodos;
+  - los resultados y el orden de prioridad;
+  - una página por categoría con su diagnóstico, impacto, hallazgos, recomendaciones y las respuestas como evidencia;
+  - el DOFA y las conclusiones;
+  - las fichas de acción, el cronograma por semanas y los indicadores (KPI);
   - los próximos pasos y un glosario.
+- En el PDF los niveles tienen nombres más formales: «Se puede mejorar» es «Requiere mejora», «Vas en buen camino» es «Desempeño satisfactorio» y «Sigue así» es «Desempeño óptimo».
 
 ## B.5 Tu historial
 

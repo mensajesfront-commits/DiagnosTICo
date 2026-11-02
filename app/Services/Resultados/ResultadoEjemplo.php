@@ -73,8 +73,8 @@ class ResultadoEjemplo
             $analisis[$c['ref']] = [
                 'preguntas' => $iaPreguntas,
                 'metodo' => $metodo,
-                'metodo_motivo' => 'Ejemplo: con la IA real, el método se elige según lo que responda la empresa.',
-                'observacion_categoria' => "Ejemplo: con estas respuestas, {$nombre} queda en nivel ".Niveles::nombre(Niveles::de($promedio)).'. Con la IA real, aquí va qué pasa, por qué y qué le cuesta a la empresa.',
+                'metodo_motivo' => 'Ejemplo: el método que mejor encaja con lo que respondió la empresa.',
+                'observacion_categoria' => "Ejemplo: con estas respuestas, {$nombre} queda en nivel ".Niveles::nombre(Niveles::de($promedio)).'. Aquí la IA explica qué está pasando, por qué pasa y qué le cuesta a la empresa.',
                 ...AnalisisSinIa::partes($nombre, $metodo, 'de ejemplo'),
             ];
         }

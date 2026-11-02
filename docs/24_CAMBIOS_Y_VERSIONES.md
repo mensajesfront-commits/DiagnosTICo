@@ -70,6 +70,42 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (informe PDF según la propuesta de reestructuración, 2 de noviembre)
+
+Fase 1 de la «Propuesta de reestructuración del Informe de Diagnóstico y Estrategia de Marketing Digital»: todo lo que sale de las respuestas y del análisis de la IA.
+
+- **Estructura nueva:**
+  - portada corporativa;
+  - 1 Ficha técnica y alcance (datos de la empresa, fuentes y lo que quedó fuera);
+  - 2 Resumen ejecutivo;
+  - 3 Metodología y criterios (fórmula con el valor exacto antes de redondear, rúbrica de las abiertas, controles de calidad de la IA, métodos y limitaciones);
+  - 4 Resultados generales (barras y radar);
+  - 5 Comparación y priorización (con el criterio de desempate);
+  - 6 Diagnóstico por categoría con plantilla uniforme (resultado, diagnóstico, impacto, hallazgos con todos los grupos del método, fortalezas y debilidades, información pendiente, recomendaciones y evidencia);
+  - 7 DOFA consolidado;
+  - 8 Conclusiones;
+  - 9 Plan estratégico con fichas de acción;
+  - 10 Cronograma por semanas;
+  - 11 KPI;
+  - 12 Próximos pasos y anexos.
+- **Diseño:** azul #172B46, naranja #F28C28, Montserrat e Inter incrustadas (`@fontsource/montserrat`, `@fontsource/inter`), colores de nivel de la propuesta.
+- **Nombres formales de nivel solo en el PDF:** Crítico, Requiere mejora, Desempeño satisfactorio y Desempeño óptimo (`Niveles::NOMBRES_INFORME`). La pantalla conserva los del wireframe.
+- **IA:**
+  - cada categoría trae además impacto, debilidades, oportunidades, amenazas, información faltante y, por recomendación, la ficha de acción (problema, objetivo, rol responsable, recursos, semanas, KPI con fórmula, línea base, meta, frecuencia y fuente, y evidencia);
+  - instrucciones nuevas: no inventar datos ni metas, y distinguir actividad de resultado.
+- **Resultado de ejemplo:** ya no dice «con la IA real, aquí va…»; el PDF de ejemplo lo avisa en la portada y en la ficha técnica.
+- **Datos:** `App\Support\DatosInforme` arma todo (prioridades, empates, aporte, DOFA, fichas, cronograma y KPI).
+- **Resultados ya publicados:** se ven con lo que tienen; lo que no traen sale como «Por definir» o «Sin información suficiente».
+- **[FUNCIONALIDAD POR DEFINIR] Fase 2 de la propuesta:**
+  - evidencias de canales (capturas, enlaces);
+  - análisis de competencia con datos verificados;
+  - perfil y objetivos de marketing;
+  - seguimiento de acciones entre mediciones;
+  - revisión humana antes de publicar;
+  - mejoras al cuestionario.
+  Lo último lo hace el Administrador en A2.1, sin cambiar código.
+- **[INFORMACIÓN PENDIENTE]** Logotipo de NuevasTIC para la portada: mientras tanto va el nombre en texto.
+
 ### Cambiado (informe PDF completo, 2 de noviembre)
 
 - El PDF deja de ser un resumen de 3 páginas y pasa a ser un informe que se entiende sin la pantalla:

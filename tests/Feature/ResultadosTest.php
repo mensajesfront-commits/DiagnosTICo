@@ -121,13 +121,15 @@ it('al enviar analiza cada categoría, publica el resultado inmutable y avisa a 
         ->and($resultado->por_categoria[0]['preguntas'][1]['puntaje'])->toBe(100)
         ->and($resultado->por_categoria[0]['preguntas'][2]['puntaje'])->toBe(40)
         ->and($resultado->por_categoria[0]['preguntas'][3]['respuesta'])->toBeNull()
-        ->and($resultado->por_categoria[1]['recomendacion']['titulo'])->toBe('Mejora Automatización')
+        ->and($resultado->por_categoria[1]['recomendacion']['titulo'])->toBe('Ordena lo básico de automatización')
         // La IA de prueba elige el método por el nombre de la categoría.
         ->and($resultado->por_categoria[0]['metodo']['clave'])->toBe('VRIO')
         ->and($resultado->por_categoria[0]['metodo']['nombre'])->toBe('VRIO')
         ->and($resultado->por_categoria[1]['metodo']['clave'])->toBe('DOFA')
         // Lo que encontró el método va en los grupos de ese método.
-        ->and(array_column($resultado->por_categoria[1]['hallazgos'], 'grupo'))->toBe(['Fortalezas', 'Oportunidades'])
+        ->and(array_column($resultado->por_categoria[1]['hallazgos'], 'grupo'))->toBe(['Fortalezas', 'Oportunidades', 'Debilidades', 'Amenazas'])
+        ->and($resultado->por_categoria[1]['impacto'])->not->toBe('')
+        ->and($resultado->por_categoria[1]['faltante'])->toHaveCount(1)
         ->and($resultado->por_categoria[1]['fortalezas'])->toHaveCount(1)
         ->and($resultado->por_categoria[1]['recomendaciones'])->toHaveCount(2)
         ->and($resultado->por_categoria[1]['recomendaciones'][0]['pasos'])->toHaveCount(3);
@@ -269,25 +271,29 @@ it('descarga el PDF guardado; si falta, lo vuelve a generar sin llamar a la IA',
         ->assertDownload('informe_la_esquina_m1.pdf');
 });
 
-it('el informe PDF explica cómo leerlo, analiza cada categoría y arma el plan de acción', function () {
+it('el informe PDF sigue la estructura de la propuesta: ficha, resumen, metodología, categorías, DOFA, plan, cronograma y KPI', function () {
     responderYEnviar($this, $this->medicion);
     $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
 
     $html = view('pdf.informe', ['informe' => DatosResultado::informe($resultado)])->render();
 
     expect($html)
-        ->toContain('Marketing digital de La Esquina')
-        ->toContain('Cómo leer este informe')
-        ->toContain('Cómo se calcula el puntaje')
-        ->toContain('Los métodos de análisis')
+        ->toContain('Informe de Diagnóstico y Estrategia de Marketing Digital')
+        ->toContain('Ficha técnica y alcance')
+        ->toContain('Resumen ejecutivo')
+        ->toContain('Metodología y criterios')
         ->toContain('5 Fuerzas de Porter')
-        ->toContain('Recomendaciones priorizadas')
-        ->toContain('Análisis por categoría')
-        ->toContain('Lo que encontró el análisis DOFA')
-        ->toContain('Cómo saber si funcionó')
-        ->toContain('Plan de acción')
-        ->toContain('Glosario')
-        ->toContain('Mejora Automatización')
+        ->toContain('Comparación y priorización')
+        ->toContain('Diagnóstico por categoría')
+        ->toContain('Hallazgos del diagnóstico')
+        ->toContain('Análisis estratégico DOFA')
+        ->toContain('Plan estratégico de marketing')
+        ->toContain('Cronograma de implementación')
+        ->toContain('Indicadores de seguimiento (KPI)')
+        ->toContain('Requiere mejora')
+        ->toContain('Ordena lo básico de automatización')
+        ->not->toContain('IA real')
+        ->not->toContain('Informe de ejemplo:')
         ->toContain('new Chart(')
         ->not->toContain('cdn.');
 });
@@ -340,15 +346,19 @@ it('al borrar para siempre la empresa conserva sus mediciones terminadas sin nom
     $this->actingAs($this->admin)->get(route('resultados.ver', $medicion))->assertNotFound();
 });
 
-it('el plan de acción del PDF pone primero la principal de las 3 categorías más débiles', function () {
+it('las fichas del PDF ponen primero la principal de las 3 categorías más débiles', function () {
     responderYEnviar($this, $this->medicion);
     $informe = DatosResultado::informe(Resultado::where('medicion_id', $this->medicion->id)->firstOrFail());
 
     $primeras = array_column(array_slice($informe['prioridades'], 0, 3), 'nombre');
 
-    expect(array_column($informe['plan']['primero'], 'categoria'))->toBe($primeras)
-        ->and($informe['plan']['luego'])->not->toBeEmpty()
-        ->and(collect($informe['categorias'])->sum('aporte'))->toEqualWithDelta($informe['puntaje'], 1);
+    $prioritarias = array_values(array_filter($informe['fichas'], fn ($f) => $f['tipo'] === 'prioritaria'));
+
+    expect(array_column($prioritarias, 'categoria'))->toBe($primeras)
+        ->and(collect($informe['fichas'])->where('tipo', 'seguimiento'))->not->toBeEmpty()
+        ->and($informe['total_exacto'])->toEqualWithDelta($informe['puntaje'], 0.5)
+        ->and($informe['cronograma']['filas'][0]['inicio'])->toBe(1)
+        ->and($informe['dofa']['fortalezas'])->not->toBeEmpty();
 });
 
 it('el PDF lleva encabezado y número de página en cada hoja', function () {
@@ -360,4 +370,32 @@ it('el PDF lleva encabezado y número de página en cada hoja', function () {
     expect($pdf->footerViewName)->toBe('pdf.pie')
         ->and($pdf->headerViewName)->toBe('pdf.encabezado')
         ->and(view('pdf.pie')->render())->toContain('class="pageNumber"')->toContain('class="totalPages"');
+});
+
+it('un resultado publicado antes del informe nuevo se sigue viendo en el PDF, sin inventar lo que no tiene', function () {
+    responderYEnviar($this, $this->medicion);
+    $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
+
+    // Como se guardaban antes: sin impacto, DOFA, faltante ni fichas.
+    $viejo = array_map(function (array $c) {
+        unset($c['impacto'], $c['debilidades'], $c['oportunidades'], $c['amenazas'], $c['faltante'], $c['hallazgos'], $c['fortalezas'], $c['recomendaciones']);
+
+        return $c;
+    }, $resultado->por_categoria);
+    Resultado::whereKey($resultado->id)->update(['por_categoria' => json_encode($viejo)]);
+
+    $html = view('pdf.informe', ['informe' => DatosResultado::informe($resultado->fresh())])->render();
+
+    expect($html)
+        ->toContain('Ordena lo básico de automatización')
+        ->toContain('Por definir cuando se mida la línea base.')
+        ->toContain('Sin información suficiente en las respuestas.')
+        ->toContain('acciones no tienen plazo en semanas');
+});
+
+it('el PDF del resultado de ejemplo lo dice en la portada', function () {
+    responderYEnviar($this, $this->medicion);
+    $informe = DatosResultado::informeDe(['id' => null, 'numero' => 1, 'empresa' => ['id' => null, 'nombre' => 'Empresa de ejemplo'], 'sector' => 'Comidas', 'diagnostico' => 'D', 'version' => 1], DatosResultado::resultado(Resultado::firstOrFail()), null, now(), null, true);
+
+    expect(view('pdf.informe', ['informe' => $informe])->render())->toContain('Informe de ejemplo: los datos y textos son ilustrativos');
 });

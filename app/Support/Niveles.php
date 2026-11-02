@@ -41,11 +41,29 @@ class Niveles
      * @var array<string, string>
      */
     public const array EN_CATEGORIA = [
-        'critico' => 'En este tema casi no hay prácticas digitales todavía. Es donde un cambio pequeño se nota más rápido.',
-        'mejorar' => 'Hay algunas prácticas, pero les falta constancia, un plan o medir los resultados.',
-        'camino' => 'Lo básico funciona. Falta afinar lo que se hace y medirlo para crecer.',
-        'sigue' => 'Este tema está sólido. El reto es mantenerlo y revisarlo cada mes.',
+        'critico' => 'Prácticas digitales ausentes o con deficiencias importantes.',
+        'mejorar' => 'Existen prácticas, pero falta constancia, planificación o medición.',
+        'camino' => 'La base funciona; se requiere optimización y seguimiento.',
+        'sigue' => 'Prácticas consolidadas que deben mantenerse y revisarse.',
     ];
+
+    /**
+     * Nombres formales del informe PDF (propuesta de reestructuración, 2 de
+     * noviembre de 2026). La pantalla conserva los del wireframe.
+     *
+     * @var array<string, string>
+     */
+    public const array NOMBRES_INFORME = [
+        'critico' => 'Crítico',
+        'mejorar' => 'Requiere mejora',
+        'camino' => 'Desempeño satisfactorio',
+        'sigue' => 'Desempeño óptimo',
+    ];
+
+    public static function nombreInforme(string $clave): string
+    {
+        return self::NOMBRES_INFORME[$clave] ?? self::nombre($clave);
+    }
 
     public static function enCategoria(string $clave): string
     {

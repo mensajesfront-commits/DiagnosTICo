@@ -59,7 +59,7 @@ class ResultadoEjemploController extends Controller
 
         $datos = DatosResultado::pagina(ResultadoEjemplo::calcular($contenido, $this->caso($request)), null, now(), false);
 
-        return InformePdf::desde(DatosResultado::informeDe($this->cabecera($diagnostico, $version), $datos, null, now()))
+        return InformePdf::desde(DatosResultado::informeDe($this->cabecera($diagnostico, $version), $datos, null, now(), ejemplo: true))
             ->inline('informe_de_ejemplo.pdf');
     }
 
