@@ -8728,7 +8728,7 @@ Obtiene de la IA las observaciones, calificaciones y recomendaciones de cada cat
 
 1. Armo el prompt de la categoría (HU-081).
 2. Envío la categoría a la IA.
-3. Recibo una observación por pregunta, el puntaje 0–100 de cada abierta, una observación de la categoría y una recomendación.
+3. Recibo una observación por pregunta, el puntaje 0–100 de cada abierta, el diagnóstico de la categoría, lo que encontró el método por grupos, lo que la empresa hace bien y 2 o 3 recomendaciones con pasos, plazo e indicador.
 4. Repito para cada categoría.
 
 ### Criterios de aceptación

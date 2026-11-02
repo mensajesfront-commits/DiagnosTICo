@@ -8,6 +8,7 @@ import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
 import SelectorEjemplo from '@/components/ia/SelectorEjemplo.vue';
+import TarjetaRecomendacion from '@/components/resultados/TarjetaRecomendacion.vue';
 import { enviarJson } from '@/lib/ia';
 import { rutas } from '@/lib/rutas';
 import type {
@@ -182,19 +183,47 @@ const resultadoDe = computed(
                             · {{ prueba.resultado.metodo_motivo }}</span
                         >
                     </p>
-                    <h3 class="mt-3 text-xs font-semibold">
-                        Observación de la categoría
-                    </h3>
+                    <h3 class="mt-3 text-xs font-semibold">Diagnóstico</h3>
                     <p>{{ prueba.resultado.observacion_categoria }}</p>
-                    <h3 class="mt-3 text-xs font-semibold">Recomendación</h3>
-                    <p>
-                        <strong
-                            >{{
-                                prueba.resultado.recomendacion.titulo
-                            }}.</strong
+                    <h3 class="mt-3 text-xs font-semibold">
+                        Lo que encontró {{ prueba.resultado.metodo }}
+                    </h3>
+                    <dl class="flex flex-col gap-1">
+                        <div
+                            v-for="h in prueba.resultado.hallazgos"
+                            :key="h.grupo"
                         >
-                        {{ prueba.resultado.recomendacion.detalle }}
-                    </p>
+                            <dt class="font-medium">{{ h.grupo }}</dt>
+                            <dd>
+                                <ul class="list-disc pl-4">
+                                    <li v-for="(punto, i) in h.puntos" :key="i">
+                                        {{ punto }}
+                                    </li>
+                                </ul>
+                            </dd>
+                        </div>
+                    </dl>
+                    <template v-if="prueba.resultado.fortalezas.length">
+                        <h3 class="mt-3 text-xs font-semibold">
+                            Lo que ya hace bien
+                        </h3>
+                        <ul class="list-disc pl-4">
+                            <li
+                                v-for="(f, i) in prueba.resultado.fortalezas"
+                                :key="i"
+                            >
+                                {{ f }}
+                            </li>
+                        </ul>
+                    </template>
+                    <h3 class="mt-3 text-xs font-semibold">Recomendaciones</h3>
+                    <TarjetaRecomendacion
+                        v-for="(r, i) in prueba.resultado.recomendaciones"
+                        :key="i"
+                        class="mt-2"
+                        :recomendacion="r"
+                        :numero="i + 1"
+                    />
                 </div>
             </section>
         </div>

@@ -134,7 +134,7 @@ it('prueba el prompt con un ejemplo sin guardar nada; si la IA falla, muestra el
         'borrador' => ['alcance' => 'general', 'textos' => ['contexto' => 'Prueba {categoria}', 'tarea' => 'Analiza']],
     ])->assertOk()
         ->assertJsonPath('resultado.preguntas.0.id', $this->categoria['preguntas'][0]['ref'])
-        ->assertJsonStructure(['preguntas', 'resultado' => ['observacion_categoria', 'recomendacion' => ['titulo', 'detalle']]]);
+        ->assertJsonStructure(['preguntas', 'resultado' => ['observacion_categoria', 'hallazgos' => [['grupo', 'puntos']], 'fortalezas', 'recomendaciones' => [['titulo', 'detalle', 'pasos', 'plazo', 'indicador']], 'recomendacion' => ['titulo', 'detalle']]]);
 
     expect(Prompt::count())->toBe(0)->and(AnalisisCategoria::count())->toBe(0);
 

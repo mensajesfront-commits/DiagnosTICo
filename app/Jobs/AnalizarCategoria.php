@@ -73,8 +73,17 @@ class AnalizarCategoria implements ShouldQueue
                 'preguntas' => [],
                 'metodo' => 'CAME',
                 'metodo_motivo' => 'Sin respuestas, la única acción posible es responder la categoría.',
-                'observacion_categoria' => 'No respondiste ninguna pregunta de esta categoría.',
-                'recomendacion' => ['titulo' => 'Responde esta categoría', 'detalle' => 'En tu próxima medición responde sus preguntas para saber cómo vas en este tema.'],
+                'observacion_categoria' => 'No respondiste ninguna pregunta de esta categoría, así que no sabemos cómo vas en este tema.',
+                'hallazgos' => [['grupo' => 'Corregir', 'puntos' => ['Sin respuestas no hay con qué medir esta categoría.']]],
+                'fortalezas' => [],
+                'recomendaciones' => [[
+                    'titulo' => 'Responde esta categoría',
+                    'detalle' => 'Así sabrás cómo vas en este tema y qué mejorar.',
+                    'pasos' => ['Lee las preguntas de esta categoría.', 'Respóndelas en tu próxima medición.', 'Revisa el resultado y sus recomendaciones.'],
+                    'plazo' => 'En tu próxima medición',
+                    'indicador' => 'La categoría queda con todas sus preguntas respondidas.',
+                ]],
+                'recomendacion' => ['titulo' => 'Responde esta categoría', 'detalle' => 'Así sabrás cómo vas en este tema y qué mejorar.'],
             ]
             : $analizador->analizar($prompt['instrucciones'], $prompt['categoria']);
 

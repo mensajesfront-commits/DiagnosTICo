@@ -41,13 +41,29 @@ Las rutas completas, con su controlador y permiso, están en `15_BACKEND.md`. La
   ],
   "metodo": "DOFA",
   "metodo_motivo": "Mezcla fortalezas internas con amenazas del mercado.",
-  "observacion_categoria": "Conoce a su cliente, pero no mide sus canales.",
-  "recomendacion": { "titulo": "Mide tus canales", "detalle": "Pon un enlace con UTM en cada red durante un mes." }
+  "observacion_categoria": "Conoce a su cliente, pero no mide qué canal le trae ventas. Reparte el tiempo entre redes sin saber cuál funciona, y eso le cuesta horas cada semana.",
+  "hallazgos": [
+    { "grupo": "Fortalezas", "puntos": ["Tiene su cliente ideal por escrito."] },
+    { "grupo": "Debilidades", "puntos": ["Publica sin un plan.", "No mide de dónde llegan los clientes."] }
+  ],
+  "fortalezas": ["Sabe a quién le vende."],
+  "recomendaciones": [
+    {
+      "titulo": "Mide tus canales",
+      "detalle": "Sin medir, no sabes dónde poner tu tiempo.",
+      "pasos": ["Crea un enlace con UTM por red", "Ponlo en la biografía de cada una", "Revisa las visitas cada viernes"],
+      "plazo": "4 semanas",
+      "indicador": "Visitas por red al final del mes"
+    }
+  ]
 }
 ```
 
 - `puntaje` solo va en las abiertas; en las cerradas llega `null`, porque el sistema ya lo calculó.
 - `metodo` es uno de `PESTEL`, `PORTER`, `VRIO`, `DOFA` o `CAME` (DEC-019).
+- `hallazgos` usa los grupos del método elegido (`MetodosAnalisis::GRUPOS`; por ejemplo Corregir, Afrontar, Mantener y Explotar en CAME). La validación descarta los grupos de otro método y deja hasta 3 puntos por grupo.
+- `fortalezas`: 0 a 2. `recomendaciones`: 2 o 3, de la más a la menos importante, cada una con 3 pasos, plazo e indicador. La validación rechaza la respuesta (y la cola reintenta) si no hay ninguna recomendación con pasos o ningún hallazgo del método.
+- Al guardar, el sistema agrega `recomendacion` (título y detalle de la primera) para el inicio de la empresa y los resultados viejos.
 
 ### Sin clave
 

@@ -70,6 +70,17 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (análisis de la IA más completo, 2 de noviembre)
+
+- **Cada categoría trae ahora**, en E6, A3.3, el resultado de ejemplo (A2.6) y "Probar" (A4.7):
+  - el **diagnóstico** en 2 o 3 frases: qué pasa, por qué y qué le cuesta a la empresa;
+  - **lo que encontró el método**, por sus grupos (DOFA: Fortalezas, Oportunidades, Debilidades, Amenazas; PESTEL, Porter, VRIO y CAME con los suyos);
+  - **lo que ya hace bien** (0 a 2 frases);
+  - **2 o 3 recomendaciones en orden**, cada una con 3 pasos, plazo y "Cómo saber si funcionó".
+- El PDF agrega los pasos, el plazo y el indicador a las 3 recomendaciones priorizadas, sin pasar de 3 páginas.
+- `AnalizadorDeCategoria` pide y valida el formato nuevo: descarta grupos de otro método y reintenta si no hay hallazgos o recomendaciones con pasos.
+- Los resultados publicados antes no cambian (RN-023): se siguen viendo con la observación y una recomendación.
+
 ### Corregido (29 de octubre)
 
 - **Barra de arriba de E2–E4:** al marcar una respuesta, "✓ Guardado 8:25 p. m." cambiaba a "Guardando…", que es más corto, y la barra de avance con el porcentaje y la categoría se estiraba y volvía a encogerse. Ahora ese aviso tiene un ancho fijo y nada se mueve al guardar.

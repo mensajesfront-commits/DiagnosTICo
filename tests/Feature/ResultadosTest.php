@@ -124,7 +124,12 @@ it('al enviar analiza cada categoría, publica el resultado inmutable y avisa a 
         // La IA de prueba elige el método por el nombre de la categoría.
         ->and($resultado->por_categoria[0]['metodo']['clave'])->toBe('VRIO')
         ->and($resultado->por_categoria[0]['metodo']['nombre'])->toBe('VRIO')
-        ->and($resultado->por_categoria[1]['metodo']['clave'])->toBe('DOFA');
+        ->and($resultado->por_categoria[1]['metodo']['clave'])->toBe('DOFA')
+        // Lo que encontró el método va en los grupos de ese método.
+        ->and(array_column($resultado->por_categoria[1]['hallazgos'], 'grupo'))->toBe(['Fortalezas', 'Oportunidades'])
+        ->and($resultado->por_categoria[1]['fortalezas'])->toHaveCount(1)
+        ->and($resultado->por_categoria[1]['recomendaciones'])->toHaveCount(2)
+        ->and($resultado->por_categoria[1]['recomendaciones'][0]['pasos'])->toHaveCount(3);
 
     // Puntajes y observaciones guardados por respuesta.
     expect(Respuesta::where('medicion_id', $this->medicion->id)->where('pregunta_ref', 'p3')->value('puntaje'))->toBe(40)

@@ -1,3 +1,5 @@
+import type { Hallazgo, RecomendacionCompleta } from '@/types/resultados';
+
 /**
  * A4 · Configuración de la IA, etapa "Analizar categoría" (HU-041 a HU-045).
  * Lo arma `App\Support\DatosConfiguracionIa`.
@@ -118,6 +120,9 @@ export type ResultadoPrueba = {
         metodo: string;
         metodo_motivo: string;
         observacion_categoria: string;
+        hallazgos: Hallazgo[];
+        fortalezas: string[];
+        recomendaciones: RecomendacionCompleta[];
         recomendacion: { titulo: string; detalle: string };
     };
     /** Pruebas que quedan hoy (100 al día entre todos, PA-003). */

@@ -68,6 +68,9 @@
         .reco b { display: block; font-size: 11.5px; font-weight: 600; margin: 6px 0 3px; }
         .reco p { margin: 0; line-height: 1.5; color: #1e2533; }
         .reco .metodo { margin-top: 4px; font-size: 9.5px; color: #5f6470; }
+        .reco .pasos { margin: 5px 0 0; padding-left: 16px; font-size: 10px; line-height: 1.45; }
+        .reco .plan { margin-top: 5px; font-size: 9.5px; color: #5f6470; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+        .reco .plan b { display: inline; font-size: 9.5px; margin: 0; color: #1e2533; }
         .siguiente { margin-top: auto; background: #f5f4f0; border-radius: 6px; padding: 10px 12px; font-size: 10px; line-height: 1.5; }
         .cuerpo.columna { display: flex; flex-direction: column; }
         .niveles { display: flex; gap: 8px; }
@@ -208,6 +211,17 @@
                     </div>
                     <b>{{ $p['recomendacion']['titulo'] }}</b>
                     <p>{{ $p['recomendacion']['detalle'] }}</p>
+                    @if (! empty($p['principal']['pasos']))
+                        <ol class="pasos">
+                            @foreach ($p['principal']['pasos'] as $paso)
+                                <li>{{ $paso }}</li>
+                            @endforeach
+                        </ol>
+                        <p class="plan">
+                            @if ($p['principal']['plazo'] !== '')<span><b>Plazo:</b> {{ $p['principal']['plazo'] }}</span>@endif
+                            @if ($p['principal']['indicador'] !== '')<span><b>Cómo saber si funcionó:</b> {{ $p['principal']['indicador'] }}</span>@endif
+                        </p>
+                    @endif
                     @if (! empty($p['metodo']['motivo']))
                         <p class="metodo">Analizado con {{ $p['metodo']['nombre'] }}: {{ $p['metodo']['motivo'] }}</p>
                     @endif
@@ -226,7 +240,7 @@
                         </tr>
                     @endforeach
                 </table>
-                <p class="sub" style="margin-top: 6px">El detalle de cada recomendación está en tu resultado en línea.</p>
+                <p class="sub" style="margin-top: 6px">El análisis completo de cada categoría (lo que encontró el método, lo que ya haces bien y todas sus recomendaciones con pasos) está en tu resultado en línea.</p>
             @endif
 
             <div class="siguiente">

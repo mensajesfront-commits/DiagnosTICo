@@ -651,8 +651,16 @@ Lo que devuelve la IA para una categoría (etapa única, RN-021), ya validado (`
   ],
   "metodo": "VRIO",
   "metodo_motivo": "Las respuestas hablan de lo que la empresa tiene: contenido y equipo.",
-  "observacion_categoria": "Tienen presencia constante, pero sin un plan de contenidos.",
-  "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "Tres publicaciones por semana; revisa cada mes cuáles funcionan." }
+  "observacion_categoria": "Tienen presencia constante, pero sin un plan de contenidos. Deciden qué publicar el mismo día y pasan semanas sin aparecer.",
+  "hallazgos": [
+    { "grupo": "Valioso", "puntos": ["Fotos propias del producto."] },
+    { "grupo": "Organizado para aprovecharlo", "puntos": ["Nadie tiene a cargo las publicaciones."] }
+  ],
+  "fortalezas": ["Publican cada semana."],
+  "recomendaciones": [
+    { "titulo": "Arma un calendario mensual", "detalle": "Publicar sin plan te deja semanas sin aparecer.", "pasos": ["…", "…", "…"], "plazo": "4 semanas", "indicador": "12 publicaciones en el mes" }
+  ],
+  "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "Publicar sin plan te deja semanas sin aparecer." }
 }
 ```
 
@@ -660,7 +668,7 @@ Lo que devuelve la IA para una categoría (etapa única, RN-021), ya validado (`
 
 ### `resultados.por_categoria`
 
-Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 / A3.3, E9 / A3.5 y el PDF. Copia los textos de las preguntas y las respuestas para que el resultado no cambie aunque cambie el diagnóstico (RN-023). `anterior` y `variacion` son `null` en la primera medición (RN-020); el radar usa `anterior` para la línea punteada.
+Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 / A3.3, E9 / A3.5 y el PDF. Copia los textos de las preguntas y las respuestas para que el resultado no cambie aunque cambie el diagnóstico (RN-023). `anterior` y `variacion` son `null` en la primera medición (RN-020); el radar usa `anterior` para la línea punteada. `hallazgos`, `fortalezas` y `recomendaciones` llegan vacíos en los resultados publicados antes del 2 de noviembre de 2026; esos se muestran solo con la observación y `recomendacion` (RN-023).
 
 ```json
 [
@@ -669,6 +677,9 @@ Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 
     "puntaje": 38, "nivel": "mejorar", "anterior": 33, "variacion": 5,
     "observacion": "Publicas sin un plan…",
     "metodo": { "clave": "VRIO", "nombre": "VRIO", "motivo": "…" },
+    "hallazgos": [{ "grupo": "Valioso", "puntos": ["…"] }],
+    "fortalezas": ["…"],
+    "recomendaciones": [{ "titulo": "Arma un calendario mensual", "detalle": "…", "pasos": ["…"], "plazo": "4 semanas", "indicador": "…" }],
     "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "…" },
     "preguntas": [
       { "ref": "p41", "texto": "¿Con qué frecuencia publicas?", "tipo": "opcion_unica", "respuesta": "Varias veces por semana", "puntaje": 60, "observacion": "…" },

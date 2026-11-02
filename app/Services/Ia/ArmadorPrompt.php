@@ -69,31 +69,35 @@ class ArmadorPrompt
         Analiza todas las respuestas de la empresa en esta categoría: {respuestas_categoria}.
         1. Escribe una observación breve y concreta para cada pregunta, basada en lo que respondió la empresa.
         2. Califica de 0 a 100 solo las preguntas de tipo "abierta", según su "criterio". En las demás devuelve puntaje null: su puntaje ya está calculado y no lo cambias.
-        3. Escribe una observación de la categoría que resuma la situación de la empresa en ese tema.
-        4. Escribe una recomendación accionable: un título corto en imperativo y un detalle de una o dos frases que se pueda hacer en 1 a 3 meses con pocos recursos.
+        3. Escribe el diagnóstico de la categoría en 2 o 3 frases: qué pasa, por qué pasa y qué le cuesta a la empresa (clientes, ventas, tiempo o dinero).
+        4. Elige un método de análisis y escribe lo que encontraste con él, en sus grupos: de 1 a 3 frases cortas por grupo, solo en los grupos donde las respuestas digan algo.
+        5. Escribe 1 o 2 cosas que la empresa ya hace bien en este tema. Si no hay ninguna, déjalo vacío; no inventes.
+        6. Escribe 2 o 3 recomendaciones, de la más a la menos importante. Cada una con un título corto en imperativo, una frase de por qué hacerla, 3 pasos concretos en orden, el plazo (por ejemplo "4 semanas") y cómo saber si funcionó (algo que se pueda contar o revisar). Que se puedan hacer en 1 a 3 meses con pocos recursos.
         TXT,
         'detalles' => <<<'TXT'
         - Criterios para las abiertas: 0–29 la práctica no existe o la respuesta no aplica; 30–59 existe pero es informal; 60–79 está definida y tiene algo de medición; 80–100 está definida, se mide y se mejora con datos.
         - Las preguntas cerradas ya traen su puntaje: úsalo para entender a la empresa, no lo recalifiques. Si una respuesta trae "ten_en_cuenta", tenlo en cuenta al calificar y al redactar.
-        - Elige UN método de análisis según lo que respondió la empresa (no siempre el mismo) y úsalo para la observación de la categoría y la recomendación:
-          - PESTEL: factores del entorno (políticos, económicos, sociales, tecnológicos, ecológicos y legales). Úsalo cuando las respuestas dependen de normas, economía, tecnología o cambios del mercado.
-          - PORTER (5 Fuerzas de Porter): competidores, poder de clientes y proveedores, sustitutos y nuevos competidores. Úsalo cuando las respuestas tratan de la competencia, los precios o el poder de clientes y proveedores.
-          - VRIO: si los recursos propios son valiosos, raros, difíciles de imitar y si la empresa está organizada para aprovecharlos. Úsalo cuando las respuestas tratan de la marca, el equipo, el contenido, las herramientas o los datos.
-          - DOFA: debilidades, oportunidades, fortalezas y amenazas. Úsalo cuando las respuestas mezclan lo interno con lo externo.
-          - CAME: corregir, afrontar, mantener y explotar. Úsalo cuando el problema ya está claro y hace falta convertirlo en acciones.
+        - Elige UN método de análisis según lo que respondió la empresa (no siempre el mismo) y úsalo para el diagnóstico, lo que encontraste y las recomendaciones. Cada método tiene sus grupos:
+          - PESTEL: factores del entorno. Úsalo cuando las respuestas dependen de normas, economía, tecnología o cambios del mercado. Grupos: Político, Económico, Social, Tecnológico, Ecológico, Legal.
+          - PORTER (5 Fuerzas de Porter): la presión del mercado. Úsalo cuando las respuestas tratan de la competencia, los precios o el poder de clientes y proveedores. Grupos: Competidores actuales, Nuevos competidores, Productos sustitutos, Poder de los clientes, Poder de los proveedores.
+          - VRIO: los recursos propios. Úsalo cuando las respuestas tratan de la marca, el equipo, el contenido, las herramientas o los datos. Grupos: Valioso, Raro, Difícil de imitar, Organizado para aprovecharlo.
+          - DOFA: lo interno y lo externo. Úsalo cuando las respuestas mezclan los dos. Grupos: Fortalezas, Oportunidades, Debilidades, Amenazas.
+          - CAME: de problema a acción. Úsalo cuando el problema ya está claro y hace falta convertirlo en acciones. Grupos: Corregir, Afrontar, Mantener, Explotar.
           Si una respuesta trae "ten_en_cuenta" que pide un método, usa ese.
-        - La recomendación ataca la debilidad más importante que muestre el método elegido.
+        - La primera recomendación ataca la debilidad más importante que muestre el método elegido.
+        - Cada frase de lo que encontraste, de lo que hace bien y de las recomendaciones debe salir de una respuesta concreta de la empresa. No uses frases que sirvan para cualquier empresa.
         - Escribe en español de Colombia, en segunda persona (tú), con frases cortas y sin palabras técnicas ni siglas. Basa todo en lo que la empresa respondió, sin suponer; no compares con otras empresas ni con promedios.
         TXT,
         'ejemplos' => <<<'TXT'
         Sí: "Publico en Instagram según lo que se me ocurra ese día" → 35, "Publica con regularidad, pero sin plan ni medición". No: observaciones genéricas como "Debe mejorar sus redes".
-        Recomendación — Sí: título "Arma un calendario mensual", detalle "Tres publicaciones por semana; revisa cada mes cuáles funcionan". No: "Mejora tu contenido".
+        Recomendación — Sí: título "Arma un calendario mensual", detalle "Publicar sin plan hace que pases semanas sin aparecer", pasos "Elige 3 temas que tus clientes preguntan", "Agenda 3 publicaciones por semana en una hoja", "Cada viernes revisa cuál tuvo más mensajes", plazo "4 semanas", indicador "12 publicaciones en el mes y cuál trajo más mensajes". No: "Mejora tu contenido".
+        Lo que encontraste (DOFA) — Sí: en Debilidades "No respondes los mensajes de Instagram el mismo día". No: "Falta de estrategia digital".
         TXT,
     ];
 
     /** Capa 5: formato fijo; la salida estructurada lo exige igual (AnalizadorDeCategoria::esquema). */
     public const string FORMATO = <<<'TXT'
-    Responde solo con un objeto JSON con: "preguntas" (una entrada por cada pregunta recibida, con su "id", "puntaje" —0 a 100 en las abiertas, null en las demás— y "observacion"), "metodo" (el método de análisis que usaste según las respuestas: PESTEL, PORTER, VRIO, DOFA o CAME), "metodo_motivo" (una frase: por qué ese método encaja con lo que respondió la empresa), "observacion_categoria" y "recomendacion" (con "titulo" y "detalle").
+    Responde solo con un objeto JSON con: "preguntas" (una entrada por cada pregunta recibida, con su "id", "puntaje" —0 a 100 en las abiertas, null en las demás— y "observacion"), "metodo" (el método de análisis que usaste según las respuestas: PESTEL, PORTER, VRIO, DOFA o CAME), "metodo_motivo" (una frase: por qué ese método encaja con lo que respondió la empresa), "observacion_categoria" (el diagnóstico de 2 o 3 frases), "hallazgos" (lista de grupos del método elegido, cada uno con "grupo" y "puntos"), "fortalezas" (lista de 0 a 2 frases) y "recomendaciones" (2 o 3, cada una con "titulo", "detalle", "pasos", "plazo" e "indicador").
     TXT;
 
     /**

@@ -19,6 +19,16 @@ export type CabeceraResultado = {
 
 export type Recomendacion = { titulo: string; detalle: string };
 
+/** Recomendación con su plan: 3 pasos, plazo y cómo saber si funcionó. */
+export type RecomendacionCompleta = Recomendacion & {
+    pasos: string[];
+    plazo: string;
+    indicador: string;
+};
+
+/** Lo que encontró el método en uno de sus grupos (por ejemplo "Debilidades" en DOFA). */
+export type Hallazgo = { grupo: string; puntos: string[] };
+
 /** A2.6 · Resultado de ejemplo de un diagnóstico (HU-030). */
 export type EjemploResultado = {
     caso: 'mejor' | 'medio' | 'peor';
@@ -56,7 +66,12 @@ export type CategoriaResultado = {
     variacion: number | null;
     observacion: string;
     metodo: MetodoAnalisis | null;
+    /** La principal, con título y detalle (todos los resultados la traen). */
     recomendacion: Recomendacion;
+    /** No vienen en resultados publicados antes del análisis completo. */
+    hallazgos?: Hallazgo[];
+    fortalezas?: string[];
+    recomendaciones?: RecomendacionCompleta[];
     preguntas: PreguntaResultado[];
 };
 
@@ -66,6 +81,8 @@ export type Prioridad = {
     puntaje: number;
     nivel: Exclude<Nivel, 'sin'>;
     recomendacion: Recomendacion;
+    /** La principal con pasos, plazo e indicador; null en resultados viejos. */
+    principal: RecomendacionCompleta | null;
     metodo: MetodoAnalisis | null;
 };
 

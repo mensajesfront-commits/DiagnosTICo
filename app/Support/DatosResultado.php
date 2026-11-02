@@ -101,6 +101,8 @@ class DatosResultado
             'puntaje' => $c['puntaje'],
             'nivel' => $c['nivel'],
             'recomendacion' => $c['recomendacion'],
+            // La principal completa (pasos, plazo e indicador), si la hay.
+            'principal' => $c['recomendaciones'][0] ?? null,
             'metodo' => $c['metodo'] ?? null,
         ], $categorias);
     }

@@ -175,7 +175,12 @@ En el resultado (E6) ves:
   - Sigue así: 80–100.
 - **Variación:** cuánto subiste o bajaste frente a tu medición anterior, desde la segunda medición.
 - **Radar** con todas las categorías.
-- **Por cada categoría:** el puntaje, el método con el que se analizó, una observación y una recomendación.
+- **Por cada categoría:**
+  - el puntaje y el nivel;
+  - el diagnóstico: qué pasa, por qué y qué le cuesta a la empresa;
+  - lo que encontró el método de análisis, por grupos (por ejemplo Fortalezas y Debilidades en DOFA);
+  - lo que la empresa ya hace bien;
+  - 2 o 3 recomendaciones en orden, cada una con 3 pasos, el plazo y cómo saber si funcionó.
 
 Además:
 

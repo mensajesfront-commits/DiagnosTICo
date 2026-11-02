@@ -16,7 +16,7 @@ El sistema se llama **Captter**.
 |---|---|
 | Cada diagnóstico depende de quién lo haga y de cómo lo pregunte. | Cada sector tiene su diagnóstico publicado; todas sus empresas responden las mismas preguntas con los mismos puntajes (RN-010, RN-014). |
 | Es difícil comparar una empresa consigo misma en el tiempo. | Cada medición guarda su resultado inmutable y muestra la variación frente a la anterior (RN-020, RN-023). |
-| El análisis y las recomendaciones toman tiempo del equipo. | La IA analiza cada categoría y escribe observaciones y una recomendación concreta (RN-021, RN-022). |
+| El análisis y las recomendaciones toman tiempo del equipo. | La IA analiza cada categoría y escribe un diagnóstico, lo que encontró con el método elegido y 2 o 3 recomendaciones con pasos, plazo e indicador (RN-021, RN-022). |
 | La empresa recibe el resultado sin un formato fijo. | La empresa ve su resultado en pantalla y recibe un PDF de 3 páginas (RN-024). |
 
 **[INFORMACIÓN PENDIENTE]** Cómo hace hoy NuevasTIC los diagnósticos (encuestas, hojas de cálculo, entrevistas) y cuánto tiempo le toman. Sin ese dato no se puede medir cuánto tiempo ahorra el sistema.

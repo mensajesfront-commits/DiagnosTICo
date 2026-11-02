@@ -25,8 +25,10 @@ import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import RadarCategorias from '@/components/graficas/RadarCategorias.vue';
+import AnalisisCategoria from '@/components/resultados/AnalisisCategoria.vue';
 import EtiquetaMetodo from '@/components/resultados/EtiquetaMetodo.vue';
 import PreguntaResultado from '@/components/resultados/PreguntaResultado.vue';
+import TarjetaRecomendacion from '@/components/resultados/TarjetaRecomendacion.vue';
 import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal, mesYAnio } from '@/lib/fechas';
 import { niveles, ordenNiveles } from '@/lib/niveles';
@@ -38,6 +40,7 @@ import {
 } from '@/routes/inicio';
 import type {
     CabeceraResultado,
+    CategoriaResultado,
     EjemploResultado,
     Resultado,
 } from '@/types/resultados';
@@ -154,6 +157,11 @@ const categoria = computed(
         props.resultado.categorias.find((c) => c.ref === elegida.value) ??
         props.resultado.categorias[0],
 );
+
+// Cuántas recomendaciones tiene la categoría además de la principal.
+function masRecomendaciones(c: CategoriaResultado): number {
+    return Math.max(0, (c.recomendaciones?.length ?? 1) - 1);
+}
 
 function abrirCategoria(ref: string): void {
     elegida.value = ref;
@@ -376,6 +384,13 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                                     {{ p.recomendacion.titulo }}
                                 </span>
                                 <span
+                                    v-if="p.principal?.plazo"
+                                    class="mt-0.5 block text-xs font-medium text-marca"
+                                >
+                                    {{ p.principal.pasos.length }} pasos ·
+                                    {{ p.principal.plazo }}
+                                </span>
+                                <span
                                     class="mt-0.5 line-clamp-3 block text-xs text-tinta-suave"
                                 >
                                     {{ p.recomendacion.detalle }}
@@ -515,39 +530,25 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                 <div
                     class="flex flex-col gap-4 p-5 lg:min-h-0 lg:overflow-y-auto"
                 >
-                    <PreguntaResultado
-                        v-for="p in categoria.preguntas"
-                        :key="p.ref"
-                        :pregunta="p"
-                        :interno="interno"
-                    />
-                    <div
-                        v-if="categoria.metodo"
-                        class="flex flex-wrap items-center gap-2 text-sm"
-                    >
-                        <span class="text-tinta-suave">Analizado con</span>
-                        <EtiquetaMetodo :metodo="categoria.metodo" />
-                        <span
-                            v-if="categoria.metodo.motivo"
-                            class="text-xs text-tinta-suave"
-                            >{{ categoria.metodo.motivo }}</span
+                    <AnalisisCategoria :categoria="categoria" />
+                    <section class="flex flex-col gap-4">
+                        <h3
+                            class="border-t border-linea pt-4 text-sm font-semibold"
                         >
-                    </div>
-                    <div class="rounded-lg bg-lienzo px-4 py-3 text-sm">
-                        <span
-                            class="mr-2 rounded border border-linea bg-white px-1 font-mono text-[10px]"
-                            >IA</span
-                        >
-                        <strong>Observación de la categoría:</strong>
-                        {{ categoria.observacion }}
-                    </div>
-                    <div
-                        class="rounded-lg border-l-4 border-marca bg-lienzo px-4 py-3 text-sm"
-                    >
-                        <strong>Recomendación:</strong>
-                        {{ categoria.recomendacion.titulo }}.
-                        {{ categoria.recomendacion.detalle }}
-                    </div>
+                            {{
+                                interno
+                                    ? 'Respuestas de la empresa'
+                                    : 'Tus respuestas'
+                            }}
+                            y lo que dice la IA de cada una
+                        </h3>
+                        <PreguntaResultado
+                            v-for="p in categoria.preguntas"
+                            :key="p.ref"
+                            :pregunta="p"
+                            :interno="interno"
+                        />
+                    </section>
                 </div>
             </section>
         </div>
@@ -555,8 +556,9 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
         <!-- Recomendaciones de todas las categorías -->
         <section v-else class="flex flex-col gap-2 lg:min-h-0 lg:flex-1">
             <p class="shrink-0 text-sm text-tinta-suave">
-                Una recomendación por categoría, de la más débil a la más
-                fuerte. Las redacta la IA a partir de
+                La recomendación más importante de cada categoría, de la más
+                débil a la más fuerte, con sus pasos. Las redacta la IA a partir
+                de
                 {{
                     interno ? 'las respuestas de la empresa' : 'tus respuestas'
                 }}.
@@ -585,18 +587,22 @@ const numero = (i: number) => String(i + 1).padStart(2, '0');
                         </span>
                         <EtiquetaMetodo v-if="c.metodo" :metodo="c.metodo" />
                     </span>
-                    <p class="mt-1.5 text-sm font-semibold">
-                        {{ c.recomendacion.titulo }}
-                    </p>
-                    <p class="mt-0.5 text-xs text-tinta-suave">
-                        {{ c.recomendacion.detalle }}
-                    </p>
+                    <TarjetaRecomendacion
+                        class="mt-2"
+                        :recomendacion="
+                            c.recomendaciones?.[0] ?? c.recomendacion
+                        "
+                    />
                     <button
                         type="button"
-                        class="mt-1 text-xs text-marca underline underline-offset-2"
+                        class="mt-2 text-sm text-marca underline underline-offset-2"
                         @click="abrirCategoria(c.ref)"
                     >
-                        Ver el detalle
+                        {{
+                            masRecomendaciones(c) > 0
+                                ? `Ver el análisis y ${masRecomendaciones(c)} ${masRecomendaciones(c) === 1 ? 'recomendación más' : 'recomendaciones más'}`
+                                : 'Ver el análisis completo'
+                        }}
                     </button>
                 </li>
             </ol>

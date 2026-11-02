@@ -158,7 +158,7 @@ Están completos, con ejemplo, en `12_BASE_DE_DATOS.md`. Resumen:
 |---|---|
 | `versiones_diagnostico.contenido` | `{ categorias: [{ ref, nombre, importancia, preguntas: [{ ref, texto, tipo, indicacion, criterio_ia, obligatoria, opciones: [{ ref, texto, puntaje, ten_en_cuenta, exclusiva, con_texto }] }] }] }` |
 | `respuestas.opciones_elegidas` | Lista de referencias de opción (`["o12"]`). El texto de la abierta o del "¿Cuál?" va en `respuestas.texto`. |
-| `analisis_categoria.respuesta_ia` | `{ preguntas: [{ id, puntaje, observacion }], metodo, metodo_motivo, observacion_categoria, recomendacion: { titulo, detalle } }` |
+| `analisis_categoria.respuesta_ia` | `{ preguntas: [{ id, puntaje, observacion }], metodo, metodo_motivo, observacion_categoria, hallazgos: [{ grupo, puntos }], fortalezas, recomendaciones: [{ titulo, detalle, pasos, plazo, indicador }], recomendacion: { titulo, detalle } }` |
 | `resultados.por_categoria` | Lista con `ref`, `nombre`, `importancia`, `puntaje`, `nivel`, `anterior`, `variacion`, `observacion`, `metodo`, `recomendacion` y `preguntas`. |
 
 ## 5. Concurrencia y fallas

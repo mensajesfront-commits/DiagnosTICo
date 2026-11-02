@@ -2,6 +2,7 @@
 
 namespace App\Services\Ia;
 
+use App\Support\AnalisisSinIa;
 use App\Support\MetodosAnalisis;
 
 /**
@@ -38,10 +39,7 @@ class AnalizadorDePrueba implements Analizador
             'metodo' => $metodo,
             'metodo_motivo' => 'Método de prueba elegido por el nombre de la categoría.',
             'observacion_categoria' => "Observación de prueba de {$categoria['nombre']}: analizada sin conexión a la IA.",
-            'recomendacion' => [
-                'titulo' => "Mejora {$categoria['nombre']}",
-                'detalle' => 'Recomendación de prueba: con la IA real aquí va una acción concreta para los próximos 1 a 3 meses.',
-            ],
+            ...AnalisisSinIa::partes($categoria['nombre'], $metodo, 'de prueba'),
         ];
     }
 }

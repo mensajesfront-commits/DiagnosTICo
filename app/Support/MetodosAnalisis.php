@@ -46,6 +46,37 @@ class MetodosAnalisis
         ],
     ];
 
+    /**
+     * Grupos en los que cada método ordena lo que encontró (hallazgos del
+     * resultado). La IA solo llena los que tienen algo que decir según las
+     * respuestas.
+     *
+     * @var array<string, list<string>>
+     */
+    public const array GRUPOS = [
+        'PESTEL' => ['Político', 'Económico', 'Social', 'Tecnológico', 'Ecológico', 'Legal'],
+        'PORTER' => ['Competidores actuales', 'Nuevos competidores', 'Productos sustitutos', 'Poder de los clientes', 'Poder de los proveedores'],
+        'VRIO' => ['Valioso', 'Raro', 'Difícil de imitar', 'Organizado para aprovecharlo'],
+        'DOFA' => ['Fortalezas', 'Oportunidades', 'Debilidades', 'Amenazas'],
+        'CAME' => ['Corregir', 'Afrontar', 'Mantener', 'Explotar'],
+    ];
+
+    /** @return list<string> */
+    public static function grupos(string $clave): array
+    {
+        return self::GRUPOS[$clave] ?? [];
+    }
+
+    /**
+     * Todos los grupos, sin repetir (para el esquema de la respuesta).
+     *
+     * @return list<string>
+     */
+    public static function todosLosGrupos(): array
+    {
+        return array_values(array_unique(array_merge(...array_values(self::GRUPOS))));
+    }
+
     /** @return list<string> */
     public static function claves(): array
     {
@@ -63,7 +94,7 @@ class MetodosAnalisis
         $lineas = [];
 
         foreach (self::METODOS as $clave => [$nombre, $que, $cuando]) {
-            $lineas[] = "  - {$clave} ({$nombre}): {$que} Úsalo {$cuando}";
+            $lineas[] = "  - {$clave} ({$nombre}): {$que} Úsalo {$cuando} Grupos: ".implode(', ', self::grupos($clave)).'.';
         }
 
         return implode("\n", $lineas);
