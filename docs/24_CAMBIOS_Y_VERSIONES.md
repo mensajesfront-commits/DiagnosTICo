@@ -70,6 +70,22 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (L2b · diseño de Verifica tu correo, 3 de noviembre)
+
+- **El código se ve en 6 casillas:**
+  - la casilla donde va el siguiente dígito queda resaltada con un cursor;
+  - las llenas toman el color de la marca;
+  - con un código incorrecto, todas se ponen rojas.
+- **Sigue siendo un solo campo** (`#codigo`, invisible encima de las casillas). Pegar el código, el autocompletado del celular (`one-time-code`), el envío automático al llegar a 6 dígitos y los lectores de pantalla funcionan igual que antes.
+- **Textos:**
+  - "Vence en 15 minutos. Revisa también la carpeta de spam" queda bajo el campo, con ícono de reloj, y deja de ser un recuadro aparte;
+  - el aviso del servidor ("Te enviamos un código nuevo") va en un recuadro verde con ícono;
+  - el correo largo ya no se corta a la mitad.
+- **Botones:**
+  - "Verificar" lleva ícono;
+  - "Reenviar código" es un botón dentro de una franja "¿No te llegó?"; mientras espera muestra un anillo que se vacía con los 60 segundos.
+- Lo mismo aplica en Mi perfil al confirmar un correo o teléfono nuevo. El backend no cambia.
+
 ### Cambiado (L4 · diseño de Crea una contraseña nueva, 3 de noviembre)
 
 - **Encabezado:** lleva la descripción "Elige una contraseña segura que no hayas usado antes". La cuenta aparece en un recuadro con ícono ("Para la cuenta").
