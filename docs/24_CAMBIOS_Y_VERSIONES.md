@@ -70,6 +70,26 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A6 / E11 · diseño de Mi perfil, 3 de noviembre)
+
+- **Encabezado:** lleva ícono. El aviso de solo lectura (colaborador o rol sin permiso) va en un recuadro de alerta.
+- **Tarjeta de identidad:**
+  - franja de marca arriba, con la foto o el logo encima;
+  - chips con el rol (ícono y color de `estiloRol`) y el sector, o "NuevasTIC" en las cuentas internas;
+  - "Cambiar foto" o "Cambiar logo" como botón con ícono;
+  - en A6, el último acceso y la fecha de creación de la cuenta como dos datos al pie.
+- **Tarjetas aparte con ícono:**
+  - Seguridad (solo E11), con la última actualización de la contraseña y "Cambiar contraseña" a lo ancho;
+  - Sesión activa, con "Cerrar sesión";
+  - Cuenta principal (solo A6), con borde rojo y "Eliminar mi cuenta" como botón rojo.
+- **En escritorio**, la columna izquierda queda fija al bajar.
+- **Formulario:**
+  - cada sección (Información personal, Información de empresa, Avisos o Preferencias) tiene un encabezado con ícono y una línea que explica para qué es;
+  - los avisos van en una lista con borde;
+  - la nota "Algunos datos solo puede modificarlos el equipo de NuevasTIC" pasó a la sección de empresa.
+- **Barra de guardar:** un punto verde indica que no hay cambios y uno ámbar que hay cambios sin guardar. Con cambios, la barra queda fija abajo para tener "Guardar cambios" siempre a mano.
+- "Cambiar contraseña" (A6) tiene encabezado con ícono. El backend no cambia.
+
 ### Cambiado (E12 · diseño de Colaboradores, 3 de noviembre)
 
 - **Encabezado:** lleva ícono, y el botón "Agregar colaborador" tiene ícono.
