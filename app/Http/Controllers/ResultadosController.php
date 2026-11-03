@@ -38,6 +38,8 @@ class ResultadosController extends Controller
             'medicion' => DatosResultado::cabecera($medicion),
             'resultado' => DatosResultado::resultado($resultado),
             'interno' => $this->interno($request),
+            // A3.3 · Para pasar de una medición a otra sin volver a la ficha.
+            'mediciones' => $this->interno($request) ? DatosResultado::mediciones($medicion) : [],
         ]);
     }
 

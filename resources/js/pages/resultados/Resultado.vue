@@ -26,6 +26,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     CalendarClock,
+    ChevronLeft,
     ChevronRight,
     FileText,
     FlaskConical,
@@ -48,6 +49,7 @@ import TarjetaRecomendacion from '@/components/resultados/TarjetaRecomendacion.v
 import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal, mesYAnio } from '@/lib/fechas';
 import { niveles } from '@/lib/niveles';
+import type { Nivel } from '@/lib/niveles';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import {
@@ -68,7 +70,30 @@ const props = defineProps<{
     interno: boolean;
     /** A2.6 · Resultado de ejemplo de un diagnóstico (HU-030): datos de muestra. */
     ejemplo?: EjemploResultado | null;
+    /**
+     * A3.3 · Las mediciones terminadas de la empresa, para pasar de una a
+     * otra (solo vista interna: Administrador y Consultor).
+     */
+    mediciones?: {
+        id: number;
+        numero: number;
+        fecha: string;
+        puntaje: number;
+        nivel: Nivel;
+    }[];
 }>();
+
+const posicion = computed(() =>
+    (props.mediciones ?? []).findIndex((m) => m.id === props.medicion.id),
+);
+const anteriorMedicion = computed(() =>
+    posicion.value > 0 ? props.mediciones![posicion.value - 1] : null,
+);
+const siguienteMedicion = computed(() =>
+    posicion.value >= 0 && posicion.value < (props.mediciones?.length ?? 0) - 1
+        ? props.mediciones![posicion.value + 1]
+        : null,
+);
 
 const { puede } = usePermisos();
 
@@ -354,6 +379,65 @@ const porcentaje = (n: number) =>
                 :opciones="pestanas"
                 etiqueta-accesible="Secciones del resultado"
             />
+
+            <!-- A3.3 · Pasar a otra medición de la empresa -->
+            <nav
+                v-if="!ejemplo && interno && (mediciones?.length ?? 0) > 1"
+                class="flex max-w-full items-center gap-1.5"
+                aria-label="Otras mediciones de la empresa"
+            >
+                <Link
+                    v-if="anteriorMedicion"
+                    :href="rutas.resultados.ver(anteriorMedicion.id)"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-linea bg-white text-tinta-suave hover:border-marca hover:text-marca"
+                    :aria-label="`Medición ${anteriorMedicion.numero}`"
+                    preserve-scroll
+                >
+                    <ChevronLeft class="size-4" aria-hidden="true" />
+                </Link>
+                <ol
+                    class="flex items-center gap-1 overflow-x-auto rounded-lg bg-lienzo-oscuro p-1"
+                >
+                    <li v-for="m in mediciones" :key="m.id">
+                        <Link
+                            :href="rutas.resultados.ver(m.id)"
+                            :aria-current="
+                                m.id === medicion.id ? 'page' : undefined
+                            "
+                            :title="`Medición ${m.numero} · ${diaYMes(fechaLocal(m.fecha))}`"
+                            :class="
+                                cn(
+                                    'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs whitespace-nowrap',
+                                    m.id === medicion.id
+                                        ? 'bg-white font-semibold text-tinta shadow-sm'
+                                        : 'text-tinta-suave hover:text-tinta',
+                                )
+                            "
+                        >
+                            <span
+                                :class="
+                                    cn(
+                                        'size-2 rounded-full',
+                                        niveles[m.nivel].barra,
+                                    )
+                                "
+                                aria-hidden="true"
+                            />
+                            M{{ m.numero }}
+                            <span class="font-mono">{{ m.puntaje }}</span>
+                        </Link>
+                    </li>
+                </ol>
+                <Link
+                    v-if="siguienteMedicion"
+                    :href="rutas.resultados.ver(siguienteMedicion.id)"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-linea bg-white text-tinta-suave hover:border-marca hover:text-marca"
+                    :aria-label="`Medición ${siguienteMedicion.numero}`"
+                    preserve-scroll
+                >
+                    <ChevronRight class="size-4" aria-hidden="true" />
+                </Link>
+            </nav>
         </div>
 
         <!-- Resumen -->
@@ -384,6 +468,11 @@ const porcentaje = (n: number) =>
                         class="text-xs font-medium tracking-wide text-tinta-suave uppercase"
                     >
                         Calificación general
+                        <span
+                            v-if="interno && !ejemplo"
+                            class="font-normal tracking-normal normal-case"
+                            >· el mensaje que lee la empresa</span
+                        >
                     </h2>
                     <p class="mt-1 text-lg leading-snug font-medium">
                         {{ resultado.frase }}
@@ -402,7 +491,9 @@ const porcentaje = (n: number) =>
                         {{
                             ejemplo
                                 ? 'Sin medición anterior: el ejemplo es una primera medición.'
-                                : 'Es tu primera medición: será tu punto de partida.'
+                                : interno
+                                  ? 'Es su primera medición: será su punto de partida.'
+                                  : 'Es tu primera medición: será tu punto de partida.'
                         }}
                     </p>
 
@@ -504,7 +595,13 @@ const porcentaje = (n: number) =>
                     <div
                         class="flex flex-wrap items-baseline justify-between gap-2"
                     >
-                        <h2 class="text-lg font-semibold">Qué hacer ahora</h2>
+                        <h2 class="text-lg font-semibold">
+                            {{
+                                interno && !ejemplo
+                                    ? 'Qué le conviene hacer'
+                                    : 'Qué hacer ahora'
+                            }}
+                        </h2>
                         <span class="text-xs text-tinta-suave">
                             De la categoría más débil a la más fuerte
                         </span>
@@ -584,7 +681,8 @@ const porcentaje = (n: number) =>
                         class="flex flex-wrap items-center justify-between gap-2"
                     >
                         <h2 class="text-lg font-semibold">
-                            Tus {{ resultado.categorias.length }} categorías
+                            {{ interno && !ejemplo ? 'Sus' : 'Tus' }}
+                            {{ resultado.categorias.length }} categorías
                         </h2>
                         <SelectorCompacto
                             v-model="vistaCategorias"

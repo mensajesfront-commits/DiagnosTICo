@@ -39,12 +39,12 @@ beforeEach(function () {
     $this->medicionOtra = medicionTerminada($this, $this->otra);
 });
 
-function medicionTerminada($test, Empresa $empresa): Medicion
+function medicionTerminada($test, Empresa $empresa, int $numero = 1): Medicion
 {
     $medicion = Medicion::factory()->create([
         'empresa_id' => $empresa->id,
         'version_diagnostico_id' => $test->version->id,
-        'numero' => 1,
+        'numero' => $numero,
         'estado' => 'terminada',
     ]);
     $medicion->forceFill(['enviada_en' => now(), 'terminada_en' => now()])->save();
@@ -137,6 +137,18 @@ it('descarga el PDF del resultado de su empresa', function () {
 
     expect($this->consultor->can('resultados.pdf'))->toBeTrue()
         ->and($this->consultor->can('empresas.registrar'))->toBeFalse();
+});
+
+it('en el resultado recibe las mediciones de la empresa para pasar de una a otra', function () {
+    $segunda = medicionTerminada($this, $this->suya, 2);
+
+    $this->actingAs($this->consultor)
+        ->get(route('resultados.ver', $segunda))
+        ->assertInertia(fn (Assert $p) => $p
+            ->where('interno', true)
+            ->has('mediciones', 2)
+            ->where('mediciones.0.id', $this->medicionSuya->id)
+            ->where('mediciones.1.id', $segunda->id));
 });
 
 it('no ve la ficha, el historial ni los resultados de otra empresa', function () {

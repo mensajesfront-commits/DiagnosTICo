@@ -31,6 +31,30 @@ class DatosResultado
         ];
     }
 
+    /**
+     * Las mediciones terminadas de la misma empresa, de la primera a la última.
+     *
+     * @return list<array{id: int, numero: int, fecha: string, puntaje: int, nivel: string}>
+     */
+    public static function mediciones(Medicion $medicion): array
+    {
+        return array_values(Medicion::query()
+            ->where('empresa_id', $medicion->empresa_id)
+            ->where('estado', 'terminada')
+            ->whereHas('resultado')
+            ->with('resultado:id,medicion_id,puntaje_total,nivel,publicado_en')
+            ->orderBy('numero')
+            ->get(['id', 'numero'])
+            ->map(fn (Medicion $m) => [
+                'id' => $m->id,
+                'numero' => $m->numero,
+                'fecha' => (string) $m->resultado?->publicado_en->toDateString(),
+                'puntaje' => (int) $m->resultado?->puntaje_total,
+                'nivel' => (string) $m->resultado?->nivel,
+            ])
+            ->all());
+    }
+
     /** @return array<string, mixed> */
     public static function resultado(Resultado $resultado): array
     {

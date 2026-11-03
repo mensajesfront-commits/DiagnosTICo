@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A3.3 · resultado visto por el Consultor y el Administrador, 3 de noviembre)
+
+- **Pasar de una medición a otra** sin volver a la ficha: junto a las pestañas, "M1 51 · M2 47…" con el color del nivel y flechas anterior / siguiente (`DatosResultado::mediciones()`, solo en la vista interna).
+- **Textos en tercera persona** en la vista interna: "Qué le conviene hacer", "Sus N categorías", "Es su primera medición". La frase del nivel se aclara como "el mensaje que lee la empresa". La empresa sigue viendo su texto de siempre.
+- **Menú:** en un resultado queda marcado "Mis empresas" (Consultor) o "Empresas" (Administrador) (`ItemMenu.tambien`).
+
 ### Cambiado (A3.1 · ficha de la empresa para el Consultor, 3 de noviembre)
 
 - **Historial a todo el ancho:** al consultor no le sale la columna de la medición pendiente, porque ya está arriba en "Medición N pendiente".

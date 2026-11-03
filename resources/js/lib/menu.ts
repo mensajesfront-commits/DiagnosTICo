@@ -34,6 +34,8 @@ export type ItemMenu = {
     sinRoles?: string[];
     /** Submenú plegable. */
     hijos?: ItemMenu[];
+    /** Otras rutas en las que se marca como activa (p. ej. un resultado). */
+    tambien?: string[];
 };
 
 export const menuAdministrador: ItemMenu[] = [
@@ -51,6 +53,7 @@ export const menuAdministrador: ItemMenu[] = [
         permiso: 'empresas.ver',
         // RN-030: el consultor tiene "Mis empresas" (C2) en su lugar.
         sinRoles: ['Consultor'],
+        tambien: ['/resultados'],
     },
     {
         titulo: 'Mis empresas',
@@ -58,6 +61,7 @@ export const menuAdministrador: ItemMenu[] = [
         icono: Building2,
         permiso: 'empresas.ver',
         roles: ['Consultor'],
+        tambien: ['/resultados'],
     },
     // HU-041 CA-001: "Configuración IA" va sin submenú de fases.
     {
