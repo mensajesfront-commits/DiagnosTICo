@@ -7,6 +7,11 @@
  * nivel; a la derecha, la cabecera de la elegida y sus preguntas como
  * tarjetas, con la respuesta, el puntaje y la nota de la IA. Abajo, la
  * categoría anterior y la siguiente. "Volver al resultado" y "Ver informe PDF".
+ *
+ * El puntaje de cada pregunta lleva el color de su nivel. En la vista interna
+ * (Administrador y Consultor) hay además un filtro "Todas · Para mejorar ·
+ * Sin responder" y cada categoría dice cuántas preguntas tiene para mejorar
+ * (nivel Crítico o Se puede mejorar, calculado en el servidor).
  */
 import { Head, Link } from '@inertiajs/vue3';
 import {
@@ -16,10 +21,14 @@ import {
     ChevronRight,
     ClipboardList,
     Lock,
+    Minus,
+    TrendingDown,
+    TrendingUp,
 } from '@lucide/vue';
 import { computed, nextTick, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
+import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import PreguntaResultado from '@/components/resultados/PreguntaResultado.vue';
 import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes } from '@/lib/fechas';
@@ -27,7 +36,11 @@ import { niveles } from '@/lib/niveles';
 import { rutas } from '@/lib/rutas';
 import { plural } from '@/lib/texto';
 import { cn } from '@/lib/utils';
-import type { CabeceraResultado, CategoriaResultado } from '@/types/resultados';
+import type {
+    CabeceraResultado,
+    CategoriaResultado,
+    PreguntaResultado as Pregunta,
+} from '@/types/resultados';
 
 const props = defineProps<{
     medicion: CabeceraResultado;
@@ -57,8 +70,48 @@ const siguiente = computed(() => props.categorias[indice.value + 1]);
 
 const lista = ref<HTMLElement | null>(null);
 
+// --- Filtro de preguntas (vista interna) -------------------------------------
+
+type Filtro = 'todas' | 'mejorar' | 'sin_responder';
+
+const paraMejorar = (p: Pregunta) =>
+    p.nivel === 'critico' || p.nivel === 'mejorar';
+
+const filtros: Record<Filtro, (p: Pregunta) => boolean> = {
+    todas: () => true,
+    mejorar: paraMejorar,
+    sin_responder: (p) => p.respuesta === null,
+};
+
+const filtro = ref<Filtro>('todas');
+
+const opcionesFiltro = computed(() =>
+    (
+        [
+            ['todas', 'Todas'],
+            ['mejorar', 'Para mejorar'],
+            ['sin_responder', 'Sin responder'],
+        ] as [Filtro, string][]
+    )
+        .map(([valor, etiqueta]) => ({
+            valor,
+            etiqueta,
+            cantidad:
+                categoria.value?.preguntas.filter(filtros[valor]).length ?? 0,
+        }))
+        .filter((o) => o.valor === 'todas' || o.cantidad > 0),
+);
+
+/** Las preguntas con su número original, filtradas. */
+const preguntas = computed(() =>
+    (categoria.value?.preguntas ?? [])
+        .map((p, i) => ({ p, numero: i + 1 }))
+        .filter(({ p }) => filtros[filtro.value](p)),
+);
+
 async function elegir(ref: string) {
     elegida.value = ref;
+    filtro.value = 'todas';
     await nextTick();
     lista.value?.scrollTo({ top: 0 });
 
@@ -234,7 +287,17 @@ const enviada = computed(() =>
                                 class="flex w-full items-center justify-between gap-2 text-xs text-tinta-suave"
                             >
                                 <span>{{ niveles[c.nivel].nombre }}</span>
-                                <span>{{
+                                <span
+                                    v-if="
+                                        interno && c.preguntas.some(paraMejorar)
+                                    "
+                                    class="font-medium text-alerta"
+                                    >{{
+                                        c.preguntas.filter(paraMejorar).length
+                                    }}
+                                    para mejorar</span
+                                >
+                                <span v-else>{{
                                     plural(
                                         c.preguntas.length,
                                         'pregunta',
@@ -267,6 +330,38 @@ const enviada = computed(() =>
                         >
                             {{ categoria.nombre }}
                             <EtiquetaNivel :nivel="categoria.nivel" />
+                            <span
+                                v-if="categoria.variacion !== null"
+                                :class="
+                                    cn(
+                                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
+                                        categoria.variacion > 0
+                                            ? 'bg-exito-suave text-exito'
+                                            : categoria.variacion < 0
+                                              ? 'bg-aviso-suave text-aviso'
+                                              : 'bg-lienzo text-tinta-suave',
+                                    )
+                                "
+                                :title="`Antes: ${categoria.anterior}`"
+                            >
+                                <TrendingUp
+                                    v-if="categoria.variacion > 0"
+                                    class="size-3"
+                                    aria-hidden="true"
+                                />
+                                <TrendingDown
+                                    v-else-if="categoria.variacion < 0"
+                                    class="size-3"
+                                    aria-hidden="true"
+                                />
+                                <Minus
+                                    v-else
+                                    class="size-3"
+                                    aria-hidden="true"
+                                />
+                                {{ categoria.variacion > 0 ? '+' : ''
+                                }}{{ categoria.variacion }} vs. la anterior
+                            </span>
                         </h2>
                         <ul
                             class="mt-2 flex flex-wrap gap-1.5 text-xs text-tinta-suave"
@@ -311,11 +406,19 @@ const enviada = computed(() =>
                     ref="lista"
                     class="flex flex-col gap-3 p-3 sm:p-5 lg:min-h-0 lg:overflow-y-auto"
                 >
+                    <SelectorCompacto
+                        v-if="interno && opcionesFiltro.length > 1"
+                        v-model="filtro"
+                        :opciones="opcionesFiltro"
+                        etiqueta-accesible="Filtrar preguntas"
+                        class="self-start"
+                    />
+
                     <PreguntaResultado
-                        v-for="(p, i) in categoria.preguntas"
+                        v-for="{ p, numero } in preguntas"
                         :key="p.ref"
                         :pregunta="p"
-                        :numero="i + 1"
+                        :numero="numero"
                         :interno="interno"
                         tarjeta
                     />

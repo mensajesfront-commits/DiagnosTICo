@@ -53,7 +53,7 @@ class ResultadosController extends Controller
 
         return Inertia::render('resultados/Respuestas', [
             'medicion' => DatosResultado::cabecera($medicion),
-            'categorias' => $resultado->por_categoria,
+            'categorias' => DatosResultado::conNivelPorPregunta($resultado->por_categoria),
             'inicial' => $request->string('categoria')->toString() ?: null,
             'interno' => $this->interno($request),
         ]);

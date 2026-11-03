@@ -151,6 +151,24 @@ it('en el resultado recibe las mediciones de la empresa para pasar de una a otra
             ->where('mediciones.1.id', $segunda->id));
 });
 
+it('en las respuestas cada pregunta trae su nivel según el puntaje', function () {
+    $this->actingAs($this->consultor)
+        ->get(route('resultados.respuestas', $this->medicionSuya))
+        ->assertInertia(function (Assert $p) {
+            $p->component('resultados/Respuestas')->where('interno', true);
+            $pregunta = $p->toArray()['props']['categorias'][0]['preguntas'][0];
+
+            expect($pregunta)->toHaveKey('nivel');
+
+            if (is_numeric($pregunta['puntaje']) && empty($pregunta['extra'])) {
+                expect($pregunta['nivel'])->toBe(Niveles::de($pregunta['puntaje']));
+            }
+        });
+
+    // Lo guardado no cambia (RN-023).
+    expect($this->medicionSuya->resultado->fresh()->por_categoria[0]['preguntas'][0])->not->toHaveKey('nivel');
+});
+
 it('no ve la ficha, el historial ni los resultados de otra empresa', function () {
     $this->actingAs($this->consultor);
 

@@ -9,6 +9,7 @@
  */
 import { CircleDot, ListChecks, PenLine, Sparkles } from '@lucide/vue';
 import { computed } from 'vue';
+import { niveles } from '@/lib/niveles';
 import { cn } from '@/lib/utils';
 import type { PreguntaResultado } from '@/types/resultados';
 
@@ -79,7 +80,9 @@ const opciones = computed(() =>
                                 'inline-flex shrink-0 items-center gap-1 self-start rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap',
                                 extra || pregunta.puntaje === null
                                     ? 'bg-lienzo-oscuro text-tinta-suave'
-                                    : 'bg-marca-suave text-marca',
+                                    : pregunta.nivel
+                                      ? niveles[pregunta.nivel].etiqueta
+                                      : 'bg-marca-suave text-marca',
                             )
                         "
                     >

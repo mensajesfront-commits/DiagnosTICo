@@ -53,6 +53,8 @@ export type PreguntaResultado = {
     /** Opcional: dato extra que no cuenta en el puntaje (no viene en resultados viejos). */
     extra?: boolean;
     observacion: string | null;
+    /** Nivel según su puntaje (lo agrega el servidor en A3.5 / E9). */
+    nivel?: Exclude<Nivel, 'sin'> | null;
 };
 
 export type CategoriaResultado = {

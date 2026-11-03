@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A3.5 / E9 · Respuestas, 3 de noviembre)
+
+- **Puntaje de cada pregunta con el color de su nivel** (rojo, naranja, azul o verde). El nivel lo agrega el servidor al leer (`DatosResultado::conNivelPorPregunta()`); lo guardado no cambia (RN-023).
+- **Variación de la categoría** junto a su nivel: "+18 vs. la anterior".
+- **Vista interna (Administrador y Consultor):** filtro "Todas · Para mejorar · Sin responder" (solo los que tienen preguntas) y, en la lista de categorías, "N para mejorar" (preguntas en Crítico o Se puede mejorar). Al filtrar, cada pregunta conserva su número.
+
 ### Cambiado (A3.3 · resultado visto por el Consultor y el Administrador, 3 de noviembre)
 
 - **Pasar de una medición a otra** sin volver a la ficha: junto a las pestañas, "M1 51 · M2 47…" con el color del nivel y flechas anterior / siguiente (`DatosResultado::mediciones()`, solo en la vista interna).

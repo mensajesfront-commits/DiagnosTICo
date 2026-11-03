@@ -55,6 +55,34 @@ class DatosResultado
             ->all());
     }
 
+    /**
+     * A3.5 / E9 · Agrega el nivel de cada pregunta según su puntaje (RN de
+     * niveles), para el color del puntaje y el filtro "Para mejorar". Solo
+     * se lee: lo guardado no cambia (RN-023).
+     *
+     * @param  array<mixed>  $categorias
+     * @return array<mixed>
+     */
+    public static function conNivelPorPregunta(array $categorias): array
+    {
+        return array_map(function (mixed $c): mixed {
+            if (! is_array($c)) {
+                return $c;
+            }
+
+            /** @var list<array<string, mixed>> $preguntas */
+            $preguntas = is_array($c['preguntas'] ?? null) ? $c['preguntas'] : [];
+            $c['preguntas'] = array_map(fn (array $p): array => [
+                ...$p,
+                'nivel' => is_numeric($p['puntaje'] ?? null) && empty($p['extra'])
+                    ? Niveles::de((float) $p['puntaje'])
+                    : null,
+            ], $preguntas);
+
+            return $c;
+        }, $categorias);
+    }
+
     /** @return array<string, mixed> */
     public static function resultado(Resultado $resultado): array
     {
