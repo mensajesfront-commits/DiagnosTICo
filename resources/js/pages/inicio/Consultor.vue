@@ -31,7 +31,6 @@ import {
     TriangleAlert,
 } from '@lucide/vue';
 import { computed, ref } from 'vue';
-import Boton from '@/components/base/Boton.vue';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { plural } from '@/lib/texto';
@@ -293,19 +292,8 @@ const resumen = computed(() => [
             </div>
         </section>
 
-        <Boton
-            v-if="empresas.length > 0"
-            variante="secundario"
-            class="self-start"
-            href="/empresas"
-        >
-            <Building2 class="size-4" aria-hidden="true" />
-            Ver mis empresas
-            <ChevronRight class="size-4" aria-hidden="true" />
-        </Boton>
-
         <div
-            v-else
+            v-if="empresas.length === 0"
             class="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-linea-fuerte bg-white px-5 py-12 text-center"
         >
             <span

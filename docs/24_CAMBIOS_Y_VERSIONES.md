@@ -73,7 +73,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 ### Agregado (C2 · Mis empresas del Consultor, 3 de noviembre)
 
 - **"Mis empresas"** en el menú del Consultor (`empresas/MisEmpresas.vue`, en `/empresas`): las tarjetas de sus empresas, con el buscador desde 7 empresas. Reemplaza la redirección a su inicio.
-- **C1 · Inicio del Consultor:** queda con el resumen, "Qué atender" (o "Todo al día" si no hay avisos) y "Ver mis empresas".
+- **C1 · Inicio del Consultor:** queda con el resumen y "Qué atender" (o "Todo al día" si no hay avisos). Sin botón "Ver mis empresas": ya está en el menú.
 - La ficha (A3.1) vuelve con "← Mis empresas".
 
 ### Cambiado (A3.1 / A3.4 / E8 · ancho de la ficha y "Ver:" de la evolución, 3 de noviembre)
