@@ -75,7 +75,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - **Layout de acceso (`AuthLayout.vue`), usado por L1 a L4:**
   - el panel oscuro tiene un fondo con brillos y puntos, una etiqueta "Diagnóstico de marketing digital" y el titular más grande;
   - los tres pasos (responder, recibir el resultado, medir la evolución) van con ícono, título y una línea;
-  - en pantallas anchas se muestra una tarjeta de **ejemplo** de resultado. Es solo decorativa: `aria-hidden` y datos de muestra;
+  - sin barra de desplazamiento visible (clase `sin-barra`), aunque la página sigue bajando con la rueda, el dedo o el teclado;
   - el formulario va en una tarjeta blanca con sombra;
   - en el celular, la marca va centrada arriba y la ayuda abajo con ícono.
 - **L1 Iniciar sesión:** el botón lleva ícono. "Registrar mi empresa" pasa a ser un botón secundario de ancho completo, bajo un separador "¿Aún no tienes cuenta?".

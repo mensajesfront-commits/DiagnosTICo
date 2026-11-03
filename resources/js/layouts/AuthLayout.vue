@@ -4,14 +4,17 @@
  *
  * - A la izquierda (42 %), el panel oscuro: la marca, el mensaje del
  *   sistema, los tres pasos (responder, recibir el resultado, medir otra
- *   vez) con ícono y una tarjeta de ejemplo de resultado (decorativa).
+ *   vez) con ícono.
  *   El panel es `fixed` y ocupa todo el alto: solo se desplaza el
- *   formulario (el registro es largo).
+ *   formulario (el registro es largo). La barra de desplazamiento no se
+ *   ve (clase `sin-barra` en <html> mientras la pantalla está abierta),
+ *   pero la página baja igual con la rueda, el dedo o el teclado.
  * - A la derecha, el formulario en una tarjeta blanca sobre el fondo gris
  *   cálido, con el título y la descripción que manda cada página.
  * - En pantallas pequeñas el panel se reduce a la marca arriba.
  */
 import { ClipboardList, LifeBuoy, Sparkles, TrendingUp } from '@lucide/vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import Logo from '@/components/marca/Logo.vue';
 
 const {
@@ -43,12 +46,8 @@ const pasos = [
     },
 ];
 
-/** Solo ilustra cómo se ve un resultado; no son datos reales. */
-const ejemplo = [
-    { nombre: 'Presencia en línea', puntaje: 82, color: 'bg-nivel-sigue' },
-    { nombre: 'Contenido', puntaje: 64, color: 'bg-nivel-camino' },
-    { nombre: 'Análisis del cliente', puntaje: 41, color: 'bg-nivel-mejorar' },
-];
+onMounted(() => document.documentElement.classList.add('sin-barra'));
+onBeforeUnmount(() => document.documentElement.classList.remove('sin-barra'));
 </script>
 
 <template>
@@ -73,7 +72,7 @@ const ejemplo = [
             </div>
 
             <div
-                class="relative flex h-full flex-col justify-between gap-10 overflow-y-auto px-12 py-12 xl:px-20"
+                class="sin-barra relative flex h-full flex-col justify-between gap-10 overflow-y-auto px-12 py-12 xl:px-20"
             >
                 <p
                     class="flex items-center gap-3 text-base font-semibold text-white"
@@ -116,68 +115,6 @@ const ejemplo = [
                             </span>
                         </li>
                     </ul>
-
-                    <!-- Tarjeta de ejemplo: solo decorativa -->
-                    <div
-                        aria-hidden="true"
-                        class="mt-10 hidden max-w-sm rounded-2xl bg-white/95 p-4 text-tinta shadow-2xl ring-1 ring-white/20 xl:block"
-                    >
-                        <div class="flex items-center gap-3">
-                            <svg viewBox="0 0 44 44" class="size-12 -rotate-90">
-                                <circle
-                                    cx="22"
-                                    cy="22"
-                                    r="18"
-                                    fill="none"
-                                    stroke-width="5"
-                                    class="stroke-lienzo-oscuro"
-                                />
-                                <circle
-                                    cx="22"
-                                    cy="22"
-                                    r="18"
-                                    fill="none"
-                                    stroke-width="5"
-                                    stroke-linecap="round"
-                                    stroke-dasharray="113.1"
-                                    stroke-dashoffset="35"
-                                    class="stroke-nivel-camino"
-                                />
-                            </svg>
-                            <div>
-                                <p class="text-xs text-tinta-suave">
-                                    Ejemplo de resultado
-                                </p>
-                                <p class="font-semibold">
-                                    <span class="font-mono">69</span> / 100 ·
-                                    Vas en buen camino
-                                </p>
-                            </div>
-                        </div>
-                        <ul class="mt-3 flex flex-col gap-2">
-                            <li v-for="c in ejemplo" :key="c.nombre">
-                                <span
-                                    class="flex justify-between text-xs text-tinta-suave"
-                                >
-                                    {{ c.nombre }}
-                                    <span class="font-mono text-tinta">{{
-                                        c.puntaje
-                                    }}</span>
-                                </span>
-                                <span
-                                    class="mt-1 block h-1.5 overflow-hidden rounded-full bg-lienzo-oscuro"
-                                >
-                                    <span
-                                        :class="[
-                                            'block h-full rounded-full',
-                                            c.color,
-                                        ]"
-                                        :style="{ width: `${c.puntaje}%` }"
-                                    />
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
 
                 <p class="flex items-center gap-2 text-xs">
