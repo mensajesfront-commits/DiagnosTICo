@@ -70,6 +70,24 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E3 · diseño de Revisa antes de enviar, 3 de noviembre)
+
+- **Resumen arriba:**
+  - un anillo con el avance: el porcentaje o, si está completo, ✓ en verde;
+  - tres cifras: categorías completas, preguntas respondidas y obligatorias pendientes (en rojo si falta alguna, en verde si no).
+- **Aviso grande:**
+  - con ícono, «Faltan N preguntas obligatorias» y el botón «Ir a la pregunta»;
+  - o «Todo listo» en verde.
+- **Tus categorías:**
+  - siempre a la vista en tarjetas, con su estado (✓ verde o ! rojo), cuántas van respondidas y una barra;
+  - «Completar» o «Revisar» con ícono.
+  - Antes, completo, había que abrir «Ver detalle por categoría».
+- **Qué pasa al enviar:** tres pasos con ícono (Envías → La IA las analiza → Te avisamos).
+- **Barra de abajo:**
+  - «Volver» y «Enviar diagnóstico» con ícono, y «Todo listo para enviar» en verde cuando se puede;
+  - en el celular cabe en un renglón.
+- **Confirmación de envío:** «No podrás cambiar tus respuestas» en un recuadro de alerta, y el botón con ícono.
+
 ### Cambiado (E2 · diseño de Responder, 3 de noviembre)
 
 - **Barra de arriba (también E3 y E4):**
