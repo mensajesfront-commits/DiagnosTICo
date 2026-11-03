@@ -142,7 +142,9 @@ const notaPendiente = computed(() => {
             return 'La estamos analizando: cuando termine, aparecerá en la tabla.';
         case 'vencida':
             return props.interno
-                ? 'Venció sin enviarse. Cámbiale la fecha o asígnale otra.'
+                ? puedeAsignar.value
+                    ? 'Venció sin enviarse. Cámbiale la fecha o asígnale otra.'
+                    : 'Venció sin enviarse. NuevasTIC puede darle otra fecha.'
                 : 'Venció. Desde tu inicio puedes pedir una nueva fecha.';
         case 'no_iniciada':
             return props.interno

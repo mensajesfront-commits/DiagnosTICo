@@ -74,6 +74,7 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 - **"Por categoría"** junto a "Mediciones" en la tarjeta de la derecha: cada categoría de su primera a su última medición ("M1 30 → M4 95"), con el cambio en puntos y una barra del color del nivel, de la que más bajó a la que más subió. Al tocar una, la gráfica muestra esa categoría. Lo calcula `DatosHistorial::cambiosPorCategoria()`; solo en la vista interna.
 - La gráfica dice "Evolución del puntaje total" (antes "de tu calificación") en la vista interna.
+- La medición vencida ya no le pide al consultor "Cámbiale la fecha o asígnale otra" (no puede): "NuevasTIC puede darle otra fecha."
 
 ### Cambiado (A6 · Mi perfil del Consultor, 3 de noviembre)
 
