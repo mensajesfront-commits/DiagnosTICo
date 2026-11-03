@@ -10,6 +10,8 @@ defineProps<{
     recomendacion: Recomendacion | RecomendacionCompleta;
     /** Orden de prioridad (1 es la más importante). */
     numero?: number;
+    /** Sin borde ni fondo propio, para ir dentro de otra tarjeta. */
+    plana?: boolean;
 }>();
 
 function pasos(r: Recomendacion | RecomendacionCompleta): string[] {
@@ -26,7 +28,11 @@ function indicador(r: Recomendacion | RecomendacionCompleta): string {
 </script>
 
 <template>
-    <article class="rounded-lg border border-linea bg-white px-4 py-3">
+    <article
+        :class="
+            plana ? '' : 'rounded-lg border border-linea bg-white px-4 py-3'
+        "
+    >
         <div class="flex items-start justify-between gap-3">
             <h4 class="text-base font-semibold">
                 <span v-if="numero" class="mr-1 font-mono text-marca"

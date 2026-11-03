@@ -26,8 +26,10 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     CalendarClock,
+    Check,
     ChevronLeft,
     ChevronRight,
+    Copy,
     FileText,
     FlaskConical,
     Info,
@@ -60,6 +62,8 @@ import type {
     CabeceraResultado,
     CategoriaResultado,
     EjemploResultado,
+    Recomendacion,
+    RecomendacionCompleta,
     Resultado,
 } from '@/types/resultados';
 
@@ -223,6 +227,88 @@ const categoria = computed(
         props.resultado.categorias.find((c) => c.ref === elegida.value) ??
         props.resultado.categorias[0],
 );
+
+// --- Recomendaciones: agrupadas por prioridad ------------------------------------
+const GRUPOS_PLAN = [
+    {
+        clave: 'primero',
+        titulo: 'Atender primero',
+        descripcion: 'Nivel Crítico',
+        niveles: ['critico'],
+    },
+    {
+        clave: 'despues',
+        titulo: 'Después',
+        descripcion: 'Se puede mejorar',
+        niveles: ['mejorar'],
+    },
+    {
+        clave: 'mantener',
+        titulo: 'Para mantener',
+        descripcion: 'Vas en buen camino o Sigue así',
+        niveles: ['camino', 'sigue'],
+    },
+] as const;
+
+/** Los grupos con sus categorías; el número sigue el orden de prioridad. */
+const gruposPlan = computed(() => {
+    const numeradas = ordenadas.value.map((c, i) => ({ c, numero: i + 1 }));
+
+    return GRUPOS_PLAN.map((g) => ({
+        ...g,
+        categorias: numeradas.filter(({ c }) =>
+            (g.niveles as readonly string[]).includes(c.nivel),
+        ),
+    })).filter((g) => g.categorias.length > 0);
+});
+
+/** "Copiar plan": las recomendaciones como texto para pegar en un correo o chat. */
+const copiado = ref(false);
+
+async function copiarPlan(): Promise<void> {
+    const lineas = [
+        `Plan de trabajo · ${props.medicion.empresa.nombre} · Medición ${props.medicion.numero}`,
+        '',
+    ];
+
+    for (const g of gruposPlan.value) {
+        lineas.push(g.titulo.toUpperCase());
+
+        for (const { c, numero } of g.categorias) {
+            const r: Partial<RecomendacionCompleta> & Recomendacion =
+                c.recomendaciones?.[0] ?? c.recomendacion;
+            lineas.push(
+                `${numero}. ${c.nombre} (${c.puntaje}/100): ${r.titulo}`,
+            );
+
+            if (r.detalle) {
+                lineas.push(`   ${r.detalle}`);
+            }
+
+            if (r.pasos?.length) {
+                r.pasos.forEach((p, i) => lineas.push(`   ${i + 1}) ${p}`));
+
+                if (r.plazo) {
+                    lineas.push(`   Plazo: ${r.plazo}`);
+                }
+
+                if (r.indicador) {
+                    lineas.push(`   Cómo saber si funcionó: ${r.indicador}`);
+                }
+            }
+
+            lineas.push('');
+        }
+    }
+
+    try {
+        await navigator.clipboard.writeText(lineas.join('\n').trim());
+        copiado.value = true;
+        setTimeout(() => (copiado.value = false), 2500);
+    } catch {
+        copiado.value = false;
+    }
+}
 
 // Cuántas recomendaciones tiene la categoría además de la principal.
 function masRecomendaciones(c: CategoriaResultado): number {
@@ -947,70 +1033,122 @@ const porcentaje = (n: number) =>
         </div>
 
         <!-- Recomendaciones de todas las categorías -->
-        <section v-else class="flex flex-col gap-2 lg:min-h-0 lg:flex-1">
-            <p class="shrink-0 text-sm text-tinta-suave">
-                La recomendación más importante de cada categoría, de la más
-                débil a la más fuerte, con sus pasos. Las redacta la IA a partir
-                de
-                {{
-                    interno ? 'las respuestas de la empresa' : 'tus respuestas'
-                }}.
-            </p>
-            <ol
-                class="grid content-start gap-2 lg:min-h-0 lg:grid-cols-2 lg:overflow-y-auto"
+        <section v-else class="flex flex-col gap-3 lg:min-h-0 lg:flex-1">
+            <div
+                class="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
             >
-                <li
-                    v-for="(c, i) in ordenadas"
-                    :key="c.ref"
-                    :class="
-                        cn(
-                            'rounded-2xl border border-l-4 border-linea bg-white px-4 py-3',
-                            niveles[c.nivel].borde,
-                        )
-                    "
+                <p class="text-sm text-tinta-suave">
+                    La recomendación más importante de cada categoría, de la más
+                    débil a la más fuerte, con sus pasos. Las redacta la IA a
+                    partir de
+                    {{
+                        interno
+                            ? 'las respuestas de la empresa'
+                            : 'tus respuestas'
+                    }}.
+                </p>
+                <Boton
+                    variante="secundario"
+                    tamano="sm"
+                    class="shrink-0 self-start sm:self-auto"
+                    @click="copiarPlan"
                 >
-                    <span class="flex items-center gap-2">
-                        <span
-                            :class="
-                                cn(
-                                    'flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold text-white',
-                                    niveles[c.nivel].barra,
-                                )
-                            "
-                            aria-hidden="true"
-                            >{{ i + 1 }}</span
-                        >
-                        <span
-                            :class="
-                                cn(
-                                    'rounded px-1.5 py-0.5 text-[11px] font-medium',
-                                    niveles[c.nivel].etiqueta,
-                                )
-                            "
-                        >
-                            {{ c.nombre }} · {{ c.puntaje }}
-                        </span>
-                        <EtiquetaMetodo v-if="c.metodo" :metodo="c.metodo" />
-                    </span>
-                    <TarjetaRecomendacion
-                        class="mt-2"
-                        :recomendacion="
-                            c.recomendaciones?.[0] ?? c.recomendacion
-                        "
+                    <Check
+                        v-if="copiado"
+                        class="size-3.5 text-exito"
+                        aria-hidden="true"
                     />
-                    <button
-                        type="button"
-                        class="mt-2 text-sm text-marca underline underline-offset-2"
-                        @click="abrirCategoria(c.ref)"
-                    >
-                        {{
-                            masRecomendaciones(c) > 0
-                                ? `Ver el análisis y ${masRecomendaciones(c)} ${masRecomendaciones(c) === 1 ? 'recomendación más' : 'recomendaciones más'}`
-                                : 'Ver el análisis completo'
-                        }}
-                    </button>
-                </li>
-            </ol>
+                    <Copy v-else class="size-3.5" aria-hidden="true" />
+                    {{ copiado ? 'Plan copiado' : 'Copiar plan' }}
+                </Boton>
+            </div>
+            <span class="sr-only" role="status">{{
+                copiado ? 'Plan copiado al portapapeles.' : ''
+            }}</span>
+
+            <div class="flex flex-col gap-5 lg:min-h-0 lg:overflow-y-auto">
+                <section
+                    v-for="g in gruposPlan"
+                    :key="g.clave"
+                    :aria-labelledby="`plan-${g.clave}`"
+                >
+                    <header class="mb-2 flex items-baseline gap-2">
+                        <h2
+                            :id="`plan-${g.clave}`"
+                            class="text-base font-semibold"
+                        >
+                            {{ g.titulo }}
+                        </h2>
+                        <span class="text-xs text-tinta-suave"
+                            >{{ g.descripcion }} ·
+                            {{
+                                g.categorias.length === 1
+                                    ? '1 categoría'
+                                    : `${g.categorias.length} categorías`
+                            }}</span
+                        >
+                    </header>
+                    <ol class="grid content-start gap-3 lg:grid-cols-2">
+                        <li
+                            v-for="{ c, numero } in g.categorias"
+                            :key="c.ref"
+                            class="flex flex-col rounded-2xl border border-t-4 border-linea bg-white"
+                            :style="{ borderTopColor: niveles[c.nivel].color }"
+                        >
+                            <div
+                                class="flex flex-wrap items-center gap-2 px-4 pt-3"
+                            >
+                                <span
+                                    :class="
+                                        cn(
+                                            'flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold text-white',
+                                            niveles[c.nivel].barra,
+                                        )
+                                    "
+                                    aria-hidden="true"
+                                    >{{ numero }}</span
+                                >
+                                <span
+                                    :class="
+                                        cn(
+                                            'rounded px-1.5 py-0.5 text-xs font-medium',
+                                            niveles[c.nivel].etiqueta,
+                                        )
+                                    "
+                                >
+                                    {{ c.nombre }} · {{ c.puntaje }}
+                                </span>
+                                <EtiquetaMetodo
+                                    v-if="c.metodo"
+                                    :metodo="c.metodo"
+                                />
+                            </div>
+                            <TarjetaRecomendacion
+                                plana
+                                class="flex-1 px-4 py-3"
+                                :recomendacion="
+                                    c.recomendaciones?.[0] ?? c.recomendacion
+                                "
+                            />
+                            <button
+                                type="button"
+                                class="group flex items-center justify-between gap-2 rounded-b-2xl border-t border-linea bg-lienzo/40 px-4 py-2.5 text-left text-sm font-medium text-marca hover:bg-marca-suave/40"
+                                @click="abrirCategoria(c.ref)"
+                            >
+                                {{
+                                    masRecomendaciones(c) > 0
+                                        ? `Ver el análisis y ${masRecomendaciones(c)} ${masRecomendaciones(c) === 1 ? 'recomendación más' : 'recomendaciones más'}`
+                                        : 'Ver el análisis completo'
+                                }}
+                                <ChevronRight
+                                    class="size-4 shrink-0 transition group-hover:translate-x-0.5"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                        </li>
+                    </ol>
+                </section>
+            </div>
         </section>
 
         <p

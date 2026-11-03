@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E6 / A3.3 · pestaña Recomendaciones, 3 de noviembre)
+
+- **Agrupadas por prioridad:** "Atender primero" (Crítico), "Después" (Se puede mejorar) y "Para mantener" (Vas en buen camino o Sigue así), cada grupo con cuántas categorías tiene. El número de cada tarjeta sigue el orden de prioridad.
+- **Una sola tarjeta por categoría:** franja arriba del color del nivel, la recomendación sin un recuadro adentro (`TarjetaRecomendacion` con `plana`) y abajo "Ver el análisis…" como pie de la tarjeta.
+- **"Copiar plan":** copia al portapapeles el plan en texto (empresa, medición, grupos, cada recomendación con sus pasos, plazo y cómo saber si funcionó) para pegarlo en un correo o chat.
+
 ### Cambiado (E6 / A3.3 · "Mapa" de las categorías, 3 de noviembre)
 
 - **Vértices numerados** en un círculo del color del nivel de cada categoría, en vez de los nombres largos que se cortaban (`RadarCategorias` con `colores`; sin ellos se ve como antes).
