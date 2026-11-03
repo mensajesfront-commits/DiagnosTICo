@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Medicion;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
 /**
@@ -94,6 +95,71 @@ class DatosInicioConsultor
             <=> [self::PRIORIDAD[$b['tipo']], -($b['puntos'] ?? $b['dias'] ?? 0), $b['empresa']['nombre']]);
 
         return $avisos;
+    }
+
+    /** Cuántas fechas límite y resultados recientes se muestran. */
+    public const int CUANTOS = 5;
+
+    /**
+     * C1 · Resumen de la cartera del consultor, con la lista de sus empresas
+     * de DatosEmpresas::lista() (ya filtrada y con los extras del consultor).
+     *
+     * @param  list<array<string, mixed>>  $empresas
+     * @return array<string, mixed>
+     */
+    public static function resumen(array $empresas): array
+    {
+        $lista = collect($empresas);
+        $conResultado = $lista->whereNotNull('puntaje');
+        $promedio = $conResultado->isEmpty() ? null : (int) round((float) $conResultado->avg('puntaje'));
+        $hoy = now()->startOfDay();
+
+        $porNivel = [];
+        foreach (['critico', 'mejorar', 'camino', 'sigue', 'sin'] as $nivel) {
+            $porNivel[$nivel] = $lista->where('nivel', $nivel)->count();
+        }
+
+        return [
+            'empresas' => $lista->count(),
+            'con_resultado' => $conResultado->count(),
+            'promedio' => $promedio,
+            'nivel_promedio' => $promedio === null ? 'sin' : Niveles::de($promedio),
+            'mejoraron' => $lista->filter(fn (array $e) => ($e['variacion'] ?? 0) > 0)->count(),
+            'bajaron' => $lista->filter(fn (array $e) => ($e['variacion'] ?? 0) < 0)->count(),
+            'pendientes' => $lista->whereNotNull('pendiente')->count(),
+            'vencidas' => $lista->where('vencida', true)->count(),
+            'por_nivel' => $porNivel,
+            // Las fechas límite que vienen (las vencidas ya están en "Qué atender").
+            'proximas' => $lista
+                ->filter(fn (array $e) => $e['vence'] !== null && ! $e['vencida'])
+                ->sortBy('vence')
+                ->take(self::CUANTOS)
+                ->map(fn (array $e) => [
+                    'empresa' => ['id' => $e['id'], 'nombre' => $e['nombre']],
+                    'numero' => $e['pendiente']['numero'],
+                    'estado' => $e['pendiente']['estado'],
+                    'avance' => $e['pendiente']['avance'],
+                    'vence' => $e['vence'],
+                    'dias' => (int) $hoy->diffInDays(CarbonImmutable::parse($e['vence'])->startOfDay()),
+                ])
+                ->values()
+                ->all(),
+            'recientes' => $lista
+                ->filter(fn (array $e) => $e['ultima'] !== null)
+                ->sortByDesc(fn (array $e) => $e['ultima']['fecha'])
+                ->take(self::CUANTOS)
+                ->map(fn (array $e) => [
+                    'empresa' => ['id' => $e['id'], 'nombre' => $e['nombre']],
+                    'medicion' => $e['ultima']['id'],
+                    'numero' => $e['ultima']['numero'],
+                    'fecha' => $e['ultima']['fecha'],
+                    'puntaje' => $e['puntaje'],
+                    'nivel' => $e['nivel'],
+                    'variacion' => $e['variacion'],
+                ])
+                ->values()
+                ->all(),
+        ];
     }
 
     /**

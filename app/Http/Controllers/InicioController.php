@@ -44,8 +44,10 @@ class InicioController extends Controller
         $usuario = $request->user();
 
         if ($usuario->esConsultor()) {
+            $empresas = DatosEmpresas::lista($usuario);
+
             return Inertia::render('inicio/Consultor', [
-                'empresas' => DatosEmpresas::lista($usuario),
+                'resumen' => DatosInicioConsultor::resumen($empresas),
                 'avisos' => DatosInicioConsultor::avisos($usuario),
             ]);
         }

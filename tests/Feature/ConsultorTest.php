@@ -70,8 +70,27 @@ it('entra a su propio inicio con solo sus empresas, no al del Administrador', fu
         ->assertOk()
         ->assertInertia(fn (Assert $p) => $p
             ->component('inicio/Consultor')
-            ->has('empresas', 1)
-            ->where('empresas.0.nombre', 'La Esquina'));
+            ->where('resumen.empresas', 1)
+            ->where('resumen.con_resultado', 1)
+            ->where('resumen.promedio', $this->medicionSuya->resultado->puntaje_total)
+            ->has('resumen.recientes', 1)
+            ->where('resumen.recientes.0.empresa.nombre', 'La Esquina'));
+});
+
+it('el inicio trae las próximas fechas límite, sin las vencidas', function () {
+    $otra = Empresa::factory()->create(['nombre' => 'Zapatería Sol', 'sector_id' => $this->suya->sector_id]);
+    $this->consultor->empresasAsesoradas()->attach($otra->id);
+    medicionDelConsultor($this, $this->suya, 2, ['estado' => 'en_curso', 'fecha_limite' => now()->addDays(5)->toDateString()]);
+    medicionDelConsultor($this, $otra, 1, ['estado' => 'en_curso', 'fecha_limite' => now()->subDays(2)->toDateString()]);
+
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->where('resumen.pendientes', 2)
+            ->where('resumen.vencidas', 1)
+            ->has('resumen.proximas', 1)
+            ->where('resumen.proximas.0.empresa.nombre', 'La Esquina')
+            ->where('resumen.proximas.0.dias', 5));
 });
 
 it('en /empresas ve "Mis empresas" (C2) solo con las suyas', function () {
@@ -142,7 +161,7 @@ it('sin empresas vinculadas no ve ninguna', function () {
 
     $this->actingAs($this->consultor)
         ->get(route('inicio.administrador'))
-        ->assertInertia(fn (Assert $p) => $p->has('empresas', 0)->has('avisos', 0));
+        ->assertInertia(fn (Assert $p) => $p->where('resumen.empresas', 0)->has('avisos', 0));
     $this->get(route('empresas.ver', $this->suya))->assertNotFound();
 });
 

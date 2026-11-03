@@ -70,6 +70,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (C1 · diseño del inicio del Consultor, 3 de noviembre)
+
+- **Saludo** con la fecha y una frase: "N empresas necesitan tu atención hoy" o "Tus empresas están al día".
+- **Cuatro cifras:** empresas (y cuántas con resultado), puntaje promedio con su nivel, cuántas mejoraron y cuántas bajaron en su última medición, y mediciones pendientes (con las vencidas).
+- **"Qué atender"** a la izquierda (con "Todo al día" dentro si no hay avisos) y debajo **"Resultados recientes"**: el último resultado de cada empresa, del más nuevo, con su variación.
+- **A la derecha:** "Cómo están por nivel" (barra y conteo) y "Próximas fechas límite" (las 5 que vienen; las vencidas ya están en "Qué atender").
+- Todo se calcula en `DatosInicioConsultor::resumen()`; el inicio ya no recibe la lista completa de empresas.
+
 ### Cambiado (C2 · diseño de Mis empresas, 3 de noviembre)
 
 - **Filtros** "Todas · Con medición pendiente · Bajaron · Sin resultado", con su cantidad (solo los que tienen empresas), y **orden** por nombre, puntaje más alto, más bajo o "Bajaron primero". El buscador sigue desde 7 empresas.
