@@ -74,10 +74,15 @@ it('entra a su propio inicio con solo sus empresas, no al del Administrador', fu
             ->where('empresas.0.nombre', 'La Esquina'));
 });
 
-it('no tiene la lista de Empresas: lo lleva a su inicio', function () {
+it('en /empresas ve "Mis empresas" (C2) solo con las suyas', function () {
     $this->actingAs($this->consultor)
         ->get(route('empresas.index'))
-        ->assertRedirect(route('inicio.administrador'));
+        ->assertOk()
+        ->assertInertia(fn (Assert $p) => $p
+            ->component('empresas/MisEmpresas')
+            ->has('empresas', 1)
+            ->where('empresas.0.id', $this->suya->id)
+            ->missing('sectores'));
 });
 
 it('ve la ficha, el historial y los resultados de su empresa', function () {

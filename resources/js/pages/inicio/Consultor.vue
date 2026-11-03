@@ -10,7 +10,8 @@
  *
  * "Qué atender" (HU-086 CA-005) pone arriba lo que pide su atención: una
  * medición vencida, un puntaje que bajó, una medición sin empezar hace una
- * semana o un resultado nuevo. Con 7 empresas o más aparece un buscador.
+ * semana o un resultado nuevo. Las tarjetas de cada empresa están en
+ * "Mis empresas" (C2, /empresas).
  *
  * Los datos llegan calculados del servidor (DatosEmpresas::lista y
  * DatosInicioConsultor::avisos).
@@ -21,26 +22,19 @@ import {
     Building2,
     ChartLine,
     ChevronRight,
+    CircleCheck,
     ClipboardList,
     Clock,
     Eye,
-    History,
-    Minus,
-    Search,
     Sparkles,
     TrendingDown,
-    TrendingUp,
     TriangleAlert,
 } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
-import EtiquetaEstado from '@/components/base/EtiquetaEstado.vue';
-import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
-import Entrada from '@/components/base/Entrada.vue';
-import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
-import { normalizar, plural } from '@/lib/texto';
+import { plural } from '@/lib/texto';
 import { cn } from '@/lib/utils';
 import type { FilaEmpresa } from '@/types/empresas';
 
@@ -117,21 +111,6 @@ function enlaceAviso(a: Aviso): string {
         : rutas.empresas.ver(a.empresa.id);
 }
 
-/** Con 7 empresas o más, un buscador por nombre o sector. */
-const MINIMO_BUSCADOR = 7;
-const busqueda = ref('');
-const empresasFiltradas = computed(() => {
-    const texto = normalizar(busqueda.value.trim());
-
-    if (texto === '') {
-        return props.empresas;
-    }
-
-    return props.empresas.filter((e) =>
-        normalizar(`${e.nombre} ${e.sector ?? ''}`).includes(texto),
-    );
-});
-
 const page = usePage();
 const nombre = computed(
     () => page.props.auth.user?.name?.split(' ')[0] ?? 'consultor',
@@ -180,8 +159,8 @@ const resumen = computed(() => [
             <div>
                 <h1 class="text-2xl font-semibold">Hola, {{ nombre }}</h1>
                 <p class="mt-0.5 text-sm text-tinta-suave">
-                    Estas son las empresas que acompañas. Puedes ver sus
-                    resultados, su evolución y el informe en PDF.
+                    Esto es lo que pasa en las empresas que acompañas. Sus
+                    tarjetas están en "Mis empresas".
                 </p>
             </div>
         </header>
@@ -208,6 +187,24 @@ const resumen = computed(() => [
                 </dd>
             </div>
         </dl>
+
+        <p
+            v-if="avisos.length === 0 && empresas.length > 0"
+            class="flex items-center gap-3 rounded-2xl border border-linea bg-white px-4 py-3.5 text-sm text-tinta-suave sm:px-5"
+            role="status"
+        >
+            <span
+                class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-exito-suave text-exito"
+                aria-hidden="true"
+            >
+                <CircleCheck class="size-4" />
+            </span>
+            <span>
+                <span class="block font-medium text-tinta">Todo al día</span>
+                Ninguna medición vencida, ningún puntaje que bajó ni resultados
+                nuevos esta semana.
+            </span>
+        </p>
 
         <section
             v-if="avisos.length > 0"
@@ -296,175 +293,38 @@ const resumen = computed(() => [
             </div>
         </section>
 
-        <section aria-labelledby="titulo-mis-empresas">
-            <div
-                class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-            >
-                <h2 id="titulo-mis-empresas" class="font-semibold">
-                    Mis empresas
-                </h2>
-                <div
-                    v-if="empresas.length >= MINIMO_BUSCADOR"
-                    class="relative sm:w-72"
-                >
-                    <Search
-                        class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-tinta-suave"
-                        aria-hidden="true"
-                    />
-                    <Entrada
-                        v-model="busqueda"
-                        type="search"
-                        placeholder="Buscar por nombre o sector"
-                        aria-label="Buscar empresa"
-                        class="pl-9"
-                    />
-                </div>
-            </div>
+        <Boton
+            v-if="empresas.length > 0"
+            variante="secundario"
+            class="self-start"
+            href="/empresas"
+        >
+            <Building2 class="size-4" aria-hidden="true" />
+            Ver mis empresas
+            <ChevronRight class="size-4" aria-hidden="true" />
+        </Boton>
 
-            <p
-                v-if="empresas.length > 0 && empresasFiltradas.length === 0"
-                class="rounded-2xl border border-dashed border-linea-fuerte bg-white px-5 py-8 text-center text-sm text-tinta-suave"
-                role="status"
+        <div
+            v-else
+            class="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-linea-fuerte bg-white px-5 py-12 text-center"
+        >
+            <span
+                class="flex size-11 items-center justify-center rounded-xl bg-marca-suave text-marca"
+                aria-hidden="true"
             >
-                Ninguna empresa coincide con “{{ busqueda.trim() }}”.
+                <Building2 class="size-5" />
+            </span>
+            <p class="font-semibold">Todavía no tienes empresas</p>
+            <p class="max-w-sm text-sm text-tinta-suave">
+                El equipo de NuevasTIC te las vincula. Cuando lo haga, las verás
+                en "Mis empresas".
             </p>
-
-            <ul
-                v-else-if="empresas.length > 0"
-                class="grid gap-3 md:grid-cols-2 2xl:grid-cols-3"
+            <Link
+                href="/mi-perfil"
+                class="mt-1 text-sm font-medium text-marca hover:text-marca-hover"
             >
-                <li
-                    v-for="e in empresasFiltradas"
-                    :key="e.id"
-                    class="flex flex-col rounded-2xl border border-linea bg-white"
-                >
-                    <div class="flex flex-1 items-start gap-4 p-4 sm:p-5">
-                        <AnilloPuntaje
-                            v-if="e.puntaje !== null"
-                            :puntaje="e.puntaje"
-                            :nivel="e.nivel"
-                            :tamano="72"
-                        />
-                        <span
-                            v-else
-                            class="flex size-[72px] shrink-0 items-center justify-center rounded-full border-4 border-dashed border-linea text-xs text-tinta-suave"
-                            aria-hidden="true"
-                            >—</span
-                        >
-                        <div class="min-w-0 flex-1">
-                            <h3 class="truncate font-semibold">
-                                {{ e.nombre }}
-                            </h3>
-                            <p class="truncate text-sm text-tinta-suave">
-                                {{ e.sector ?? 'Sin sector' }}
-                            </p>
-                            <div
-                                class="mt-2 flex flex-wrap items-center gap-1.5 text-xs"
-                            >
-                                <EtiquetaNivel :nivel="e.nivel" />
-                                <span
-                                    v-if="e.variacion !== null"
-                                    :class="
-                                        cn(
-                                            'inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium',
-                                            e.variacion > 0
-                                                ? 'bg-exito-suave text-exito'
-                                                : e.variacion < 0
-                                                  ? 'bg-aviso-suave text-aviso'
-                                                  : 'bg-lienzo text-tinta-suave',
-                                        )
-                                    "
-                                >
-                                    <TrendingUp
-                                        v-if="e.variacion > 0"
-                                        class="size-3"
-                                        aria-hidden="true"
-                                    />
-                                    <TrendingDown
-                                        v-else-if="e.variacion < 0"
-                                        class="size-3"
-                                        aria-hidden="true"
-                                    />
-                                    <Minus
-                                        v-else
-                                        class="size-3"
-                                        aria-hidden="true"
-                                    />
-                                    {{ e.variacion > 0 ? '+' : ''
-                                    }}{{ e.variacion }}
-                                </span>
-                                <span
-                                    class="rounded-full bg-lienzo px-2 py-0.5 text-tinta-suave"
-                                >
-                                    {{
-                                        plural(
-                                            e.mediciones,
-                                            'medición terminada',
-                                            'mediciones terminadas',
-                                        )
-                                    }}
-                                </span>
-                            </div>
-                            <p
-                                v-if="e.pendiente"
-                                class="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-tinta-suave"
-                            >
-                                Medición {{ e.pendiente.numero }}:
-                                <EtiquetaEstado
-                                    :estado="e.pendiente.estado"
-                                    :avance="e.pendiente.avance ?? undefined"
-                                />
-                            </p>
-                            <p
-                                v-if="!e.activa"
-                                class="mt-2 text-xs text-tinta-suave"
-                            >
-                                Cuenta desactivada: sus resultados se conservan.
-                            </p>
-                        </div>
-                    </div>
-                    <div
-                        class="flex flex-wrap gap-2 rounded-b-2xl border-t border-linea bg-lienzo/40 px-4 py-3 sm:px-5"
-                    >
-                        <Boton tamano="sm" :href="rutas.empresas.ver(e.id)">
-                            <Eye class="size-3.5" aria-hidden="true" />
-                            Ver empresa
-                        </Boton>
-                        <Boton
-                            v-if="e.mediciones > 0"
-                            variante="secundario"
-                            tamano="sm"
-                            :href="rutas.historial.empresa(e.id)"
-                        >
-                            <History class="size-3.5" aria-hidden="true" />
-                            Historial
-                        </Boton>
-                    </div>
-                </li>
-            </ul>
-
-            <div
-                v-else
-                class="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-linea-fuerte bg-white px-5 py-12 text-center"
-            >
-                <span
-                    class="flex size-11 items-center justify-center rounded-xl bg-marca-suave text-marca"
-                    aria-hidden="true"
-                >
-                    <Building2 class="size-5" />
-                </span>
-                <p class="font-semibold">Todavía no tienes empresas</p>
-                <p class="max-w-sm text-sm text-tinta-suave">
-                    El equipo de NuevasTIC te las vincula. Cuando lo haga, las
-                    verás aquí.
-                </p>
-                <Link
-                    href="/mi-perfil"
-                    class="mt-1 text-sm font-medium text-marca hover:text-marca-hover"
-                >
-                    Mientras tanto, completa tu perfil
-                </Link>
-            </div>
-        </section>
+                Mientras tanto, completa tu perfil
+            </Link>
+        </div>
     </div>
 </template>

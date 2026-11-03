@@ -87,7 +87,7 @@ const columnaLateral = computed(
     () => props.pendiente !== null || puede('mediciones.asignar'),
 );
 
-/** El consultor vuelve a su inicio (C1): no tiene la lista de Empresas. */
+/** El consultor vuelve a "Mis empresas" (C2): no tiene la lista A3. */
 const esConsultor = computed(() => usePage().props.auth.rol === 'Consultor');
 
 // "Ver:" de la gráfica: el puntaje total o el de una categoría.
@@ -275,11 +275,11 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
         <header class="flex shrink-0 flex-wrap items-end justify-between gap-4">
             <div>
                 <Link
-                    :href="esConsultor ? '/inicio' : rutas.empresas.lista()"
+                    :href="rutas.empresas.lista()"
                     class="mb-2 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-tinta-suave hover:text-marca"
                 >
                     <ArrowLeft class="size-4" aria-hidden="true" />
-                    {{ esConsultor ? 'Inicio' : 'Empresas' }}
+                    {{ esConsultor ? 'Mis empresas' : 'Empresas' }}
                 </Link>
                 <div class="flex items-center gap-4">
                     <span

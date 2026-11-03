@@ -34,14 +34,16 @@ class EmpresasController extends Controller
     public function __construct(private readonly AsignarMedicion $asignar) {}
 
     /** A3 · Lista con búsqueda, filtros y paginado (en la pantalla). */
-    public function index(Request $request): Response|RedirectResponse
+    public function index(Request $request): Response
     {
         /** @var User $yo */
         $yo = $request->user();
 
-        // El consultor ve sus empresas en su inicio (C1); no tiene esta lista.
+        // C2 · El consultor ve sus empresas vinculadas en tarjetas (RN-030).
         if ($yo->esConsultor()) {
-            return to_route('inicio.administrador');
+            return Inertia::render('empresas/MisEmpresas', [
+                'empresas' => DatosEmpresas::lista($yo),
+            ]);
         }
 
         return Inertia::render('empresas/Index', [

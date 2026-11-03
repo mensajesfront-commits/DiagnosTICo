@@ -9788,7 +9788,7 @@ Agregada el 3 de noviembre de 2026: en la presentación se decidió incluir el r
 
 **Definition of Ready:** LISTA
 
-**Vistas del prototipo:** C1 (inicio del Consultor, nueva), A3, A3.1, A3.3, A3.4, A3.5
+**Vistas del prototipo:** C1 (inicio del Consultor, nueva), C2 (Mis empresas, nueva), A3, A3.1, A3.3, A3.4, A3.5
 
 ### Historia de Usuario
 
@@ -9807,7 +9807,7 @@ Agregada el 3 de noviembre de 2026: en la presentación se decidió incluir el r
 
 **Cuando** abro mi inicio,
 
-**Entonces** solo aparecen esas. El Consultor no tiene "Empresas" en el menú: sus empresas están en su inicio (C1), y `/empresas` lo lleva ahí. Con 7 empresas o más, un buscador filtra por nombre o sector.
+**Entonces** solo aparecen esas. El Consultor no tiene "Empresas" (A3) en el menú sino "Mis empresas" (C2, en `/empresas`): una tarjeta por empresa con el último puntaje, el nivel, la variación y la medición pendiente. Con 7 empresas o más, un buscador filtra por nombre o sector. Su inicio (C1) muestra el resumen y "Qué atender".
 
 #### CA-002 — Otra empresa no
 

@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Agregado (C2 · Mis empresas del Consultor, 3 de noviembre)
+
+- **"Mis empresas"** en el menú del Consultor (`empresas/MisEmpresas.vue`, en `/empresas`): las tarjetas de sus empresas, con el buscador desde 7 empresas. Reemplaza la redirección a su inicio.
+- **C1 · Inicio del Consultor:** queda con el resumen, "Qué atender" (o "Todo al día" si no hay avisos) y "Ver mis empresas".
+- La ficha (A3.1) vuelve con "← Mis empresas".
+
 ### Cambiado (A3.1 / A3.4 / E8 · ancho de la ficha y "Ver:" de la evolución, 3 de noviembre)
 
 - **A3.1:** la columna de la derecha (medición pendiente y Asignar) solo aparece si tiene algo. Al consultor sin medición pendiente el historial le ocupa todo el ancho.
