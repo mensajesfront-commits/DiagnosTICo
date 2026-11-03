@@ -85,6 +85,23 @@ it('en /empresas ve "Mis empresas" (C2) solo con las suyas', function () {
             ->missing('sectores'));
 });
 
+it('cada tarjeta de Mis empresas trae la evolución, la última medición y la fecha límite', function () {
+    medicionDelConsultor($this, $this->suya, 2, ['estado' => 'en_curso', 'fecha_limite' => now()->subDay()->toDateString()]);
+
+    $this->actingAs($this->consultor)
+        ->get(route('empresas.index'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->where('empresas.0.evolucion', [$this->medicionSuya->resultado->puntaje_total])
+            ->where('empresas.0.ultima.id', $this->medicionSuya->id)
+            ->where('empresas.0.vence', now()->subDay()->toDateString())
+            ->where('empresas.0.vencida', true));
+
+    // El Administrador no recibe esos datos en A3.
+    $this->actingAs($this->admin)
+        ->get(route('empresas.index'))
+        ->assertInertia(fn (Assert $p) => $p->missing('empresas.0.evolucion'));
+});
+
 it('ve la ficha, el historial y los resultados de su empresa', function () {
     $this->actingAs($this->consultor);
 

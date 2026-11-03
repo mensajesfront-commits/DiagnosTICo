@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (C2 · diseño de Mis empresas, 3 de noviembre)
+
+- **Filtros** "Todas · Con medición pendiente · Bajaron · Sin resultado", con su cantidad (solo los que tienen empresas), y **orden** por nombre, puntaje más alto, más bajo o "Bajaron primero". El buscador sigue desde 7 empresas.
+- **Tarjeta nueva:** franja del color del nivel, variación en puntos, línea de evolución, última medición con su fecha, la medición pendiente con su fecha límite (en rojo si venció), "Desactivada" si aplica y el enlace "Último resultado".
+- `DatosEmpresas::lista()` le agrega al consultor `evolucion`, `ultima`, `vence` y `vencida`; A3 no cambia.
+
 ### Agregado (C2 · Mis empresas del Consultor, 3 de noviembre)
 
 - **"Mis empresas"** en el menú del Consultor (`empresas/MisEmpresas.vue`, en `/empresas`): las tarjetas de sus empresas, con el buscador desde 7 empresas. Reemplaza la redirección a su inicio.

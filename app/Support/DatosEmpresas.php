@@ -53,6 +53,7 @@ class DatosEmpresas
         $solicitudes = SolicitudMedicion::abiertasDe($empresas->modelKeys());
         Plazos::precargar($empresas->modelKeys());
         $lista = [];
+        $consultor = $para?->esConsultor() ?? false;
 
         foreach ($empresas as $empresa) {
             [$ultimo, $variacion] = self::ultimoResultado($empresa->mediciones);
@@ -72,6 +73,9 @@ class DatosEmpresas
                     'solicitud' => $solicitudes[$empresa->id] ?? null,
                 ] : null,
                 'activa' => $empresa->activa,
+                // C2 · Mis empresas del Consultor: la línea de evolución, el
+                // último resultado y la fecha límite de la pendiente.
+                ...($consultor ? self::extrasConsultor($empresa, $ultimo, $pendiente) : []),
             ];
         }
 
@@ -309,6 +313,31 @@ class DatosEmpresas
             'numero' => $m->numero,
             'estado' => $estado,
             'avance' => $estado !== 'no_iniciada' && $m->version ? DatosInicio::avance($m->version->contenido, $refs) : null,
+        ];
+    }
+
+    /**
+     * C2 · Lo que la tarjeta del consultor muestra además de la fila de A3.
+     *
+     * @return array{evolucion: list<int>, ultima: array{id: int, numero: int, fecha: string}|null, vence: string|null, vencida: bool}
+     */
+    private static function extrasConsultor(Empresa $empresa, ?Medicion $ultimo, ?Medicion $pendiente): array
+    {
+        $evolucion = array_values($empresa->mediciones
+            ->filter(fn (Medicion $m) => $m->estado === 'terminada' && $m->resultado !== null)
+            ->sortBy('numero')
+            ->map(fn (Medicion $m) => (int) $m->resultado?->puntaje_total)
+            ->all());
+
+        return [
+            'evolucion' => $evolucion,
+            'ultima' => $ultimo?->resultado ? [
+                'id' => $ultimo->id,
+                'numero' => $ultimo->numero,
+                'fecha' => $ultimo->resultado->publicado_en->toDateString(),
+            ] : null,
+            'vence' => $pendiente?->fecha_limite?->toDateString(),
+            'vencida' => $pendiente !== null && Plazos::vencio($pendiente),
         ];
     }
 
