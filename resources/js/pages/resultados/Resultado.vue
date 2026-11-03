@@ -737,14 +737,58 @@ const porcentaje = (n: number) =>
                             </button>
                         </li>
                     </ul>
-                    <RadarCategorias
-                        v-else
-                        class="mt-2"
-                        alto="h-80"
-                        :etiquetas="radar.etiquetas"
-                        :actual="radar.actual"
-                        :anterior="radar.anterior"
-                    />
+                    <!-- Mapa: radar numerado y, al lado, qué es cada número -->
+                    <div v-else class="mt-2 flex flex-col gap-3">
+                        <RadarCategorias
+                            alto="h-72"
+                            :etiquetas="radar.etiquetas"
+                            :actual="radar.actual"
+                            :anterior="radar.anterior"
+                            :colores="
+                                resultado.categorias.map(
+                                    (c) => niveles[c.nivel].color,
+                                )
+                            "
+                        />
+                        <ol
+                            class="grid gap-x-4 gap-y-0.5 border-t border-linea pt-3 sm:grid-cols-2"
+                        >
+                            <li
+                                v-for="(c, i) in resultado.categorias"
+                                :key="c.ref"
+                            >
+                                <button
+                                    type="button"
+                                    class="flex min-h-11 w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-lienzo"
+                                    @click="abrirCategoria(c.ref)"
+                                >
+                                    <span
+                                        class="flex size-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold text-white"
+                                        :style="{
+                                            backgroundColor:
+                                                niveles[c.nivel].color,
+                                        }"
+                                        aria-hidden="true"
+                                        >{{ i + 1 }}</span
+                                    >
+                                    <span
+                                        class="line-clamp-2 min-w-0 flex-1 leading-tight font-medium"
+                                        :title="c.nombre"
+                                        >{{ c.nombre }}</span
+                                    >
+                                    <Variacion
+                                        v-if="c.variacion !== null"
+                                        :valor="c.variacion"
+                                        class="shrink-0 text-xs"
+                                    />
+                                    <span
+                                        class="w-7 shrink-0 text-right font-mono font-semibold"
+                                        >{{ c.puntaje }}</span
+                                    >
+                                </button>
+                            </li>
+                        </ol>
+                    </div>
                     <p class="mt-auto pt-3 text-xs text-tinta-suave">
                         Toca una categoría para ver su análisis completo.
                     </p>

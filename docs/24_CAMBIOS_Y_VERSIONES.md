@@ -70,6 +70,13 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E6 / A3.3 · "Mapa" de las categorías, 3 de noviembre)
+
+- **Vértices numerados** en un círculo del color del nivel de cada categoría, en vez de los nombres largos que se cortaban (`RadarCategorias` con `colores`; sin ellos se ve como antes).
+- **Anillos con significado:** marcan dónde empieza cada nivel (30, 60, 80 y 100) con un tono de su color, y la leyenda lo dice.
+- **Lista debajo** con el número, el nombre completo (hasta dos líneas), la variación y el puntaje; al tocar una categoría se abre su análisis, igual que en "Barras".
+- Al pasar sobre un punto, el globo dice el nombre de la categoría.
+
 ### Cambiado (A3.4 · historial visto por el Consultor y el Administrador, 3 de noviembre)
 
 - **"Por categoría"** junto a "Mediciones" en la tarjeta de la derecha: cada categoría de su primera a su última medición ("M1 30 → M4 95"), con el cambio en puntos y una barra del color del nivel, de la que más bajó a la que más subió. Al tocar una, la gráfica muestra esa categoría. Lo calcula `DatosHistorial::cambiosPorCategoria()`; solo en la vista interna.
