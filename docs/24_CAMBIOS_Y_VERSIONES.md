@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A6 · Mi perfil del Consultor, 3 de noviembre)
+
+- **"Empresas que acompañas"** en la columna izquierda: cuántas tiene y las primeras 5 con enlace a su ficha; "Ver las N en Mis empresas" si son más.
+- **Sin "Avisos por correo":** los tres avisos internos (empresa envía, falla la IA, resumen semanal) solo se le envían al Administrador, así que al consultor sus interruptores no hacían nada. `OpcionesPerfil::avisosPara()` no le da ninguno. **[FUNCIONALIDAD POR DEFINIR]** Correos propios del consultor (por ejemplo, "resultado nuevo de una empresa que acompaño"); por ahora lo ve en "Qué atender".
+- Chip "Externo" en vez de "NuevasTIC" y, en Rol, "Lo asigna el equipo de NuevasTIC."
+
 ### Cambiado (A3.5 / E9 · Respuestas, 3 de noviembre)
 
 - **Puntaje de cada pregunta con el color de su nivel** (rojo, naranja, azul o verde). El nivel lo agrega el servidor al leer (`DatosResultado::conNivelPorPregunta()`); lo guardado no cambia (RN-023).

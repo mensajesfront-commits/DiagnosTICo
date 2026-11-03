@@ -28,6 +28,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import {
     Bell,
     Building2,
+    ChevronRight,
     Crown,
     ImageUp,
     KeyRound,
@@ -55,6 +56,7 @@ import { usePermisos } from '@/composables/usePermisos';
 import SelectorUbicacion from '@/components/ubicacion/SelectorUbicacion.vue';
 import { haceCuanto, mesYAnio, momento } from '@/lib/fechas';
 import { estiloRol } from '@/lib/roles';
+import { rutas } from '@/lib/rutas';
 import { iniciales } from '@/lib/usuarios';
 import { cn } from '@/lib/utils';
 import { logout } from '@/routes';
@@ -102,6 +104,8 @@ const props = defineProps<{
     usuario: Usuario;
     rol: string | null;
     empresa: Empresa | null;
+    /** Consultor: las empresas que acompaña (RN-030); null en otros roles. */
+    acompanadas: { id: number; nombre: string }[] | null;
     /** Solo la cuenta principal de la empresa cambia sus datos (RN-025). */
     editaEmpresa: boolean;
     /**
@@ -135,6 +139,10 @@ const { puede } = usePermisos();
 const editaPerfil = computed(() => puede('perfil.editar'));
 const cambiaContrasena = computed(() => puede('contrasena.cambiar'));
 const esColaborador = computed(() => props.rol === 'Colaborador');
+const esConsultor = computed(() => props.rol === 'Consultor');
+
+/** Cuántas empresas se listan antes de "Ver todas". */
+const ACOMPANADAS_VISIBLES = 5;
 
 const datosIniciales = () => ({
     name: props.usuario.name,
@@ -363,7 +371,9 @@ function cerrarSesion(): void {
                                 {{
                                     esEmpresa
                                         ? (empresa?.sector ?? 'Sin sector')
-                                        : 'NuevasTIC'
+                                        : esConsultor
+                                          ? 'Externo'
+                                          : 'NuevasTIC'
                                 }}
                             </span>
                         </div>
@@ -475,6 +485,66 @@ function cerrarSesion(): void {
                                 : 'Tu rol no permite cambiarla desde aquí.'
                         }}
                     </p>
+                </section>
+
+                <!-- Consultor: las empresas que acompaña -->
+                <section
+                    v-if="acompanadas"
+                    class="rounded-2xl border border-linea bg-white p-5 text-sm"
+                    aria-labelledby="titulo-acompanadas"
+                >
+                    <div class="flex items-start gap-3">
+                        <span
+                            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-marca-suave text-marca"
+                            aria-hidden="true"
+                        >
+                            <Building2 class="size-4.5" />
+                        </span>
+                        <div class="min-w-0">
+                            <h2 id="titulo-acompanadas" class="font-semibold">
+                                Empresas que acompañas
+                            </h2>
+                            <p class="text-xs text-tinta-suave">
+                                {{
+                                    acompanadas.length === 0
+                                        ? 'Todavía ninguna: te las vincula NuevasTIC.'
+                                        : acompanadas.length === 1
+                                          ? '1 empresa vinculada'
+                                          : `${acompanadas.length} empresas vinculadas`
+                                }}
+                            </p>
+                        </div>
+                    </div>
+                    <ul
+                        v-if="acompanadas.length > 0"
+                        class="mt-3 flex flex-col divide-y divide-linea"
+                    >
+                        <li
+                            v-for="e in acompanadas.slice(
+                                0,
+                                ACOMPANADAS_VISIBLES,
+                            )"
+                            :key="e.id"
+                        >
+                            <Link
+                                :href="rutas.empresas.ver(e.id)"
+                                class="group flex items-center justify-between gap-2 py-2 hover:text-marca"
+                            >
+                                <span class="truncate">{{ e.nombre }}</span>
+                                <ChevronRight
+                                    class="size-4 shrink-0 text-tinta-suave group-hover:text-marca"
+                                    aria-hidden="true"
+                                />
+                            </Link>
+                        </li>
+                    </ul>
+                    <Link
+                        v-if="acompanadas.length > ACOMPANADAS_VISIBLES"
+                        href="/empresas"
+                        class="mt-2 inline-flex text-xs font-medium text-marca hover:text-marca-hover"
+                    >
+                        Ver las {{ acompanadas.length }} en Mis empresas
+                    </Link>
                 </section>
 
                 <section
@@ -709,7 +779,11 @@ function cerrarSesion(): void {
                                     <Campo
                                         etiqueta="Rol"
                                         para="perfil-rol"
-                                        ayuda="Solo otro administrador puede cambiarlo, desde Usuarios y roles."
+                                        :ayuda="
+                                            esConsultor
+                                                ? 'Lo asigna el equipo de NuevasTIC.'
+                                                : 'Solo otro administrador puede cambiarlo, desde Usuarios y roles.'
+                                        "
                                     >
                                         <div class="relative">
                                             <Entrada
@@ -913,6 +987,7 @@ function cerrarSesion(): void {
                         </section>
 
                         <section
+                            v-if="Object.keys(opciones.avisos).length > 0"
                             class="flex flex-col gap-3 border-t border-linea p-4 sm:p-6"
                         >
                             <div class="flex items-start gap-3">

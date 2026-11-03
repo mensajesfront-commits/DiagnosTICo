@@ -61,6 +61,11 @@ class PerfilController extends Controller
                 'telefono_pendiente' => $usuario->telefono_pendiente,
             ],
             'rol' => $rol,
+            // A6 · El Consultor ve las empresas que acompaña (RN-030).
+            'acompanadas' => $usuario->esConsultor()
+                ? $usuario->empresasAsesoradas()->orderBy('nombre')->get(['empresas.id', 'empresas.nombre'])
+                    ->map(fn ($e) => ['id' => $e->id, 'nombre' => $e->nombre])->values()->all()
+                : null,
             // Solo la cuenta principal del Administrador se elimina a sí misma.
             'principal' => $usuario->administrador_principal ? [
                 'sucesores' => self::sucesores($usuario)->map(fn (User $u) => ['id' => $u->id, 'nombre' => $u->name, 'correo' => $u->email])->values()->all(),

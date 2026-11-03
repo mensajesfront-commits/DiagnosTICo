@@ -169,6 +169,22 @@ it('en las respuestas cada pregunta trae su nivel según el puntaje', function (
     expect($this->medicionSuya->resultado->fresh()->por_categoria[0]['preguntas'][0])->not->toHaveKey('nivel');
 });
 
+it('en Mi perfil ve las empresas que acompaña y no tiene avisos por correo', function () {
+    $this->actingAs($this->consultor)
+        ->get(route('profile.edit'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $p) => $p
+            ->component('perfil/MiPerfil')
+            ->has('acompanadas', 1)
+            ->where('acompanadas.0.nombre', 'La Esquina')
+            ->where('opciones.avisos', []));
+
+    // Otros roles no reciben la lista.
+    $this->actingAs($this->admin)
+        ->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $p) => $p->where('acompanadas', null));
+});
+
 it('no ve la ficha, el historial ni los resultados de otra empresa', function () {
     $this->actingAs($this->consultor);
 

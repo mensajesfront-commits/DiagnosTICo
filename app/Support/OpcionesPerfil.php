@@ -117,6 +117,13 @@ class OpcionesPerfil
      */
     public static function avisosPara(User $usuario): array
     {
+        // El Consultor no recibe correos de avisos: esos van al Administrador
+        // o a la empresa. Lo nuevo lo ve en "Qué atender" (C1).
+        // [FUNCIONALIDAD POR DEFINIR] Correos propios del Consultor.
+        if ($usuario->esConsultor()) {
+            return [];
+        }
+
         return $usuario->empresa_id === null ? self::AVISOS_INTERNOS : self::AVISOS_EMPRESA;
     }
 
