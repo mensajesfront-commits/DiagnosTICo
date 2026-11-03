@@ -19,11 +19,22 @@
  * opciones, opciones grandes con borde (también las de "marca varias") y la
  * marca "Respondida" en cada pregunta.
  *
+ * Diseño de la página: a la izquierda, un anillo con el avance total y las
+ * categorías con su barra; arriba de las preguntas, una tarjeta con la
+ * categoría y su avance; abajo, anterior y siguiente con ícono.
+ *
  * La opción "Otro" que pide escribir cuál (`con_texto`): al elegirla aparece
  * el campo "¿Cuál?" (máx. 255) y se guarda al dejar de escribir. La IA lee
  * "Otro: lo que escribió".
  */
 import { Head, Link } from '@inertiajs/vue3';
+import {
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    ClipboardCheck,
+    Info,
+} from '@lucide/vue';
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import Boton from '@/components/base/Boton.vue';
@@ -230,6 +241,26 @@ const enEsta = computed(
     () => categoria.value.preguntas.filter(respondida).length,
 );
 
+const obligatoriasEnEsta = computed(
+    () => categoria.value.preguntas.filter((p) => p.obligatoria).length,
+);
+
+/** Anillo del avance total. */
+const RADIO = 30;
+const CIRCUNFERENCIA = 2 * Math.PI * RADIO;
+
+const completas = computed(
+    () =>
+        props.categorias.filter((_, i) => estadoCategoria(i) === 'completa')
+            .length,
+);
+
+const avanceDe = (i: number) =>
+    Math.round(
+        ((avance.value.categorias[i]?.respondidas ?? 0) * 100) /
+            Math.max(1, props.categorias[i].preguntas.length),
+    );
+
 /** Opción grande con borde, fácil de leer y de tocar. */
 const opcionClase =
     'flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border px-5 py-3 text-base leading-snug has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-marca/40';
@@ -257,107 +288,263 @@ const pistas = {
         :guardando="guardando > 0"
     />
 
-    <div class="grid min-h-[calc(100dvh-57px)] lg:grid-cols-[280px_1fr]">
+    <div class="grid min-h-[calc(100dvh-61px)] lg:grid-cols-[280px_1fr]">
         <aside
-            class="border-b border-linea bg-lienzo px-4 py-5 text-sm lg:sticky lg:top-[57px] lg:h-[calc(100dvh-57px)] lg:overflow-y-auto lg:border-r lg:border-b-0"
+            class="flex flex-col gap-4 border-b border-linea bg-lienzo px-4 py-5 text-sm lg:sticky lg:top-[61px] lg:h-[calc(100dvh-61px)] lg:overflow-y-auto lg:border-r lg:border-b-0"
         >
-            <p class="px-2 text-xs text-tinta-suave">
-                Puedes moverte entre categorías cuando quieras.
-                <Link
-                    :href="rutas.responder.revisar(medicion.id)"
-                    class="text-marca underline"
-                >
-                    Revisar antes de enviar
-                </Link>
-            </p>
-            <ol class="mt-3 flex flex-col gap-0.5">
-                <li v-for="(c, i) in categorias" :key="c.ref">
-                    <button
-                        type="button"
-                        :aria-current="i === actual ? 'step' : undefined"
-                        :class="
-                            cn(
-                                'flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left',
-                                i === actual
-                                    ? 'bg-marca-suave font-medium'
-                                    : 'hover:bg-white',
-                            )
-                        "
-                        @click="actual = i"
+            <div
+                class="hidden items-center gap-3 rounded-2xl border border-linea bg-white p-3 lg:flex"
+            >
+                <div class="relative size-16 shrink-0">
+                    <svg
+                        viewBox="0 0 70 70"
+                        class="size-16 -rotate-90"
+                        aria-hidden="true"
                     >
-                        <span
+                        <circle
+                            cx="35"
+                            cy="35"
+                            :r="RADIO"
+                            fill="none"
+                            stroke-width="7"
+                            class="stroke-lienzo-oscuro"
+                        />
+                        <circle
+                            cx="35"
+                            cy="35"
+                            :r="RADIO"
+                            fill="none"
+                            stroke-width="7"
+                            stroke-linecap="round"
+                            class="stroke-marca transition-all duration-500"
+                            :stroke-dasharray="CIRCUNFERENCIA"
+                            :stroke-dashoffset="
+                                CIRCUNFERENCIA * (1 - avance.porcentaje / 100)
+                            "
+                        />
+                    </svg>
+                    <span
+                        class="absolute inset-0 flex items-center justify-center font-mono text-sm font-semibold"
+                    >
+                        {{ avance.porcentaje }}%
+                    </span>
+                </div>
+                <div class="min-w-0">
+                    <p class="font-semibold">Tu avance</p>
+                    <p class="text-xs text-tinta-suave">
+                        {{ completas }} de {{ categorias.length }}
+                        {{
+                            categorias.length === 1
+                                ? 'categoría completa'
+                                : 'categorías completas'
+                        }}
+                    </p>
+                </div>
+            </div>
+
+            <div>
+                <p
+                    class="px-2 text-xs font-semibold tracking-wide text-tinta-suave uppercase"
+                >
+                    Categorías
+                </p>
+                <ol class="mt-2 flex flex-col gap-1">
+                    <li v-for="(c, i) in categorias" :key="c.ref">
+                        <button
+                            type="button"
+                            :aria-current="i === actual ? 'step' : undefined"
                             :class="
                                 cn(
-                                    'flex size-6 shrink-0 items-center justify-center rounded-full text-xs',
+                                    'flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors lg:py-2.5',
                                     i === actual
                                         ? 'bg-marca text-white'
-                                        : estadoCategoria(i) === 'completa'
-                                          ? 'text-exito'
-                                          : estadoCategoria(i) === 'media'
-                                            ? 'bg-alerta-suave text-alerta'
-                                            : 'border border-linea-fuerte text-tinta-suave',
+                                        : 'hover:bg-white',
                                 )
                             "
-                            aria-hidden="true"
+                            @click="actual = i"
                         >
-                            {{
-                                i === actual
-                                    ? i + 1
-                                    : estadoCategoria(i) === 'completa'
-                                      ? '✓'
-                                      : estadoCategoria(i) === 'media'
-                                        ? '●'
-                                        : i + 1
-                            }}
-                        </span>
-                        <span class="flex-1">{{ c.nombre }}</span>
-                        <span
-                            v-if="
-                                estadoCategoria(i) !== 'completa' ||
-                                i === actual
-                            "
-                            :class="
-                                cn(
-                                    'font-mono text-xs',
-                                    estadoCategoria(i) === 'media' &&
+                            <span
+                                :class="
+                                    cn(
+                                        'mt-px flex size-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold',
+                                        i === actual
+                                            ? 'bg-white/20 text-white'
+                                            : estadoCategoria(i) === 'completa'
+                                              ? 'bg-exito text-white'
+                                              : estadoCategoria(i) === 'media'
+                                                ? 'bg-alerta-suave text-alerta'
+                                                : 'border border-linea-fuerte bg-white text-tinta-suave',
+                                    )
+                                "
+                                aria-hidden="true"
+                            >
+                                <Check
+                                    v-if="
+                                        estadoCategoria(i) === 'completa' &&
                                         i !== actual
-                                        ? 'text-alerta'
-                                        : 'text-tinta-suave',
-                                )
-                            "
-                        >
-                            {{ avance.categorias[i]?.respondidas ?? 0 }}/{{
-                                c.preguntas.length
-                            }}
-                        </span>
-                    </button>
-                </li>
-            </ol>
-            <p
-                class="mt-4 border-t border-linea px-2 pt-3 text-xs text-tinta-suave"
+                                    "
+                                    class="size-3.5"
+                                />
+                                <template v-else>{{ i + 1 }}</template>
+                            </span>
+                            <span class="min-w-0 flex-1">
+                                <span
+                                    class="flex items-start justify-between gap-2"
+                                >
+                                    <span
+                                        :class="i === actual && 'font-medium'"
+                                    >
+                                        {{ c.nombre }}
+                                    </span>
+                                    <span
+                                        :class="
+                                            cn(
+                                                'shrink-0 font-mono text-xs',
+                                                i === actual
+                                                    ? 'text-white/80'
+                                                    : estadoCategoria(i) ===
+                                                        'media'
+                                                      ? 'text-alerta'
+                                                      : 'text-tinta-suave',
+                                            )
+                                        "
+                                    >
+                                        {{
+                                            avance.categorias[i]?.respondidas ??
+                                            0
+                                        }}/{{ c.preguntas.length }}
+                                    </span>
+                                </span>
+                                <span
+                                    :class="
+                                        cn(
+                                            'mt-1.5 block h-1 rounded-full',
+                                            i === actual
+                                                ? 'bg-white/25'
+                                                : 'bg-lienzo-oscuro',
+                                        )
+                                    "
+                                    aria-hidden="true"
+                                >
+                                    <span
+                                        :class="
+                                            cn(
+                                                'block h-1 rounded-full transition-all',
+                                                i === actual
+                                                    ? 'bg-white'
+                                                    : estadoCategoria(i) ===
+                                                        'completa'
+                                                      ? 'bg-exito'
+                                                      : 'bg-alerta',
+                                            )
+                                        "
+                                        :style="{ width: `${avanceDe(i)}%` }"
+                                    />
+                                </span>
+                                <span class="sr-only">
+                                    {{
+                                        estadoCategoria(i) === 'completa'
+                                            ? 'completa'
+                                            : estadoCategoria(i) === 'media'
+                                              ? 'a medias'
+                                              : 'por empezar'
+                                    }}
+                                </span>
+                            </span>
+                        </button>
+                    </li>
+                </ol>
+            </div>
+
+            <Link
+                :href="rutas.responder.revisar(medicion.id)"
+                class="mt-auto flex items-center justify-center gap-1.5 rounded-xl border border-linea bg-white px-3 py-2.5 text-sm font-medium text-marca transition hover:border-marca"
             >
-                <span class="text-exito">✓</span> Completa ·
-                <span class="text-alerta">●</span> A medias · respondidas /
-                total
+                <ClipboardCheck class="size-4" aria-hidden="true" />
+                Revisar antes de enviar
+            </Link>
+            <p class="hidden px-2 text-xs text-tinta-suave lg:block">
+                Puedes moverte entre categorías cuando quieras. Todo se guarda
+                solo.
             </p>
         </aside>
 
         <div class="flex min-w-0 flex-col">
             <main id="cuestionario" class="flex-1 px-4 py-8 sm:px-8">
                 <div class="mx-auto flex max-w-5xl flex-col gap-5">
-                    <div>
-                        <p class="font-mono text-sm text-tinta-suave">
-                            CATEGORÍA {{ actual + 1 }} / {{ categorias.length }}
+                    <section
+                        class="rounded-2xl border border-linea bg-linear-to-br from-marca-suave/70 to-white px-5 py-5 sm:px-8"
+                    >
+                        <div
+                            class="flex flex-wrap items-end justify-between gap-4"
+                        >
+                            <div class="min-w-0">
+                                <p
+                                    class="font-mono text-sm font-semibold tracking-wide text-marca"
+                                >
+                                    CATEGORÍA {{ actual + 1 }} DE
+                                    {{ categorias.length }}
+                                </p>
+                                <h1
+                                    class="text-3xl leading-tight font-semibold"
+                                >
+                                    {{ categoria.nombre }}
+                                </h1>
+                                <p class="mt-1 text-sm text-tinta-suave">
+                                    {{ categoria.preguntas.length }}
+                                    {{
+                                        categoria.preguntas.length === 1
+                                            ? 'pregunta'
+                                            : 'preguntas'
+                                    }}
+                                    · {{ obligatoriasEnEsta }}
+                                    {{
+                                        obligatoriasEnEsta === 1
+                                            ? 'obligatoria'
+                                            : 'obligatorias'
+                                    }}
+                                </p>
+                            </div>
+                            <div class="w-full sm:w-56">
+                                <p
+                                    class="flex justify-between text-sm text-tinta-suave"
+                                >
+                                    Respondidas
+                                    <span
+                                        class="font-mono font-semibold text-tinta"
+                                    >
+                                        {{ enEsta }}/{{
+                                            categoria.preguntas.length
+                                        }}
+                                    </span>
+                                </p>
+                                <div
+                                    class="mt-1.5 h-2 rounded-full bg-white"
+                                    aria-hidden="true"
+                                >
+                                    <div
+                                        class="h-2 rounded-full bg-marca transition-all duration-500"
+                                        :style="{
+                                            width: `${(enEsta * 100) / Math.max(1, categoria.preguntas.length)}%`,
+                                        }"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <p
+                            class="mt-4 flex items-start gap-2 rounded-xl bg-white/80 px-3 py-2.5 text-base"
+                        >
+                            <Info
+                                class="mt-1 size-4 shrink-0 text-marca"
+                                aria-hidden="true"
+                            />
+                            <span>
+                                No hay respuestas buenas o malas. Las preguntas
+                                marcadas como <strong>Obligatoria</strong> se
+                                necesitan para enviar.
+                            </span>
                         </p>
-                        <h1 class="text-3xl font-semibold">
-                            {{ categoria.nombre }}
-                        </h1>
-                        <p class="mt-2 text-base text-tinta-suave">
-                            No hay respuestas buenas o malas. Las preguntas
-                            marcadas como <strong>Obligatoria</strong> se
-                            necesitan para enviar.
-                        </p>
-                    </div>
+                    </section>
 
                     <fieldset
                         v-for="(p, i) in categoria.preguntas"
@@ -527,21 +714,54 @@ const pistas = {
             </main>
 
             <footer
-                class="sticky bottom-0 flex items-center justify-between gap-4 border-t border-linea bg-white px-6 py-3"
+                class="sticky bottom-0 flex items-center justify-between gap-4 border-t border-linea bg-white/95 px-4 py-3 backdrop-blur sm:px-6"
             >
-                <Boton v-if="anterior" variante="secundario" @click="actual--">
-                    ← {{ anterior.nombre }}
+                <Boton
+                    v-if="anterior"
+                    variante="secundario"
+                    class="min-w-0 gap-1"
+                    @click="actual--"
+                >
+                    <ChevronLeft class="size-4 shrink-0" aria-hidden="true" />
+                    <span class="truncate">{{ anterior.nombre }}</span>
                 </Boton>
                 <span v-else />
-                <span class="hidden text-sm text-tinta-suave sm:inline">
-                    {{ enEsta }} de {{ categoria.preguntas.length }} preguntas
-                    respondidas en esta categoría
+                <span
+                    class="hidden items-center gap-1.5 text-sm text-tinta-suave md:inline-flex"
+                >
+                    <span
+                        v-for="(c, i) in categorias"
+                        :key="c.ref"
+                        :class="
+                            cn(
+                                'h-1.5 rounded-full transition-all',
+                                i === actual
+                                    ? 'w-6 bg-marca'
+                                    : estadoCategoria(i) === 'completa'
+                                      ? 'w-1.5 bg-exito'
+                                      : 'w-1.5 bg-linea-fuerte',
+                            )
+                        "
+                        aria-hidden="true"
+                    />
+                    <span class="ml-2">
+                        {{ enEsta }} de {{ categoria.preguntas.length }}
+                        respondidas aquí
+                    </span>
                 </span>
-                <Boton v-if="siguiente" @click="actual++">
-                    Siguiente: {{ siguiente.nombre }} →
+                <Boton v-if="siguiente" class="min-w-0 gap-1" @click="actual++">
+                    <span class="truncate">
+                        Siguiente: {{ siguiente.nombre }}
+                    </span>
+                    <ChevronRight class="size-4 shrink-0" aria-hidden="true" />
                 </Boton>
-                <Boton v-else :href="rutas.responder.revisar(medicion.id)">
-                    Revisar antes de enviar →
+                <Boton
+                    v-else
+                    class="gap-1.5"
+                    :href="rutas.responder.revisar(medicion.id)"
+                >
+                    <ClipboardCheck class="size-4" aria-hidden="true" />
+                    Revisar antes de enviar
                 </Boton>
             </footer>
         </div>

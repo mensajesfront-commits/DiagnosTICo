@@ -70,6 +70,25 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E2 · diseño de Responder, 3 de noviembre)
+
+- **Barra de arriba (también E3 y E4):**
+  - el avance va en una barra más gruesa con el porcentaje en una píldora;
+  - «Guardado 10:42» va en una píldora verde con ícono (en el celular solo el ícono y la hora);
+  - «Guardar y salir» es un botón con ícono.
+  - Mide 61 px de alto (antes 57) y la columna de categorías se ajusta a esa altura.
+- **Columna de categorías:**
+  - un anillo con el avance total y «N de M categorías completas» (solo en pantallas grandes);
+  - cada categoría con su número o ✓, su conteo y una barra de avance (verde si está completa, ámbar si va a medias);
+  - la elegida va en azul;
+  - «Revisar antes de enviar» es un botón con ícono al final.
+- **Cabecera de la categoría:** una tarjeta con «Categoría N de M», el nombre, cuántas preguntas y cuántas obligatorias tiene, su barra de respondidas y el aviso «No hay respuestas buenas o malas» con ícono.
+- **Barra de abajo:**
+  - anterior y siguiente con flechas;
+  - en el medio, un punto por categoría (el actual más largo, en verde las completas) y cuántas van respondidas;
+  - en la última categoría, «Revisar antes de enviar» con ícono.
+- Las preguntas y las opciones no cambian: ya tenían el diseño de lectura fácil (letra grande, opciones con borde).
+
 ### Cambiado (A2.6 · diseño del resultado de ejemplo, 3 de noviembre)
 
 - **Franja «Datos de muestra»** arriba de las pestañas, con borde punteado ámbar y un ícono:

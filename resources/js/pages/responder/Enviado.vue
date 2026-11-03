@@ -183,7 +183,7 @@ function reintentar(): void {
     <BarraResponder :con-salir="false" />
 
     <main
-        class="flex min-h-[calc(100dvh-57px)] items-center justify-center px-4 py-8 sm:px-8"
+        class="flex min-h-[calc(100dvh-61px)] items-center justify-center px-4 py-8 sm:px-8"
     >
         <section
             class="w-full max-w-3xl overflow-hidden rounded-2xl border border-linea bg-white shadow-sm"
