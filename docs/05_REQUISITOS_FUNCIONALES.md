@@ -9805,9 +9805,9 @@ Agregada el 3 de noviembre de 2026: en la presentación se decidió incluir el r
 
 **Dado** que tengo empresas vinculadas,
 
-**Cuando** abro mi inicio o "Empresas",
+**Cuando** abro mi inicio,
 
-**Entonces** solo aparecen esas.
+**Entonces** solo aparecen esas. El Consultor no tiene "Empresas" en el menú: sus empresas están en su inicio (C1), y `/empresas` lo lleva ahí. Con 7 empresas o más, un buscador filtra por nombre o sector.
 
 #### CA-002 — Otra empresa no
 
@@ -9832,6 +9832,21 @@ Agregada el 3 de noviembre de 2026: en la presentación se decidió incluir el r
 **Cuando** entro,
 
 **Entonces** veo un aviso de que el equipo de NuevasTIC me las vincula.
+
+#### CA-005 — Qué atender
+
+**Dado** que tengo empresas vinculadas,
+
+**Cuando** abro mi inicio,
+
+**Entonces** arriba de "Mis empresas" veo "Qué atender", de lo más urgente a lo menos:
+
+1. una medición vencida sin enviar;
+2. un último resultado por debajo del anterior (RN-020), con los puntos que bajó;
+3. una medición sin empezar asignada hace 7 días o más;
+4. un resultado publicado en los últimos 7 días.
+
+Cada aviso abre el resultado ("bajó" y "nuevo") o la ficha (lo pendiente). Se ven 4 y "Ver los N avisos" muestra el resto. Si no hay avisos, la franja no aparece. No se usa "desde tu último acceso" porque el último acceso se actualiza al entrar.
 
 ### Reglas de negocio
 

@@ -70,6 +70,15 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Agregado (C1 · "Qué atender" y sin "Empresas" para el Consultor, 3 de noviembre)
+
+- **"Qué atender"** en el inicio del Consultor (HU-086 CA-005), calculado en `App\Support\DatosInicioConsultor::avisos()`:
+  - orden: medición vencida, puntaje que bajó, sin empezar hace 7 días o más y resultado nuevo (últimos 7 días);
+  - cada aviso abre el resultado o la ficha; se ven 4 y "Ver los N avisos" muestra el resto.
+- **Sin "Empresas" en el menú del Consultor:** sus empresas ya están en su inicio. `ItemMenu.sinRoles` en `lib/menu.ts`; `/empresas` lo redirige a su inicio y la ficha vuelve con "← Inicio".
+- **Buscador en "Mis empresas"** con 7 empresas o más (nombre o sector).
+- **Pruebas:** 3 casos nuevos en `ConsultorTest.php` y uno en `menu.test.ts`.
+
 ### Corregido (tablas paginadas · filas que caben, 3 de noviembre)
 
 - **El problema:** las tablas que se paginan según el espacio (A1, A2, A3, A3.1, A5 y E8) calculaban cuántas filas caben con el alto de la fila **más alta**. En A5, la fila del Administrador principal tiene tres líneas, así que la lista mostraba 5 cuentas y dejaba un espacio vacío abajo.

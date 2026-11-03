@@ -7,6 +7,7 @@ use App\Models\Resultado;
 use App\Models\Sector;
 use App\Models\User;
 use App\Services\Resultados\ResultadoEjemplo;
+use App\Support\DatosInicioConsultor;
 use App\Support\Niveles;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Facades\Notification;
@@ -73,11 +74,10 @@ it('entra a su propio inicio con solo sus empresas, no al del Administrador', fu
             ->where('empresas.0.nombre', 'La Esquina'));
 });
 
-it('en Empresas solo ve las que tiene vinculadas', function () {
+it('no tiene la lista de Empresas: lo lleva a su inicio', function () {
     $this->actingAs($this->consultor)
         ->get(route('empresas.index'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $p) => $p->has('empresas', 1)->where('empresas.0.id', $this->suya->id));
+        ->assertRedirect(route('inicio.administrador'));
 });
 
 it('ve la ficha, el historial y los resultados de su empresa', function () {
@@ -119,8 +119,8 @@ it('sin empresas vinculadas no ve ninguna', function () {
     $this->consultor->empresasAsesoradas()->detach();
 
     $this->actingAs($this->consultor)
-        ->get(route('empresas.index'))
-        ->assertInertia(fn (Assert $p) => $p->has('empresas', 0));
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p->has('empresas', 0)->has('avisos', 0));
     $this->get(route('empresas.ver', $this->suya))->assertNotFound();
 });
 
@@ -129,6 +129,64 @@ it('el Administrador sigue viendo todas las empresas', function () {
         ->get(route('empresas.index'))
         ->assertInertia(fn (Assert $p) => $p->has('empresas', 2));
     $this->get(route('empresas.ver', $this->otra))->assertOk();
+});
+
+// --- Qué atender (HU-086 CA-005) ---------------------------------------------------
+
+function medicionDelConsultor($test, Empresa $empresa, int $numero, array $datos): Medicion
+{
+    return Medicion::factory()->create([
+        'empresa_id' => $empresa->id,
+        'version_diagnostico_id' => $test->version->id,
+        'numero' => $numero,
+        ...$datos,
+    ]);
+}
+
+it('avisa del resultado nuevo de sus empresas y no de las ajenas', function () {
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->has('avisos', 1)
+            ->where('avisos.0.tipo', 'nuevo')
+            ->where('avisos.0.empresa.id', $this->suya->id)
+            ->where('avisos.0.medicion', $this->medicionSuya->id));
+});
+
+it('ordena: vencida, bajó, sin empezar y nuevo', function () {
+    // La Esquina bajó 8 puntos en su último resultado.
+    $this->medicionSuya->resultado->update(['variacion' => -8]);
+
+    // Una vencida y una sin empezar hace 10 días, en otras dos empresas suyas.
+    $vencida = Empresa::factory()->create(['nombre' => 'Zapatería Sol', 'sector_id' => $this->suya->sector_id]);
+    $quieta = Empresa::factory()->create(['nombre' => 'Arepas Ya', 'sector_id' => $this->suya->sector_id]);
+    $this->consultor->empresasAsesoradas()->attach([$vencida->id, $quieta->id]);
+
+    medicionDelConsultor($this, $vencida, 1, ['estado' => 'en_curso', 'fecha_limite' => now()->subDays(3)->toDateString()]);
+    $sinEmpezar = medicionDelConsultor($this, $quieta, 1, ['estado' => 'no_iniciada', 'fecha_limite' => now()->addDays(20)->toDateString()]);
+    $sinEmpezar->forceFill(['created_at' => now()->subDays(10)])->save();
+
+    // Recién asignada: todavía no avisa.
+    medicionDelConsultor($this, $this->suya, 2, ['estado' => 'no_iniciada', 'fecha_limite' => now()->addDays(20)->toDateString()]);
+
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->has('avisos', 3)
+            ->where('avisos.0.tipo', 'vencida')
+            ->where('avisos.0.empresa.nombre', 'Zapatería Sol')
+            ->where('avisos.1.tipo', 'bajo')
+            ->where('avisos.1.puntos', 8)
+            ->where('avisos.2.tipo', 'sin_empezar')
+            ->where('avisos.2.dias', 10));
+});
+
+it('un resultado de hace más de una semana ya no es nuevo', function () {
+    $this->medicionSuya->resultado->update(['publicado_en' => now()->subDays(DatosInicioConsultor::DIAS_NUEVO + 1)]);
+
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p->has('avisos', 0));
 });
 
 // --- Vincular (HU-085) --------------------------------------------------------------

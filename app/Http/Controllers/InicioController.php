@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Support\DatosEmpresas;
 use App\Support\DatosInicio;
+use App\Support\DatosInicioConsultor;
 use App\Support\DatosInicioEmpresa;
 use App\Support\DatosUsuarios;
 use Illuminate\Http\RedirectResponse;
@@ -45,6 +46,7 @@ class InicioController extends Controller
         if ($usuario->esConsultor()) {
             return Inertia::render('inicio/Consultor', [
                 'empresas' => DatosEmpresas::lista($usuario),
+                'avisos' => DatosInicioConsultor::avisos($usuario),
             ]);
         }
 

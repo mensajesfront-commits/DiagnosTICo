@@ -8,30 +8,129 @@
  * "Ver empresa" abre la ficha (A3.1) e "Historial", A3.4. Solo mira: no
  * responde ni asigna (los botones de la ficha dependen de los permisos).
  *
- * Los datos llegan calculados del servidor (DatosEmpresas::lista).
+ * "Qué atender" (HU-086 CA-005) pone arriba lo que pide su atención: una
+ * medición vencida, un puntaje que bajó, una medición sin empezar hace una
+ * semana o un resultado nuevo. Con 7 empresas o más aparece un buscador.
+ *
+ * Los datos llegan calculados del servidor (DatosEmpresas::lista y
+ * DatosInicioConsultor::avisos).
  */
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
+    BellRing,
     Building2,
     ChartLine,
+    ChevronRight,
     ClipboardList,
+    Clock,
     Eye,
     History,
     Minus,
+    Search,
+    Sparkles,
     TrendingDown,
     TrendingUp,
+    TriangleAlert,
 } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EtiquetaEstado from '@/components/base/EtiquetaEstado.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
+import Entrada from '@/components/base/Entrada.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
+import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
-import { plural } from '@/lib/texto';
+import { normalizar, plural } from '@/lib/texto';
 import { cn } from '@/lib/utils';
 import type { FilaEmpresa } from '@/types/empresas';
 
-const props = defineProps<{ empresas: FilaEmpresa[] }>();
+type TipoAviso = 'vencida' | 'bajo' | 'sin_empezar' | 'nuevo';
+
+type Aviso = {
+    tipo: TipoAviso;
+    empresa: { id: number; nombre: string };
+    medicion: number;
+    numero: number;
+    fecha: string | null;
+    puntos: number | null;
+    puntaje: number | null;
+    nivel: string | null;
+    dias: number | null;
+};
+
+const props = defineProps<{ empresas: FilaEmpresa[]; avisos: Aviso[] }>();
+
+/** Cuántos avisos se ven antes de "Ver todos". */
+const AVISOS_VISIBLES = 4;
+const verTodos = ref(false);
+const avisosVisibles = computed(() =>
+    verTodos.value ? props.avisos : props.avisos.slice(0, AVISOS_VISIBLES),
+);
+
+const ESTILO_AVISO: Record<
+    TipoAviso,
+    { icono: typeof Clock; caja: string; etiqueta: string }
+> = {
+    vencida: {
+        icono: TriangleAlert,
+        caja: 'bg-aviso-suave text-aviso',
+        etiqueta: 'Vencida',
+    },
+    bajo: {
+        icono: TrendingDown,
+        caja: 'bg-alerta-suave text-alerta',
+        etiqueta: 'Bajó',
+    },
+    sin_empezar: {
+        icono: Clock,
+        caja: 'bg-lienzo text-tinta-suave',
+        etiqueta: 'Sin empezar',
+    },
+    nuevo: {
+        icono: Sparkles,
+        caja: 'bg-exito-suave text-exito',
+        etiqueta: 'Nuevo',
+    },
+};
+
+function fecha(a: Aviso): string {
+    return a.fecha ? diaYMes(fechaLocal(a.fecha)) : '';
+}
+
+function textoAviso(a: Aviso): string {
+    switch (a.tipo) {
+        case 'vencida':
+            return `La medición ${a.numero} venció el ${fecha(a)} sin enviarse.`;
+        case 'bajo':
+            return `Bajó ${plural(a.puntos ?? 0, 'punto', 'puntos')} en la medición ${a.numero}: quedó en ${a.puntaje}.`;
+        case 'sin_empezar':
+            return `La medición ${a.numero} lleva ${plural(a.dias ?? 0, 'día', 'días')} sin empezar.`;
+        case 'nuevo':
+            return `Resultado nuevo de la medición ${a.numero} (${fecha(a)}): ${a.puntaje} puntos.`;
+    }
+}
+
+/** El resultado para "bajó" y "nuevo"; la ficha para lo pendiente. */
+function enlaceAviso(a: Aviso): string {
+    return a.tipo === 'bajo' || a.tipo === 'nuevo'
+        ? rutas.resultados.ver(a.medicion)
+        : rutas.empresas.ver(a.empresa.id);
+}
+
+/** Con 7 empresas o más, un buscador por nombre o sector. */
+const MINIMO_BUSCADOR = 7;
+const busqueda = ref('');
+const empresasFiltradas = computed(() => {
+    const texto = normalizar(busqueda.value.trim());
+
+    if (texto === '') {
+        return props.empresas;
+    }
+
+    return props.empresas.filter((e) =>
+        normalizar(`${e.nombre} ${e.sector ?? ''}`).includes(texto),
+    );
+});
 
 const page = usePage();
 const nombre = computed(
@@ -110,17 +209,132 @@ const resumen = computed(() => [
             </div>
         </dl>
 
+        <section
+            v-if="avisos.length > 0"
+            aria-labelledby="titulo-que-atender"
+            class="rounded-2xl border border-linea bg-white"
+        >
+            <header
+                class="flex items-center gap-2 border-b border-linea px-4 py-3 sm:px-5"
+            >
+                <BellRing class="size-4 text-marca" aria-hidden="true" />
+                <h2 id="titulo-que-atender" class="font-semibold">
+                    Qué atender
+                </h2>
+                <span
+                    class="rounded-full bg-marca-suave px-2 py-0.5 font-mono text-xs font-semibold text-marca"
+                    >{{ avisos.length }}</span
+                >
+            </header>
+            <ul class="divide-y divide-linea">
+                <li
+                    v-for="a in avisosVisibles"
+                    :key="`${a.tipo}-${a.medicion}`"
+                >
+                    <Link
+                        :href="enlaceAviso(a)"
+                        class="group flex items-center gap-3 px-4 py-3 hover:bg-lienzo/60 focus-visible:bg-lienzo/60 focus-visible:outline-none sm:px-5"
+                    >
+                        <span
+                            :class="
+                                cn(
+                                    'flex size-9 shrink-0 items-center justify-center rounded-xl',
+                                    ESTILO_AVISO[a.tipo].caja,
+                                )
+                            "
+                            aria-hidden="true"
+                        >
+                            <component
+                                :is="ESTILO_AVISO[a.tipo].icono"
+                                class="size-4"
+                            />
+                        </span>
+                        <span class="min-w-0 flex-1">
+                            <span
+                                class="flex flex-wrap items-center gap-x-2 gap-y-0.5"
+                            >
+                                <span class="truncate font-medium">{{
+                                    a.empresa.nombre
+                                }}</span>
+                                <span
+                                    :class="
+                                        cn(
+                                            'rounded-full px-2 py-0.5 text-xs font-medium',
+                                            ESTILO_AVISO[a.tipo].caja,
+                                        )
+                                    "
+                                    >{{ ESTILO_AVISO[a.tipo].etiqueta }}</span
+                                >
+                            </span>
+                            <span class="mt-0.5 block text-sm text-tinta-suave">
+                                {{ textoAviso(a) }}
+                            </span>
+                        </span>
+                        <ChevronRight
+                            class="size-4 shrink-0 text-tinta-suave group-hover:text-marca"
+                            aria-hidden="true"
+                        />
+                    </Link>
+                </li>
+            </ul>
+            <div
+                v-if="avisos.length > AVISOS_VISIBLES"
+                class="border-t border-linea px-4 py-2.5 sm:px-5"
+            >
+                <button
+                    type="button"
+                    class="rounded-md text-sm font-medium text-marca hover:text-marca-hover"
+                    :aria-expanded="verTodos"
+                    @click="verTodos = !verTodos"
+                >
+                    {{
+                        verTodos
+                            ? 'Ver menos'
+                            : `Ver los ${avisos.length} avisos`
+                    }}
+                </button>
+            </div>
+        </section>
+
         <section aria-labelledby="titulo-mis-empresas">
-            <h2 id="titulo-mis-empresas" class="mb-3 font-semibold">
-                Mis empresas
-            </h2>
+            <div
+                class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            >
+                <h2 id="titulo-mis-empresas" class="font-semibold">
+                    Mis empresas
+                </h2>
+                <div
+                    v-if="empresas.length >= MINIMO_BUSCADOR"
+                    class="relative sm:w-72"
+                >
+                    <Search
+                        class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-tinta-suave"
+                        aria-hidden="true"
+                    />
+                    <Entrada
+                        v-model="busqueda"
+                        type="search"
+                        placeholder="Buscar por nombre o sector"
+                        aria-label="Buscar empresa"
+                        class="pl-9"
+                    />
+                </div>
+            </div>
+
+            <p
+                v-if="empresas.length > 0 && empresasFiltradas.length === 0"
+                class="rounded-2xl border border-dashed border-linea-fuerte bg-white px-5 py-8 text-center text-sm text-tinta-suave"
+                role="status"
+            >
+                Ninguna empresa coincide con “{{ busqueda.trim() }}”.
+            </p>
 
             <ul
-                v-if="empresas.length > 0"
+                v-else-if="empresas.length > 0"
                 class="grid gap-3 md:grid-cols-2 2xl:grid-cols-3"
             >
                 <li
-                    v-for="e in empresas"
+                    v-for="e in empresasFiltradas"
                     :key="e.id"
                     class="flex flex-col rounded-2xl border border-linea bg-white"
                 >

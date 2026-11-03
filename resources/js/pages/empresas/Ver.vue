@@ -79,6 +79,9 @@ const props = defineProps<FichaEmpresa>();
 
 const { puede } = usePermisos();
 
+/** El consultor vuelve a su inicio (C1): no tiene la lista de Empresas. */
+const esConsultor = computed(() => usePage().props.auth.rol === 'Consultor');
+
 // "Ver:" de la gráfica: el puntaje total o el de una categoría.
 const verCategoria = ref('');
 const puntosEvolucion = computed(
@@ -264,11 +267,11 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
         <header class="flex shrink-0 flex-wrap items-end justify-between gap-4">
             <div>
                 <Link
-                    :href="rutas.empresas.lista()"
+                    :href="esConsultor ? '/inicio' : rutas.empresas.lista()"
                     class="mb-2 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-tinta-suave hover:text-marca"
                 >
                     <ArrowLeft class="size-4" aria-hidden="true" />
-                    Empresas
+                    {{ esConsultor ? 'Inicio' : 'Empresas' }}
                 </Link>
                 <div class="flex items-center gap-4">
                     <span
