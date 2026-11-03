@@ -11,9 +11,11 @@
  *   sale de HU-019.
  */
 import { useForm } from '@inertiajs/vue3';
+import { Archive, Trash2 } from '@lucide/vue';
 import { computed } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
 import type { Categoria } from '@/types/diagnosticos';
 
@@ -64,52 +66,44 @@ function confirmar(): void {
                   : 'Deja de ofrecerse para diagnósticos nuevos. No se borra: la puedes restaurar cuando quieras.'
         "
         ancho="lg"
+        :icono="archivar ? Archive : Trash2"
+        :tono="archivar ? 'alerta' : 'peligro'"
     >
         <div class="flex flex-col gap-3 text-sm">
-            <div
+            <Recuadro
                 v-if="categoria.versiones_publicadas > 0"
-                class="rounded-md border border-linea px-4 py-3"
+                tono="exito"
+                :titulo="`Versiones publicadas (${categoria.versiones_publicadas}): no cambian`"
             >
-                <p class="font-semibold">
-                    ✓ Versiones publicadas ({{
-                        categoria.versiones_publicadas
-                    }}): no cambian
-                </p>
-                <p class="mt-1 text-tinta-suave">
-                    Siguen incluyendo la categoría y se pueden seguir asignando.
-                </p>
-            </div>
+                Siguen incluyendo la categoría y se pueden seguir asignando.
+            </Recuadro>
 
-            <div
+            <Recuadro
                 v-if="categoria.borradores.length > 0"
-                class="rounded-md border border-nivel-mejorar bg-alerta-suave px-4 py-3"
+                tono="alerta"
+                :titulo="`Borradores (${categoria.borradores.length}): la categoría se quita`"
             >
-                <p class="font-semibold text-alerta">
-                    ⚠ Borradores ({{ categoria.borradores.length }}): la
-                    categoría se quita
-                </p>
-                <p class="mt-1">
-                    Su importancia queda pendiente de repartir entre las demás
-                    categorías. No podrás publicarlos hasta ajustarla.
-                </p>
-                <ul class="mt-2 list-disc pl-5">
+                Su importancia queda pendiente de repartir entre las demás
+                categorías. No podrás publicarlos hasta ajustarla.
+                <ul class="mt-2 flex flex-col gap-1">
                     <li
                         v-for="borrador in categoria.borradores"
                         :key="borrador"
+                        class="rounded-lg bg-white/70 px-2.5 py-1 text-xs"
                     >
                         {{ borrador }}
                     </li>
                 </ul>
-            </div>
+            </Recuadro>
 
-            <p
-                v-if="archivar"
-                class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
-            >
+            <Recuadro v-if="archivar" tono="neutro">
                 Puedes restaurarla desde el filtro «Archivadas» del catálogo. Al
                 restaurarla vuelve a estar disponible, pero no se agrega sola a
                 los borradores.
-            </p>
+            </Recuadro>
+            <Recuadro v-else tono="peligro" titulo="No se puede deshacer">
+                La categoría se borra del catálogo con su descripción.
+            </Recuadro>
         </div>
 
         <template #pie>
@@ -118,9 +112,12 @@ function confirmar(): void {
             </Boton>
             <Boton
                 :variante="archivar ? 'primario' : 'peligro'"
+                class="gap-1.5"
                 :cargando="form.processing"
                 @click="confirmar"
             >
+                <Archive v-if="archivar" class="size-4" aria-hidden="true" />
+                <Trash2 v-else class="size-4" aria-hidden="true" />
                 {{ archivar ? 'Archivar categoría' : 'Eliminar categoría' }}
             </Boton>
         </template>

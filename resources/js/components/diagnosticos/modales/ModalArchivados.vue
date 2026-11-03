@@ -8,11 +8,22 @@
  *   resultados guardan la versión con la que se hicieron (RN-010, RN-023).
  */
 import { router, usePage } from '@inertiajs/vue3';
+import {
+    Archive,
+    ArchiveRestore,
+    Building2,
+    CalendarDays,
+    ClipboardList,
+    Lock,
+    Trash2,
+} from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
+import { cn } from '@/lib/utils';
 import type { DiagnosticoArchivado } from '@/types/diagnosticos';
 import { usePermisos } from '@/composables/usePermisos';
 
@@ -67,104 +78,195 @@ const plural = (n: number, uno: string, varios: string) =>
         titulo="Diagnósticos archivados"
         descripcion="No se asignan a nuevas mediciones. Sus mediciones y resultados se conservan."
         ancho="lg"
+        :icono="Archive"
+        tono="alerta"
     >
-        <p
+        <div
             v-if="archivados.length === 0"
-            class="py-6 text-center text-sm text-tinta-suave"
+            class="flex flex-col items-center gap-2 py-8 text-center text-sm text-tinta-suave"
         >
+            <span
+                class="flex size-12 items-center justify-center rounded-2xl bg-lienzo"
+                aria-hidden="true"
+            >
+                <Archive class="size-6" />
+            </span>
             No hay diagnósticos archivados.
-        </p>
+        </div>
 
-        <p
-            v-if="error"
-            class="mb-3 rounded-md bg-aviso-suave px-3 py-2 text-xs text-aviso"
-            role="alert"
-        >
+        <Recuadro v-if="error" tono="peligro" class="mb-3" role="alert">
             {{ error }}
-        </p>
+        </Recuadro>
 
-        <ul class="flex flex-col divide-y divide-linea">
+        <ul class="flex flex-col gap-2">
             <li
                 v-for="d in archivados"
                 :key="d.id"
-                class="flex flex-wrap items-center justify-between gap-3 py-3"
+                :class="
+                    cn(
+                        'rounded-xl border p-3 transition-colors',
+                        confirmando === d.id
+                            ? 'border-aviso/40 bg-aviso-suave/40'
+                            : 'border-linea',
+                    )
+                "
             >
-                <div class="min-w-0">
-                    <p class="font-medium">{{ d.nombre }}</p>
-                    <p class="text-xs text-tinta-suave">
-                        <template v-if="mostrarSector && d.sector_nombre"
-                            >{{ d.sector_nombre }} ·
-                        </template>
-                        <template v-if="d.version_publicada"
-                            >v{{ d.version_publicada }} ·
-                        </template>
-                        Archivado el {{ fecha(d.archivado_en) }} ·
-                        {{
-                            d.mediciones > 0
-                                ? `${plural(d.mediciones, 'medición', 'mediciones')} de ${plural(d.empresas, 'empresa', 'empresas')}`
-                                : 'Ninguna empresa lo respondió'
-                        }}
-                    </p>
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="flex min-w-0 items-start gap-3">
+                        <span
+                            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-lienzo-oscuro text-tinta-suave"
+                            aria-hidden="true"
+                        >
+                            <Archive class="size-4" />
+                        </span>
+                        <div class="min-w-0">
+                            <p class="font-medium">{{ d.nombre }}</p>
+                            <p
+                                class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-tinta-suave"
+                            >
+                                <span
+                                    v-if="mostrarSector && d.sector_nombre"
+                                    class="rounded-full bg-lienzo px-2 py-0.5 text-tinta"
+                                >
+                                    {{ d.sector_nombre }}
+                                </span>
+                                <span
+                                    v-if="d.version_publicada"
+                                    class="rounded-full bg-lienzo px-2 py-0.5"
+                                >
+                                    v{{ d.version_publicada }}
+                                </span>
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full bg-lienzo px-2 py-0.5"
+                                >
+                                    <CalendarDays
+                                        class="size-3"
+                                        aria-hidden="true"
+                                    />
+                                    Archivado el {{ fecha(d.archivado_en) }}
+                                </span>
+                                <span
+                                    :class="
+                                        cn(
+                                            'inline-flex items-center gap-1 rounded-full px-2 py-0.5',
+                                            d.mediciones > 0
+                                                ? 'bg-marca-suave text-marca'
+                                                : 'bg-lienzo',
+                                        )
+                                    "
+                                >
+                                    <ClipboardList
+                                        v-if="d.mediciones > 0"
+                                        class="size-3"
+                                        aria-hidden="true"
+                                    />
+                                    <Building2
+                                        v-else
+                                        class="size-3"
+                                        aria-hidden="true"
+                                    />
+                                    {{
+                                        d.mediciones > 0
+                                            ? `${plural(d.mediciones, 'medición', 'mediciones')} de ${plural(d.empresas, 'empresa', 'empresas')}`
+                                            : 'Ninguna empresa lo respondió'
+                                    }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="
+                            confirmando !== d.id && puede('diagnosticos.editar')
+                        "
+                        class="flex shrink-0 items-center gap-1.5"
+                    >
+                        <Boton
+                            variante="secundario"
+                            tamano="sm"
+                            class="gap-1.5"
+                            :disabled="ocupado !== null"
+                            @click="restaurar(d)"
+                        >
+                            <ArchiveRestore
+                                class="size-3.5"
+                                aria-hidden="true"
+                            />
+                            Restaurar
+                        </Boton>
+                        <Boton
+                            v-if="d.mediciones === 0"
+                            variante="secundario"
+                            tamano="sm"
+                            class="gap-1.5 text-aviso"
+                            :disabled="ocupado !== null"
+                            @click="confirmando = d.id"
+                        >
+                            <Trash2 class="size-3.5" aria-hidden="true" />
+                            Eliminar
+                        </Boton>
+                        <span
+                            v-else
+                            class="inline-flex items-center gap-1 px-1 text-[11px] text-tinta-suave"
+                            title="Tiene mediciones de empresas: se queda archivado para no perder sus resultados."
+                        >
+                            <Lock class="size-3.5" aria-hidden="true" />
+                            No se elimina
+                        </span>
+                    </div>
                 </div>
 
                 <div
                     v-if="confirmando === d.id"
-                    class="flex flex-wrap items-center gap-2 text-sm"
+                    class="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-white px-3 py-2.5"
                     role="alert"
                 >
-                    <span class="text-aviso">¿Eliminar para siempre?</span>
-                    <Boton
-                        variante="secundario"
-                        tamano="sm"
-                        @click="confirmando = null"
-                    >
-                        No
-                    </Boton>
-                    <Boton
-                        variante="peligro"
-                        tamano="sm"
-                        :cargando="ocupado === d.id"
-                        @click="eliminar(d)"
-                    >
-                        Sí, eliminar
-                    </Boton>
-                </div>
-                <div
-                    v-else-if="puede('diagnosticos.editar')"
-                    class="flex items-center gap-3 text-sm"
-                >
-                    <button
-                        type="button"
-                        class="text-marca underline underline-offset-2 hover:text-marca-hover disabled:text-tinta-suave"
-                        :disabled="ocupado !== null"
-                        @click="restaurar(d)"
-                    >
-                        Restaurar
-                    </button>
-                    <button
-                        type="button"
-                        class="text-tinta underline underline-offset-2 hover:text-aviso disabled:cursor-not-allowed disabled:text-tinta-suave disabled:no-underline"
-                        :disabled="d.mediciones > 0 || ocupado !== null"
-                        :title="
-                            d.mediciones > 0
-                                ? 'Tiene mediciones de empresas: se queda archivado para no perder sus resultados.'
-                                : undefined
-                        "
-                        @click="confirmando = d.id"
-                    >
-                        Eliminar
-                    </button>
+                    <p class="flex items-start gap-2 text-sm">
+                        <Trash2
+                            class="mt-0.5 size-4 shrink-0 text-aviso"
+                            aria-hidden="true"
+                        />
+                        <span>
+                            <strong class="text-aviso">
+                                ¿Eliminar para siempre?
+                            </strong>
+                            <span class="block text-xs text-tinta-suave">
+                                Se borra con todo su historial de versiones. No
+                                se puede deshacer.
+                            </span>
+                        </span>
+                    </p>
+                    <div class="flex gap-2">
+                        <Boton
+                            variante="secundario"
+                            tamano="sm"
+                            @click="confirmando = null"
+                        >
+                            No, conservarlo
+                        </Boton>
+                        <Boton
+                            variante="peligro"
+                            tamano="sm"
+                            class="gap-1.5"
+                            :cargando="ocupado === d.id"
+                            @click="eliminar(d)"
+                        >
+                            <Trash2 class="size-3.5" aria-hidden="true" />
+                            Sí, eliminar
+                        </Boton>
+                    </div>
                 </div>
             </li>
         </ul>
 
-        <p
+        <Recuadro
             v-if="archivados.some((d) => d.mediciones > 0)"
-            class="mt-3 text-xs text-tinta-suave"
+            tono="neutro"
+            class="mt-3"
         >
             Los que tienen mediciones no se eliminan: los resultados de esas
             empresas se hicieron con ese diagnóstico.
-        </p>
+        </Recuadro>
 
         <template #pie>
             <Boton variante="secundario" @click="abierto = false">

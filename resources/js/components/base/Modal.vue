@@ -6,6 +6,10 @@
  * Slots: default (contenido), `descripcion` (en lugar de la prop, si lleva
  * enlaces), `pie` (botones; a la izquierda queda el slot `nota`, como "Elige
  * un sector destino").
+ *
+ * `icono` (opcional) pone un ícono junto al título, con el color de `tono`:
+ * marca (crear, editar), exito, alerta (archivar, cambios con cuidado) o
+ * peligro (eliminar).
  */
 import { X } from '@lucide/vue';
 import {
@@ -17,19 +21,30 @@ import {
     DialogRoot,
     DialogTitle,
 } from 'reka-ui';
+import type { Component } from 'vue';
 import { ref } from 'vue';
 import { cn } from '@/lib/utils';
 
 type Ancho = 'sm' | 'md' | 'lg' | 'xl';
+type Tono = 'marca' | 'exito' | 'alerta' | 'peligro';
 
 withDefaults(
     defineProps<{
         titulo: string;
         descripcion?: string;
         ancho?: Ancho;
+        icono?: Component;
+        tono?: Tono;
     }>(),
-    { descripcion: undefined, ancho: 'md' },
+    { descripcion: undefined, ancho: 'md', icono: undefined, tono: 'marca' },
 );
+
+const tonos: Record<Tono, string> = {
+    marca: 'bg-marca-suave text-marca',
+    exito: 'bg-exito-suave text-exito',
+    alerta: 'bg-alerta-suave text-alerta',
+    peligro: 'bg-aviso-suave text-aviso',
+};
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 
@@ -65,7 +80,7 @@ const anchos: Record<Ancho, string> = {
             <DialogContent
                 :class="
                     cn(
-                        'fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-white shadow-xl focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+                        'fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl bg-white shadow-xl focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
                         anchos[ancho],
                     )
                 "
@@ -74,8 +89,22 @@ const anchos: Record<Ancho, string> = {
                 <header
                     class="flex items-start justify-between gap-4 px-6 pt-5"
                 >
-                    <div>
-                        <DialogTitle class="text-lg font-semibold text-tinta">
+                    <span
+                        v-if="icono"
+                        :class="
+                            cn(
+                                'flex size-10 shrink-0 items-center justify-center rounded-xl',
+                                tonos[tono],
+                            )
+                        "
+                        aria-hidden="true"
+                    >
+                        <component :is="icono" class="size-5" />
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <DialogTitle
+                            class="text-lg leading-snug font-semibold text-tinta"
+                        >
                             {{ titulo }}
                         </DialogTitle>
                         <DialogDescription
@@ -86,7 +115,7 @@ const anchos: Record<Ancho, string> = {
                         </DialogDescription>
                     </div>
                     <DialogClose
-                        class="rounded p-1 text-tinta-suave hover:bg-lienzo hover:text-tinta"
+                        class="shrink-0 rounded-lg p-1.5 text-tinta-suave hover:bg-lienzo hover:text-tinta"
                         aria-label="Cerrar"
                     >
                         <X class="size-4" />
@@ -99,7 +128,7 @@ const anchos: Record<Ancho, string> = {
 
                 <footer
                     v-if="$slots.pie"
-                    class="flex flex-wrap items-center justify-end gap-3 border-t border-linea px-6 py-4"
+                    class="flex flex-wrap items-center justify-end gap-3 rounded-b-2xl border-t border-linea bg-lienzo/40 px-6 py-4"
                 >
                     <p
                         v-if="$slots.nota"

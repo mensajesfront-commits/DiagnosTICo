@@ -70,6 +70,44 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (ventanas de diagnósticos y categorías, A3.1b y A3.2 · diseño, 3 de noviembre)
+
+- **Ventana base (`Modal`):** acepta un ícono junto al título, con color según la acción: azul para crear o editar, ámbar para archivar, rojo para eliminar. Lleva esquinas más redondeadas y el pie en gris claro. Lo usan todas las ventanas del sistema.
+- **`Recuadro` (nuevo componente base):** avisos dentro de ventanas y formularios con su ícono: información, alerta, peligro, éxito o nota.
+- **Categorías:**
+  - **A2.3b · Crear categoría:** los borradores se marcan en tarjetas con su sector y versión.
+  - **Editar categoría:** tres cifras (diagnósticos que la usan, preguntas y versiones publicadas), avisos en recuadros, y «Archivar…» y «Eliminar…» con ícono.
+  - **A2.3c · Archivar / Eliminar:** ícono ámbar o rojo; lo que no cambia, lo que se quita de los borradores y «No se puede deshacer» van en recuadros.
+- **Sectores:** **A2.2a · Crear sector:**
+  - al elegir la división CIIU se muestra en una tarjeta con sus subsectores;
+  - «Sector activo» es un interruptor que explica qué pasa en cada caso.
+  - Al editar, las cifras del sector van en tarjetas.
+- **Diagnósticos:**
+  - **Archivados:**
+    - cada diagnóstico va en una tarjeta con sector, versión, fecha y uso en píldoras;
+    - «Restaurar» y «Eliminar» llevan ícono;
+    - los que tienen mediciones muestran «No se elimina» con candado;
+    - la segunda confirmación para eliminar aparece dentro de la tarjeta, en rojo, con «No, conservarlo» y «Sí, eliminar».
+  - **Archivar:** cuántas empresas y mediciones lo usan, y «Se conserva todo» en verde.
+  - **A2.7 · Duplicar:**
+    - una tarjeta con el diagnóstico de origen;
+    - aviso si se elige otro sector;
+    - el nombre que propone es «Nombre (copia)»; antes le agregaba el sector y se cortaba a los 60 caracteres.
+  - **Eliminar borrador:** «Se elimina» (el borrador) y «Se conserva» (la versión publicada con sus empresas y mediciones), lado a lado.
+- **A3.1b · Asignar medición:**
+  - cuatro pasos numerados (empresa, diagnóstico, fecha y mensaje, aviso por correo);
+  - diagnósticos en tarjetas, y los borradores con candado;
+  - avisos en recuadros;
+  - el aviso por correo con interruptor;
+  - la vista previa con el estilo del inicio de la empresa (E1).
+- **A3.1e · Ver y editar el correo:**
+  - «Para» en una tarjeta, variables en chips y «Guardar como plantilla» con interruptor;
+  - «Así le llega a la empresa» con la misma cara que el correo real (banda azul «CAPTTER.», tarjeta blanca y pie).
+- **A3.2 · Registrar empresa:**
+  - secciones con ícono (empresa, usuario principal, primera medición);
+  - la primera medición se activa con un interruptor y el diagnóstico se elige en tarjetas;
+  - «Qué pasa al registrar» como línea de pasos.
+
 ### Cambiado (A2.4 · diseño de la vista previa y estado, 2 de noviembre)
 
 - **Encabezado:**
