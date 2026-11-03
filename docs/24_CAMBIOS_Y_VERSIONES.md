@@ -70,6 +70,17 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (L4 · diseño de Crea una contraseña nueva, 3 de noviembre)
+
+- **Encabezado:** lleva la descripción "Elige una contraseña segura que no hayas usado antes". La cuenta aparece en un recuadro con ícono ("Para la cuenta").
+- **Formulario:**
+  - el aviso de las últimas 5 contraseñas lleva ícono;
+  - "Guardar contraseña" lleva ícono, y debajo un candado con "Se activa cuando cumplas los N requisitos";
+  - al final, "Volver a iniciar sesión".
+- **Enlace vencido o ya usado:** el formulario se cambia por una vista de error con ícono rojo, "Este enlace ya no es válido", la explicación (ya se usó o se pidió otro después; solo funciona el último) y el botón "Pedir otro enlace".
+- **Corregido:** el texto bajo "Este enlace ya no es válido" ahora es fijo. Antes mostraba el mensaje del servidor, que repetía el título o, si el correo no existía, decía "te enviamos un enlace".
+- **Corregido:** "Se activa cuando cumplas los N requisitos" decía 5 aunque la lista tenía 6. Ahora también cuenta "Sin partes de tu correo".
+
 ### Cambiado (L3 · diseño de ¿Olvidaste tu contraseña?, 3 de noviembre)
 
 - **Formulario:**
