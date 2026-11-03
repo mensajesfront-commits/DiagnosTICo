@@ -34,9 +34,12 @@ class HistorialController extends Controller
         $yo = $request->user();
         abort_unless($yo->puedeVerEmpresa($empresa->id), 404);
 
+        $datos = DatosHistorial::de($empresa);
+
         return Inertia::render('historial/Historial', [
-            ...DatosHistorial::de($empresa),
+            ...$datos,
             'interno' => true,
+            'cambios_categoria' => DatosHistorial::cambiosPorCategoria($datos['evolucion_categorias']),
         ]);
     }
 }

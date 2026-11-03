@@ -70,6 +70,11 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A3.4 · historial visto por el Consultor y el Administrador, 3 de noviembre)
+
+- **"Por categoría"** junto a "Mediciones" en la tarjeta de la derecha: cada categoría de su primera a su última medición ("M1 30 → M4 95"), con el cambio en puntos y una barra del color del nivel, de la que más bajó a la que más subió. Al tocar una, la gráfica muestra esa categoría. Lo calcula `DatosHistorial::cambiosPorCategoria()`; solo en la vista interna.
+- La gráfica dice "Evolución del puntaje total" (antes "de tu calificación") en la vista interna.
+
 ### Cambiado (A6 · Mi perfil del Consultor, 3 de noviembre)
 
 - **"Empresas que acompañas"** en la columna izquierda: cuántas tiene y las primeras 5 con enlace a su ficha; "Ver las N en Mis empresas" si son más.

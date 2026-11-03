@@ -40,6 +40,43 @@ class DatosHistorial
     }
 
     /**
+     * A3.4 · "Por categoría": cada categoría en su primera y su última
+     * medición y cuánto cambió, de la que más bajó a la que más subió (las
+     * que solo tienen una medición, al final).
+     *
+     * @param  list<array{nombre: string, puntos: list<array{numero: int, fecha: string|null, puntaje: int}>}>  $series
+     * @return list<array{nombre: string, primera: array{numero: int, puntaje: int}, ultima: array{numero: int, puntaje: int}, cambio: int|null, nivel: string}>
+     */
+    public static function cambiosPorCategoria(array $series): array
+    {
+        $filas = [];
+
+        foreach ($series as $serie) {
+            $puntos = $serie['puntos'];
+
+            if ($puntos === []) {
+                continue;
+            }
+
+            $primera = $puntos[0];
+            $ultima = $puntos[count($puntos) - 1];
+
+            $filas[] = [
+                'nombre' => $serie['nombre'],
+                'primera' => ['numero' => $primera['numero'], 'puntaje' => $primera['puntaje']],
+                'ultima' => ['numero' => $ultima['numero'], 'puntaje' => $ultima['puntaje']],
+                'cambio' => count($puntos) > 1 ? $ultima['puntaje'] - $primera['puntaje'] : null,
+                'nivel' => Niveles::de($ultima['puntaje']),
+            ];
+        }
+
+        usort($filas, fn (array $a, array $b) => [$a['cambio'] === null, $a['cambio'] ?? 0, $a['nombre']]
+            <=> [$b['cambio'] === null, $b['cambio'] ?? 0, $b['nombre']]);
+
+        return $filas;
+    }
+
+    /**
      * Las cifras de arriba de E8: la última medición, el cambio desde la
      * primera y la mejor. Null si aún no hay mediciones terminadas.
      *

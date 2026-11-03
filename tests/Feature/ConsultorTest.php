@@ -7,6 +7,7 @@ use App\Models\Resultado;
 use App\Models\Sector;
 use App\Models\User;
 use App\Services\Resultados\ResultadoEjemplo;
+use App\Support\DatosHistorial;
 use App\Support\DatosInicioConsultor;
 use App\Support\Niveles;
 use Database\Seeders\RolesYPermisosSeeder;
@@ -183,6 +184,25 @@ it('en Mi perfil ve las empresas que acompaña y no tiene avisos por correo', fu
     $this->actingAs($this->admin)
         ->get(route('profile.edit'))
         ->assertInertia(fn (Assert $p) => $p->where('acompanadas', null));
+});
+
+it('en el historial recibe el cambio de cada categoría, de la que más bajó a la que más subió', function () {
+    $series = [
+        ['nombre' => 'Contenido', 'puntos' => [['numero' => 1, 'fecha' => null, 'puntaje' => 40], ['numero' => 2, 'fecha' => null, 'puntaje' => 70]]],
+        ['nombre' => 'Clientes', 'puntos' => [['numero' => 1, 'fecha' => null, 'puntaje' => 80], ['numero' => 2, 'fecha' => null, 'puntaje' => 50]]],
+        ['nombre' => 'Nueva', 'puntos' => [['numero' => 2, 'fecha' => null, 'puntaje' => 20]]],
+    ];
+
+    $filas = DatosHistorial::cambiosPorCategoria($series);
+
+    expect(array_column($filas, 'nombre'))->toBe(['Clientes', 'Contenido', 'Nueva'])
+        ->and($filas[0]['cambio'])->toBe(-30)
+        ->and($filas[1]['nivel'])->toBe(Niveles::de(70))
+        ->and($filas[2]['cambio'])->toBeNull();
+
+    $this->actingAs($this->consultor)
+        ->get(route('empresas.historial', $this->suya))
+        ->assertInertia(fn (Assert $p) => $p->where('interno', true)->has('cambios_categoria'));
 });
 
 it('no ve la ficha, el historial ni los resultados de otra empresa', function () {

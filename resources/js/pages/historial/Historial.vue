@@ -21,6 +21,7 @@ import {
     ClipboardList,
     FileDown,
     MessageSquareText,
+    TrendingDown,
     TrendingUp,
     Trophy,
 } from '@lucide/vue';
@@ -29,6 +30,7 @@ import Boton from '@/components/base/Boton.vue';
 import EtiquetaEstado from '@/components/base/EtiquetaEstado.vue';
 import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import Paginacion from '@/components/base/Paginacion.vue';
+import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
@@ -36,12 +38,40 @@ import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
 import SelectorEvolucion from '@/components/graficas/SelectorEvolucion.vue';
 import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
+import { niveles } from '@/lib/niveles';
+import type { Nivel } from '@/lib/niveles';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
+import { cn } from '@/lib/utils';
 import { empresa as inicioEmpresa } from '@/routes/inicio';
 import type { Historial } from '@/types/historial';
 
-const props = defineProps<Historial>();
+const props = defineProps<
+    Historial & {
+        /** A3.4 · Vista interna: cambio de cada categoría (DatosHistorial). */
+        cambios_categoria?: CambioCategoria[];
+    }
+>();
+
+type CambioCategoria = {
+    nombre: string;
+    primera: { numero: number; puntaje: number };
+    ultima: { numero: number; puntaje: number };
+    cambio: number | null;
+    nivel: Exclude<Nivel, 'sin'>;
+};
+
+// --- Tarjeta de la derecha: mediciones o por categoría (vista interna) ----------
+const vistas = [
+    { valor: 'mediciones' as const, etiqueta: 'Mediciones' },
+    { valor: 'categorias' as const, etiqueta: 'Por categoría' },
+];
+const vistaDerecha = ref<'mediciones' | 'categorias'>('mediciones');
+const hayCambios = computed(
+    () =>
+        props.interno &&
+        (props.cambios_categoria ?? []).some((c) => c.cambio !== null),
+);
 
 const { puede } = usePermisos();
 
@@ -358,7 +388,9 @@ const modalCancelar = ref(false);
                         {{
                             verCategoria
                                 ? `Evolución de ${verCategoria}`
-                                : 'Evolución de tu calificación'
+                                : interno
+                                  ? 'Evolución del puntaje total'
+                                  : 'Evolución de tu calificación'
                         }}
                     </h2>
                     <SelectorEvolucion
@@ -400,14 +432,136 @@ const modalCancelar = ref(false);
             <section
                 class="flex flex-col rounded-2xl border border-linea bg-white lg:min-h-0"
             >
-                <div class="px-5 pt-4 pb-2">
-                    <h2 class="text-lg font-semibold">Mediciones terminadas</h2>
+                <div class="flex flex-col gap-2 px-5 pt-4 pb-2">
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-2"
+                    >
+                        <h2 class="text-lg font-semibold">
+                            {{
+                                vistaDerecha === 'categorias'
+                                    ? 'Por categoría'
+                                    : 'Mediciones terminadas'
+                            }}
+                        </h2>
+                        <SelectorCompacto
+                            v-if="hayCambios"
+                            v-model="vistaDerecha"
+                            :opciones="vistas"
+                            etiqueta-accesible="Qué ver"
+                        />
+                    </div>
                     <p class="text-xs text-tinta-suave">
-                        De la más reciente a la primera. La variación es frente
-                        a la medición anterior.
+                        {{
+                            vistaDerecha === 'categorias'
+                                ? 'De la primera a la última medición, de la que más bajó a la que más subió. Toca una para verla en la gráfica.'
+                                : 'De la más reciente a la primera. La variación es frente a la medición anterior.'
+                        }}
                     </p>
                 </div>
+                <!-- A3.4 · Por categoría: de la primera a la última medición -->
+                <ul
+                    v-if="vistaDerecha === 'categorias'"
+                    class="flex flex-col gap-1 px-3 pb-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+                    aria-label="Cambio por categoría"
+                >
+                    <li v-for="c in cambios_categoria" :key="c.nombre">
+                        <button
+                            type="button"
+                            :aria-pressed="verCategoria === c.nombre"
+                            :class="
+                                cn(
+                                    'flex w-full flex-col gap-1.5 rounded-xl px-3 py-2.5 text-left hover:bg-lienzo/70',
+                                    verCategoria === c.nombre &&
+                                        'bg-marca-suave/60 ring-1 ring-marca/30 hover:bg-marca-suave/60',
+                                )
+                            "
+                            @click="
+                                verCategoria =
+                                    verCategoria === c.nombre ? '' : c.nombre
+                            "
+                        >
+                            <span
+                                class="flex items-center justify-between gap-3"
+                            >
+                                <span
+                                    class="min-w-0 truncate text-sm font-medium"
+                                    >{{ c.nombre }}</span
+                                >
+                                <span
+                                    v-if="c.cambio !== null"
+                                    :class="
+                                        cn(
+                                            'inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-mono text-xs font-semibold',
+                                            c.cambio > 0
+                                                ? 'bg-exito-suave text-exito'
+                                                : c.cambio < 0
+                                                  ? 'bg-aviso-suave text-aviso'
+                                                  : 'bg-lienzo text-tinta-suave',
+                                        )
+                                    "
+                                >
+                                    <TrendingUp
+                                        v-if="c.cambio > 0"
+                                        class="size-3"
+                                        aria-hidden="true"
+                                    />
+                                    <TrendingDown
+                                        v-else-if="c.cambio < 0"
+                                        class="size-3"
+                                        aria-hidden="true"
+                                    />
+                                    {{ c.cambio > 0 ? '+' : '' }}{{ c.cambio }}
+                                </span>
+                                <span
+                                    v-else
+                                    class="shrink-0 text-xs text-tinta-suave"
+                                    >Una medición</span
+                                >
+                            </span>
+                            <span
+                                class="relative h-1.5 w-full overflow-hidden rounded-full bg-lienzo-oscuro"
+                                aria-hidden="true"
+                            >
+                                <span
+                                    v-if="c.cambio !== null"
+                                    class="absolute inset-y-0 left-0 rounded-full bg-tinta/15"
+                                    :style="{ width: `${c.primera.puntaje}%` }"
+                                />
+                                <span
+                                    :class="
+                                        cn(
+                                            'absolute inset-y-0 left-0 rounded-full',
+                                            niveles[c.nivel].barra,
+                                            c.cambio !== null &&
+                                                c.cambio < 0 &&
+                                                'opacity-90',
+                                        )
+                                    "
+                                    :style="{ width: `${c.ultima.puntaje}%` }"
+                                />
+                            </span>
+                            <span class="text-xs text-tinta-suave">
+                                <template v-if="c.cambio !== null">
+                                    M{{ c.primera.numero }}
+                                    <span class="font-mono">{{
+                                        c.primera.puntaje
+                                    }}</span>
+                                    → M{{ c.ultima.numero }}
+                                </template>
+                                <template v-else
+                                    >M{{ c.ultima.numero }}</template
+                                >
+                                <span
+                                    class="ml-1 font-mono font-semibold text-tinta"
+                                    >{{ c.ultima.puntaje }}</span
+                                >
+                                · {{ niveles[c.nivel].nombre }}
+                            </span>
+                        </button>
+                    </li>
+                </ul>
                 <div
+                    v-show="vistaDerecha === 'mediciones'"
                     ref="contenedor"
                     class="px-3 lg:min-h-0 lg:flex-1 lg:overflow-hidden"
                 >
@@ -533,7 +687,7 @@ const modalCancelar = ref(false);
                     </div>
                 </div>
                 <div
-                    v-if="paginas > 1"
+                    v-if="paginas > 1 && vistaDerecha === 'mediciones'"
                     class="flex justify-end border-t border-linea px-5 py-2"
                 >
                     <Paginacion
