@@ -31,7 +31,11 @@ use Inertia\Response;
  */
 class ResponderController extends Controller
 {
-    /** E2 · `?categoria=` (índice desde 0) abre esa categoría. */
+    /**
+     * E2 · `?categoria=` (índice desde 0) abre esa categoría; con
+     * `?pregunta=` (ref, desde "Ir a la pregunta" de E3) baja hasta esa
+     * pregunta y le pone el foco.
+     */
     public function responder(Request $request, Medicion $medicion): Response|RedirectResponse
     {
         $this->deMiEmpresa($request, $medicion);
@@ -44,13 +48,20 @@ class ResponderController extends Controller
         $respuestas = DatosResponder::respuestas($medicion);
         $avance = DatosResponder::avance($cuestionario, $respuestas);
         $pedida = $request->integer('categoria', -1);
+        $inicial = $pedida >= 0 && $pedida < count($cuestionario) ? $pedida : $avance['actual'];
+        $pregunta = $request->string('pregunta')->toString();
+        /** @var list<array<string, mixed>> $preguntas */
+        $preguntas = $cuestionario[$inicial]['preguntas'] ?? [];
+        $existe = $pregunta !== '' && in_array($pregunta, array_column($preguntas, 'ref'), true);
 
         return Inertia::render('responder/Responder', [
             'medicion' => $this->cabecera($medicion),
             'categorias' => $cuestionario,
             'respuestas' => (object) $respuestas,
             'avance' => $avance,
-            'categoriaInicial' => $pedida >= 0 && $pedida < count($cuestionario) ? $pedida : $avance['actual'],
+            'categoriaInicial' => $inicial,
+            // Solo si la pregunta es de la categoría que se abre.
+            'preguntaInicial' => $existe ? $pregunta : null,
             'guardadoEn' => $medicion->respuestas()->max('updated_at'),
         ]);
     }

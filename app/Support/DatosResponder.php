@@ -86,18 +86,24 @@ class DatosResponder
             $preguntas = $c['preguntas'];
             $hechas = 0;
             $faltan = 0;
+            $primeraFaltante = null;
 
             foreach ($preguntas as $p) {
                 $lista = self::respondida($respuestas[$p['ref']] ?? null);
                 $hechas += $lista ? 1 : 0;
                 $faltan += ! $lista && $p['obligatoria'] ? 1 : 0;
+
+                // E3 "Ir a la pregunta": lleva a esta y no solo a la categoría.
+                if (! $lista && $p['obligatoria'] && $primeraFaltante === null) {
+                    $primeraFaltante = (string) $p['ref'];
+                }
             }
 
             if ($faltan > 0 && $actual === null) {
                 $actual = $i;
             }
 
-            $categorias[] = ['ref' => (string) $c['ref'], 'nombre' => (string) $c['nombre'], 'respondidas' => $hechas, 'total' => count($preguntas), 'faltan_obligatorias' => $faltan];
+            $categorias[] = ['ref' => (string) $c['ref'], 'nombre' => (string) $c['nombre'], 'respondidas' => $hechas, 'total' => count($preguntas), 'faltan_obligatorias' => $faltan, 'primera_faltante' => $primeraFaltante];
             $respondidas += $hechas;
             $total += count($preguntas);
         }

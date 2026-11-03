@@ -264,7 +264,13 @@ const hora = computed(() =>
                 </span>
             </span>
             <Link
-                :href="rutas.responder.mostrar(medicion.id, primera.indice)"
+                :href="
+                    rutas.responder.mostrar(
+                        medicion.id,
+                        primera.indice,
+                        primera.primera_faltante,
+                    )
+                "
                 class="inline-flex h-11 items-center gap-1.5 rounded-lg bg-aviso px-4 font-medium text-white hover:brightness-95"
             >
                 Ir a la pregunta
@@ -370,7 +376,13 @@ const hora = computed(() =>
                             />
                         </div>
                         <Link
-                            :href="rutas.responder.mostrar(medicion.id, i)"
+                            :href="
+                                rutas.responder.mostrar(
+                                    medicion.id,
+                                    i,
+                                    c.primera_faltante,
+                                )
+                            "
                             :class="
                                 cn(
                                     'inline-flex h-11 min-w-32 items-center justify-center gap-1.5 rounded-lg border px-4 text-base font-medium',

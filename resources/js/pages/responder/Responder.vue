@@ -35,7 +35,15 @@ import {
     ClipboardCheck,
     Info,
 } from '@lucide/vue';
-import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
+import {
+    computed,
+    nextTick,
+    onBeforeUnmount,
+    onMounted,
+    reactive,
+    ref,
+    watch,
+} from 'vue';
 import { toast } from 'vue-sonner';
 import Boton from '@/components/base/Boton.vue';
 import BarraResponder from '@/components/responder/BarraResponder.vue';
@@ -55,6 +63,8 @@ const props = defineProps<{
     respuestas: Record<string, RespuestaGuardada>;
     avance: Avance;
     categoriaInicial: number;
+    /** E3 "Ir a la pregunta": baja hasta ella, la resalta y le pone el foco. */
+    preguntaInicial?: string | null;
     guardadoEn: string | null;
 }>();
 
@@ -213,6 +223,47 @@ watch(actual, async (i) => {
     document.getElementById('cuestionario')?.scrollTo({ top: 0 });
     window.scrollTo({ top: 0 });
 });
+
+// --- "Ir a la pregunta" (E3) -------------------------------------------------------
+/** Pregunta resaltada: se quita al responderla o a los 6 segundos. */
+const resaltada = ref<string | null>(props.preguntaInicial ?? null);
+let quitarResaltado: ReturnType<typeof setTimeout> | undefined;
+
+function irAPregunta(ref: string): void {
+    const caja = document.getElementById(`pregunta-${ref}`);
+
+    if (!caja) {
+        return;
+    }
+
+    const quieto = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+    ).matches;
+    caja.scrollIntoView({
+        block: 'start',
+        behavior: quieto ? 'auto' : 'smooth',
+    });
+
+    // El foco va al primer campo: la opción marcada, la primera opción o el texto.
+    const campo =
+        caja.querySelector<HTMLElement>('input:checked') ??
+        caja.querySelector<HTMLElement>('input, textarea');
+    campo?.focus({ preventScroll: true });
+
+    clearTimeout(quitarResaltado);
+    quitarResaltado = setTimeout(() => (resaltada.value = null), 6000);
+}
+
+onMounted(() => {
+    if (props.preguntaInicial) {
+        // Después de pintar, para que la caja ya tenga su lugar.
+        requestAnimationFrame(() =>
+            irAPregunta(props.preguntaInicial as string),
+        );
+    }
+});
+
+onBeforeUnmount(() => clearTimeout(quitarResaltado));
 
 const anterior = computed(() => props.categorias[actual.value - 1] ?? null);
 const siguiente = computed(() => props.categorias[actual.value + 1] ?? null);
@@ -548,17 +599,28 @@ const pistas = {
 
                     <fieldset
                         v-for="(p, i) in categoria.preguntas"
+                        :id="`pregunta-${p.ref}`"
                         :key="p.ref"
                         :class="
                             cn(
-                                'rounded-2xl border bg-white px-5 py-6 sm:px-8',
+                                'scroll-mt-32 rounded-2xl border bg-white px-5 py-6 transition-shadow sm:scroll-mt-24 sm:px-8',
                                 respondida(p)
                                     ? 'border-marca/40'
                                     : 'border-linea',
+                                resaltada === p.ref &&
+                                    !respondida(p) &&
+                                    'border-aviso ring-4 ring-aviso/25',
                             )
                         "
                     >
                         <legend class="sr-only">Pregunta {{ i + 1 }}</legend>
+                        <p
+                            v-if="resaltada === p.ref && !respondida(p)"
+                            class="mb-4 inline-flex items-center gap-1.5 rounded-full bg-aviso-suave px-3 py-1 text-sm font-medium text-aviso"
+                            role="status"
+                        >
+                            Falta esta pregunta obligatoria
+                        </p>
                         <div class="flex items-start gap-4">
                             <span
                                 :class="

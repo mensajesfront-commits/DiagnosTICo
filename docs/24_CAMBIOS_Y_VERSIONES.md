@@ -70,6 +70,21 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Corregido (E3 → E2 · "Ir a la pregunta" lleva a la pregunta, 3 de noviembre)
+
+- **El problema:** en "Revisa antes de enviar", "Ir a la pregunta" y "Completar" abrían la categoría desde arriba, y la persona tenía que buscar cuál le faltaba.
+- **Ahora abre la categoría y baja a la primera pregunta obligatoria sin responder:**
+  - la pregunta queda arriba de la pantalla, debajo de la barra fija (también en el celular);
+  - se resalta con borde rojo y la etiqueta "Falta esta pregunta obligatoria";
+  - el resalte se quita al responderla o a los 6 segundos;
+  - el foco queda en su primer campo (la opción marcada, la primera opción o el texto), para responder con el teclado sin buscar.
+- **Si la persona prefiere menos movimiento,** el desplazamiento es instantáneo (`prefers-reduced-motion`).
+- **Cómo funciona:**
+  - el avance de cada categoría trae `primera_faltante` (`DatosResponder::avance`);
+  - el enlace lleva `?categoria=N&pregunta=ref` (`rutas.responder.mostrar`);
+  - el servidor solo acepta la pregunta si es de esa categoría (`preguntaInicial`).
+- **Pruebas:** dos casos nuevos en `ResponderTest`.
+
 ### Agregado (rol Consultor con empresas vinculadas, 3 de noviembre)
 
 En la presentación se decidió incluir el rol Consultor, que existía inactivo (PA-006). Decisiones del equipo: es externo y se le invita, solo mira, no toca diagnósticos, lo vincula el Administrador y puede tener una o varias empresas. Historias nuevas HU-085 y HU-086 (EP-014) y regla RN-030 en `05`.

@@ -120,8 +120,22 @@ export const rutas = {
         probarCorreo: () => '/mediciones/correo/prueba',
     },
     responder: {
-        mostrar: (id: number, categoria?: number) =>
-            `/mi-diagnostico/${id}${categoria !== undefined ? `?categoria=${categoria}` : ''}`,
+        /** `pregunta`: ref de la pregunta a la que se baja y se pone el foco (E3). */
+        mostrar: (id: number, categoria?: number, pregunta?: string | null) => {
+            const params = new URLSearchParams();
+
+            if (categoria !== undefined) {
+                params.set('categoria', String(categoria));
+            }
+
+            if (pregunta) {
+                params.set('pregunta', pregunta);
+            }
+
+            const query = params.toString();
+
+            return `/mi-diagnostico/${id}${query ? `?${query}` : ''}`;
+        },
         guardar: (id: number) => `/mi-diagnostico/${id}/respuestas`,
         revisar: (id: number) => `/mi-diagnostico/${id}/revisar`,
         enviar: (id: number) => `/mi-diagnostico/${id}/enviar`,
