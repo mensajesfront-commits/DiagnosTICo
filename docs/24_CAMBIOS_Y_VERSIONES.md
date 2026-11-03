@@ -70,6 +70,21 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E9 / A3.5 · diseño de Mis respuestas, 3 de noviembre)
+
+- **Encabezado:**
+  - ícono, título y chips con la empresa, el sector, el diagnóstico y la fecha de envío;
+  - etiqueta "Solo lectura" junto a "Ver informe PDF".
+- **Categorías:** cada una es una tarjeta con su puntaje, una barra del color de su nivel, el nombre del nivel y cuántas preguntas tiene. En el celular se deslizan de lado y, al elegir una, la pantalla baja a sus preguntas.
+- **Cabecera de la categoría:** "Categoría N de M", el nivel, la importancia, cuántas preguntas se respondieron y el puntaje grande sobre 100.
+- **Preguntas como tarjetas** (`PreguntaResultado` con `tarjeta`):
+  - número, tipo de pregunta con ícono y puntaje en una píldora ("Dato extra" o "· IA" según el caso);
+  - las opciones elegidas como chips, y las respuestas abiertas como cita;
+  - la nota de la IA en un recuadro con ícono.
+- **Navegación:** abajo, botones a la categoría anterior y a la siguiente.
+- **E6:** la pestaña Categorías usa el mismo estilo de pregunta, en forma de lista.
+- Sin cambios en el backend: los puntajes y niveles siguen llegando calculados.
+
 ### Cambiado (E3 · diseño de Revisa antes de enviar, 3 de noviembre)
 
 - **Resumen arriba:**
