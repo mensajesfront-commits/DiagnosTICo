@@ -70,6 +70,26 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (repaso a fondo de modales con formularios largos, 3 de noviembre)
+
+- **Nuevo componente `components/base/TituloSeccion.vue`:** encabezado de sección con ícono, título y una línea de ayuda. Lo usan los modales de esta entrada.
+- **Nuevo `lib/paginasColaborador.ts` (`iconoPagina`):** el ícono de cada página de colaborador. Lo comparten E12 y sus modales.
+- **E12.1 Agregar y E12.3 Editar colaborador:**
+  - el modal es más ancho;
+  - secciones "Datos de la persona" (nombre y cargo lado a lado), "Contraseña" y "Páginas que puede ver";
+  - en Editar, "Cambiar su contraseña" es un interruptor dentro de una tarjeta.
+- **Selector de páginas:** cada página es una tarjeta con su ícono y una marca a la derecha. La que depende de otra muestra un candado mientras falta la otra. El grupo se nombra con `aria-labelledby`, no con `legend`.
+- **E12.2 Comparte estos datos:**
+  - el usuario y la contraseña van en una credencial, cada uno con su botón de copiar;
+  - "Copiar datos" sigue copiando los dos juntos.
+- **A2.1d Versiones:**
+  - el historial es una línea de tiempo: círculo con el número de versión (verde la publicada, ámbar el borrador) y una tarjeta con estado, fecha, uso y nota;
+  - los requisitos para publicar usan íconos de cumplido o falta;
+  - "Publicar" lleva ícono.
+- **A5.1 Invitar usuario:** secciones "Datos de la persona", "Rol" y "Mensaje". El aviso del correo lleva ícono y "Enviar invitación" también.
+- **Sin cambios, porque ya estaban bien:** A5.2 Crear rol, A4.7 Probar con un ejemplo y A4.6 Instrucciones completas.
+- El backend no cambia.
+
 ### Cambiado (A2.1c · diseño de Editar importancia, 3 de noviembre)
 
 - **Encabezado:**

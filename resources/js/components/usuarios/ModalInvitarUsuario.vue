@@ -8,7 +8,14 @@
  *
  * Envía: POST /usuarios/invitar con name, email, rol_id y mensaje (opcional).
  */
-import { UserPlus } from '@lucide/vue';
+import {
+    Mail,
+    MessageSquareText,
+    Send,
+    ShieldCheck,
+    UserPlus,
+    UserRound,
+} from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
@@ -16,7 +23,7 @@ import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
-import Recuadro from '@/components/base/Recuadro.vue';
+import TituloSeccion from '@/components/base/TituloSeccion.vue';
 import OpcionRol from '@/components/usuarios/OpcionRol.vue';
 import { rutas } from '@/lib/rutas';
 import type { Rol } from '@/types/usuarios';
@@ -65,45 +72,58 @@ function invitar(): void {
     >
         <form
             id="form-invitar"
-            class="flex flex-col gap-4"
+            class="flex flex-col gap-6"
             @submit.prevent="invitar"
         >
-            <p class="text-xs text-tinta-suave">
-                Todos los campos son obligatorios, salvo los marcados como
-                opcionales.
-            </p>
-            <div class="grid gap-4 sm:grid-cols-2">
-                <Campo
-                    obligatorio
-                    etiqueta="Nombre"
-                    para="invitar-nombre"
-                    :error="form.errors.name"
-                >
-                    <Entrada
-                        id="invitar-nombre"
-                        v-model="form.name"
-                        required
-                        :invalida="!!form.errors.name"
-                    />
-                </Campo>
-                <Campo
-                    obligatorio
-                    etiqueta="Correo"
-                    para="invitar-correo"
-                    :error="form.errors.email"
-                >
-                    <Entrada
-                        id="invitar-correo"
-                        v-model="form.email"
-                        type="email"
-                        required
-                        :invalida="!!form.errors.email"
-                    />
-                </Campo>
-            </div>
+            <section class="flex flex-col gap-3">
+                <TituloSeccion
+                    :icono="UserRound"
+                    titulo="Datos de la persona"
+                    descripcion="Todos los campos son obligatorios, salvo los marcados como opcionales."
+                />
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <Campo
+                        obligatorio
+                        etiqueta="Nombre"
+                        para="invitar-nombre"
+                        :error="form.errors.name"
+                    >
+                        <Entrada
+                            id="invitar-nombre"
+                            v-model="form.name"
+                            required
+                            :invalida="!!form.errors.name"
+                        />
+                    </Campo>
+                    <Campo
+                        obligatorio
+                        etiqueta="Correo"
+                        para="invitar-correo"
+                        :error="form.errors.email"
+                    >
+                        <Entrada
+                            id="invitar-correo"
+                            v-model="form.email"
+                            type="email"
+                            required
+                            :invalida="!!form.errors.email"
+                        />
+                    </Campo>
+                </div>
+            </section>
 
-            <fieldset class="flex flex-col gap-2">
-                <legend class="mb-1 text-xs font-medium">Rol</legend>
+            <div
+                role="radiogroup"
+                aria-labelledby="invitar-titulo-rol"
+                class="flex flex-col gap-2"
+            >
+                <TituloSeccion
+                    id="invitar-titulo-rol"
+                    :icono="ShieldCheck"
+                    titulo="Rol"
+                    descripcion="Define qué puede hacer. Se cambia después desde Usuarios y roles."
+                    class="mb-1"
+                />
                 <OpcionRol
                     v-for="rol in roles"
                     :key="rol.id"
@@ -123,27 +143,39 @@ function invitar(): void {
                 <p v-if="form.errors.rol_id" class="text-xs text-aviso">
                     {{ form.errors.rol_id }}
                 </p>
-            </fieldset>
+            </div>
 
-            <Campo
-                etiqueta="Mensaje"
-                para="invitar-mensaje"
-                opcional
-                ayuda="Se incluye en el correo de invitación."
-                :error="form.errors.mensaje"
-            >
-                <AreaTexto
-                    id="invitar-mensaje"
-                    v-model="form.mensaje"
-                    rows="3"
-                    placeholder="Ej.: Te invito a apoyar la revisión de diagnósticos."
+            <section class="flex flex-col gap-3">
+                <TituloSeccion
+                    :icono="MessageSquareText"
+                    titulo="Mensaje"
+                    descripcion="Opcional: se incluye en el correo de invitación."
                 />
-            </Campo>
+                <Campo
+                    etiqueta="Mensaje para la persona"
+                    para="invitar-mensaje"
+                    opcional
+                    :error="form.errors.mensaje"
+                >
+                    <AreaTexto
+                        id="invitar-mensaje"
+                        v-model="form.mensaje"
+                        rows="3"
+                        placeholder="Ej.: Te invito a apoyar la revisión de diagnósticos."
+                    />
+                </Campo>
+            </section>
 
-            <Recuadro tono="neutro">
+            <p
+                class="flex items-start gap-2.5 rounded-xl bg-lienzo px-3 py-2.5 text-sm text-tinta-suave"
+            >
+                <Mail
+                    class="mt-0.5 size-4 shrink-0 text-marca"
+                    aria-hidden="true"
+                />
                 Recibirá un correo para crear su contraseña. El enlace sirve
                 hasta que la cree.
-            </Recuadro>
+            </p>
         </form>
 
         <template #pie>
@@ -156,6 +188,7 @@ function invitar(): void {
                 :disabled="form.rol_id === null"
                 :cargando="form.processing"
             >
+                <Send class="size-4" aria-hidden="true" />
                 Enviar invitación
             </Boton>
         </template>

@@ -23,11 +23,8 @@
 import { Head, router } from '@inertiajs/vue3';
 import {
     Ban,
-    ChartColumn,
     CircleCheck,
-    ClipboardPen,
     Crown,
-    FileDown,
     House,
     LayoutGrid,
     Pencil,
@@ -37,7 +34,6 @@ import {
     Users,
     UserX,
 } from '@lucide/vue';
-import type { Component } from 'vue';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Recuadro from '@/components/base/Recuadro.vue';
@@ -45,6 +41,7 @@ import ModalAgregarColaborador from '@/components/colaboradores/ModalAgregarCola
 import ModalEditarColaborador from '@/components/colaboradores/ModalEditarColaborador.vue';
 import ModalDatosDeAcceso from '@/components/colaboradores/ModalDatosDeAcceso.vue';
 import ModalDesactivarEliminarColaborador from '@/components/colaboradores/ModalDesactivarEliminarColaborador.vue';
+import { iconoPagina } from '@/lib/paginasColaborador';
 import { rutas } from '@/lib/rutas';
 import { plural } from '@/lib/texto';
 import { iniciales } from '@/lib/usuarios';
@@ -60,13 +57,6 @@ const props = defineProps<{
     colaboradores: Colaborador[];
     paginas: PaginaColaborador[];
 }>();
-
-/** Ícono de cada página; las nuevas que agregue el servidor usan el genérico. */
-const iconos: Record<string, Component> = {
-    'diagnostico.responder': ClipboardPen,
-    'resultados.ver': ChartColumn,
-    'resultados.pdf': FileDown,
-};
 
 const puedeVer = (colaborador: Colaborador) =>
     props.paginas.filter((p) => colaborador.paginas.includes(p.clave));
@@ -404,7 +394,7 @@ const accion =
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 text-xs ring-1 ring-linea"
                                     >
                                         <component
-                                            :is="iconos[p.clave] ?? LayoutGrid"
+                                            :is="iconoPagina(p.clave)"
                                             class="size-3.5 text-marca"
                                             aria-hidden="true"
                                         />

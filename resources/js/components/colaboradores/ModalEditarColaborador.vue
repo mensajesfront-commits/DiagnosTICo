@@ -10,7 +10,7 @@
  * Envía: PUT /colaboradores/{id} con name, cargo, email, password (vacía
  * si no se cambia) y paginas[].
  */
-import { UserPen } from '@lucide/vue';
+import { KeyRound, UserPen, UserRound } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -19,7 +19,9 @@ import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Combobox from '@/components/base/Combobox.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Interruptor from '@/components/base/Interruptor.vue';
 import Recuadro from '@/components/base/Recuadro.vue';
+import TituloSeccion from '@/components/base/TituloSeccion.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
 import SelectorPaginas from '@/components/colaboradores/SelectorPaginas.vue';
 import { cargosSugeridos } from '@/lib/cargos';
@@ -124,64 +126,75 @@ function guardar(): void {
         :titulo="`Editar a ${colaborador.nombre}`"
         descripcion="Cambia sus datos, las páginas que puede ver o define una contraseña nueva."
         :icono="UserPen"
+        ancho="lg"
     >
         <form
             id="form-editar-colaborador"
-            class="flex flex-col gap-4"
+            class="flex flex-col gap-6"
             @submit.prevent="listo && guardar()"
         >
-            <Campo
-                obligatorio
-                etiqueta="Nombre"
-                para="editar-nombre"
-                :error="form.errors.name"
-            >
-                <Entrada
-                    id="editar-nombre"
-                    v-model="form.name"
-                    required
-                    maxlength="255"
-                    autocomplete="off"
-                    :invalida="!!form.errors.name"
+            <section class="flex flex-col gap-3">
+                <TituloSeccion
+                    :icono="UserRound"
+                    titulo="Datos de la persona"
+                    descripcion="Su correo es su usuario para entrar."
                 />
-            </Campo>
-            <Campo
-                obligatorio
-                etiqueta="Cargo"
-                para="editar-cargo"
-                ayuda="Su área en la empresa. Si no aparece, escríbelo y elige «Usar…»."
-                :error="form.errors.cargo"
-            >
-                <Combobox
-                    id="editar-cargo"
-                    v-model="form.cargo"
-                    :opciones="cargosSugeridos"
-                    permitir-otro
-                    required
-                    placeholder="Ej. Marketing, Producción"
-                    :invalida="!!form.errors.cargo"
-                />
-            </Campo>
-            <Campo
-                obligatorio
-                etiqueta="Correo (es su usuario)"
-                para="editar-correo"
-                :ayuda="
-                    cambiaCorreo
-                        ? `Desde ahora iniciará sesión con este correo. Si ${primerNombre} tiene la sesión abierta, se cerrará.`
-                        : 'Con este correo inicia sesión.'
-                "
-                :error="form.errors.email"
-            >
-                <Entrada
-                    id="editar-correo"
-                    v-model="form.email"
-                    type="email"
-                    required
-                    autocomplete="off"
-                    :invalida="!!form.errors.email"
-                />
-            </Campo>
+                <div class="grid gap-x-4 gap-y-3 sm:grid-cols-2">
+                    <Campo
+                        obligatorio
+                        etiqueta="Nombre"
+                        para="editar-nombre"
+                        :error="form.errors.name"
+                    >
+                        <Entrada
+                            id="editar-nombre"
+                            v-model="form.name"
+                            required
+                            maxlength="255"
+                            autocomplete="off"
+                            :invalida="!!form.errors.name"
+                        />
+                    </Campo>
+                    <Campo
+                        obligatorio
+                        etiqueta="Cargo"
+                        para="editar-cargo"
+                        ayuda="Su área en la empresa. Si no aparece, escríbelo y elige «Usar…»."
+                        :error="form.errors.cargo"
+                    >
+                        <Combobox
+                            id="editar-cargo"
+                            v-model="form.cargo"
+                            :opciones="cargosSugeridos"
+                            permitir-otro
+                            required
+                            placeholder="Ej. Marketing, Producción"
+                            :invalida="!!form.errors.cargo"
+                        />
+                    </Campo>
+                    <Campo
+                        obligatorio
+                        etiqueta="Correo (es su usuario)"
+                        para="editar-correo"
+                        class="sm:col-span-2"
+                        :ayuda="
+                            cambiaCorreo
+                                ? `Desde ahora iniciará sesión con este correo. Si ${primerNombre} tiene la sesión abierta, se cerrará.`
+                                : 'Con este correo inicia sesión.'
+                        "
+                        :error="form.errors.email"
+                    >
+                        <Entrada
+                            id="editar-correo"
+                            v-model="form.email"
+                            type="email"
+                            required
+                            autocomplete="off"
+                            :invalida="!!form.errors.email"
+                        />
+                    </Campo>
+                </div>
+            </section>
 
             <SelectorPaginas
                 v-model="form.paginas"
@@ -190,15 +203,22 @@ function guardar(): void {
                 :error="form.errors.paginas"
             />
 
-            <div class="flex flex-col gap-3 border-t border-linea pt-4">
-                <label class="flex items-center gap-2 text-sm font-medium">
-                    <input
-                        v-model="cambiarContrasena"
-                        type="checkbox"
-                        class="size-4 rounded border-linea-fuerte accent-marca"
+            <section
+                class="flex flex-col gap-3 rounded-xl border border-linea p-4"
+            >
+                <div class="flex items-center justify-between gap-3">
+                    <TituloSeccion
+                        :icono="KeyRound"
+                        titulo="Contraseña"
+                        descripcion="Actívalo solo si quieres darle una nueva."
                     />
-                    Cambiar su contraseña
-                </label>
+                    <Interruptor
+                        id="editar-cambiar-contrasena"
+                        v-model="cambiarContrasena"
+                    >
+                        <span class="sr-only">Cambiar su contraseña</span>
+                    </Interruptor>
+                </div>
                 <template v-if="cambiarContrasena">
                     <Campo
                         obligatorio
@@ -225,7 +245,7 @@ function guardar(): void {
                         los compartas por un medio seguro.
                     </Recuadro>
                 </template>
-            </div>
+            </section>
         </form>
 
         <template #pie>

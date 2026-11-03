@@ -11,7 +11,7 @@
  *
  * Envía: POST /colaboradores con name, cargo, email, password y paginas[].
  */
-import { UserPlus } from '@lucide/vue';
+import { KeyRound, UserPlus, UserRound } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -21,6 +21,7 @@ import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
 import Recuadro from '@/components/base/Recuadro.vue';
+import TituloSeccion from '@/components/base/TituloSeccion.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
 import SelectorPaginas from '@/components/colaboradores/SelectorPaginas.vue';
 import { cargosSugeridos } from '@/lib/cargos';
@@ -90,79 +91,99 @@ function crear(): void {
         titulo="Agregar colaborador"
         descripcion="Crea una cuenta para alguien de tu equipo y elige qué páginas puede ver."
         :icono="UserPlus"
+        ancho="lg"
     >
         <form
             id="form-agregar-colaborador"
-            class="flex flex-col gap-4"
+            class="flex flex-col gap-6"
             @submit.prevent="crear"
         >
-            <Campo
-                obligatorio
-                etiqueta="Nombre"
-                para="colaborador-nombre"
-                :error="form.errors.name"
-            >
-                <Entrada
-                    id="colaborador-nombre"
-                    v-model="form.name"
-                    required
-                    autocomplete="off"
-                    maxlength="255"
-                    :invalida="!!form.errors.name"
+            <section class="flex flex-col gap-3">
+                <TituloSeccion
+                    :icono="UserRound"
+                    titulo="Datos de la persona"
+                    descripcion="Su correo será su usuario para entrar."
                 />
-            </Campo>
-            <Campo
-                obligatorio
-                etiqueta="Cargo"
-                para="colaborador-cargo"
-                ayuda="Su área en la empresa. Si no aparece, escríbelo y elige «Usar…»."
-                :error="form.errors.cargo"
-            >
-                <Combobox
-                    id="colaborador-cargo"
-                    v-model="form.cargo"
-                    :opciones="cargosSugeridos"
-                    permitir-otro
-                    required
-                    placeholder="Ej. Marketing, Producción"
-                    :invalida="!!form.errors.cargo"
+                <div class="grid gap-x-4 gap-y-3 sm:grid-cols-2">
+                    <Campo
+                        obligatorio
+                        etiqueta="Nombre"
+                        para="colaborador-nombre"
+                        :error="form.errors.name"
+                    >
+                        <Entrada
+                            id="colaborador-nombre"
+                            v-model="form.name"
+                            required
+                            autocomplete="off"
+                            maxlength="255"
+                            :invalida="!!form.errors.name"
+                        />
+                    </Campo>
+                    <Campo
+                        obligatorio
+                        etiqueta="Cargo"
+                        para="colaborador-cargo"
+                        ayuda="Su área en la empresa. Si no aparece, escríbelo y elige «Usar…»."
+                        :error="form.errors.cargo"
+                    >
+                        <Combobox
+                            id="colaborador-cargo"
+                            v-model="form.cargo"
+                            :opciones="cargosSugeridos"
+                            permitir-otro
+                            required
+                            placeholder="Ej. Marketing, Producción"
+                            :invalida="!!form.errors.cargo"
+                        />
+                    </Campo>
+                    <Campo
+                        obligatorio
+                        etiqueta="Correo (será su usuario)"
+                        para="colaborador-correo"
+                        class="sm:col-span-2"
+                        ayuda="Con este correo iniciará sesión."
+                        :error="form.errors.email"
+                    >
+                        <Entrada
+                            id="colaborador-correo"
+                            v-model="form.email"
+                            type="email"
+                            required
+                            autocomplete="off"
+                            :invalida="!!form.errors.email"
+                        />
+                    </Campo>
+                </div>
+            </section>
+
+            <section class="flex flex-col gap-3">
+                <TituloSeccion
+                    :icono="KeyRound"
+                    titulo="Contraseña"
+                    descripcion="Tú la creas y se la compartes."
                 />
-            </Campo>
-            <Campo
-                obligatorio
-                etiqueta="Correo (será su usuario)"
-                para="colaborador-correo"
-                ayuda="Con este correo iniciará sesión."
-                :error="form.errors.email"
-            >
-                <Entrada
-                    id="colaborador-correo"
-                    v-model="form.email"
-                    type="email"
-                    required
-                    autocomplete="off"
-                    :invalida="!!form.errors.email"
+                <Campo
+                    obligatorio
+                    etiqueta="Contraseña"
+                    para="colaborador-contrasena"
+                    ayuda="Te la mostraremos una sola vez al crear la cuenta."
+                    :error="form.errors.password"
+                >
+                    <CampoContrasena
+                        id="colaborador-contrasena"
+                        v-model="form.password"
+                        required
+                        autocomplete="new-password"
+                        :invalida="!!form.errors.password"
+                    />
+                </Campo>
+                <RequisitosContrasena
+                    :contrasena="form.password"
+                    :correo="form.email"
                 />
-            </Campo>
-            <Campo
-                obligatorio
-                etiqueta="Contraseña"
-                para="colaborador-contrasena"
-                ayuda="Te la mostraremos una sola vez al crear la cuenta."
-                :error="form.errors.password"
-            >
-                <CampoContrasena
-                    id="colaborador-contrasena"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                    :invalida="!!form.errors.password"
-                />
-            </Campo>
-            <RequisitosContrasena
-                :contrasena="form.password"
-                :correo="form.email"
-            />
+            </section>
+
             <SelectorPaginas
                 v-model="form.paginas"
                 :paginas="paginas"
