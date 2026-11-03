@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Corregido (tablas paginadas · filas que caben, 3 de noviembre)
+
+- **El problema:** las tablas que se paginan según el espacio (A1, A2, A3, A3.1, A5 y E8) calculaban cuántas filas caben con el alto de la fila **más alta**. En A5, la fila del Administrador principal tiene tres líneas, así que la lista mostraba 5 cuentas y dejaba un espacio vacío abajo.
+- **Corrección:** `useFilasQueCaben` (`lib/paginacion.ts`) mide ahora con el alto **típico** de las filas (la mediana). Si en alguna página no caben, porque toca una fila más alta, `ajustar()` quita una, como antes.
+- **Resultado:** en A5, a 1626 × 990 pasa de 5 a 7 filas por página y a 1440 × 900 a 6, sin que la tabla se desborde. Lo que queda abajo es menos que una fila.
+
 ### Agregado (datos de demostración con volumen, 3 de noviembre)
 
 - **`database/seeders/DatosDemoSeeder.php`:** solo para desarrollo local, no lo llama `DatabaseSeeder`. Crea:

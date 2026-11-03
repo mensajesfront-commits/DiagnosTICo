@@ -65,7 +65,8 @@ export function usePaginacion<T>(
 /**
  * Cuántas filas de una tabla caben en su caja (`contenedor`) en pantallas
  * grandes, para que la página no se desplace; en pantallas pequeñas,
- * `movil` por página. Mide la fila más alta que se ve y vuelve a medir al
+ * `movil` por página. Mide el alto típico de las filas que se ven (la
+ * mediana) y vuelve a medir al
  * cambiar el tamaño de la caja o cuando carga la letra. Llamar `medir()`
  * cuando la tabla pasa de vacía a tener filas y `ajustar()` después de
  * mostrar otra página (por si sus filas son más altas).
@@ -103,15 +104,17 @@ export function useFilasQueCaben(
         }
 
         // Solo se mide al cambiar el tamaño (no al cambiar de página), así el
-        // número de filas no salta.
-        let altoFila = 0;
-
-        for (const elemento of caja.querySelectorAll(fila)) {
-            altoFila = Math.max(
-                altoFila,
-                elemento.getBoundingClientRect().height,
-            );
-        }
+        // número de filas no salta. Con el alto típico (la mediana) y no el
+        // de la fila más alta: una fila de tres líneas dejaba espacio vacío
+        // en las demás páginas. Si en una página no caben, `ajustar()` quita
+        // una.
+        const altos = [...caja.querySelectorAll(fila)]
+            .map((elemento) => elemento.getBoundingClientRect().height)
+            .filter((alto) => alto > 0)
+            .sort((a, b) => a - b);
+        const altoFila = altos.length
+            ? altos[Math.floor((altos.length - 1) / 2)]
+            : 0;
 
         const altoEncabezado = encabezado
             ? (caja.querySelector(encabezado)?.clientHeight ?? 40)
