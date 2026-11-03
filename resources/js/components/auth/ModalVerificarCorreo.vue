@@ -123,7 +123,12 @@ watch(abierto, (valor) => {
 </script>
 
 <template>
-    <Modal v-model:abierto="abierto" :titulo="titulo" ancho="sm">
+    <Modal
+        v-model:abierto="abierto"
+        :titulo="titulo"
+        ancho="sm"
+        :icono="MailCheck"
+    >
         <template #descripcion>
             Enviamos un código de 6 dígitos a
             <strong class="text-tinta">{{ correo }}</strong

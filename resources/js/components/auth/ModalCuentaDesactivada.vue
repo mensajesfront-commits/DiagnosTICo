@@ -23,14 +23,14 @@ const abierto = defineModel<boolean>('abierto', { default: false });
 </script>
 
 <template>
-    <Modal v-model:abierto="abierto" :titulo="titulo" ancho="sm">
-        <div class="flex flex-col items-center gap-4 text-center">
-            <span
-                class="grid size-12 place-items-center rounded-full bg-aviso-suave text-aviso"
-                aria-hidden="true"
-            >
-                <CircleSlash class="size-6" />
-            </span>
+    <Modal
+        v-model:abierto="abierto"
+        :titulo="titulo"
+        ancho="sm"
+        :icono="CircleSlash"
+        tono="peligro"
+    >
+        <div class="flex flex-col gap-3">
             <p class="text-sm text-tinta">{{ mensaje }}</p>
             <p class="text-xs text-tinta-suave">
                 Escríbenos a

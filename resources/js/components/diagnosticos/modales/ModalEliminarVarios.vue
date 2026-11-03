@@ -6,10 +6,12 @@
  * Solo llegan diagnósticos que nunca se publicaron; se borran con sus
  * categorías y preguntas. Envía: ids[].
  */
+import { Trash2 } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
 import type { FilaDiagnostico } from '@/types/diagnosticos';
 
@@ -45,6 +47,8 @@ function eliminar(): void {
                 ? '¿Eliminar 1 diagnóstico?'
                 : `¿Eliminar ${cantidad} diagnósticos?`
         "
+        :icono="Trash2"
+        tono="peligro"
     >
         <div class="flex flex-col gap-3 text-sm">
             <p>
@@ -65,12 +69,9 @@ function eliminar(): void {
                     </span>
                 </li>
             </ul>
-            <p
-                v-if="form.errors.ids"
-                class="rounded-md bg-aviso-suave px-3 py-2 text-aviso"
-            >
+            <Recuadro tono="peligro" v-if="form.errors.ids">
                 {{ form.errors.ids }}
-            </p>
+            </Recuadro>
         </div>
 
         <template #pie>

@@ -20,7 +20,7 @@
  * sitio_web, numero_empleados}.
  */
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { Lock, LogOut } from '@lucide/vue';
+import { KeyRound, Lock, LogOut } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import ModalVerificarCorreo from '@/components/auth/ModalVerificarCorreo.vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
@@ -852,6 +852,7 @@ function cerrarSesion(): void {
         titulo="Cambiar contraseña"
         descripcion="Tu sesión sigue abierta después del cambio."
         ancho="lg"
+        :icono="KeyRound"
     >
         <FormularioContrasena
             :con-pie="false"

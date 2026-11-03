@@ -5,6 +5,7 @@
  * nueva, que toma su mismo número, y si se pierden respuestas parciales.
  * Lo usan A3.1 ("Asignar otra medición") y A3.1b.
  */
+import { Replace } from '@lucide/vue';
 import Boton from '@/components/base/Boton.vue';
 import EtiquetaEstado from '@/components/base/EtiquetaEstado.vue';
 import type { EstadoMedicion } from '@/components/base/EtiquetaEstado.vue';
@@ -43,6 +44,8 @@ const fecha = (texto: string) => diaYMes(fechaLocal(texto));
         ancho="lg"
         :titulo="`¿Reemplazar la medición ${actual.numero} de ${empresa}?`"
         :descripcion="`Solo puede haber una medición pendiente por empresa. La medición ${actual.numero} se cancela y la nueva ocupa su lugar.`"
+        :icono="Replace"
+        tono="alerta"
     >
         <div class="grid gap-3 text-sm sm:grid-cols-2">
             <div class="rounded-lg border border-linea-fuerte px-4 py-3">

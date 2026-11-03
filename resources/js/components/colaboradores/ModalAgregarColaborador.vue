@@ -11,6 +11,7 @@
  *
  * Envía: POST /colaboradores con name, cargo, email, password y paginas[].
  */
+import { UserPlus } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -19,6 +20,7 @@ import Combobox from '@/components/base/Combobox.vue';
 import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
 import SelectorPaginas from '@/components/colaboradores/SelectorPaginas.vue';
 import { cargosSugeridos } from '@/lib/cargos';
@@ -87,6 +89,7 @@ function crear(): void {
         v-model:abierto="abierto"
         titulo="Agregar colaborador"
         descripcion="Crea una cuenta para alguien de tu equipo y elige qué páginas puede ver."
+        :icono="UserPlus"
     >
         <form
             id="form-agregar-colaborador"
@@ -166,12 +169,10 @@ function crear(): void {
                 prefijo="agregar-pagina"
                 :error="form.errors.paginas"
             />
-            <p
-                class="rounded-md bg-lienzo-oscuro/60 px-3 py-2.5 text-xs text-tinta-suave"
-            >
+            <Recuadro tono="neutro">
                 No enviamos la contraseña por correo: tú se la compartes. Solo
                 tú puedes cambiarla después, desde «Editar».
-            </p>
+            </Recuadro>
         </form>
 
         <template #pie>

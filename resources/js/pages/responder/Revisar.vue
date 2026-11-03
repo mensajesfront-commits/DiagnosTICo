@@ -14,6 +14,7 @@
  *
  * Envía: POST /mi-diagnostico/{id}/enviar y pasa a E4.
  */
+import { Send } from '@lucide/vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -265,6 +266,7 @@ const hora = computed(() =>
         ancho="sm"
         titulo="¿Enviar tu diagnóstico?"
         :descripcion="`${medicion.sector} · Medición ${medicion.numero} · ${avance.respondidas} preguntas respondidas`"
+        :icono="Send"
     >
         <p class="text-base">
             Después de enviarlo

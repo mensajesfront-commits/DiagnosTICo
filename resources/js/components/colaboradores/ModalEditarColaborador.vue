@@ -10,6 +10,7 @@
  * Envía: PUT /colaboradores/{id} con name, cargo, email, password (vacía
  * si no se cambia) y paginas[].
  */
+import { UserPen } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -18,6 +19,7 @@ import CampoContrasena from '@/components/base/CampoContrasena.vue';
 import Combobox from '@/components/base/Combobox.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import RequisitosContrasena from '@/components/base/RequisitosContrasena.vue';
 import SelectorPaginas from '@/components/colaboradores/SelectorPaginas.vue';
 import { cargosSugeridos } from '@/lib/cargos';
@@ -121,6 +123,7 @@ function guardar(): void {
         v-model:abierto="abierto"
         :titulo="`Editar a ${colaborador.nombre}`"
         descripcion="Cambia sus datos, las páginas que puede ver o define una contraseña nueva."
+        :icono="UserPen"
     >
         <form
             id="form-editar-colaborador"
@@ -216,13 +219,11 @@ function guardar(): void {
                         :contrasena="form.password"
                         :correo="form.email"
                     />
-                    <p
-                        class="rounded-md bg-lienzo-oscuro/60 px-3 py-2.5 text-xs text-tinta-suave"
-                    >
+                    <Recuadro tono="neutro">
                         Si {{ primerNombre }} tiene la sesión abierta, se
                         cerrará. Al guardar te mostramos los datos para que se
                         los compartas por un medio seguro.
-                    </p>
+                    </Recuadro>
                 </template>
             </div>
         </form>

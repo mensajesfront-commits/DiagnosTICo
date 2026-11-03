@@ -14,6 +14,7 @@
  * completas" (A4.4), cuándo aplica, la última edición y "Quitar ajuste".
  * Cambiar de alcance con cambios sin guardar pide confirmación.
  */
+import { Undo2 } from '@lucide/vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -760,6 +761,8 @@ const listoParaEditar = computed(
         ancho="sm"
         titulo="¿Descartar los cambios?"
         @update:abierto="(a: boolean) => !a && (destino = null)"
+        :icono="Undo2"
+        tono="alerta"
     >
         <p class="text-sm text-tinta-suave">
             Tienes cambios sin guardar en

@@ -10,6 +10,7 @@
  *
  * Envía: POST /diagnosticos/{id}/publicar con nota y pendientes.
  */
+import { History } from '@lucide/vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -80,6 +81,7 @@ function publicar(): void {
         ancho="lg"
         :titulo="`Versiones de “${diagnostico.nombre}” · ${diagnostico.sector.nombre}`"
         descripcion="El número de versión lo pone el sistema: v1, v2, v3… Solo se escribe una nota de qué cambió."
+        :icono="History"
     >
         <div class="flex flex-col gap-4 text-sm">
             <section>

@@ -14,12 +14,14 @@
  * Envía: POST /usuarios/{id}/desactivar (sin campos) o
  * DELETE /usuarios/{id} con confirmacion (el correo).
  */
+import { Trash2, UserCog, UserX } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import TarjetaOpcion from '@/components/base/TarjetaOpcion.vue';
 import { rutas } from '@/lib/rutas';
 import { avisoCuentaPrincipal } from '@/lib/usuarios';
@@ -90,7 +92,19 @@ function eliminar(): void {
 </script>
 
 <template>
-    <Modal v-model:abierto="abierto" :titulo="titulo" :descripcion="detalle">
+    <Modal
+        v-model:abierto="abierto"
+        :titulo="titulo"
+        :descripcion="detalle"
+        :icono="
+            paso === 'eliminar'
+                ? Trash2
+                : paso === 'desactivar'
+                  ? UserX
+                  : UserCog
+        "
+        :tono="paso === 'eliminar' ? 'peligro' : 'alerta'"
+    >
         <!-- Paso 1 · elegir -->
         <div v-if="paso === 'elegir'" class="flex flex-col gap-3">
             <TarjetaOpcion
@@ -119,12 +133,9 @@ function eliminar(): void {
                 No podrá iniciar sesión. Su información no se borra y puedes
                 reactivarla desde esta misma lista.
             </p>
-            <p
-                v-if="avisoDesactivar"
-                class="rounded-md bg-alerta-suave px-3 py-2.5 text-alerta"
-            >
-                ⚠ {{ avisoDesactivar }}
-            </p>
+            <Recuadro tono="alerta" v-if="avisoDesactivar">
+                {{ avisoDesactivar }}
+            </Recuadro>
         </div>
 
         <!-- Paso 2b · eliminar -->
@@ -134,7 +145,7 @@ function eliminar(): void {
             class="flex flex-col gap-4 text-sm"
             @submit.prevent="coincide && eliminar()"
         >
-            <div class="rounded-md bg-aviso-suave px-3 py-2.5 text-aviso">
+            <Recuadro tono="peligro">
                 <p class="font-medium">
                     Tienes 90 días para recuperarla; después se borra para
                     siempre.
@@ -153,7 +164,7 @@ function eliminar(): void {
                     Para recuperarla, filtra por Estado «Eliminadas». Si solo
                     quieres quitarle el acceso, desactívala.
                 </p>
-            </div>
+            </Recuadro>
             <Campo
                 obligatorio
                 etiqueta="Para confirmar, escribe el correo de la cuenta"

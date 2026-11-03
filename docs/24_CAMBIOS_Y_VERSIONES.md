@@ -70,6 +70,25 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (las demás ventanas del sistema, 3 de noviembre)
+
+- **Las 35 ventanas que faltaban llevan ícono en el título**, con el color de la acción:
+  - azul: crear, editar, ver o probar;
+  - ámbar: desactivar, reemplazar o quitar un ajuste;
+  - rojo: eliminar o cancelar;
+  - verde: reactivar o datos listos.
+- **Cuáles son:**
+  - editor (agregar categoría, versiones, agregar o editar pregunta, eliminar pregunta);
+  - sectores (desactivar o reactivar, reasignar, eliminar, eliminar varios diagnósticos);
+  - empresas (cuenta principal, desactivar, reemplazar, cambiar fecha o cancelar medición);
+  - usuarios y roles; colaboradores; Configuración IA (probar, instrucciones completas, quitar ajuste, descartar cambios);
+  - Mi perfil (cambiar contraseña, eliminar mi cuenta);
+  - inicio de sesión (verificar correo, cuenta desactivada, demasiados intentos);
+  - documentos legales del registro;
+  - «¿Enviar tu diagnóstico?» (E3).
+- **Avisos:** 23 avisos dentro de esas ventanas pasan al componente `Recuadro`, con su ícono. Se quitaron los «⚠» que quedaban repetidos junto al ícono.
+- **Plurales:** las ventanas de sector decían «1 empresas, 1 diagnósticos y 1 mediciones» y «Reasignar las 1 empresas». Ahora usan `plural()` (nuevo, en `resources/js/lib/texto.ts`).
+
 ### Cambiado (ventanas de diagnósticos y categorías, A3.1b y A3.2 · diseño, 3 de noviembre)
 
 - **Ventana base (`Modal`):** acepta un ícono junto al título, con color según la acción: azul para crear o editar, ámbar para archivar, rojo para eliminar. Lleva esquinas más redondeadas y el pie en gris claro. Lo usan todas las ventanas del sistema.

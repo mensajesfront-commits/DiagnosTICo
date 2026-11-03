@@ -13,10 +13,12 @@
  *
  * Envía: POST /colaboradores/{id}/desactivar o DELETE /colaboradores/{id}.
  */
+import { Trash2, UserCog, UserX } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import TarjetaOpcion from '@/components/base/TarjetaOpcion.vue';
 import { rutas } from '@/lib/rutas';
 import type { Colaborador } from '@/types/colaboradores';
@@ -86,6 +88,16 @@ function eliminar(): void {
         v-model:abierto="abierto"
         :titulo="titulo"
         :descripcion="colaborador.correo"
+        :icono="
+            paso === 'eliminar' || paso === 'confirmar'
+                ? Trash2
+                : paso === 'desactivar'
+                  ? UserX
+                  : UserCog
+        "
+        :tono="
+            paso === 'eliminar' || paso === 'confirmar' ? 'peligro' : 'alerta'
+        "
     >
         <div v-if="paso === 'elegir'" class="flex flex-col gap-3">
             <TarjetaOpcion titulo="Desactivar" @elegir="paso = 'desactivar'">
@@ -107,14 +119,11 @@ function eliminar(): void {
             conservan, y puedes reactivarlo desde esta misma lista.
         </p>
 
-        <p
-            v-else-if="paso === 'eliminar'"
-            class="rounded-md bg-aviso-suave px-3 py-2.5 text-sm text-aviso"
-        >
+        <Recuadro tono="peligro" v-else-if="paso === 'eliminar'">
             {{ colaborador.nombre }} sale de tu lista y ya no puede entrar. Si
             fue un error, escribe a NuevasTIC en los próximos 90 días para
             recuperarlo; después se borra para siempre.
-        </p>
+        </Recuadro>
 
         <div v-else class="flex flex-col gap-2 text-sm">
             <p>

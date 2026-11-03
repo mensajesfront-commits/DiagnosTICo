@@ -26,14 +26,14 @@ const reloj = computed(() => {
 </script>
 
 <template>
-    <Modal v-model:abierto="abierto" titulo="Demasiados intentos" ancho="sm">
-        <div class="flex flex-col items-center gap-4 text-center">
-            <span
-                class="grid size-12 place-items-center rounded-full bg-alerta-suave text-alerta"
-                aria-hidden="true"
-            >
-                <Clock class="size-6" />
-            </span>
+    <Modal
+        v-model:abierto="abierto"
+        titulo="Demasiados intentos"
+        ancho="sm"
+        :icono="Clock"
+        tono="alerta"
+    >
+        <div class="flex flex-col gap-3">
             <p class="text-sm text-tinta">
                 Por tu seguridad, después de 5 intentos fallidos pausamos el
                 inicio de sesión con este correo durante un minuto.

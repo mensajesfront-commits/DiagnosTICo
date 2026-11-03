@@ -5,11 +5,13 @@
  *
  * Envía: POST /roles/{id}/asignar con cuenta_id y avisar.
  */
+import { UserCheck } from '@lucide/vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
 import {
     avisoCuentaPrincipal,
@@ -92,6 +94,7 @@ function asignar(): void {
         v-model:abierto="abierto"
         :titulo="`Asignar el rol ${rol.nombre}`"
         ancho="lg"
+        :icono="UserCheck"
     >
         <template #descripcion>
             Elige una cuenta que ya existe. Su rol actual se reemplaza por
@@ -166,12 +169,7 @@ function asignar(): void {
                 </p>
             </fieldset>
 
-            <p
-                v-if="aviso"
-                class="rounded-md bg-alerta-suave px-3 py-2.5 text-sm text-alerta"
-            >
-                ⚠ {{ aviso }}
-            </p>
+            <Recuadro tono="alerta" v-if="aviso"> {{ aviso }} </Recuadro>
 
             <label class="flex items-center gap-2 text-sm">
                 <input

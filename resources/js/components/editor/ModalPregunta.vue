@@ -23,7 +23,16 @@
  * Envía: POST /diagnosticos/{id}/preguntas o PUT …/preguntas/{pregunta}.
  */
 import { useForm } from '@inertiajs/vue3';
-import { ArrowDown, ArrowUp, Lightbulb, Plus, Sparkles, X } from '@lucide/vue';
+import {
+    ArrowDown,
+    ArrowUp,
+    Lightbulb,
+    MessageSquarePlus,
+    Pencil,
+    Plus,
+    Sparkles,
+    X,
+} from '@lucide/vue';
 import { computed, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
@@ -271,6 +280,7 @@ const claseSelect =
                 ? `Editar pregunta ${numero} · ${parte.nombre}`
                 : `Agregar pregunta · ${parte.nombre}`
         "
+        :icono="pregunta ? Pencil : MessageSquarePlus"
     >
         <template #descripcion>
             <template v-if="!pregunta">

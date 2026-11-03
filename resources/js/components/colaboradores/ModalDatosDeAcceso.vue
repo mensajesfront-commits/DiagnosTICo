@@ -6,9 +6,11 @@
  * contraseña (E12.3). Muestra el usuario y la contraseña una sola vez: al
  * cerrar se borran de la pantalla.
  */
+import { KeyRound } from '@lucide/vue';
 import { ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import type { DatosDeAcceso } from '@/types/colaboradores';
 
 const props = defineProps<{
@@ -42,16 +44,18 @@ async function copiar(): Promise<void> {
         v-model:abierto="abierto"
         titulo="Comparte estos datos"
         :descripcion="`${datos.nombre} ya puede iniciar sesión con ${cambio ? 'su contraseña nueva' : 'ellos'}.`"
+        :icono="KeyRound"
+        tono="exito"
     >
         <div class="flex flex-col gap-4 text-sm">
-            <p class="rounded-md bg-exito-suave px-3 py-2.5 text-exito">
+            <Recuadro tono="exito">
                 ✓
                 {{
                     cambio
                         ? `Contraseña cambiada para ${datos.nombre}`
                         : `Cuenta creada para ${datos.nombre}`
                 }}
-            </p>
+            </Recuadro>
             <dl class="border-y border-linea">
                 <div
                     class="flex items-center justify-between gap-4 border-b border-linea py-3"
@@ -64,11 +68,11 @@ async function copiar(): Promise<void> {
                     <dd class="font-mono break-all">{{ datos.contrasena }}</dd>
                 </div>
             </dl>
-            <p class="rounded-md bg-alerta-suave px-3 py-2.5 text-alerta">
-                ⚠ Esta contraseña no se vuelve a mostrar. Cópiala y compártela
+            <Recuadro tono="alerta">
+                Esta contraseña no se vuelve a mostrar. Cópiala y compártela
                 ahora por un medio seguro. Si se pierde, puedes crear una nueva
                 con "Cambiar contraseña".
-            </p>
+            </Recuadro>
         </div>
 
         <template #pie>

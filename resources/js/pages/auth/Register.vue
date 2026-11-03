@@ -20,6 +20,7 @@
  *
  * Solo se ofrecen sectores activos y no existe la opción "Otro" (RN-003).
  */
+import { FileText } from '@lucide/vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, nextTick, ref, watch } from 'vue';
 import CaptchaTurnstile from '@/components/auth/CaptchaTurnstile.vue';
@@ -544,6 +545,7 @@ const pasos = [
         :descripcion="legal ? documentosLegales[legal].resumen : undefined"
         ancho="xl"
         @update:abierto="(v) => !v && (legal = null)"
+        :icono="FileText"
     >
         <TextoLegal v-if="legal" :documento="documentosLegales[legal]" />
         <template #pie>

@@ -8,6 +8,7 @@
  *
  * Envía: POST /usuarios/invitar con name, email, rol_id y mensaje (opcional).
  */
+import { UserPlus } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
@@ -15,6 +16,7 @@ import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import OpcionRol from '@/components/usuarios/OpcionRol.vue';
 import { rutas } from '@/lib/rutas';
 import type { Rol } from '@/types/usuarios';
@@ -59,6 +61,7 @@ function invitar(): void {
         titulo="Invitar usuario interno"
         descripcion="Para alguien del equipo de NuevasTIC. No se asocia a ninguna empresa: las cuentas de empresa se crean al registrar la empresa."
         ancho="lg"
+        :icono="UserPlus"
     >
         <form
             id="form-invitar"
@@ -137,12 +140,10 @@ function invitar(): void {
                 />
             </Campo>
 
-            <p
-                class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
-            >
+            <Recuadro tono="neutro">
                 Recibirá un correo para crear su contraseña. El enlace sirve
                 hasta que la cree.
-            </p>
+            </Recuadro>
         </form>
 
         <template #pie>

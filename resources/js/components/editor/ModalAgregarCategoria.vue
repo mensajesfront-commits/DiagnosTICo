@@ -10,11 +10,13 @@
  *
  * Envía: POST /diagnosticos/{id}/categorias con categorias[] y reparto.
  */
+import { Shapes } from '@lucide/vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
 import { normalizar } from '@/lib/texto';
 import type { CategoriaCatalogo, ParteEditor } from '@/types/editor';
@@ -88,6 +90,7 @@ const errores = computed(
         ancho="lg"
         titulo="Agregar categoría a este diagnóstico"
         descripcion="Elige categorías del catálogo. Si falta una, primero se crea en el catálogo de categorías."
+        :icono="Shapes"
     >
         <div class="flex flex-col gap-4 text-sm">
             <Entrada
@@ -101,14 +104,11 @@ const errores = computed(
                 <h3 class="mb-2 text-xs font-medium">
                     Disponibles para agregar ({{ disponibles.length }})
                 </h3>
-                <p
-                    v-if="disponibles.length === 0"
-                    class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
-                >
+                <Recuadro tono="neutro" v-if="disponibles.length === 0">
                     No hay más categorías en el catálogo{{
                         busqueda ? ' con ese nombre' : ''
                     }}.
-                </p>
+                </Recuadro>
                 <div v-else class="flex flex-col gap-2">
                     <label
                         v-for="c in disponibles"

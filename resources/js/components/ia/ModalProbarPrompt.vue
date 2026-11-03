@@ -4,9 +4,11 @@
  * con las instrucciones actuales, incluidos los cambios sin guardar, y
  * muestra lo que respondería. No guarda nada; gasta una llamada a la IA.
  */
+import { FlaskConical } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import SelectorEjemplo from '@/components/ia/SelectorEjemplo.vue';
 import TarjetaRecomendacion from '@/components/resultados/TarjetaRecomendacion.vue';
 import { enviarJson } from '@/lib/ia';
@@ -91,6 +93,7 @@ const resultadoDe = computed(
         ancho="xl"
         titulo="Probar con un ejemplo · Analizar categoría"
         descripcion="Elige una empresa y una categoría de ejemplo y mira qué respondería la IA con tus instrucciones actuales, incluidos los cambios sin guardar."
+        :icono="FlaskConical"
     >
         <div class="flex max-h-[60vh] flex-col gap-4 overflow-y-auto">
             <SelectorEjemplo
@@ -140,13 +143,9 @@ const resultadoDe = computed(
                 </span>
             </div>
 
-            <p
-                v-if="error"
-                class="rounded-md bg-aviso-suave px-3 py-2 text-sm text-aviso"
-                role="alert"
-            >
+            <Recuadro tono="peligro" v-if="error" role="alert">
                 {{ error }}
-            </p>
+            </Recuadro>
 
             <section
                 v-if="prueba"

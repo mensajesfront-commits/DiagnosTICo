@@ -25,7 +25,7 @@ import Modal from '@/components/base/Modal.vue';
 import Recuadro from '@/components/base/Recuadro.vue';
 import TarjetaOpcion from '@/components/base/TarjetaOpcion.vue';
 import { rutas } from '@/lib/rutas';
-import { normalizar } from '@/lib/texto';
+import { normalizar, plural } from '@/lib/texto';
 import type {
     DivisionCiiu,
     ResumenDiagnosticos,
@@ -360,7 +360,11 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
                     </p>
                     <TarjetaOpcion
                         v-if="resumen.empresas > 0"
-                        :titulo="`Reasignar las ${resumen.empresas} empresas a otro sector`"
+                        :titulo="
+                            resumen.empresas === 1
+                                ? 'Reasignar la empresa a otro sector'
+                                : `Reasignar las ${resumen.empresas} empresas a otro sector`
+                        "
                         @elegir="otraOpcion('reasignar')"
                     >
                         Al reasignar, las empresas se llevan sus mediciones. Si
@@ -385,9 +389,11 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
                         @elegir="otraOpcion('eliminar')"
                     >
                         <template v-if="tieneDatos">
-                            Tiene {{ resumen.empresas }} empresas. Reasígnalas o
-                            desactiva el sector. Si queda sin empresas ni
-                            mediciones, podrás eliminarlo.
+                            Tiene
+                            {{
+                                plural(resumen.empresas, 'empresa', 'empresas')
+                            }}. Reasígnalas o desactiva el sector. Si queda sin
+                            empresas ni mediciones, podrás eliminarlo.
                         </template>
                         <template v-else>
                             No tiene empresas ni mediciones. No se puede

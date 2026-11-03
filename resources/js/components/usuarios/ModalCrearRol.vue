@@ -8,12 +8,14 @@
  *
  * Envía: POST /roles con nombre, descripcion, activo, permisos[] y cuentas[].
  */
+import { ShieldPlus } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import GrillaPermisos from '@/components/usuarios/GrillaPermisos.vue';
 import { rutas } from '@/lib/rutas';
 import { avisoCuentaPrincipal, coincide } from '@/lib/usuarios';
@@ -97,6 +99,7 @@ function crear(): void {
         titulo="Crear rol"
         descripcion="Define qué puede hacer y, si quieres, a quién se lo das ahora."
         ancho="xl"
+        :icono="ShieldPlus"
     >
         <form
             id="form-crear-rol"
@@ -215,13 +218,9 @@ function crear(): void {
                         </button>
                     </li>
                 </ul>
-                <p
-                    v-for="aviso in avisos"
-                    :key="aviso"
-                    class="rounded-md bg-alerta-suave px-3 py-2.5 text-sm text-alerta"
-                >
-                    ⚠ {{ aviso }}
-                </p>
+                <Recuadro tono="alerta" v-for="aviso in avisos" :key="aviso">
+                    {{ aviso }}
+                </Recuadro>
             </div>
         </form>
 
