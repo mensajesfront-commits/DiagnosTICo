@@ -70,6 +70,27 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A5 · diseño de Usuarios y roles, 3 de noviembre)
+
+- **Encabezado:** ícono, y las pestañas «Usuarios» y «Roles» con ícono. La elegida va en azul.
+- **A5 · Usuarios:**
+  - accesos rápidos por estado con su conteo (Todas, Activas, Invitaciones, Desactivadas, Eliminadas), como en Empresas; reemplazan el filtro «Estado»;
+  - búsqueda con lupa y filtro de rol en una tarjeta;
+  - cada cuenta con un círculo de iniciales del color de su rol (Administrador azul, Empresa verde, Colaborador celeste, los creados gris) y «Tú» en la propia;
+  - el rol en una píldora;
+  - la empresa con ícono, o «Equipo NuevasTIC» en las internas;
+  - el estado con un punto de color;
+  - las acciones son botones con ícono: Ver como, Cambiar rol, Desactivar / Eliminar, Reactivar, Reenviar invitación, Recuperar, Eliminar.
+- **A5.1 · Roles:**
+  - cada rol con su ícono y color, el número de cuentas en una píldora y un candado si es del sistema; el elegido va en azul;
+  - el detalle empieza con una cabecera (ícono, nombre, descripción y píldoras «Del sistema», «Activo» o «Inactivo» y el número de cuentas);
+  - en los roles del sistema ya no se muestran el nombre y la descripción en campos bloqueados;
+  - «Rol activo» es un interruptor;
+  - los permisos van en tarjetas por bloque, con ícono y «2/3»;
+  - las cuentas van con iniciales;
+  - los botones llevan ícono.
+- `resources/js/lib/roles.ts` (nuevo): ícono y color de cada rol.
+
 ### Cambiado (A4 · diseño de Configuración IA, 3 de noviembre)
 
 - **Encabezado:** ícono, y el estado de los cambios en una píldora (verde «Sin cambios pendientes», ámbar «Cambios sin guardar»). «Descartar» y «Guardar» llevan ícono.
