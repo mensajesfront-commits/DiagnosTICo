@@ -70,6 +70,24 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A2.1c · diseño de Editar importancia, 3 de noviembre)
+
+- **Encabezado:**
+  - lleva ícono, "Volver al editor" y el diagnóstico con su sector debajo del título;
+  - "Cancelar" y "Guardar importancia" llevan ícono.
+- **Resumen arriba:**
+  - el total va en un anillo de color: verde si suma 100, rojo si se pasa y naranja si falta;
+  - una etiqueta dice "Suma exacta", "Sobran N puntos" o "Faltan N puntos", junto al número de categorías cambiadas;
+  - botones "Deshacer cambios" (nuevo: vuelve a los valores guardados sin salir) y "Repartir en partes iguales".
+- **Categorías:**
+  - cada una es una tarjeta con número, nombre, el campo en % y una barra deslizable;
+  - las cambiadas se resaltan con "Antes 20 → 25".
+- **A la derecha, tres tarjetas:**
+  - qué significa la importancia, con el ejemplo en un recuadro;
+  - el efecto del cambio, con ícono por punto;
+  - los cuatro niveles fijos con su color y rango.
+- La validación (exactamente 100 %) y el backend no cambian.
+
 ### Agregado (páginas de error con el diseño de Captter, 3 de noviembre)
 
 - **Nueva página `resources/js/pages/errores/Error.vue`** para 403, 404, 500 y 503, en vez de la página blanca de Laravel:
