@@ -70,6 +70,21 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (L1–L4 · diseño de Iniciar sesión y Registro, 3 de noviembre)
+
+- **Layout de acceso (`AuthLayout.vue`), usado por L1 a L4:**
+  - el panel oscuro tiene un fondo con brillos y puntos, una etiqueta "Diagnóstico de marketing digital" y el titular más grande;
+  - los tres pasos (responder, recibir el resultado, medir la evolución) van con ícono, título y una línea;
+  - en pantallas anchas se muestra una tarjeta de **ejemplo** de resultado. Es solo decorativa: `aria-hidden` y datos de muestra;
+  - el formulario va en una tarjeta blanca con sombra;
+  - en el celular, la marca va centrada arriba y la ayuda abajo con ícono.
+- **L1 Iniciar sesión:** el botón lleva ícono. "Registrar mi empresa" pasa a ser un botón secundario de ancho completo, bajo un separador "¿Aún no tienes cuenta?".
+- **L2 Registro:**
+  - indicador de pasos con ícono (empresa, usuario); el paso hecho se marca con ✓ verde y el actual queda resaltado;
+  - "Siguiente: tu usuario →", "← Atrás" y "✓ Registrar empresa" con íconos;
+  - la casilla de términos va en un recuadro que se resalta al marcarla y se pone rojo si falta.
+- L3 y L4 toman el nuevo layout sin más cambios. La lógica, la validación y el backend no cambian.
+
 ### Cambiado (A6 / E11 · diseño de Mi perfil, 3 de noviembre)
 
 - **Encabezado:** lleva ícono. El aviso de solo lectura (colaborador o rol sin permiso) va en un recuadro de alerta.

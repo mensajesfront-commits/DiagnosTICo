@@ -20,7 +20,14 @@
  *
  * Solo se ofrecen sectores activos y no existe la opción "Otro" (RN-003).
  */
-import { FileText } from '@lucide/vue';
+import {
+    ArrowLeft,
+    ArrowRight,
+    Building2,
+    Check,
+    FileText,
+    UserRound,
+} from '@lucide/vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, nextTick, ref, watch } from 'vue';
 import CaptchaTurnstile from '@/components/auth/CaptchaTurnstile.vue';
@@ -196,8 +203,18 @@ function enviar(): void {
 }
 
 const pasos = [
-    { numero: 1, titulo: 'Mi empresa' },
-    { numero: 2, titulo: 'Tu usuario' },
+    {
+        numero: 1,
+        titulo: 'Mi empresa',
+        texto: 'Datos del negocio',
+        icono: Building2,
+    },
+    {
+        numero: 2,
+        titulo: 'Tu usuario',
+        texto: 'Con qué vas a entrar',
+        icono: UserRound,
+    },
 ] as const;
 </script>
 
@@ -206,34 +223,70 @@ const pasos = [
 
     <form class="flex flex-col gap-4" novalidate @submit.prevent="enviar">
         <!-- Indicador de pasos -->
-        <ol class="grid grid-cols-2 gap-3" aria-label="Pasos del registro">
-            <li
-                v-for="p in pasos"
-                :key="p.numero"
-                :aria-current="paso === p.numero ? 'step' : undefined"
-                class="flex flex-col gap-1.5"
-            >
-                <span
+        <ol
+            class="mb-2 flex items-center gap-1.5 rounded-xl bg-lienzo/70 p-1.5 sm:gap-3 sm:p-2"
+            aria-label="Pasos del registro"
+        >
+            <template v-for="(p, i) in pasos" :key="p.numero">
+                <li
+                    v-if="i > 0"
+                    aria-hidden="true"
                     :class="
                         cn(
-                            'h-1 rounded-full',
-                            paso >= p.numero ? 'bg-marca' : 'bg-linea',
+                            'hidden h-0.5 w-10 shrink-0 rounded-full sm:block',
+                            paso > 1 ? 'bg-marca' : 'bg-linea-fuerte',
                         )
                     "
                 />
-                <span
+                <li
+                    :aria-current="paso === p.numero ? 'step' : undefined"
                     :class="
                         cn(
-                            'text-xs',
-                            paso === p.numero
-                                ? 'font-semibold text-marca'
-                                : 'text-tinta-suave',
+                            'flex min-w-0 flex-1 basis-0 items-center gap-2 rounded-lg px-1.5 py-1.5 sm:gap-2.5 sm:px-2',
+                            paso === p.numero &&
+                                'bg-white shadow-xs ring-1 ring-linea',
                         )
                     "
                 >
-                    Paso {{ p.numero }} de 2 · {{ p.titulo }}
-                </span>
-            </li>
+                    <span
+                        :class="
+                            cn(
+                                'flex size-7 shrink-0 items-center justify-center rounded-lg sm:size-8',
+                                paso > p.numero
+                                    ? 'bg-exito text-white'
+                                    : paso === p.numero
+                                      ? 'bg-marca text-white'
+                                      : 'bg-lienzo-oscuro text-tinta-suave',
+                            )
+                        "
+                        aria-hidden="true"
+                    >
+                        <Check v-if="paso > p.numero" class="size-4" />
+                        <component :is="p.icono" v-else class="size-4" />
+                    </span>
+                    <span class="min-w-0">
+                        <span class="block text-[11px] text-tinta-suave"
+                            >Paso {{ p.numero }} de 2<span
+                                v-if="paso > p.numero"
+                                class="sr-only"
+                            >
+                                (listo)</span
+                            ></span
+                        >
+                        <span
+                            :class="
+                                cn(
+                                    'block truncate text-sm',
+                                    paso === p.numero
+                                        ? 'font-semibold text-tinta'
+                                        : 'text-tinta-suave',
+                                )
+                            "
+                            >{{ p.titulo }}</span
+                        >
+                    </span>
+                </li>
+            </template>
         </ol>
 
         <!-- Paso 1 · Mi empresa -->
@@ -350,8 +403,9 @@ const pasos = [
                 }"
             />
 
-            <Boton type="submit" class="w-full sm:col-span-2">
-                Siguiente
+            <Boton type="submit" class="mt-2 w-full sm:col-span-2">
+                Siguiente: tu usuario
+                <ArrowRight class="size-4" aria-hidden="true" />
             </Boton>
         </div>
 
@@ -462,7 +516,17 @@ const pasos = [
             />
 
             <div>
-                <label class="flex items-start gap-2 text-sm text-tinta">
+                <label
+                    :class="
+                        cn(
+                            'flex cursor-pointer items-start gap-2.5 rounded-xl border p-3 text-sm text-tinta transition-colors',
+                            form.terminos
+                                ? 'border-marca/40 bg-marca-suave/50'
+                                : 'border-linea',
+                            form.errors.terminos && 'border-aviso',
+                        )
+                    "
+                >
                     <input
                         v-model="form.terminos"
                         type="checkbox"
@@ -513,6 +577,7 @@ const pasos = [
 
             <div class="flex flex-col-reverse gap-3 sm:flex-row">
                 <Boton variante="secundario" class="sm:w-40" @click="atras">
+                    <ArrowLeft class="size-4" aria-hidden="true" />
                     Atrás
                 </Boton>
                 <Boton
@@ -522,12 +587,15 @@ const pasos = [
                     :cargando="form.processing"
                     data-test="register-user-button"
                 >
+                    <Check class="size-4" aria-hidden="true" />
                     Registrar empresa
                 </Boton>
             </div>
         </div>
 
-        <p class="text-center text-sm text-tinta-suave">
+        <p
+            class="mt-2 border-t border-linea pt-4 text-center text-sm text-tinta-suave"
+        >
             ¿Ya tienes cuenta?
             <Link
                 :href="login()"
