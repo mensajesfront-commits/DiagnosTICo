@@ -70,6 +70,24 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Agregado (páginas de error con el diseño de Captter, 3 de noviembre)
+
+- **Nueva página `resources/js/pages/errores/Error.vue`** para 403, 404, 500 y 503, en vez de la página blanca de Laravel:
+  - logo, ícono por tipo de error, "ERROR 404", un título y una explicación en lenguaje sencillo;
+  - botones "Volver" e "Ir al inicio" (lleva a `/`, que manda al login o al inicio de cada rol);
+  - enlace a soporte con el asunto ya escrito.
+- **Textos de cada error:**
+  - **403:** "No tienes acceso a esta página".
+  - **404:** "No encontramos esta página".
+  - **500:** "Algo salió mal de nuestro lado".
+  - **503:** "Estamos en mantenimiento".
+- **El 500 solo se cambia con `APP_DEBUG=false`.** Mientras se programa sigue saliendo el detalle del error.
+- **419 (página expirada):** no muestra una pantalla. Vuelve a la página anterior con el aviso "La página estuvo abierta mucho tiempo. Inténtalo de nuevo".
+- **Peticiones JSON:** siguen recibiendo el error en JSON.
+- Se arma en `bootstrap/app.php` (`withExceptions → respond`). La página no usa el menú ni la sesión, porque en un 404 Laravel no la abre.
+- **Pruebas:** `tests/Feature/PaginasErrorTest.php` (6 casos).
+- [INFORMACIÓN PENDIENTE] El correo de soporte falta confirmarlo con NuevasTIC.
+
 ### Cambiado (L1 · diseño de Demasiados intentos y Cuenta desactivada, 3 de noviembre)
 
 - **Demasiados intentos:**
