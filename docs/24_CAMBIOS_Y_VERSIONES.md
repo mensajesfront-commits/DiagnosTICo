@@ -70,6 +70,19 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (L3 · diseño de ¿Olvidaste tu contraseña?, 3 de noviembre)
+
+- **Formulario:**
+  - el correo lleva una nota con ícono: "El enlace no vence por tiempo: sirve hasta que cambies la contraseña" (RN-006);
+  - "Enviar enlace" lleva ícono;
+  - "Volver a iniciar sesión" va con flecha, bajo una línea.
+- **Al enviar,** el formulario se cambia por una vista de confirmación:
+  - ícono de correo en verde y "Revisa tu correo", con el mismo texto que no afirma que la cuenta exista (RN-005);
+  - tres pasos numerados que citan el asunto y el botón reales del correo ("Cambia tu contraseña de Captter" y "Cambiar contraseña");
+  - nota de spam: si se pide otro enlace, solo funciona el último;
+  - botones "Reenviar enlace" (reenvía con el mismo formulario, que queda oculto) y "Usar otro correo" (vuelve al formulario).
+- El backend no cambia.
+
 ### Cambiado (L1–L4 · diseño de Iniciar sesión y Registro, 3 de noviembre)
 
 - **Layout de acceso (`AuthLayout.vue`), usado por L1 a L4:**
