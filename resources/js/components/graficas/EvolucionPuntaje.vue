@@ -122,6 +122,10 @@ const fuente = { family: 'IBM Plex Mono', size: 11 };
 const opciones: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    // Sin animación de entrada: en E8/A3.4 el contenedor crece después de
+    // crear la gráfica y Chart.js terminaba la animación con las posiciones
+    // del tamaño inicial (los puntos quedaban arriba a la izquierda).
+    animation: false,
     // Espacio arriba para la etiqueta de un puntaje cerca de 100.
     layout: { padding: { top: 16 } },
     plugins: { legend: { display: false } },

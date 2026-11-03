@@ -70,6 +70,24 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Agregado (datos de demostración con volumen, 3 de noviembre)
+
+- **`database/seeders/DatosDemoSeeder.php`:** solo para desarrollo local, no lo llama `DatabaseSeeder`. Crea:
+  - 20 empresas en Comidas y Programación y consultoría informática, cada una con su cuenta principal;
+  - de 1 a 4 mediciones terminadas por empresa, con respuestas guardadas y resultados calculados con `PublicarResultado::calcular`, igual que uno real. Los textos de la IA son de ejemplo, sin llamarla;
+  - en algunas empresas, además, una medición en curso, sin empezar o vencida;
+  - 6 colaboradores en Panadería La Espiga, uno desactivado;
+  - una consultora (Valeria Ríos) con 10 empresas vinculadas.
+- **Las cuentas** terminan en `captter-demo.test` y usan la contraseña `DatosDemoSeeder::CLAVE`. Los comandos y los correos de prueba están en el README.
+- **Se puede repetir:** borra lo anterior de la demostración y lo crea de nuevo. `DatosDemoSeeder::limpiar()` solo lo borra.
+- **Pruebas:** `tests/Feature/DatosDemoTest.php`.
+
+### Corregido (E8 / A3.4 · gráfica de evolución, 3 de noviembre)
+
+- **El problema:** en Mi historial y en el historial de la empresa, con varias mediciones, la gráfica dejaba los puntos amontonados arriba a la izquierda y sin línea. El contenedor crece después de crear la gráfica, y Chart.js terminaba la animación de entrada con las posiciones del tamaño inicial.
+- **Corrección:** `EvolucionPuntaje.vue` ya no anima la entrada (`animation: false`). Se dibuja directamente con el tamaño real y se ajusta igual al cambiar de tamaño.
+- No se había visto porque ninguna empresa de prueba tenía más de una medición. Apareció con los datos de demostración.
+
 ### Corregido (E3 → E2 · "Ir a la pregunta" lleva a la pregunta, 3 de noviembre)
 
 - **El problema:** en "Revisa antes de enviar", "Ir a la pregunta" y "Completar" abrían la categoría desde arriba, y la persona tenía que buscar cuál le faltaba.

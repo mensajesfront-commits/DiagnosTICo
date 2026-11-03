@@ -105,7 +105,36 @@ Si cambias código de PHP, reinícialos para que lo tomen: `./vendor/bin/sail re
 
 ## Cuentas de prueba
 
-El proyecto no trae cuentas de demostración (se quitaron el 8 de octubre de 2026). Cada persona crea las suyas: las empresas se registran en `/register`, los colaboradores los crea su empresa en Colaboradores y las cuentas internas se invitan desde Usuarios y roles.
+`migrate --seed` no crea cuentas de demostración (se quitaron el 8 de octubre de 2026). Cada persona crea las suyas: las empresas se registran en `/register`, los colaboradores los crea su empresa en Colaboradores y las cuentas internas se invitan desde Usuarios y roles.
+
+### Datos de demostración (opcional, solo en local)
+
+Para ver las pantallas con volumen hay un seeder aparte, que `db:seed` no llama:
+
+```bash
+./vendor/bin/sail artisan db:seed --class=DiagnosticoEjemploSeeder
+./vendor/bin/sail artisan db:seed --class=DiagnosticoProgramacionSeeder
+./vendor/bin/sail artisan db:seed --class=DatosDemoSeeder
+```
+
+Crea 20 empresas (sectores Comidas y Programación y consultoría informática) con 1 a 4 mediciones terminadas cada una. Sus resultados se calculan igual que uno real, y los textos de la IA son de ejemplo. Algunas empresas tienen además una medición en curso, sin empezar o vencida.
+
+También crea una empresa con 6 colaboradores y una consultora con 10 empresas vinculadas. Todas las cuentas terminan en `captter-demo.test` y usan la contraseña `Demo-Captter-2026`:
+
+| Cuenta | Correo |
+|---|---|
+| Empresa con 6 colaboradores (Panadería La Espiga) | `gerencia@panaderia-la-espiga.captter-demo.test` |
+| Un colaborador de La Espiga | `camila.restrepo@la-espiga.captter-demo.test` |
+| Consultora con 10 empresas | `valeria.rios@captter-demo.test` |
+| Otra empresa | `gerencia@<nombre-de-la-empresa>.captter-demo.test` (por ejemplo, `gerencia@codigo-andino.captter-demo.test`) |
+
+Volver a correrlo borra lo anterior de la demostración y lo crea de nuevo. Para solo borrarlo:
+
+```bash
+./vendor/bin/sail artisan tinker --execute 'Database\Seeders\DatosDemoSeeder::limpiar();'
+```
+
+No lo uses en una base con datos reales.
 
 ## Copia de la base de datos
 
