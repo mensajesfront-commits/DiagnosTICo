@@ -70,6 +70,13 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A3.1 / A3.4 / E8 · ancho de la ficha y "Ver:" de la evolución, 3 de noviembre)
+
+- **A3.1:** la columna de la derecha (medición pendiente y Asignar) solo aparece si tiene algo. Al consultor sin medición pendiente el historial le ocupa todo el ancho.
+- **"Ver:" de la gráfica de evolución** (A3.1, A3.4, E8): va en su propia fila, abajo a la derecha del título, con ancho fijo. Un nombre de categoría largo ya no lo baja ni cambia los tamaños.
+- **Gráfica de evolución:** más espacio arriba para que la etiqueta "100" no se corte.
+- **A3.4:** al consultor la etiqueta dice "Vista del consultor" (antes, "Vista del Administrador").
+
 ### Agregado (C1 · "Qué atender" y sin "Empresas" para el Consultor, 3 de noviembre)
 
 - **"Qué atender"** en el inicio del Consultor (HU-086 CA-005), calculado en `App\Support\DatosInicioConsultor::avisos()`:

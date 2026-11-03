@@ -127,7 +127,7 @@ const opciones: ChartOptions<'line'> = {
     // del tamaño inicial (los puntos quedaban arriba a la izquierda).
     animation: false,
     // Espacio arriba para la etiqueta de un puntaje cerca de 100.
-    layout: { padding: { top: 16 } },
+    layout: { padding: { top: 24 } },
     plugins: { legend: { display: false } },
     scales: {
         y: {

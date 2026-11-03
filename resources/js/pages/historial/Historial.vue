@@ -45,6 +45,9 @@ const props = defineProps<Historial>();
 
 const { puede } = usePermisos();
 
+/** El consultor también ve el historial "por dentro", pero no es Administrador. */
+const esConsultor = computed(() => usePage().props.auth.rol === 'Consultor');
+
 const page = usePage();
 const puedeAsignar = computed(() =>
     page.props.auth.permisos.includes('mediciones.asignar'),
@@ -151,7 +154,11 @@ const modalCancelar = ref(false);
                     <span
                         v-if="interno"
                         class="rounded bg-lienzo-oscuro px-2 py-0.5 text-xs font-normal text-tinta-suave"
-                        >Vista del Administrador</span
+                        >{{
+                            esConsultor
+                                ? 'Vista del consultor'
+                                : 'Vista del Administrador'
+                        }}</span
                     >
                 </h1>
                 <p class="mt-0.5 text-sm text-tinta-suave">
@@ -344,8 +351,10 @@ const modalCancelar = ref(false);
             <section
                 class="flex flex-col rounded-2xl border border-linea bg-white p-5 lg:min-h-0"
             >
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h2 class="text-lg font-semibold">
+                <!-- "Ver:" va en su propia fila, a la derecha: así el título
+                     largo de una categoría no mueve nada. -->
+                <div class="flex flex-col gap-2">
+                    <h2 class="truncate text-lg font-semibold">
                         {{
                             verCategoria
                                 ? `Evolución de ${verCategoria}`
@@ -355,6 +364,7 @@ const modalCancelar = ref(false);
                     <SelectorEvolucion
                         v-if="evolucion.length >= 2"
                         v-model="verCategoria"
+                        class="self-end"
                         :categorias="evolucion_categorias"
                     />
                 </div>

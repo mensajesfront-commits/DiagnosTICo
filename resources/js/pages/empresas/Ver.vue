@@ -79,6 +79,14 @@ const props = defineProps<FichaEmpresa>();
 
 const { puede } = usePermisos();
 
+/**
+ * La columna de la derecha (medición pendiente y Asignar) solo si tiene algo:
+ * sin ella, el historial ocupa todo el ancho (el consultor sin pendiente).
+ */
+const columnaLateral = computed(
+    () => props.pendiente !== null || puede('mediciones.asignar'),
+);
+
 /** El consultor vuelve a su inicio (C1): no tiene la lista de Empresas. */
 const esConsultor = computed(() => usePage().props.auth.rol === 'Consultor');
 
@@ -335,7 +343,12 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
         <!-- Historial (A3.1) -->
         <div
             v-if="pestana === 'historial'"
-            class="grid items-start gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_300px] lg:grid-rows-[minmax(0,1fr)] lg:items-stretch"
+            :class="
+                cn(
+                    'grid items-start gap-4 lg:min-h-0 lg:flex-1 lg:grid-rows-[minmax(0,1fr)] lg:items-stretch',
+                    columnaLateral && 'lg:grid-cols-[1fr_300px]',
+                )
+            "
         >
             <div class="flex flex-col gap-4 lg:min-h-0">
                 <dl class="grid shrink-0 gap-3 sm:grid-cols-3">
@@ -456,29 +469,29 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 <section
                     class="flex shrink-0 flex-col rounded-2xl border border-linea bg-white px-5 py-4"
                 >
-                    <div
-                        class="flex flex-wrap items-center justify-between gap-2"
-                    >
-                        <h2 class="text-base font-semibold">
+                    <!-- "Ver:" va en su propia fila, a la derecha: así el
+                         título largo de una categoría no mueve nada. -->
+                    <div class="flex items-center justify-between gap-3">
+                        <h2 class="min-w-0 truncate text-base font-semibold">
                             {{
                                 verCategoria
                                     ? `Evolución de ${verCategoria}`
                                     : 'Evolución del puntaje total'
                             }}
                         </h2>
-                        <SelectorEvolucion
-                            v-model="verCategoria"
-                            class="ml-auto"
-                            :categorias="evolucion_categorias"
-                        />
                         <Link
                             v-if="puede('resultados.ver')"
                             :href="rutas.historial.empresa(empresa.id)"
-                            :class="cn(enlace, 'text-xs')"
+                            :class="cn(enlace, 'shrink-0 text-xs')"
                         >
                             Ver historial completo
                         </Link>
                     </div>
+                    <SelectorEvolucion
+                        v-model="verCategoria"
+                        class="mt-1.5 self-end"
+                        :categorias="evolucion_categorias"
+                    />
                     <EvolucionPuntaje
                         v-if="evolucion.length > 0"
                         :key="verCategoria"
@@ -669,7 +682,10 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 </section>
             </div>
 
-            <div class="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto">
+            <div
+                v-if="columnaLateral"
+                class="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto"
+            >
                 <section
                     v-if="pendiente"
                     class="shrink-0 rounded-2xl border border-linea bg-white p-5 text-sm"
