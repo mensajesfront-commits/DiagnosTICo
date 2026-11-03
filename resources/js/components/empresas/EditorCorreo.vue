@@ -71,8 +71,8 @@ const esMensaje = (p: string) =>
 </script>
 
 <template>
-    <div class="grid gap-5 lg:grid-cols-[1fr_1fr]">
-        <div class="flex flex-col gap-3">
+    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div class="flex min-w-0 flex-col gap-3">
             <div
                 class="flex items-center gap-3 rounded-xl border border-linea bg-lienzo/50 px-3 py-2.5"
             >
@@ -84,7 +84,7 @@ const esMensaje = (p: string) =>
                 </span>
                 <div class="min-w-0 text-sm">
                     <p class="text-[11px] text-tinta-suave">Para</p>
-                    <p id="correo-para" class="truncate font-medium">
+                    <p id="correo-para" class="font-medium break-words">
                         {{ para }}
                     </p>
                 </div>
@@ -147,7 +147,7 @@ const esMensaje = (p: string) =>
 
         <section
             aria-label="Así le llega a la empresa"
-            class="flex flex-col gap-2"
+            class="flex min-w-0 flex-col gap-2"
         >
             <p
                 class="flex items-center gap-1.5 text-xs font-medium text-tinta-suave"
@@ -162,7 +162,7 @@ const esMensaje = (p: string) =>
                     <p class="font-semibold">
                         {{ asuntoFinal || '(sin asunto)' }}
                     </p>
-                    <p class="mt-0.5 truncate text-xs text-tinta-suave">
+                    <p class="mt-0.5 text-xs break-words text-tinta-suave">
                         Para: {{ para }}
                     </p>
                 </div>

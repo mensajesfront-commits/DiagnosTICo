@@ -25,7 +25,7 @@ import type { Component } from 'vue';
 import { ref } from 'vue';
 import { cn } from '@/lib/utils';
 
-type Ancho = 'sm' | 'md' | 'lg' | 'xl';
+type Ancho = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 type Tono = 'marca' | 'exito' | 'alerta' | 'peligro';
 
 withDefaults(
@@ -68,6 +68,7 @@ const anchos: Record<Ancho, string> = {
     md: 'max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
+    '2xl': 'max-w-6xl',
 };
 </script>
 

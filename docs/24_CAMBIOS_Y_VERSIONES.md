@@ -70,6 +70,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Corregido (A3.1e · el correo se salía de la ventana, 3 de noviembre)
+
+- Con un correo largo en «Para», la vista previa empujaba la ventana y salía una barra horizontal. Ahora:
+  - las dos columnas no pasan de su mitad;
+  - «Para» baja de línea en lugar de cortarse;
+  - la ventana del correo es más ancha (`ancho="2xl"`, nuevo en `Modal`, hasta 72 rem).
+- Aplica en Asignar medición (A3.1b) y en Enviar recordatorio / Reenviar aviso.
+
 ### Cambiado (las demás ventanas del sistema, 3 de noviembre)
 
 - **Las 35 ventanas que faltaban llevan ícono en el título**, con el color de la acción:

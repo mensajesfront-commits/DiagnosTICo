@@ -686,7 +686,7 @@ const estadoPendiente: Record<string, string> = {
 
     <Modal
         v-model:abierto="modalCorreo"
-        ancho="xl"
+        ancho="2xl"
         titulo="Correo de aviso de la medición"
         descripcion="Se envía al usuario principal de la empresa. Las variables se llenan solas."
         :icono="Mail"

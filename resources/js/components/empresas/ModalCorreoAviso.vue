@@ -112,7 +112,7 @@ function probar(): void {
 <template>
     <Modal
         v-model:abierto="abierto"
-        ancho="xl"
+        ancho="2xl"
         :titulo="`${accion} · medición ${medicion.numero} de ${empresa}`"
         descripcion="Se envía al usuario principal de la empresa. Las variables se llenan solas."
         :icono="Mail"
