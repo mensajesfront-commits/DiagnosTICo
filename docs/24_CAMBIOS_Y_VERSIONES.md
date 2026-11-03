@@ -70,6 +70,19 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (L1 · diseño de Demasiados intentos y Cuenta desactivada, 3 de noviembre)
+
+- **Demasiados intentos:**
+  - la cuenta regresiva va en un anillo que se vacía durante el minuto de la pausa, junto a "Vuelve a intentarlo en un momento" y la nota de que «Iniciar sesión» se activa solo cuando termine;
+  - tres consejos con ícono: el correo bien escrito, las mayúsculas, y crear una contraseña nueva sin esperar;
+  - "Crear contraseña nueva" lleva ícono.
+- **Cuenta desactivada o eliminada:**
+  - el mensaje del servidor no cambia (`auth.desactivada`);
+  - una tarjeta de soporte ("¿Crees que es un error?") muestra el correo de NuevasTIC;
+  - el botón nuevo "Escribir a soporte" abre el correo con el asunto ya escrito ("Cuenta desactivada en Captter" o "Cuenta eliminada en Captter"). El correo de soporte sigue como [INFORMACIÓN PENDIENTE].
+- En el celular, los botones del pie de las dos ventanas ocupan todo el ancho.
+- El backend no cambia.
+
 ### Cambiado (L2b · diseño de Verifica tu correo, 3 de noviembre)
 
 - **El código se ve en 6 casillas:**
