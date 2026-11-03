@@ -17,12 +17,20 @@
  *
  * Todo llega calculado y no cambia (RN-023). Sin FODA ni comparación con
  * promedios (RN-028).
+ *
+ * A2.6 · Resultado de ejemplo: arriba una franja de «Datos de muestra» (borde
+ * punteado ámbar) que explica el caso elegido y deja cambiar entre «Mejor
+ * caso», «Caso medio» y «Peor caso» con tarjetas con ícono.
  */
 import { Head, Link, router } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     CalendarClock,
     ChevronRight,
+    FileText,
+    FlaskConical,
+    Info,
+    Minus,
     TrendingDown,
     TrendingUp,
 } from '@lucide/vue';
@@ -70,16 +78,19 @@ const casos = [
         valor: 'mejor' as const,
         etiqueta: 'Mejor caso',
         texto: 'todas las respuestas cerca del máximo.',
+        icono: TrendingUp,
     },
     {
         valor: 'medio' as const,
         etiqueta: 'Caso medio',
         texto: 'respuestas intermedias.',
+        icono: Minus,
     },
     {
         valor: 'peor' as const,
         etiqueta: 'Peor caso',
         texto: 'todas las respuestas cerca del mínimo.',
+        icono: TrendingDown,
     },
 ];
 
@@ -245,7 +256,7 @@ const porcentaje = (n: number) =>
                 >
                     Así se vería el resultado
                     <span
-                        class="rounded bg-nivel-mejorar-suave px-2 py-0.5 text-xs font-medium text-nivel-mejorar-texto"
+                        class="rounded-full border border-linea bg-white px-2.5 py-0.5 text-xs font-medium text-tinta-suave"
                         >{{ ejemplo.etiqueta }}</span
                     >
                 </h1>
@@ -259,8 +270,9 @@ const porcentaje = (n: number) =>
                     :href="ejemplo.pdf"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex h-10 items-center rounded-md bg-marca px-4 text-sm font-medium text-white hover:bg-marca-hover"
+                    class="inline-flex h-10 items-center gap-1.5 rounded-lg bg-marca px-4 text-sm font-medium text-white hover:bg-marca-hover"
                 >
+                    <FileText class="size-4" aria-hidden="true" />
                     Ver formato del PDF
                 </a>
             </div>
@@ -281,50 +293,67 @@ const porcentaje = (n: number) =>
             </div>
         </header>
 
+        <!-- A2.6 · modo ejemplo: datos de muestra y caso -->
+        <section
+            v-if="ejemplo"
+            class="flex shrink-0 flex-wrap items-center gap-4 rounded-2xl border border-dashed border-nivel-mejorar/60 bg-nivel-mejorar-suave/50 px-4 py-3"
+        >
+            <div class="flex min-w-60 flex-1 items-start gap-3">
+                <span
+                    class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-nivel-mejorar-texto shadow-sm"
+                    aria-hidden="true"
+                >
+                    <FlaskConical class="size-5" />
+                </span>
+                <div class="text-sm">
+                    <p class="font-semibold text-nivel-mejorar-texto">
+                        Datos de muestra
+                    </p>
+                    <p class="text-xs text-tinta">
+                        No se guardan ni llaman a la IA. Ahora ves el
+                        <strong>{{ casoActual?.etiqueta.toLowerCase() }}</strong
+                        >: {{ casoActual?.texto }}
+                    </p>
+                </div>
+            </div>
+            <div
+                class="grid w-full grid-cols-3 gap-2 sm:w-auto"
+                role="radiogroup"
+                aria-label="Respuestas de muestra"
+            >
+                <button
+                    v-for="c in casos"
+                    :key="c.valor"
+                    type="button"
+                    role="radio"
+                    :aria-checked="ejemplo.caso === c.valor"
+                    :title="`Respuestas de muestra: ${c.texto}`"
+                    :class="
+                        cn(
+                            'flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition',
+                            ejemplo.caso === c.valor
+                                ? 'border-marca bg-marca text-white'
+                                : 'border-linea bg-white hover:border-marca/40',
+                        )
+                    "
+                    @click="ejemplo.caso !== c.valor && cambiarCaso(c.valor)"
+                >
+                    <component
+                        :is="c.icono"
+                        class="size-4"
+                        aria-hidden="true"
+                    />
+                    {{ c.etiqueta }}
+                </button>
+            </div>
+        </section>
+
         <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
             <SelectorCompacto
                 v-model="pestana"
                 :opciones="pestanas"
                 etiqueta-accesible="Secciones del resultado"
             />
-            <div
-                v-if="ejemplo"
-                class="flex flex-wrap items-center gap-2 rounded-lg border border-nivel-mejorar/40 bg-nivel-mejorar-suave/60 px-3 py-1.5 text-xs"
-            >
-                <span :title="casoActual?.texto">
-                    <strong class="text-nivel-mejorar-texto"
-                        >Datos de muestra</strong
-                    >
-                    que no se guardan ni llaman a la IA ·
-                </span>
-                <span
-                    class="flex items-center gap-1"
-                    role="radiogroup"
-                    aria-label="Respuestas de muestra"
-                >
-                    <button
-                        v-for="c in casos"
-                        :key="c.valor"
-                        type="button"
-                        role="radio"
-                        :aria-checked="ejemplo.caso === c.valor"
-                        :title="`Respuestas de muestra: ${c.texto}`"
-                        :class="
-                            cn(
-                                'rounded-md px-2.5 py-1',
-                                ejemplo.caso === c.valor
-                                    ? 'bg-marca font-medium text-white'
-                                    : 'bg-white hover:bg-lienzo',
-                            )
-                        "
-                        @click="
-                            ejemplo.caso !== c.valor && cambiarCaso(c.valor)
-                        "
-                    >
-                        {{ c.etiqueta }}
-                    </button>
-                </span>
-            </div>
         </div>
 
         <!-- Resumen -->
@@ -842,7 +871,11 @@ const porcentaje = (n: number) =>
             </ol>
         </section>
 
-        <p v-if="ejemplo" class="shrink-0 text-xs text-tinta-suave">
+        <p
+            v-if="ejemplo"
+            class="flex shrink-0 items-center gap-1.5 text-xs text-tinta-suave"
+        >
+            <Info class="size-3.5 shrink-0" aria-hidden="true" />
             Datos de ejemplo: las observaciones y recomendaciones reales las
             escribe la IA según las respuestas de cada empresa.
         </p>

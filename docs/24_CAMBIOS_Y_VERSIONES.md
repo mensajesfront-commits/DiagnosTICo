@@ -70,6 +70,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A2.6 · diseño del resultado de ejemplo, 3 de noviembre)
+
+- **Franja «Datos de muestra»** arriba de las pestañas, con borde punteado ámbar y un ícono:
+  - explica que no se guarda ni llama a la IA y qué caso se ve («Ahora ves el caso medio: respuestas intermedias»);
+  - «Mejor caso», «Caso medio» y «Peor caso» son tarjetas con ícono. Antes eran tres botones pequeños junto a las pestañas.
+- La versión va en una píldora, «Ver formato del PDF» lleva ícono y la nota del final lleva un ícono de información.
+- **Corregido:** sin borrador pendiente, la pantalla decía «Borrador v1» aunque el diagnóstico ya tuviera versiones publicadas. Ahora dice «Versión N», la última publicada, porque su contenido es el mismo. Con borrador sigue diciendo «Borrador vN» (`ResultadoEjemploController::numeroYEtiqueta`, con prueba).
+
 ### Cambiado (A5 · diseño de Usuarios y roles, 3 de noviembre)
 
 - **Encabezado:** ícono, y las pestañas «Usuarios» y «Roles» con ícono. La elegida va en azul.

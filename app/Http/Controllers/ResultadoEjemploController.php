@@ -44,7 +44,7 @@ class ResultadoEjemploController extends Controller
             'interno' => true,
             'ejemplo' => [
                 'caso' => $caso,
-                'etiqueta' => $version ? "Versión {$version->numero}" : 'Borrador v'.($diagnostico->version_borrador ?? 1),
+                'etiqueta' => $this->numeroYEtiqueta($diagnostico, $version)[1],
                 'volver' => route('diagnosticos.vista-previa', array_filter(['diagnostico' => $diagnostico->id, 'version' => $version?->numero])),
                 'pdf' => route('diagnosticos.resultado-ejemplo.pdf', array_filter(['diagnostico' => $diagnostico->id, 'caso' => $caso, 'version' => $version?->numero])),
             ],
@@ -91,9 +91,30 @@ class ResultadoEjemploController extends Controller
             'empresa' => ['id' => 0, 'nombre' => 'Empresa de ejemplo'],
             'sector' => $diagnostico->sector->nombre ?? '',
             'diagnostico' => $diagnostico->nombre,
-            'version' => $version->numero ?? $diagnostico->version_borrador ?? 1,
+            'version' => $this->numeroYEtiqueta($diagnostico, $version)[0],
             'enviada_en' => null,
             'terminada_en' => null,
         ];
+    }
+
+    /**
+     * Qué versión se muestra: la pedida con ?version, el borrador pendiente
+     * o, si no hay borrador, la última publicada (su contenido es el mismo).
+     *
+     * @return array{0: int, 1: string}
+     */
+    private function numeroYEtiqueta(Diagnostico $diagnostico, ?VersionDiagnostico $version): array
+    {
+        if ($version !== null) {
+            return [$version->numero, "Versión {$version->numero}"];
+        }
+
+        if ($diagnostico->version_borrador !== null) {
+            return [$diagnostico->version_borrador, "Borrador v{$diagnostico->version_borrador}"];
+        }
+
+        $ultima = (int) $diagnostico->versiones()->max('numero');
+
+        return $ultima > 0 ? [$ultima, "Versión {$ultima}"] : [1, 'Borrador v1'];
     }
 }
