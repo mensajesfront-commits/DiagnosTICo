@@ -6,6 +6,7 @@ use App\Models\Empresa;
 use App\Models\User;
 use App\Notifications\RolCambiado;
 use App\Support\CambioDeRol;
+use App\Support\DatosEmpresas;
 use App\Support\DatosUsuarios;
 use App\Support\Fechas;
 use App\Support\Invitaciones;
@@ -36,6 +37,10 @@ class UsuariosController extends Controller
                 fn (array $r) => array_intersect_key($r, array_flip(['id', 'nombre', 'descripcion', 'activo', 'del_sistema', 'aviso'])),
                 DatosUsuarios::roles(0),
             ),
+            // Al invitar un Consultor se eligen sus empresas (HU-085).
+            'empresas' => $yo->can('usuarios.gestionar')
+                ? DatosEmpresas::paraElegir()
+                : [],
         ]);
     }
 
@@ -50,9 +55,12 @@ class UsuariosController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)],
             'rol_id' => ['required', 'integer', Rule::exists('roles', 'id')->where('activo', true)->whereNotIn('name', DatosUsuarios::ROLES_DE_EMPRESA)],
             'mensaje' => ['nullable', 'string', 'max:500'],
+            // Consultor (HU-085): las empresas que va a acompañar, opcional.
+            'empresas' => ['nullable', 'array'],
+            'empresas.*' => ['integer', 'distinct', Rule::exists('empresas', 'id')->whereNull('deleted_at')],
         ], [
             'rol_id.exists' => 'Elige un rol interno activo.',
-        ], ['rol_id' => 'rol', 'mensaje' => 'mensaje']);
+        ], ['rol_id' => 'rol', 'mensaje' => 'mensaje', 'empresas.*' => 'empresa']);
 
         /** @var Role $rol */
         $rol = Role::query()->findOrFail($datos['rol_id']);
@@ -64,6 +72,10 @@ class UsuariosController extends Controller
                 'password' => null,
             ]);
             $usuario->assignRole($rol);
+
+            if ($rol->name === 'Consultor') {
+                $usuario->empresasAsesoradas()->sync($datos['empresas'] ?? []);
+            }
 
             return $usuario;
         });

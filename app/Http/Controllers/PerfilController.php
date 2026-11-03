@@ -355,13 +355,15 @@ class PerfilController extends Controller
 
         if ($tipo === 'empresa') {
             $ruta = Empresa::findOrFail($id)->logo_ruta;
-            $propia = $usuario->empresa_id === $id;
+            $puede = $usuario->puedeVerEmpresa($id) || $usuario->can('usuarios.ver');
         } else {
             $ruta = User::findOrFail($id)->foto_ruta;
-            $propia = $usuario->id === $id;
+            // El consultor no ve fotos de otras cuentas (RN-030).
+            $puede = $usuario->id === $id || $usuario->can('usuarios.ver')
+                || ($usuario->can('empresas.ver') && ! $usuario->esConsultor());
         }
 
-        abort_unless($propia || $usuario->can('empresas.ver') || $usuario->can('usuarios.ver'), 403);
+        abort_unless($puede, 403);
         abort_unless($ruta && Storage::exists($ruta), 404);
 
         return Storage::response($ruta);

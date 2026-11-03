@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -147,6 +148,42 @@ class User extends Authenticatable implements MustVerifyEmail
     public function invitacionPendiente(): bool
     {
         return $this->password === null;
+    }
+
+    /** Consultor externo (RN-030): solo mira las empresas que tiene vinculadas. */
+    public function esConsultor(): bool
+    {
+        return $this->empresa_id === null && $this->hasRole('Consultor');
+    }
+
+    /**
+     * Empresas que acompaña como consultor (RN-030). Las vincula el
+     * Administrador en A3.1 o al invitarlo.
+     *
+     * @return BelongsToMany<Empresa, $this>
+     */
+    public function empresasAsesoradas(): BelongsToMany
+    {
+        return $this->belongsToMany(Empresa::class, 'consultor_empresa')->withTimestamps();
+    }
+
+    /**
+     * Si la cuenta puede ver una empresa, sus resultados y su historial:
+     * - de una empresa: solo la suya (RN-007);
+     * - interna: con `empresas.ver`; el consultor, solo las vinculadas.
+     */
+    public function puedeVerEmpresa(int $empresaId): bool
+    {
+        if ($this->empresa_id !== null) {
+            return $this->empresa_id === $empresaId;
+        }
+
+        if (! $this->can('empresas.ver')) {
+            return false;
+        }
+
+        return ! $this->esConsultor()
+            || $this->empresasAsesoradas()->whereKey($empresaId)->exists();
     }
 
     /** Cuenta principal de su empresa (rol Empresa). */

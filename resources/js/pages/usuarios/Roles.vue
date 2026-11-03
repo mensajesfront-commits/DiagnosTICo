@@ -35,8 +35,10 @@ const props = withDefaults(
         cuentas: Cuenta[];
         /** Rol abierto al entrar (?rol=id); sin él, el primero. */
         rolId?: number | null;
+        /** Para elegir las empresas de un Consultor al invitarlo (HU-085). */
+        empresas?: { id: number; nombre: string }[];
     }>(),
-    { rolId: null },
+    { rolId: null, empresas: () => [] },
 );
 
 const { puede } = usePermisos();
@@ -202,8 +204,8 @@ const rolesInternos = computed(() =>
                     class="mx-1 mt-3 flex gap-2 rounded-xl bg-lienzo/70 px-3 py-2.5 text-xs text-tinta-suave"
                 >
                     <Lock class="mt-px size-3.5 shrink-0" aria-hidden="true" />
-                    Administrador, Empresa y Colaborador son roles del sistema:
-                    no se eliminan ni cambian sus permisos.
+                    Administrador, Empresa, Colaborador y Consultor son roles
+                    del sistema: no se eliminan ni cambian sus permisos.
                 </p>
             </nav>
 
@@ -243,6 +245,7 @@ const rolesInternos = computed(() =>
     <ModalInvitarUsuario
         v-model:abierto="modalInvitar"
         :roles="rolesInternos"
+        :empresas="empresas"
     />
     <ModalCambiarRol
         v-if="cuentaACambiar"

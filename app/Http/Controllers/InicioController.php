@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Support\DatosEmpresas;
 use App\Support\DatosInicio;
 use App\Support\DatosInicioEmpresa;
 use App\Support\DatosUsuarios;
@@ -17,6 +18,8 @@ use Inertia\Response;
  *
  * - Empresa y Colaborador → E1 (/mi-inicio).
  * - Administrador y cualquier rol interno → A1 (/inicio).
+ * - Consultor → C1 (/inicio): sus empresas vinculadas y nada más (RN-030).
+ *   No ve A1, que muestra datos de todas las empresas.
  *
  * A1 tiene indicadores, mediciones y paneles (HU-006, HU-007, DatosInicio).
  * E1 muestra la medición pendiente y el último resultado (HU-057 a HU-059,
@@ -34,6 +37,15 @@ class InicioController extends Controller
     {
         if ($this->esDeEmpresa($request)) {
             return to_route('inicio.empresa');
+        }
+
+        /** @var User $usuario */
+        $usuario = $request->user();
+
+        if ($usuario->esConsultor()) {
+            return Inertia::render('inicio/Consultor', [
+                'empresas' => DatosEmpresas::lista($usuario),
+            ]);
         }
 
         return Inertia::render('inicio/Administrador', DatosInicio::administrador());

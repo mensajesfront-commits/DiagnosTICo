@@ -35,7 +35,6 @@
 | Qué | Estado | Qué falta para retomarlo |
 |---|---|---|
 | Bot de WhatsApp (EP-013, HU-071 a HU-075) | Lo hace otra persona del equipo, aparte de este repositorio | El texto del saludo (PA-001), cómo se configuran las preguntas (PA-002), un número de Meta y un servidor con HTTPS para el webhook (RN-029). |
-| Rol Consultor | Existe inactivo (PA-006) | Definir qué empresas ve cada consultor. Necesita una tabla `consultor_empresa` (`12_BASE_DE_DATOS.md`). |
 | Rol Usuario | Sin historias | Definir para qué sirve. |
 | Comparación con promedios | Fuera del alcance (RN-028) | Lo decide NuevasTIC. |
 

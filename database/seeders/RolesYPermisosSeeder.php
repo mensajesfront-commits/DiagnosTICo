@@ -60,6 +60,7 @@ class RolesYPermisosSeeder extends Seeder
         'Administrador' => 'Acceso total al sistema',
         'Empresa' => 'Responde y ve los resultados de su empresa',
         'Colaborador' => 'Trabaja con la empresa, sin gestionar el equipo',
+        'Consultor' => 'Mira los resultados de sus empresas vinculadas',
     ];
 
     /** @var array<string, list<string>> */
@@ -77,22 +78,16 @@ class RolesYPermisosSeeder extends Seeder
         // contraseña los cambia la cuenta principal (pedido del equipo, 26 de
         // octubre).
         'Colaborador' => [],
-    ];
-
-    /**
-     * Consultor: rol creado de ejemplo, inactivo hasta que exista la
-     * vinculación de empresas (A5.2, PA-006). No es del sistema, así que el
-     * Administrador lo puede editar; el seeder solo lo crea si no existe.
-     *
-     * @var list<string>
-     */
-    public const array CONSULTOR = [
-        'empresas.ver',
-        'diagnostico.responder',
-        'resultados.ver',
-        'resultados.pdf',
-        'perfil.editar',
-        'contrasena.cambiar',
+        // RN-030: externo e invitado; solo mira las empresas que le vincula
+        // el Administrador. No responde ni toca diagnósticos (decisión del
+        // 3 de noviembre). Es del sistema: sus permisos no se editan.
+        'Consultor' => [
+            'empresas.ver',
+            'resultados.ver',
+            'resultados.pdf',
+            'perfil.editar',
+            'contrasena.cambiar',
+        ],
     ];
 
     public function run(): void
@@ -121,16 +116,6 @@ class RolesYPermisosSeeder extends Seeder
                 'del_sistema' => true,
             ])->save();
             $rol->syncPermissions($permisos);
-        }
-
-        if (! Role::where('name', 'Consultor')->exists()) {
-            $consultor = Role::findOrCreate('Consultor');
-            $consultor->forceFill([
-                'descripcion' => 'Acompaña a sus empresas vinculadas.',
-                'activo' => false,
-                'del_sistema' => false,
-            ])->save();
-            $consultor->syncPermissions(self::CONSULTOR);
         }
     }
 }

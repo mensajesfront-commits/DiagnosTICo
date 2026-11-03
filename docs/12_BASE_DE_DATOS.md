@@ -709,6 +709,19 @@ Avisos por correo que la cuenta elige en Mi perfil (A6).
 | `model_has_roles` | Qué rol tiene cada cuenta (uno solo, RN-027) | — |
 | `model_has_permissions` | Permisos sueltos por cuenta (no se usan) | — |
 
+### `consultor_empresa` (RN-030, 3 de noviembre)
+
+Qué empresas acompaña cada consultor. Un consultor puede tener una o varias; una empresa, varios consultores. La llena el Administrador (pestaña "Consultores" de A3.1 o al invitar). Solo vale mientras la cuenta tenga el rol Consultor: al cambiarle el rol se borran sus filas.
+
+| Campo | Tipo | Nota |
+|---|---|---|
+| `id` | bigint | — |
+| `user_id` | FK `users`, borrado en cascada | La cuenta con el rol Consultor |
+| `empresa_id` | FK `empresas`, borrado en cascada | — |
+| `created_at`, `updated_at` | timestamps | "Desde el…" en A3.1 |
+
+Único: (`user_id`, `empresa_id`). Migración `2026_11_03_000001_consultores_con_empresas_vinculadas`, que además deja el rol Consultor activo, del sistema y con sus 5 permisos.
+
 ### Del kit de Laravel
 
 | Tabla | Para qué |
@@ -758,7 +771,6 @@ Se revisó que cada dato que muestran los wireframes tenga dónde guardarse o de
 
 Pendiente de decidir:
 
-- **[FUNCIONALIDAD POR DEFINIR]** A3.1 tiene la pestaña "Consultores · Próximamente" y A5.2 el rol "Consultor" inactivo. Si se activa, hace falta una tabla `consultor_empresa` (qué empresas ve cada consultor).
 - **[INCONSISTENCIA DETECTADA]** A6 (Mi perfil) muestra 3 requisitos de contraseña; L2 y L4 muestran 4 y RN-001 pide 4 más la confirmación.
 - **[INFORMACIÓN PENDIENTE]** "Unos 25 minutos" (A3.1b, E1): ¿se calcula por número de preguntas o se escribe en el diagnóstico?
 - Ya tienen migración los campos de Mi perfil (`users`: ciudad, país, zona horaria, idioma, avisos, foto, último acceso, fecha de la contraseña; `empresas`: teléfono, sitio web, número de empleados, logo). Los demás campos nuevos de esta revisión se agregan en T-045.

@@ -60,6 +60,8 @@ const props = defineProps<{
         Rol,
         'id' | 'nombre' | 'descripcion' | 'activo' | 'del_sistema' | 'aviso'
     >[];
+    /** Para elegir las empresas de un Consultor al invitarlo (HU-085). */
+    empresas: { id: number; nombre: string }[];
 }>();
 
 const { puede } = usePermisos();
@@ -686,6 +688,7 @@ const estadoCuenta: Record<EstadoCuenta, { texto: string; punto: string }> = {
     <ModalInvitarUsuario
         v-model:abierto="modalInvitar"
         :roles="rolesInternos"
+        :empresas="empresas"
     />
     <ModalDesactivarEliminar
         v-if="elegida"

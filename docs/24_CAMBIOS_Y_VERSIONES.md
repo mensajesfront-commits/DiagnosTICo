@@ -70,6 +70,32 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Agregado (rol Consultor con empresas vinculadas, 3 de noviembre)
+
+En la presentación se decidió incluir el rol Consultor, que existía inactivo (PA-006). Decisiones del equipo: es externo y se le invita, solo mira, no toca diagnósticos, lo vincula el Administrador y puede tener una o varias empresas. Historias nuevas HU-085 y HU-086 (EP-014) y regla RN-030 en `05`.
+
+- **Seguridad, lo más importante:** antes, si alguien activaba el rol desde A5, el consultor veía **todas** las empresas, porque "solo las vinculadas" era solo un texto. Ahora:
+  - la tabla `consultor_empresa` guarda las empresas de cada consultor;
+  - `User::puedeVerEmpresa()` decide en el servidor, y la usan Empresas (lista y ficha), el historial, los resultados, las respuestas, el PDF y los logos;
+  - de una empresa no vinculada, la respuesta es 404.
+- **Rol:** pasa a ser del sistema y activo, con 5 permisos fijos: ver empresas, resultados, PDF, su perfil y su contraseña. Pierde "Responder el diagnóstico". La migración lo ajusta si ya existía, y el seeder lo crea así en una base nueva.
+- **C1 · Inicio del Consultor** (`inicio/Consultor.vue`, nuevo):
+  - saludo y tres datos: empresas, cuántas tienen resultado y mediciones pendientes;
+  - una tarjeta por empresa con el anillo del puntaje, el nivel, la variación, las mediciones terminadas, la pendiente, y los botones "Ver empresa" e "Historial";
+  - ya no entra a A1, que muestra todas las empresas.
+- **A3.1 · Pestaña "Consultores"** (`PanelConsultores.vue`, solo con `usuarios.gestionar`):
+  - reemplaza "Próximamente";
+  - consultores vinculados (empresas que acompaña, desde cuándo, invitación pendiente) con "Quitar" y confirmación;
+  - "Vincular un consultor", enlace para invitar uno nuevo y "Qué ve un consultor".
+- **A5 · Invitar usuario:** al elegir Consultor, el título pasa a "Invitar consultor" y aparece "Empresas que acompaña", con buscador y casillas (opcional).
+- **Al cambiarle el rol** a un consultor, pierde sus vínculos.
+- **A5:**
+  - el Consultor tiene ícono propio (ojo, ámbar);
+  - la nota de roles del sistema lo incluye;
+  - los roles creados e inactivos dicen "Inactivo" en vez de "Próxima fase".
+- **Pruebas:** `tests/Feature/ConsultorTest.php` (13 casos). Se ajustaron las de roles que suponían al Consultor inactivo y editable.
+- **Docs actualizados:** 01, 03, 05, 12, 14, 17, 25 y 29.
+
 ### Cambiado (repaso a fondo de modales con formularios largos, 3 de noviembre)
 
 - **Nuevo componente `components/base/TituloSeccion.vue`:** encabezado de sección con ícono, título y una línea de ayuda. Lo usan los modales de esta entrada.

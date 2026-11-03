@@ -19,7 +19,7 @@ Hay tres roles del sistema. Son fijos: no se editan ni se eliminan, y cada cuent
 
 El Administrador puede crear roles nuevos con los permisos que elija (HU-049); cada uno tiene nombre, descripción opcional y si está activo. Un rol con cuentas no se elimina (RN-027).
 
-**Rol Consultor (PA-006, respondida el 6 de octubre):** existe pero está **inactivo** hasta que se le asigne a alguien; eso se probará más adelante. El seeder lo crea inactivo, con los 6 permisos de A5.2 (ver empresas, solo las vinculadas; responder; ver resultados; PDF; editar su perfil; cambiar su contraseña). No es del sistema: el Administrador lo puede editar o eliminar, y el seeder no pisa esos cambios.
+**Rol Consultor (RN-030, decisión del 3 de noviembre):** persona externa que invita el Administrador. Es **rol del sistema** y está activo, con 5 permisos fijos: ver empresas, ver resultados, PDF, editar su perfil y cambiar su contraseña. **No** tiene "Responder el diagnóstico" ni nada de diagnósticos, mediciones, IA o usuarios. Solo ve las empresas de la tabla `consultor_empresa`; la regla vive en `User::puedeVerEmpresa()` y la usan Empresas (lista y ficha), el historial, los resultados, las respuestas, el PDF y los logos. Entra a su propio inicio (C1), no a A1. Antes (PA-006, 6 de octubre) existía inactivo y editable; quedó cerrado porque, si alguien lo activaba, veía todas las empresas.
 
 Cada rol guarda `descripcion`, `activo` y `del_sistema` (columnas agregadas a la tabla `roles` de spatie). Un rol inactivo no se puede asignar.
 
@@ -45,7 +45,7 @@ Son los **15 permisos en 6 bloques** del wireframe A5.2 (A5.1 "Crear rol" usa la
 | Su cuenta | `perfil.editar` | Editar su perfil | Cambiar sus datos personales. En el rol Empresa, también los de la empresa | A6, E11 |
 | | `contrasena.cambiar` | Cambiar su contraseña | Cambiar su contraseña | A6, E11 |
 
-En la Empresa y el Colaborador, los permisos de "Mediciones y resultados" valen **solo para su empresa** (RN-007).
+En la Empresa y el Colaborador, los permisos de "Mediciones y resultados" valen **solo para su empresa** (RN-007). En el Consultor, "Ver empresas" y los de resultados valen **solo para sus empresas vinculadas** (RN-030); de otra, 404. Vincular o quitar consultores pide `usuarios.gestionar`.
 
 Lo que no tiene casilla en A5.2 se decide por el rol:
 

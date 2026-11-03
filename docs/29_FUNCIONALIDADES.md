@@ -9,7 +9,7 @@
 | Administrador | Equipo de NuevasTIC | Todo el panel: Inicio, Diagnósticos, Empresas, Configuración IA y Usuarios y roles |
 | Empresa | Cuenta principal de cada empresa | Su inicio, su diagnóstico, sus resultados, su historial, su perfil y sus colaboradores |
 | Colaborador | Persona que la empresa agrega | Lo mismo que la empresa, menos los colaboradores y los datos de la empresa (RN-025) |
-| Consultor | Rol futuro | Existe inactivo; no se asigna (PA-006) |
+| Consultor | Persona externa que acompaña empresas (invitada) | Su inicio con sus empresas vinculadas; su ficha, historial, resultados, respuestas y PDF. Solo mira (RN-030) |
 
 ## Acceso (todos)
 

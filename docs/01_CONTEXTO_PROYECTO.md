@@ -46,8 +46,9 @@ Los cuatro niveles del resultado son:
 Tomadas de `05_REQUISITOS_FUNCIONALES.md`:
 
 - **Roles:**
-  - Hay tres: Administrador, Empresa y Colaborador.
-  - Consultor y Usuario quedan para un posible futuro.
+  - Hay cuatro: Administrador, Empresa, Colaborador y Consultor.
+  - El Consultor se agregó el 3 de noviembre (EP-014): es externo, lo invita el Administrador y solo mira las empresas que tiene vinculadas.
+  - Usuario queda para un posible futuro.
 - **Análisis de la IA:**
   - Se hace en una sola etapa por cada categoría.
   - No hay análisis FODA ni comparación con promedios.

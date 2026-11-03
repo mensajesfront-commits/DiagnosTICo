@@ -59,7 +59,7 @@ export type Rol = {
     /** Texto corto de la lista ("Acceso total", "Sin gestionar equipo"). */
     resumen: string;
     activo: boolean;
-    /** Administrador, Empresa y Colaborador: no se editan ni se eliminan (RN-027). */
+    /** Administrador, Empresa, Colaborador y Consultor: no se editan ni se eliminan (RN-027, RN-030). */
     del_sistema: boolean;
     /** Nombres técnicos de los permisos marcados. */
     permisos: string[];

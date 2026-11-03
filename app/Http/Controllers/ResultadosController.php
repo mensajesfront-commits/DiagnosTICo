@@ -22,7 +22,7 @@ use Throwable;
  *
  * Permisos `resultados.ver` y `resultados.pdf`. La empresa y su colaborador
  * solo ven su empresa (RN-007; de otra, 404). Un usuario interno, además,
- * necesita `empresas.ver`.
+ * necesita `empresas.ver`; el consultor, que la empresa esté vinculada.
  */
 class ResultadosController extends Controller
 {
@@ -112,11 +112,9 @@ class ResultadosController extends Controller
         /** @var User $yo */
         $yo = $request->user();
 
-        if ($yo->empresa_id !== null) {
-            abort_unless($medicion->empresa_id === $yo->empresa_id, 404);
-        } else {
-            abort_unless($yo->can('empresas.ver'), 404);
-        }
+        // Su empresa; o, si es interna, con `empresas.ver` (el consultor,
+        // solo las vinculadas, RN-030).
+        abort_unless($medicion->empresa_id !== null && $yo->puedeVerEmpresa($medicion->empresa_id), 404);
     }
 
     private function interno(Request $request): bool

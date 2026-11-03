@@ -23,13 +23,28 @@ class DatosEmpresas
     public const array PENDIENTES = ['no_iniciada', 'en_curso', 'enviada', 'vencida'];
 
     /**
-     * A3 · Todas las empresas (no eliminadas), por nombre.
+     * Empresas para elegir al invitar un Consultor (HU-085).
+     *
+     * @return array<int, array{id: int, nombre: string}>
+     */
+    public static function paraElegir(): array
+    {
+        return Empresa::orderBy('nombre')->get(['id', 'nombre'])
+            ->map(fn (Empresa $e) => ['id' => $e->id, 'nombre' => $e->nombre])
+            ->values()->all();
+    }
+
+    /**
+     * A3 · Todas las empresas (no eliminadas), por nombre. Para un
+     * consultor, solo las que tiene vinculadas (RN-030).
      *
      * @return list<array<string, mixed>>
      */
-    public static function lista(): array
+    public static function lista(?User $para = null): array
     {
         $empresas = Empresa::query()
+            // El consultor solo ve las empresas que tiene vinculadas (RN-030).
+            ->when($para?->esConsultor(), fn ($q) => $q->whereIn('id', $para->empresasAsesoradas()->select('empresas.id')))
             ->with(['sector:id,nombre', 'mediciones' => fn ($q) => $q->where('estado', '!=', 'cancelada')->with(['resultado', 'version:id,contenido'])])
             ->orderBy('nombre')
             ->get();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Notifications\RolCambiado;
 use App\Support\CambioDeRol;
+use App\Support\DatosEmpresas;
 use App\Support\DatosUsuarios;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Http\RedirectResponse;
@@ -32,6 +33,8 @@ class RolesController extends Controller
             'bloques' => DatosUsuarios::bloques(),
             'cuentas' => DatosUsuarios::cuentas($yo),
             'rolId' => $request->integer('rol') ?: null,
+            // Al invitar un Consultor se eligen sus empresas (HU-085).
+            'empresas' => $yo->can('usuarios.gestionar') ? DatosEmpresas::paraElegir() : [],
         ]);
     }
 

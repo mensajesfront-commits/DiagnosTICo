@@ -2,7 +2,7 @@
 /**
  * Opción de rol con radio, título y explicación (Invitar usuario y A5.5).
  * Un rol inactivo se ve gris, no se puede elegir y lleva la etiqueta
- * "Próxima fase" (HU-050 CA-003).
+ * "Inactivo" (HU-050 CA-003).
  */
 import Etiqueta from '@/components/base/Etiqueta.vue';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,7 @@ defineProps<{
     titulo: string;
     descripcion?: string | null;
     deshabilitada?: boolean;
-    /** Etiqueta a la derecha ("Rol actual", "Próxima fase"). */
+    /** Etiqueta a la derecha ("Rol actual", "Inactivo"). */
     etiqueta?: string | null;
     tonoEtiqueta?: 'neutro' | 'alerta';
 }>();

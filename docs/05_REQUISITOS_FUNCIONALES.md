@@ -16,7 +16,7 @@ Requisitos funcionales (RF), historias de usuario, criterios de aceptación y ba
 
 Sistema web para que NuevasTIC mida el nivel de marketing digital de empresas. Las empresas responden un diagnóstico propio de su sector, la IA analiza cada categoría y el sistema entrega un resultado con puntaje, nivel, observaciones, recomendaciones y un PDF. El Administrador de NuevasTIC configura sectores, categorías, diagnósticos, empresas, mediciones, la IA y las cuentas.
 
-Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa y Colaborador (Consultor y Usuario quedan para un posible futuro); sin análisis FODA ni comparación con promedios; contraseña fuerte (8 caracteres, mayúscula, número y carácter especial); análisis de IA en una sola etapa por categoría; estados de medición Enviada y Terminada; medición vencida → la empresa pide otra por correo; el bot de WhatsApp es totalmente separado y queda **aplazado**; el simulador de inversión no existe.
+Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa, Colaborador y Consultor (este último agregado el 3 de noviembre, solo de lectura; Usuario queda para un posible futuro); sin análisis FODA ni comparación con promedios; contraseña fuerte (8 caracteres, mayúscula, número y carácter especial); análisis de IA en una sola etapa por categoría; estados de medición Enviada y Terminada; medición vencida → la empresa pide otra por correo; el bot de WhatsApp es totalmente separado y queda **aplazado**; el simulador de inversión no existe.
 
 # 2. Actores identificados
 
@@ -27,7 +27,8 @@ Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa y
 | Colaborador | Cuenta creada por la empresa, con casi los mismos permisos. | Responder y enviar el diagnóstico y ver resultados, historial y PDF; no crea colaboradores ni cambia datos de la empresa. |
 | Sistema | Procesos automáticos (cálculo, análisis de IA, publicación, vencimientos). | Producir resultados justos y consistentes sin intervención. |
 | Empresa por WhatsApp | Quien conversa con el bot (aplazado). | Hacer un diagnóstico rápido sin cuenta. |
-| Consultor, Usuario | Roles posibles a futuro. **[FUNCIONALIDAD POR DEFINIR]** No tienen historias. | — |
+| Consultor | Persona externa a NuevasTIC que acompaña a una o varias empresas; la invita el Administrador (agregado el 3 de noviembre). | Ver la ficha, el historial, los resultados y el PDF de las empresas que tiene vinculadas. Solo mira: no responde ni toca diagnósticos. |
+| Usuario | Rol posible a futuro. **[FUNCIONALIDAD POR DEFINIR]** No tiene historias. | — |
 
 # 3. Módulos identificados
 
@@ -9688,6 +9689,154 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 
 ---
 
+## EP-014 — Consultor
+
+Agregada el 3 de noviembre de 2026: en la presentación se decidió incluir el rol Consultor, que hasta entonces existía inactivo (PA-006). Decisiones del equipo: es una persona externa a la que se le crea una cuenta (se le invita); solo mira; no responde ni toca diagnósticos; lo vincula el Administrador; puede acompañar una o varias empresas.
+
+## HU-085 — Vincular consultores a una empresa
+
+**Épica:** EP-014 — Consultor
+
+**Actor:** Administrador
+
+**Prioridad:** Alta — Sin el vínculo, el consultor no ve ninguna empresa.
+
+**Story Points:** 5 — Tabla nueva, pestaña en la ficha y elección de empresas al invitar.
+
+**MoSCoW:** Must
+
+**Estado:** Hecha
+
+**Definition of Ready:** LISTA
+
+**Vistas del prototipo:** A3.1 (pestaña "Consultores", antes "Próximamente"), A5 (Invitar usuario)
+
+### Historia de Usuario
+
+> Como Administrador, quiero vincular consultores a las empresas, para que cada consultor vea solo las empresas que acompaña.
+
+### Caso de éxito
+
+1. Invito a la persona desde Usuarios y roles con el rol Consultor y, si quiero, elijo sus empresas.
+2. En la ficha de una empresa, pestaña "Consultores", elijo un consultor y lo vinculo.
+3. Si ya no la acompaña, lo quito con una confirmación.
+
+### Criterios de aceptación
+
+#### CA-001 — Vincular desde la ficha
+
+**Dado** que existe una cuenta con el rol Consultor,
+
+**Cuando** la elijo en la pestaña "Consultores" de la empresa y pulso "Vincular",
+
+**Entonces** queda vinculada y la ve en su inicio.
+
+#### CA-002 — Varias empresas
+
+**Dado** que un consultor ya acompaña una empresa,
+
+**Cuando** lo vinculo a otra,
+
+**Entonces** ve las dos.
+
+#### CA-003 — Elegir empresas al invitar
+
+**Dado** que invito a alguien con el rol Consultor,
+
+**Cuando** marco empresas en la invitación,
+
+**Entonces** quedan vinculadas desde que crea su contraseña. Con otro rol no se vincula ninguna.
+
+#### CA-004 — Quitar
+
+**Dado** que un consultor está vinculado,
+
+**Cuando** lo quito y confirmo,
+
+**Entonces** deja de ver esa empresa; su cuenta sigue activa.
+
+#### CA-005 — Solo consultores
+
+**Dado** que elijo una cuenta que no tiene el rol Consultor,
+
+**Cuando** intento vincularla,
+
+**Entonces** el sistema lo rechaza. Si la cuenta deja de ser Consultor, pierde sus vínculos.
+
+### Reglas de negocio
+
+- RN-030 — El Consultor es externo e invitado; solo mira las empresas que el Administrador le vincula (una o varias): su ficha, su historial, sus resultados, sus respuestas y el PDF. No responde, no asigna mediciones, no cambia datos y no toca diagnósticos. Es un rol del sistema: sus permisos no se editan.
+
+### Validaciones
+
+- Solo quien tiene "Gestionar usuarios y roles" vincula o quita consultores.
+- Solo se vinculan cuentas con el rol Consultor.
+
+## HU-086 — Ver mis empresas como consultor
+
+**Épica:** EP-014 — Consultor
+
+**Actor:** Consultor
+
+**Prioridad:** Alta — Es la razón de ser del rol.
+
+**Story Points:** 5 — Inicio propio y filtro en todas las pantallas de empresas y resultados.
+
+**MoSCoW:** Must
+
+**Estado:** Hecha
+
+**Definition of Ready:** LISTA
+
+**Vistas del prototipo:** C1 (inicio del Consultor, nueva), A3, A3.1, A3.3, A3.4, A3.5
+
+### Historia de Usuario
+
+> Como consultor, quiero ver los resultados de las empresas que acompaño, para orientarlas sin poder cambiar nada.
+
+### Caso de éxito
+
+1. Inicio sesión y llego a mi inicio con mis empresas, su último puntaje, su nivel y su medición pendiente.
+2. Abro una empresa y veo su historial, sus resultados, sus respuestas y el PDF.
+
+### Criterios de aceptación
+
+#### CA-001 — Solo sus empresas
+
+**Dado** que tengo empresas vinculadas,
+
+**Cuando** abro mi inicio o "Empresas",
+
+**Entonces** solo aparecen esas.
+
+#### CA-002 — Otra empresa no
+
+**Dado** que una empresa no está vinculada,
+
+**Cuando** intento abrir su ficha, su historial, un resultado o su PDF,
+
+**Entonces** el sistema responde "No encontramos esta página" (404).
+
+#### CA-003 — Solo lectura
+
+**Dado** que soy consultor,
+
+**Cuando** abro la ficha de una empresa,
+
+**Entonces** no veo acciones (asignar medición, editar, desactivar) y el servidor las rechaza si las intento.
+
+#### CA-004 — Sin empresas
+
+**Dado** que todavía no tengo empresas vinculadas,
+
+**Cuando** entro,
+
+**Entonces** veo un aviso de que el equipo de NuevasTIC me las vincula.
+
+### Reglas de negocio
+
+- RN-030.
+
 # 6. Reglas de negocio
 
 | ID | Regla | Historias |
@@ -9718,9 +9867,10 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 | RN-024 | Informe de Diagnóstico y Estrategia de Marketing Digital en PDF, según la propuesta de reestructuración del 2 de noviembre de 2026, generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA. | HU-066, HU-084 |
 | RN-025 | Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa. | HU-035, HU-048, HU-056, HU-076, HU-077, HU-078, HU-079 |
 | RN-026 | “Ver como” es solo de lectura y queda registrado quién lo usó y cuándo. | HU-053, HU-054 |
-| RN-027 | Los roles del sistema (Administrador, Empresa, Colaborador) son fijos; cada cuenta tiene un solo rol; solo se elimina un rol sin cuentas. | HU-048, HU-049, HU-050, HU-051, HU-052 |
+| RN-027 | Los roles del sistema (Administrador, Empresa, Colaborador y, desde el 3 de noviembre, Consultor) son fijos; cada cuenta tiene un solo rol; solo se elimina un rol sin cuentas. | HU-048, HU-049, HU-050, HU-051, HU-052 |
 | RN-028 | El resultado no incluye análisis FODA ni comparación con promedios. | HU-038, HU-064, HU-066 |
 | RN-029 | El diagnóstico por WhatsApp es totalmente separado de la web: sin cuentas, mediciones ni PDF; máximo 10 preguntas configurables; solo texto; retoma desde la última pregunta y solo se reinicia si la empresa lo pide. | HU-071, HU-072, HU-073, HU-074, HU-075 |
+| RN-030 | El Consultor es externo e invitado; solo mira las empresas que el Administrador le vincula (una o varias): ficha, historial, resultados, respuestas y PDF. No responde, no asigna, no cambia datos ni toca diagnósticos. Es rol del sistema (decisión del 3 de noviembre de 2026). | HU-085, HU-086 |
 
 # 7. Requisitos no funcionales relacionados
 
@@ -9781,6 +9931,7 @@ Requisito → Épica → Historia → Criterio de aceptación.
 | RF-038 — Publicar el resultado | EP-012 | HU-084 | HU-084: CA-001–CA-005 | Completa |
 | RF-039 — Configurar el bot de WhatsApp | EP-013 | HU-071 | HU-071: CA-001–CA-005 | Completa (aplazada) |
 | RF-040 — Diagnóstico por WhatsApp | EP-013 | HU-072, HU-073, HU-074, HU-075 | HU-072: CA-001–CA-003; HU-073: CA-001–CA-006; HU-074: CA-001–CA-004; HU-075: CA-001–CA-004 | Completa (aplazada) |
+| RF-041 — Consultor con empresas vinculadas | EP-014 | HU-085, HU-086 | HU-085: CA-001–CA-005; HU-086: CA-001–CA-004 | Completa |
 
 ## Historia → requisito (T-061)
 
@@ -9872,6 +10023,8 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Hecha (botón "Pedir una nueva fecha" en E1) |
 | HU-083 — Atender las solicitudes de nueva medición | RF-034 | Hecha (aviso en A1, en la lista y la ficha de la empresa y en Asignar medición; se atiende asignando otra, con nueva fecha o cancelando la vencida) |
 | HU-084 — Publicar el resultado | RF-038 | Hecha |
+| HU-085 — Vincular consultores a una empresa | RF-041 | Hecha (pestaña "Consultores" de A3.1 y elección de empresas al invitar) |
+| HU-086 — Ver mis empresas como consultor | RF-041 | Hecha (inicio C1 y filtro en A3, A3.1, A3.3, A3.4, A3.5 y PDF) |
 
 HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la semana 4; mientras tanto vuelven a A2 con un aviso. HU-078 también permite editar el nombre, el cargo y el correo del colaborador, y E12 permite eliminarlo (DEC-017).
 
@@ -10223,7 +10376,7 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 - **[INFORMACIÓN PENDIENTE]** Capacidad del equipo para organizar Sprints (PA-007).
 - **[INFORMACIÓN PENDIENTE]** Diseño y textos del bot de WhatsApp (PA-001, PA-002).
 - **[FUNCIONALIDAD POR DEFINIR]** Rol Usuario; historial de solicitudes de nueva medición.
-- **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. ~~El Colaborador puede editar su propio perfil.~~
+- **Cambiado (3 de noviembre):** el rol Consultor se incluye y queda activo como rol del sistema, solo de lectura, con empresas vinculadas por el Administrador (EP-014, RN-030). Antes: **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. ~~El Colaborador puede editar su propio perfil.~~
 - **Definido (28 de octubre):** los colaboradores no cambian de rol; solo los desactivan o eliminan el Administrador o la cuenta principal de su empresa. A una empresa sin cuenta principal se le da una cuenta nueva.
 - **Definido (28 de octubre):** la cuenta del Administrador principal (la creada al instalar) no pierde el rol ni se desactiva o elimina. Una cuenta de empresa que pasa a un rol interno deja la empresa y crea una contraseña nueva con la invitación; si era la principal, la empresa queda desactivada. El teléfono nuevo de Mi perfil se confirma con un código al correo.
 - **Cambiado (26 de octubre):** el Colaborador **no** edita su perfil ni su contraseña: lo hace la cuenta principal (E12.3), que además elige qué páginas ve cada colaborador. Desactivar un rol bloquea a sus cuentas hasta que tengan otro rol.

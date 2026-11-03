@@ -3,8 +3,8 @@
  * A3.1 · Ficha de la empresa (HU-033) y A3.1d · Datos de la cuenta (HU-034).
  *
  * Encabezado: iniciales, nombre, sector, "Cuenta activa desde…" y las pestañas
- * Historial, Datos de la cuenta y Consultores (Próximamente: el rol
- * Consultor está aplazado).
+ * Historial, Datos de la cuenta y Consultores (HU-085: solo quien gestiona
+ * usuarios; vincula o quita consultores, PanelConsultores).
  *
  * Historial:
  * - Último puntaje con su nivel, variación frente a la anterior (RN-020; no
@@ -58,6 +58,7 @@ import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
 import ModalCuentaPrincipal from '@/components/empresas/ModalCuentaPrincipal.vue';
 import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
+import PanelConsultores from '@/components/empresas/PanelConsultores.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
 import SelectorEvolucion from '@/components/graficas/SelectorEvolucion.vue';
@@ -86,20 +87,26 @@ const puntosEvolucion = computed(
             ?.puntos ?? props.evolucion,
 );
 
-type Pestana = 'historial' | 'cuenta';
+type Pestana = 'historial' | 'cuenta' | 'consultores';
 
 // Sale de la URL de Inertia y no de `window`: con SSR se arma en Node.
+const pestanaUrl = new URLSearchParams(usePage().url.split('?')[1] ?? '').get(
+    'pestana',
+);
 const pestana = ref<Pestana>(
-    new URLSearchParams(usePage().url.split('?')[1] ?? '').get('pestana') ===
-        'cuenta'
-        ? 'cuenta'
+    pestanaUrl === 'cuenta' ||
+        (pestanaUrl === 'consultores' && props.consultores !== null)
+        ? (pestanaUrl as Pestana)
         : 'historial',
 );
 
-const pestanas = [
+const pestanas = computed(() => [
     { valor: 'historial' as const, etiqueta: 'Historial' },
     { valor: 'cuenta' as const, etiqueta: 'Datos de la cuenta' },
-];
+    ...(props.consultores !== null
+        ? [{ valor: 'consultores' as const, etiqueta: 'Consultores' }]
+        : []),
+]);
 
 const fecha = (texto: string | null) =>
     texto ? diaYMes(fechaLocal(texto)) : '—';
@@ -319,17 +326,6 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     :opciones="pestanas"
                     etiqueta-accesible="Secciones de la ficha"
                 />
-                <span
-                    class="flex items-center gap-1.5 px-3 text-xs text-tinta-suave"
-                    title="Llega con el rol Consultor"
-                >
-                    Consultores
-                    <span
-                        class="rounded-full bg-lienzo-oscuro px-2 py-0.5 text-[11px]"
-                    >
-                        Próximamente
-                    </span>
-                </span>
             </div>
         </header>
 
@@ -889,6 +885,13 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 </section>
             </div>
         </div>
+
+        <!-- Consultores (HU-085) -->
+        <PanelConsultores
+            v-else-if="pestana === 'consultores' && consultores"
+            :empresa="empresa"
+            :consultores="consultores"
+        />
 
         <!-- Datos de la cuenta (A3.1d) -->
         <div
