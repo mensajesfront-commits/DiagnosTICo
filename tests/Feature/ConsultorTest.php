@@ -132,6 +132,13 @@ it('ve la ficha, el historial y los resultados de su empresa', function () {
     $this->get(route('resultados.respuestas', $this->medicionSuya))->assertOk();
 });
 
+it('descarga el PDF del resultado de su empresa', function () {
+    $this->actingAs($this->consultor);
+
+    expect($this->consultor->can('resultados.pdf'))->toBeTrue()
+        ->and($this->consultor->can('empresas.registrar'))->toBeFalse();
+});
+
 it('no ve la ficha, el historial ni los resultados de otra empresa', function () {
     $this->actingAs($this->consultor);
 

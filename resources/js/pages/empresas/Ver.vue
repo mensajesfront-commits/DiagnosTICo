@@ -36,6 +36,7 @@ import {
     CalendarPlus,
     ChartLine,
     ClipboardList,
+    FileDown,
     Store,
     TrendingUp,
 } from '@lucide/vue';
@@ -51,6 +52,7 @@ import Paginacion from '@/components/base/Paginacion.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import CamposEmpresa from '@/components/empresas/CamposEmpresa.vue';
+import DatosEmpresaLectura from '@/components/empresas/DatosEmpresaLectura.vue';
 import type { FormularioEmpresa } from '@/components/empresas/CamposEmpresa.vue';
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
@@ -79,16 +81,18 @@ const props = defineProps<FichaEmpresa>();
 
 const { puede } = usePermisos();
 
+/** El consultor vuelve a "Mis empresas" (C2): no tiene la lista A3. */
+const esConsultor = computed(() => usePage().props.auth.rol === 'Consultor');
+
 /**
  * La columna de la derecha (medición pendiente y Asignar) solo si tiene algo:
  * sin ella, el historial ocupa todo el ancho (el consultor sin pendiente).
  */
 const columnaLateral = computed(
-    () => props.pendiente !== null || puede('mediciones.asignar'),
+    () =>
+        puede('mediciones.asignar') ||
+        (props.pendiente !== null && !esConsultor.value),
 );
-
-/** El consultor vuelve a "Mis empresas" (C2): no tiene la lista A3. */
-const esConsultor = computed(() => usePage().props.auth.rol === 'Consultor');
 
 // "Ver:" de la gráfica: el puntaje total o el de una categoría.
 const verCategoria = ref('');
@@ -113,7 +117,12 @@ const pestana = ref<Pestana>(
 
 const pestanas = computed(() => [
     { valor: 'historial' as const, etiqueta: 'Historial' },
-    { valor: 'cuenta' as const, etiqueta: 'Datos de la cuenta' },
+    {
+        valor: 'cuenta' as const,
+        etiqueta: puede('empresas.registrar')
+            ? 'Datos de la cuenta'
+            : 'Datos de la empresa',
+    },
     ...(props.consultores !== null
         ? [{ valor: 'consultores' as const, etiqueta: 'Consultores' }]
         : []),
@@ -660,6 +669,23 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                             >
                                                 Ver resultado
                                             </Link>
+                                            <a
+                                                v-if="
+                                                    m.estado === 'terminada' &&
+                                                    puede('resultados.pdf')
+                                                "
+                                                :href="
+                                                    rutas.resultados.pdf(m.id)
+                                                "
+                                                class="ml-3 inline-flex size-7 items-center justify-center rounded-md align-middle text-tinta-suave hover:bg-lienzo hover:text-marca"
+                                                :aria-label="`Descargar el PDF de la medición ${m.numero}`"
+                                                title="Descargar PDF"
+                                            >
+                                                <FileDown
+                                                    class="size-4"
+                                                    aria-hidden="true"
+                                                />
+                                            </a>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -917,7 +943,15 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
             v-else
             class="grid items-start gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_300px] lg:grid-rows-[minmax(0,1fr)]"
         >
+            <DatosEmpresaLectura
+                v-if="!puede('empresas.registrar')"
+                class="lg:max-h-full lg:overflow-y-auto"
+                :empresa="empresa"
+                :principal="principal"
+                :opciones="opciones"
+            />
             <form
+                v-else
                 class="flex flex-col gap-4 rounded-2xl border border-linea bg-white p-5 lg:max-h-full lg:overflow-y-auto"
                 novalidate
                 @submit.prevent="guardar"
@@ -941,14 +975,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     Cambiar el sector no modifica las mediciones ya hechas: las
                     próximas se asignan con diagnósticos del sector nuevo.
                 </p>
-                <p
-                    v-if="!puede('empresas.registrar')"
-                    class="mt-auto rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
-                >
-                    Solo lectura: tu rol no permite cambiar los datos de las
-                    empresas.
-                </p>
-                <div v-else class="mt-auto flex justify-end gap-3 pt-2">
+                <div class="mt-auto flex justify-end gap-3 pt-2">
                     <Boton
                         variante="secundario"
                         :disabled="!form.isDirty || form.processing"

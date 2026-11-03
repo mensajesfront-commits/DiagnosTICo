@@ -70,6 +70,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A3.1 · ficha de la empresa para el Consultor, 3 de noviembre)
+
+- **Historial a todo el ancho:** al consultor no le sale la columna de la medición pendiente, porque ya está arriba en "Medición N pendiente".
+- **"Datos de la empresa"** (antes "Datos de la cuenta" con el formulario deshabilitado): para quien no puede editar (`empresas.registrar`), los datos se ven como texto en `DatosEmpresaLectura.vue`: descripción, sector, actividad económica, ubicación, empleados, teléfono y sitio web (con enlace), y el contacto principal con su correo y teléfono. Sin asteriscos ni ayudas de edición.
+- **PDF en cada fila** del historial de la ficha, junto a "Ver resultado", para quien tiene `resultados.pdf`.
+
 ### Cambiado (C1 · diseño del inicio del Consultor, 3 de noviembre)
 
 - **Saludo** con la fecha y una frase: "N empresas necesitan tu atención hoy" o "Tus empresas están al día".
