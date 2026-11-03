@@ -70,6 +70,20 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (E12 · diseño de Colaboradores, 3 de noviembre)
+
+- **Encabezado:** lleva ícono, y el botón "Agregar colaborador" tiene ícono.
+- **Qué puede y qué no puede hacer un colaborador:** dos tarjetas, una con ícono verde y otra con ícono rojo.
+- **Las personas son tarjetas en vez de una tabla** (en el celular ya no hay que deslizar de lado):
+  - la cuenta principal va primero, con fondo de marca y el chip "Cuenta principal · Tú";
+  - cada tarjeta lleva iniciales, nombre, correo y estado (Activo o Desactivado); el cargo solo se muestra si existe;
+  - "Puede ver" muestra las páginas como chips con ícono, o "Solo Inicio" si no tiene ninguna;
+  - acciones con ícono: Editar y "Desactivar o eliminar"; en las desactivadas, Reactivar y Eliminar en rojo. Las desactivadas tienen borde punteado.
+- **Filtro** Todos / Activos / Desactivados, con conteos. La cuenta principal siempre se ve.
+- **Lista vacía:** tarjeta punteada con ícono junto a la cuenta principal (HU-076 CA-004).
+- **Nota final:** va en un recuadro y dice cuántos colaboradores activos hay.
+- Los modales E12.1 a E12.3 y el backend no cambian.
+
 ### Cambiado (E9 / A3.5 · diseño de Mis respuestas, 3 de noviembre)
 
 - **Encabezado:**
