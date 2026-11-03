@@ -70,6 +70,24 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Cambiado (A4 · diseño de Configuración IA, 3 de noviembre)
+
+- **Encabezado:** ícono, y el estado de los cambios en una píldora (verde «Sin cambios pendientes», ámbar «Cambios sin guardar»). «Descartar» y «Guardar» llevan ícono.
+- **A quién se aplica:** «Todas las empresas», «Solo un sector» y «Solo una empresa» son tres tarjetas con ícono y una línea de explicación. La explicación de la etapa va en una franja con ícono.
+- **Datos que se insertan solos:** cada dato en una tarjeta con su código resaltado y «En uso» o «Sin usar» en una píldora.
+- **Contexto, Tarea, Detalles y Ejemplos:**
+  - número en un círculo azul y un ícono por parte;
+  - «Incluye {…}» o «Sin {…}» en una píldora verde o ámbar;
+  - «Restaurar texto original» con ícono.
+  - En los ajustes de sector o empresa, «Usar general», «Agregar» y «Reemplazar» son tarjetas con ícono.
+- **Formato de la respuesta:** «Fijo» con candado.
+- **Panel derecho:** cada tarjeta lleva ícono. «¿Quieres ver cómo queda?» va resaltada y «Quitar el ajuste» tiene borde ámbar.
+- **A4.9 · Cómo se arma el prompt final:**
+  - las cinco capas en una línea de pasos con ícono;
+  - la etiqueta dice quién la escribe: azul tú, verde el sistema con tus datos, gris fija;
+  - termina en «= Prompt final que lee la IA»;
+  - el panel derecho lleva íconos y viñetas de color.
+
 ### Corregido (A3.1e · el correo se salía de la ventana, 3 de noviembre)
 
 - Con un correo largo en «Para», la vista previa empujaba la ventana y salía una barra horizontal. Ahora:

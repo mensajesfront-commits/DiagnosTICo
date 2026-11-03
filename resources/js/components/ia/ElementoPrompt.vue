@@ -6,7 +6,23 @@
  *   automáticos usa y "Restaurar texto original".
  * - Ajuste de sector o empresa (A4.5, A4.6): se elige "Usar general" (o
  *   "Usar sector"), "Agregar" o "Reemplazar" y se ve cómo lo leerá la IA.
+ *
+ * Diseño: número en un círculo azul y un ícono por parte (contexto, tarea,
+ * detalles, ejemplos); los datos automáticos en una píldora verde o ámbar y
+ * los tres modos del ajuste en tarjetas con ícono.
  */
+import {
+    CircleCheck,
+    Compass,
+    Lightbulb,
+    Link2,
+    ListChecks,
+    Plus,
+    Replace,
+    RotateCcw,
+    Target,
+    TriangleAlert,
+} from '@lucide/vue';
 import { computed } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import { variablesUsadas } from '@/lib/ia';
@@ -51,9 +67,17 @@ const nombreBase = computed(() =>
     props.origenBase === 'sector' ? 'sector' : 'general',
 );
 
+const iconos = {
+    contexto: Compass,
+    tarea: Target,
+    detalles: ListChecks,
+    ejemplos: Lightbulb,
+};
+
 const opciones = computed(() => [
     {
         valor: 'usar' as const,
+        icono: Link2,
         titulo: `Usar ${nombreBase.value}`,
         detalle:
             props.origenBase === 'sector'
@@ -62,11 +86,13 @@ const opciones = computed(() => [
     },
     {
         valor: 'agregar' as const,
+        icono: Plus,
         titulo: 'Agregar',
         detalle: `Tu texto se suma al final de las instrucciones ${props.origenBase === 'sector' ? 'del sector' : 'generales'}.`,
     },
     {
         valor: 'reemplazar' as const,
+        icono: Replace,
         titulo: 'Reemplazar',
         detalle: `Tu texto sustituye por completo las instrucciones ${props.origenBase === 'sector' ? 'del sector' : 'generales'} de esta parte.`,
     },
@@ -80,16 +106,21 @@ const idTexto = computed(() => `prompt-${props.clave}`);
 </script>
 
 <template>
-    <section class="relative rounded-xl border border-linea bg-white p-5">
+    <section class="relative rounded-2xl border border-linea bg-white p-5">
         <header class="flex items-start gap-3">
             <span
-                class="flex size-7 shrink-0 items-center justify-center rounded-full bg-lienzo-oscuro text-xs font-semibold"
+                class="flex size-8 shrink-0 items-center justify-center rounded-full bg-marca font-mono text-xs font-semibold text-white"
                 aria-hidden="true"
             >
                 {{ numero }}
             </span>
-            <div>
-                <h2 class="font-semibold">
+            <div class="min-w-0 flex-1">
+                <h2 class="flex items-center gap-2 font-semibold">
+                    <component
+                        :is="iconos[clave]"
+                        class="size-4 text-marca"
+                        aria-hidden="true"
+                    />
                     <label v-if="alcance === 'general'" :for="idTexto">{{
                         titulo
                     }}</label>
@@ -121,24 +152,33 @@ const idTexto = computed(() => `prompt-${props.clave}`);
                 :id="`${idTexto}-pie`"
                 class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs"
             >
-                <span v-if="esperadas.length === 0" class="text-exito">
-                    ✓ Esta parte no necesita datos automáticos
+                <span
+                    v-if="esperadas.length === 0 || faltan.length === 0"
+                    class="inline-flex items-center gap-1 rounded-full bg-exito-suave px-2 py-0.5 font-medium text-exito"
+                >
+                    <CircleCheck class="size-3" aria-hidden="true" />
+                    {{
+                        esperadas.length === 0
+                            ? 'Esta parte no necesita datos automáticos'
+                            : `Incluye ${lista(esperadas)}`
+                    }}
                 </span>
-                <span v-else-if="faltan.length === 0" class="text-exito">
-                    ✓ Incluye
-                    {{ lista(esperadas) }}
-                </span>
-                <span v-else class="text-[#9a5d12]">
+                <span
+                    v-else
+                    class="inline-flex items-center gap-1 rounded-full bg-alerta-suave px-2 py-0.5 font-medium text-alerta"
+                >
+                    <TriangleAlert class="size-3" aria-hidden="true" />
                     Sin {{ lista(faltan) }}: la IA no recibirá ese dato en esta
                     parte.
                 </span>
                 <button
                     v-if="!soloLectura && original !== undefined"
                     type="button"
-                    class="text-marca underline underline-offset-2 disabled:text-tinta-suave disabled:no-underline"
+                    class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-tinta-suave transition hover:bg-lienzo hover:text-marca disabled:pointer-events-none disabled:opacity-40"
                     :disabled="texto === original"
                     @click="texto = original ?? ''"
                 >
+                    <RotateCcw class="size-3.5" aria-hidden="true" />
                     Restaurar texto original
                 </button>
             </div>
@@ -154,10 +194,10 @@ const idTexto = computed(() => `prompt-${props.clave}`);
                         :key="o.valor"
                         :class="
                             cn(
-                                'flex cursor-pointer gap-2 rounded-lg border px-3 py-2.5 text-sm transition-colors',
+                                'flex cursor-pointer gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition has-focus-visible:ring-2 has-focus-visible:ring-marca/30',
                                 modo === o.valor
                                     ? 'border-marca bg-marca-suave/50'
-                                    : 'border-linea hover:bg-lienzo',
+                                    : 'border-linea hover:border-marca/40',
                                 soloLectura && 'cursor-default',
                             )
                         "
@@ -168,8 +208,21 @@ const idTexto = computed(() => `prompt-${props.clave}`);
                             :name="`modo-${clave}`"
                             :value="o.valor"
                             :disabled="soloLectura"
-                            class="mt-0.5 accent-marca"
+                            class="sr-only"
                         />
+                        <span
+                            :class="
+                                cn(
+                                    'flex size-8 shrink-0 items-center justify-center rounded-lg',
+                                    modo === o.valor
+                                        ? 'bg-marca text-white'
+                                        : 'bg-lienzo text-tinta-suave',
+                                )
+                            "
+                            aria-hidden="true"
+                        >
+                            <component :is="o.icono" class="size-4" />
+                        </span>
                         <span>
                             <span class="block font-medium">{{
                                 o.titulo
@@ -182,7 +235,7 @@ const idTexto = computed(() => `prompt-${props.clave}`);
                 </div>
             </fieldset>
 
-            <div class="mt-3 overflow-hidden rounded-lg border border-linea">
+            <div class="mt-3 overflow-hidden rounded-xl border border-linea">
                 <div
                     v-if="modo !== 'reemplazar'"
                     class="bg-lienzo px-4 py-3 text-sm"
