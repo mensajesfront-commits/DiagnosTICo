@@ -30,7 +30,7 @@ class ResultadoListo extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new Correo)
             ->subject("Tu resultado de la medición {$this->medicion->numero} está listo")
             ->greeting('Hola, '.($notifiable->name ?? '').':')
             ->line("Ya terminamos de analizar el diagnóstico de {$this->medicion->empresa->nombre}.")

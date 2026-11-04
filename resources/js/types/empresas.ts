@@ -149,6 +149,26 @@ export type FichaEmpresa = {
     colaboradores: Colaborador[];
     diagnosticos: DiagnosticoAsignable[];
     opciones: OpcionesEmpresa;
+    /** Pestaña "Consultores" (HU-085); null sin `usuarios.gestionar`. */
+    consultores: ConsultoresEmpresa | null;
+};
+
+/** Cuenta con el rol Consultor (RN-030). */
+export type ConsultorFila = {
+    id: number;
+    nombre: string;
+    correo: string;
+    activo: boolean;
+    invitacion_pendiente: boolean;
+};
+
+export type ConsultoresEmpresa = {
+    vinculados: (ConsultorFila & {
+        /** Cuántas empresas acompaña en total. */
+        empresas: number;
+        vinculado_en: string | null;
+    })[];
+    disponibles: ConsultorFila[];
 };
 
 /** Empresa que se ofrece en A3.1b. */

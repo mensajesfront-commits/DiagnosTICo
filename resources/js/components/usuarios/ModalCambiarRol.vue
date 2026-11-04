@@ -10,10 +10,12 @@
  *
  * Envía: PUT /usuarios/{id}/rol con rol_id y avisar (aviso por correo).
  */
+import { ShieldCheck } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import OpcionRol from '@/components/usuarios/OpcionRol.vue';
 import { rutas } from '@/lib/rutas';
 import { avisoCuentaPrincipal, avisoSaleDeEmpresa } from '@/lib/usuarios';
@@ -96,6 +98,7 @@ function cambiar(): void {
         v-model:abierto="abierto"
         :titulo="`Cambiar el rol de ${cuenta.nombre}`"
         :descripcion="detalle"
+        :icono="ShieldCheck"
     >
         <form
             id="form-cambiar-rol"
@@ -127,12 +130,7 @@ function cambiar(): void {
                 </p>
             </fieldset>
 
-            <p
-                v-if="aviso"
-                class="rounded-md bg-alerta-suave px-3 py-2.5 text-sm text-alerta"
-            >
-                ⚠ {{ aviso }}
-            </p>
+            <Recuadro tono="alerta" v-if="aviso"> {{ aviso }} </Recuadro>
 
             <label class="flex items-center gap-2 text-sm">
                 <input

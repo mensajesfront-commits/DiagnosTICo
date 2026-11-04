@@ -8,10 +8,13 @@
  * [INFORMACIÓN PENDIENTE] El wireframe A2.2c no está en los PDF recibidos;
  * los textos salen de HU-015.
  */
+import { Power, PowerOff } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
+import { plural } from '@/lib/texto';
 import type { ResumenDiagnosticos, Sector } from '@/types/diagnosticos';
 
 const props = defineProps<{
@@ -43,18 +46,21 @@ function confirmar(): void {
                 ? `¿Desactivar el sector “${sector.nombre}”?`
                 : `¿Reactivar el sector “${sector.nombre}”?`
         "
+        :icono="sector.activo ? PowerOff : Power"
+        :tono="sector.activo ? 'alerta' : 'exito'"
     >
         <div v-if="sector.activo" class="flex flex-col gap-3 text-sm">
             <p>
                 Deja de ofrecerse al registrar empresas nuevas. Las empresas que
                 ya lo tienen no cambian.
             </p>
-            <p class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave">
-                Se conservan sus {{ resumen.empresas }} empresas,
-                {{ sector.diagnosticos }} diagnósticos y
-                {{ resumen.mediciones }} mediciones. Puedes reactivarlo cuando
-                quieras desde «Editar sector».
-            </p>
+            <Recuadro tono="neutro">
+                Se conservan sus
+                {{ plural(resumen.empresas, 'empresa', 'empresas') }},
+                {{ plural(sector.diagnosticos, 'diagnóstico', 'diagnósticos') }}
+                y {{ plural(resumen.mediciones, 'medición', 'mediciones') }}.
+                Puedes reactivarlo cuando quieras desde «Editar sector».
+            </Recuadro>
         </div>
         <p v-else class="text-sm">
             Vuelve a ofrecerse al registrar empresas nuevas.

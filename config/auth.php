@@ -93,14 +93,23 @@ return [
     */
 
     'passwords' => [
+        // "¿Olvidaste tu contraseña?" (L3/L4): el enlace vence a los 10 minutos
+        // (RN-006, cambio del 4 de noviembre, ERR-09). Pedir otro invalida el anterior.
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            // RN-006: el enlace no vence por tiempo; sirve hasta guardar la
-            // contraseña. Se usa un año como "sin vencimiento". Pedir otro
-            // enlace invalida el anterior.
-            'expire' => (int) env('AUTH_PASSWORD_RESET_EXPIRE', 525600),
+            'expire' => (int) env('AUTH_PASSWORD_RESET_EXPIRE', 10),
             'throttle' => 60,
+        ],
+
+        // Invitación para crear la primera contraseña (A5, A3.2, Administrador
+        // principal): sirve hasta usarla; un año es el máximo técnico.
+        // Mandar otra invitación invalida la anterior.
+        'invitaciones' => [
+            'provider' => 'users',
+            'table' => 'invitaciones_tokens',
+            'expire' => (int) env('AUTH_INVITATION_EXPIRE', 525600),
+            'throttle' => 0,
         ],
     ],
 

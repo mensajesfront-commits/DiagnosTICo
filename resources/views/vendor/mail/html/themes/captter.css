@@ -1,0 +1,302 @@
+/*
+ * Tema de los correos de Captter (colores de resources/css/app.css).
+ * Laravel lo pasa a estilos en línea, que es lo que respetan Gmail y Outlook.
+ */
+
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+        sans-serif;
+    position: relative;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #f5f4f0;
+    color: #1e2533;
+    height: 100%;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+}
+
+p,
+ul,
+ol,
+blockquote {
+    line-height: 1.6;
+    text-align: left;
+}
+
+a {
+    color: #2d4a7a;
+}
+
+a img {
+    border: none;
+}
+
+h1 {
+    color: #1e2533;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+h2 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+h3 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+p {
+    color: #3b4352;
+    font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+p.sub {
+    font-size: 12px;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Layout */
+
+.wrapper {
+    background-color: #f5f4f0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.content {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Encabezado: banda azul con el nombre de la marca */
+
+.header {
+    padding: 28px 0 0;
+    text-align: center;
+}
+
+.header a {
+    text-decoration: none;
+}
+
+.marca {
+    background-color: #14154d;
+    border-radius: 12px 12px 0 0;
+    margin: 0 auto;
+    padding: 22px 32px 20px;
+    width: 570px;
+}
+
+.marca-nombre {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-align: left;
+}
+
+.marca-punto {
+    color: #6ae45b;
+}
+
+.marca-lema {
+    color: #c9cdea;
+    font-size: 12px;
+    padding-top: 2px;
+    text-align: left;
+}
+
+/* Cuerpo: tarjeta blanca con franja verde */
+
+.body {
+    background-color: #f5f4f0;
+    border-bottom: 0;
+    border-top: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    background-color: #ffffff;
+    border-color: #e3e2dd;
+    border-radius: 0 0 12px 12px;
+    border-style: solid;
+    border-width: 0 1px 1px;
+    border-top: 4px solid #6ae45b;
+    box-shadow: 0 2px 6px rgba(20, 21, 77, 0.06);
+    margin: 0 auto;
+    padding: 0;
+    width: 570px;
+}
+
+.inner-body a {
+    word-break: break-all;
+}
+
+.content-cell {
+    max-width: 100vw;
+    padding: 34px 36px 30px;
+}
+
+/* Enlace alternativo, debajo del botón */
+
+.subcopy {
+    border-top: 1px solid #e3e2dd;
+    margin-top: 24px;
+    padding-top: 20px;
+}
+
+.subcopy p {
+    color: #5f6470;
+    font-size: 12px;
+}
+
+/* Pie */
+
+.footer {
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    width: 570px;
+}
+
+.footer p {
+    color: #8a8f99;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.footer a {
+    color: #5f6470;
+    text-decoration: underline;
+}
+
+/* Tablas dentro del texto */
+
+.table table {
+    margin: 24px auto;
+    width: 100%;
+}
+
+.table th {
+    border-bottom: 1px solid #e3e2dd;
+    margin: 0;
+    padding-bottom: 8px;
+}
+
+.table td {
+    color: #3b4352;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 0;
+    padding: 10px 0;
+}
+
+.content-cell {
+    max-width: 100vw;
+}
+
+/* Botón */
+
+.action {
+    margin: 26px auto 28px;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.button {
+    -webkit-text-size-adjust: none;
+    border-radius: 8px;
+    color: #ffffff !important;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 600;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.button-blue,
+.button-primary {
+    background-color: #2d4a7a;
+    border-bottom: 13px solid #2d4a7a;
+    border-left: 28px solid #2d4a7a;
+    border-right: 28px solid #2d4a7a;
+    border-top: 13px solid #2d4a7a;
+}
+
+.button-green,
+.button-success {
+    background-color: #4e9954;
+    border-bottom: 13px solid #4e9954;
+    border-left: 28px solid #4e9954;
+    border-right: 28px solid #4e9954;
+    border-top: 13px solid #4e9954;
+}
+
+.button-red,
+.button-error {
+    background-color: #d85249;
+    border-bottom: 13px solid #d85249;
+    border-left: 28px solid #d85249;
+    border-right: 28px solid #d85249;
+    border-top: 13px solid #d85249;
+}
+
+/* Panel (avisos destacados) */
+
+.panel {
+    border-left: #2d4a7a solid 4px;
+    margin: 21px 0;
+}
+
+.panel-content {
+    background-color: #e5eff9;
+    color: #1e2533;
+    padding: 16px;
+}
+
+.panel-content p {
+    color: #1e2533;
+}
+
+.panel-item {
+    padding: 0;
+}
+
+.panel-item p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Utilidades */
+
+.break-all {
+    word-break: break-all;
+}

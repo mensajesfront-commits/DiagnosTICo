@@ -2,9 +2,9 @@
 /**
  * A3.1 · Ficha de la empresa (HU-033) y A3.1d · Datos de la cuenta (HU-034).
  *
- * Encabezado: nombre, sector, "Cuenta activa desde…" y las pestañas
- * Historial, Datos de la cuenta y Consultores (Próximamente: el rol
- * Consultor está aplazado).
+ * Encabezado: iniciales, nombre, sector, "Cuenta activa desde…" y las pestañas
+ * Historial, Datos de la cuenta y Consultores (HU-085: solo quien gestiona
+ * usuarios; vincula o quita consultores, PanelConsultores).
  *
  * Historial:
  * - Último puntaje con su nivel, variación frente a la anterior (RN-020; no
@@ -31,7 +31,15 @@
  * (HU-039).
  */
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowLeft } from '@lucide/vue';
+import {
+    ArrowLeft,
+    CalendarPlus,
+    ChartLine,
+    ClipboardList,
+    FileDown,
+    Store,
+    TrendingUp,
+} from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
@@ -44,6 +52,7 @@ import Paginacion from '@/components/base/Paginacion.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import SelectorCompacto from '@/components/base/SelectorCompacto.vue';
 import CamposEmpresa from '@/components/empresas/CamposEmpresa.vue';
+import DatosEmpresaLectura from '@/components/empresas/DatosEmpresaLectura.vue';
 import type { FormularioEmpresa } from '@/components/empresas/CamposEmpresa.vue';
 import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.vue';
@@ -51,7 +60,8 @@ import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
 import ModalCuentaPrincipal from '@/components/empresas/ModalCuentaPrincipal.vue';
 import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
-import Variacion from '@/components/empresas/Variacion.vue';
+import PanelConsultores from '@/components/empresas/PanelConsultores.vue';
+import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import EvolucionPuntaje from '@/components/graficas/EvolucionPuntaje.vue';
 import SelectorEvolucion from '@/components/graficas/SelectorEvolucion.vue';
 import {
@@ -71,6 +81,19 @@ const props = defineProps<FichaEmpresa>();
 
 const { puede } = usePermisos();
 
+/** El consultor vuelve a "Mis empresas" (C2): no tiene la lista A3. */
+const esConsultor = computed(() => usePage().props.auth.rol === 'Consultor');
+
+/**
+ * La columna de la derecha (medición pendiente y Asignar) solo si tiene algo:
+ * sin ella, el historial ocupa todo el ancho (el consultor sin pendiente).
+ */
+const columnaLateral = computed(
+    () =>
+        puede('mediciones.asignar') ||
+        (props.pendiente !== null && !esConsultor.value),
+);
+
 // "Ver:" de la gráfica: el puntaje total o el de una categoría.
 const verCategoria = ref('');
 const puntosEvolucion = computed(
@@ -79,26 +102,48 @@ const puntosEvolucion = computed(
             ?.puntos ?? props.evolucion,
 );
 
-type Pestana = 'historial' | 'cuenta';
+type Pestana = 'historial' | 'cuenta' | 'consultores';
 
 // Sale de la URL de Inertia y no de `window`: con SSR se arma en Node.
+const pestanaUrl = new URLSearchParams(usePage().url.split('?')[1] ?? '').get(
+    'pestana',
+);
 const pestana = ref<Pestana>(
-    new URLSearchParams(usePage().url.split('?')[1] ?? '').get('pestana') ===
-        'cuenta'
-        ? 'cuenta'
+    pestanaUrl === 'cuenta' ||
+        (pestanaUrl === 'consultores' && props.consultores !== null)
+        ? (pestanaUrl as Pestana)
         : 'historial',
 );
 
-const pestanas = [
+const pestanas = computed(() => [
     { valor: 'historial' as const, etiqueta: 'Historial' },
-    { valor: 'cuenta' as const, etiqueta: 'Datos de la cuenta' },
-];
+    {
+        valor: 'cuenta' as const,
+        etiqueta: puede('empresas.registrar')
+            ? 'Datos de la cuenta'
+            : 'Datos de la empresa',
+    },
+    ...(props.consultores !== null
+        ? [{ valor: 'consultores' as const, etiqueta: 'Consultores' }]
+        : []),
+]);
 
 const fecha = (texto: string | null) =>
     texto ? diaYMes(fechaLocal(texto)) : '—';
 
 const activaDesde = computed(() =>
     props.empresa.registrada_en ? mesYAnio(props.empresa.registrada_en) : null,
+);
+
+/** "Panadería El Trigal" → "PE", para el círculo del encabezado. */
+const iniciales = computed(
+    () =>
+        props.empresa.nombre
+            .split(/\s+/)
+            .filter((p) => p.length > 2 || /^[A-ZÁÉÍÓÚÑ]/.test(p))
+            .slice(0, 2)
+            .map((p) => p.charAt(0).toUpperCase())
+            .join('') || props.empresa.nombre.charAt(0).toUpperCase(),
 );
 
 const terminadas = computed(
@@ -243,137 +288,219 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     class="mb-2 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-tinta-suave hover:text-marca"
                 >
                     <ArrowLeft class="size-4" aria-hidden="true" />
-                    Empresas
+                    {{ esConsultor ? 'Mis empresas' : 'Empresas' }}
                 </Link>
-                <div class="flex flex-wrap items-center gap-3">
-                    <h1 class="text-2xl font-semibold">{{ empresa.nombre }}</h1>
-                    <Etiqueta>Sector: {{ empresa.sector ?? '—' }}</Etiqueta>
-                    <span v-if="!empresa.activa" class="text-sm text-aviso">
-                        ⊘ Cuenta desactivada
-                    </span>
+                <div class="flex items-center gap-4">
                     <span
-                        v-else-if="activaDesde"
-                        class="text-sm text-tinta-suave"
+                        :class="
+                            cn(
+                                'flex size-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold',
+                                empresa.activa
+                                    ? 'bg-marca text-white'
+                                    : 'bg-lienzo-oscuro text-tinta-suave',
+                            )
+                        "
+                        aria-hidden="true"
+                        >{{ iniciales }}</span
                     >
-                        Cuenta activa desde {{ activaDesde }}
-                    </span>
+                    <div class="min-w-0">
+                        <h1 class="text-2xl leading-tight font-semibold">
+                            {{ empresa.nombre }}
+                        </h1>
+                        <p
+                            class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-tinta-suave"
+                        >
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-0.5 ring-1 ring-linea"
+                            >
+                                <Store class="size-3.5" aria-hidden="true" />
+                                {{ empresa.sector ?? 'Sin sector' }}
+                            </span>
+                            <span
+                                v-if="!empresa.activa"
+                                class="inline-flex items-center gap-1.5 font-medium text-aviso"
+                            >
+                                <span
+                                    class="size-2 rounded-full bg-aviso"
+                                    aria-hidden="true"
+                                />
+                                Cuenta desactivada
+                            </span>
+                            <span
+                                v-else-if="activaDesde"
+                                class="inline-flex items-center gap-1.5"
+                            >
+                                <span
+                                    class="size-2 rounded-full bg-nivel-sigue"
+                                    aria-hidden="true"
+                                />
+                                Cuenta activa desde {{ activaDesde }}
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center gap-1">
+            <div class="flex flex-wrap items-center gap-1">
                 <SelectorCompacto
                     v-model="pestana"
                     :opciones="pestanas"
                     etiqueta-accesible="Secciones de la ficha"
                 />
-                <span
-                    class="flex items-center gap-1.5 px-3 text-sm text-tinta-suave"
-                    title="Llega con el rol Consultor"
-                >
-                    Consultores
-                    <span
-                        class="rounded bg-lienzo-oscuro px-1.5 py-0.5 text-xs"
-                    >
-                        Próximamente
-                    </span>
-                </span>
             </div>
         </header>
 
         <!-- Historial (A3.1) -->
         <div
             v-if="pestana === 'historial'"
-            class="grid items-start gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_300px] lg:grid-rows-[minmax(0,1fr)] lg:items-stretch"
+            :class="
+                cn(
+                    'grid items-start gap-4 lg:min-h-0 lg:flex-1 lg:grid-rows-[minmax(0,1fr)] lg:items-stretch',
+                    columnaLateral && 'lg:grid-cols-[1fr_300px]',
+                )
+            "
         >
             <div class="flex flex-col gap-4 lg:min-h-0">
-                <dl class="grid shrink-0 gap-4 sm:grid-cols-3">
+                <div class="grid shrink-0 gap-3 sm:grid-cols-3">
                     <div
-                        class="rounded-xl border border-linea bg-white px-5 py-4"
+                        class="flex items-center gap-4 rounded-2xl border border-linea bg-linear-to-br from-marca-suave/70 to-white p-4"
                     >
-                        <dt class="text-xs text-tinta-suave">
-                            Último puntaje<template v-if="ultimo">
-                                · medición {{ ultimo.numero }}</template
+                        <AnilloPuntaje
+                            v-if="ultimo"
+                            :puntaje="ultimo.puntaje"
+                            :nivel="ultimo.nivel"
+                            :tamano="60"
+                        />
+                        <span
+                            v-else
+                            class="flex size-14 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-linea-fuerte text-tinta-suave"
+                            aria-hidden="true"
+                            >–</span
+                        >
+                        <dl class="min-w-0">
+                            <dt class="text-xs font-medium text-tinta-suave">
+                                Último puntaje
+                            </dt>
+                            <dd class="mt-1">
+                                <EtiquetaNivel
+                                    :nivel="ultimo?.nivel ?? 'sin'"
+                                />
+                            </dd>
+                            <dd
+                                v-if="ultimo"
+                                class="mt-1 text-xs text-tinta-suave"
                             >
-                        </dt>
-                        <dd class="mt-2 flex items-center gap-2">
-                            <span
-                                class="font-mono text-3xl leading-none font-semibold"
-                            >
-                                {{ ultimo?.puntaje ?? '—' }}
-                            </span>
-                            <EtiquetaNivel :nivel="ultimo?.nivel ?? 'sin'" />
-                        </dd>
+                                Medición {{ ultimo.numero }}
+                            </dd>
+                        </dl>
                     </div>
-                    <div
-                        class="rounded-xl border border-linea bg-white px-5 py-4"
-                    >
-                        <dt class="text-xs text-tinta-suave">
-                            Variación vs. medición anterior · desde la 2.ª
-                            medición
-                        </dt>
-                        <dd class="mt-2">
-                            <Variacion
-                                :valor="variacion"
-                                class="text-2xl font-semibold"
-                            />
-                        </dd>
-                    </div>
-                    <div
-                        class="rounded-xl border border-linea bg-white px-5 py-4"
-                    >
-                        <dt class="text-xs text-tinta-suave">
-                            {{
-                                pendiente
-                                    ? `Medición ${pendiente.numero}`
-                                    : 'Medición pendiente'
-                            }}
+                    <dl class="rounded-2xl border border-linea bg-white p-4">
+                        <dt
+                            class="flex items-center gap-1.5 text-xs font-medium text-tinta-suave"
+                        >
+                            <TrendingUp class="size-4" aria-hidden="true" />
+                            Variación vs. medición anterior
                         </dt>
                         <dd
-                            v-if="pendiente"
-                            class="mt-2 flex flex-wrap items-center gap-2 text-xs text-tinta-suave"
+                            v-if="variacion !== null"
+                            :class="
+                                cn(
+                                    'mt-1 font-mono text-3xl font-semibold',
+                                    variacion > 0
+                                        ? 'text-nivel-sigue-texto'
+                                        : variacion < 0
+                                          ? 'text-nivel-critico-texto'
+                                          : 'text-tinta',
+                                )
+                            "
                         >
-                            <EtiquetaEstado
-                                :estado="pendiente.estado"
-                                :avance="pendiente.avance ?? undefined"
-                            />
-                            {{
-                                pendiente.vence
-                                    ? `vence ${fecha(pendiente.vence)}`
-                                    : 'sin fecha límite'
-                            }}
+                            {{ variacion > 0 ? '+' : '' }}{{ variacion }}
+                            <span
+                                class="font-sans text-sm font-normal text-tinta-suave"
+                                >pts</span
+                            >
                         </dd>
-                        <dd v-else class="mt-2 text-sm text-tinta-suave">
-                            Ninguna · {{ terminadas }}
-                            {{ terminadas === 1 ? 'terminada' : 'terminadas' }}
+                        <dd v-else class="mt-1 text-sm text-tinta-suave">
+                            Aparece desde la 2.ª medición.
                         </dd>
+                    </dl>
+                    <div
+                        class="flex items-center gap-3 rounded-2xl border border-linea bg-white p-4"
+                    >
+                        <span
+                            :class="
+                                cn(
+                                    'flex size-11 shrink-0 items-center justify-center rounded-xl',
+                                    pendiente?.estado === 'vencida'
+                                        ? 'bg-nivel-critico-suave text-nivel-critico-texto'
+                                        : pendiente
+                                          ? 'bg-marca-suave text-marca'
+                                          : 'bg-lienzo-oscuro text-tinta-suave',
+                                )
+                            "
+                            aria-hidden="true"
+                        >
+                            <ClipboardList class="size-5" />
+                        </span>
+                        <dl class="min-w-0">
+                            <dt class="text-xs font-medium text-tinta-suave">
+                                {{
+                                    pendiente
+                                        ? `Medición ${pendiente.numero} pendiente`
+                                        : 'Medición pendiente'
+                                }}
+                            </dt>
+                            <dd
+                                v-if="pendiente"
+                                class="mt-1 flex flex-wrap items-center gap-2 text-xs text-tinta-suave"
+                            >
+                                <EtiquetaEstado
+                                    :estado="pendiente.estado"
+                                    :avance="pendiente.avance ?? undefined"
+                                />
+                                {{
+                                    pendiente.vence
+                                        ? `vence ${fecha(pendiente.vence)}`
+                                        : 'sin fecha límite'
+                                }}
+                            </dd>
+                            <dd v-else class="mt-1 text-sm text-tinta-suave">
+                                Ninguna · {{ terminadas }}
+                                {{
+                                    terminadas === 1
+                                        ? 'terminada'
+                                        : 'terminadas'
+                                }}
+                            </dd>
+                        </dl>
                     </div>
-                </dl>
+                </div>
 
                 <section
-                    class="flex shrink-0 flex-col rounded-xl border border-linea bg-white px-5 py-4"
+                    class="flex shrink-0 flex-col rounded-2xl border border-linea bg-white px-5 py-4"
                 >
-                    <div
-                        class="flex flex-wrap items-center justify-between gap-2"
-                    >
-                        <h2 class="text-sm font-semibold">
+                    <!-- "Ver:" va en su propia fila, a la derecha: así el
+                         título largo de una categoría no mueve nada. -->
+                    <div class="flex items-center justify-between gap-3">
+                        <h2 class="min-w-0 truncate text-base font-semibold">
                             {{
                                 verCategoria
                                     ? `Evolución de ${verCategoria}`
                                     : 'Evolución del puntaje total'
                             }}
                         </h2>
-                        <SelectorEvolucion
-                            v-model="verCategoria"
-                            class="ml-auto"
-                            :categorias="evolucion_categorias"
-                        />
                         <Link
                             v-if="puede('resultados.ver')"
                             :href="rutas.historial.empresa(empresa.id)"
-                            :class="cn(enlace, 'text-xs')"
+                            :class="cn(enlace, 'shrink-0 text-xs')"
                         >
                             Ver historial completo
                         </Link>
                     </div>
+                    <SelectorEvolucion
+                        v-model="verCategoria"
+                        class="mt-1.5 self-end"
+                        :categorias="evolucion_categorias"
+                    />
                     <EvolucionPuntaje
                         v-if="evolucion.length > 0"
                         :key="verCategoria"
@@ -382,14 +509,18 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     />
                     <p
                         v-else
-                        class="flex h-24 items-center justify-center text-sm text-tinta-suave"
+                        class="mt-2 flex h-24 items-center justify-center gap-2 rounded-xl bg-lienzo text-sm text-tinta-suave"
                     >
+                        <ChartLine
+                            class="size-5 text-marca/60"
+                            aria-hidden="true"
+                        />
                         La gráfica aparece con el primer resultado.
                     </p>
                 </section>
 
                 <section
-                    class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0 lg:flex-1"
+                    class="flex flex-col rounded-2xl border border-linea bg-white lg:min-h-0 lg:flex-1"
                 >
                     <p
                         v-if="mediciones.length === 0"
@@ -404,7 +535,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         >
                             <table class="w-full border-collapse text-sm">
                                 <thead>
-                                    <tr class="border-b border-linea text-left">
+                                    <tr
+                                        class="border-b border-linea bg-lienzo/60 text-left"
+                                    >
                                         <th
                                             v-for="c in [
                                                 'Medición',
@@ -416,7 +549,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                             ]"
                                             :key="c"
                                             scope="col"
-                                            class="px-4 py-2.5 text-xs font-normal text-tinta-suave"
+                                            class="px-4 py-2.5 text-xs font-medium text-tinta-suave"
                                         >
                                             {{ c }}
                                         </th>
@@ -428,8 +561,10 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                         :key="m.id"
                                         class="border-b border-linea last:border-b-0"
                                     >
-                                        <td class="px-4 py-2.5 font-medium">
-                                            {{ m.numero }}
+                                        <td
+                                            class="px-4 py-2.5 font-semibold whitespace-nowrap"
+                                        >
+                                            Medición {{ m.numero }}
                                         </td>
                                         <td
                                             class="px-4 py-2.5 whitespace-nowrap"
@@ -452,13 +587,23 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                         </td>
                                         <td class="px-4 py-2.5">
                                             <span
-                                                class="flex items-center gap-2"
+                                                class="flex items-center gap-2.5"
                                             >
-                                                <strong
-                                                    class="w-6 font-mono text-base"
+                                                <AnilloPuntaje
+                                                    v-if="
+                                                        m.puntaje !== null &&
+                                                        m.nivel
+                                                    "
+                                                    :puntaje="m.puntaje"
+                                                    :nivel="m.nivel"
+                                                    :tamano="36"
+                                                />
+                                                <span
+                                                    v-else
+                                                    class="flex size-9 items-center justify-center rounded-full border-2 border-dashed border-linea-fuerte text-tinta-suave"
+                                                    aria-hidden="true"
+                                                    >–</span
                                                 >
-                                                    {{ m.puntaje ?? '–' }}
-                                                </strong>
                                                 <EtiquetaNivel
                                                     v-if="m.nivel"
                                                     :nivel="m.nivel"
@@ -470,7 +615,31 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                             </span>
                                         </td>
                                         <td class="px-4 py-2.5">
-                                            <Variacion :valor="m.variacion" />
+                                            <span
+                                                v-if="m.variacion !== null"
+                                                :class="
+                                                    cn(
+                                                        'rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap',
+                                                        m.variacion > 0
+                                                            ? 'bg-nivel-sigue-suave text-nivel-sigue-texto'
+                                                            : m.variacion < 0
+                                                              ? 'bg-nivel-critico-suave text-nivel-critico-texto'
+                                                              : 'bg-lienzo-oscuro text-tinta-suave',
+                                                    )
+                                                "
+                                                >{{
+                                                    m.variacion > 0
+                                                        ? `▲ +${m.variacion}`
+                                                        : m.variacion < 0
+                                                          ? `▼ ${m.variacion}`
+                                                          : '= 0'
+                                                }}</span
+                                            >
+                                            <span
+                                                v-else
+                                                class="text-tinta-suave"
+                                                >—</span
+                                            >
                                         </td>
                                         <td
                                             class="px-4 py-2.5 text-right whitespace-nowrap"
@@ -500,6 +669,23 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                             >
                                                 Ver resultado
                                             </Link>
+                                            <a
+                                                v-if="
+                                                    m.estado === 'terminada' &&
+                                                    puede('resultados.pdf')
+                                                "
+                                                :href="
+                                                    rutas.resultados.pdf(m.id)
+                                                "
+                                                class="ml-3 inline-flex size-7 items-center justify-center rounded-md align-middle text-tinta-suave hover:bg-lienzo hover:text-marca"
+                                                :aria-label="`Descargar el informe completo de la medición ${m.numero}`"
+                                                title="Descargar informe completo (PDF)"
+                                            >
+                                                <FileDown
+                                                    class="size-4"
+                                                    aria-hidden="true"
+                                                />
+                                            </a>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -522,13 +708,22 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 </section>
             </div>
 
-            <div class="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto">
+            <div
+                v-if="columnaLateral"
+                class="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto"
+            >
                 <section
                     v-if="pendiente"
-                    class="shrink-0 rounded-xl border border-linea bg-white p-5 text-sm"
+                    class="shrink-0 rounded-2xl border border-linea bg-white p-5 text-sm"
                 >
                     <div class="flex items-center justify-between gap-2">
-                        <h2 class="font-semibold">
+                        <h2
+                            class="flex items-center gap-2 text-base font-semibold"
+                        >
+                            <ClipboardList
+                                class="size-5 text-marca"
+                                aria-hidden="true"
+                            />
                             Medición {{ pendiente.numero }}
                         </h2>
                         <EtiquetaEstado
@@ -618,9 +813,13 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
 
                 <section
                     v-if="puede('mediciones.asignar')"
-                    class="shrink-0 rounded-xl border border-linea bg-white p-5 text-sm"
+                    class="shrink-0 rounded-2xl border border-linea bg-white p-5 text-sm"
                 >
-                    <h2 class="font-semibold">
+                    <h2 class="flex items-center gap-2 text-base font-semibold">
+                        <CalendarPlus
+                            class="size-5 text-marca"
+                            aria-hidden="true"
+                        />
                         {{
                             pendiente
                                 ? 'Asignar otra medición'
@@ -732,13 +931,28 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
             </div>
         </div>
 
+        <!-- Consultores (HU-085) -->
+        <PanelConsultores
+            v-else-if="pestana === 'consultores' && consultores"
+            :empresa="empresa"
+            :consultores="consultores"
+        />
+
         <!-- Datos de la cuenta (A3.1d) -->
         <div
             v-else
             class="grid items-start gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_300px] lg:grid-rows-[minmax(0,1fr)]"
         >
+            <DatosEmpresaLectura
+                v-if="!puede('empresas.registrar')"
+                class="lg:max-h-full lg:overflow-y-auto"
+                :empresa="empresa"
+                :principal="principal"
+                :opciones="opciones"
+            />
             <form
-                class="flex flex-col gap-4 rounded-xl border border-linea bg-white p-5 lg:max-h-full lg:overflow-y-auto"
+                v-else
+                class="flex flex-col gap-4 rounded-2xl border border-linea bg-white p-5 lg:max-h-full lg:overflow-y-auto"
                 novalidate
                 @submit.prevent="guardar"
             >
@@ -761,14 +975,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     Cambiar el sector no modifica las mediciones ya hechas: las
                     próximas se asignan con diagnósticos del sector nuevo.
                 </p>
-                <p
-                    v-if="!puede('empresas.registrar')"
-                    class="mt-auto rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
-                >
-                    Solo lectura: tu rol no permite cambiar los datos de las
-                    empresas.
-                </p>
-                <div v-else class="mt-auto flex justify-end gap-3 pt-2">
+                <div class="mt-auto flex justify-end gap-3 pt-2">
                     <Boton
                         variante="secundario"
                         :disabled="!form.isDirty || form.processing"
@@ -788,7 +995,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
 
             <aside class="flex flex-col gap-4 lg:max-h-full lg:overflow-y-auto">
                 <section
-                    class="rounded-xl border border-linea bg-white p-5 text-sm"
+                    class="rounded-2xl border border-linea bg-white p-5 text-sm"
                 >
                     <h2 class="font-semibold">Estado de la cuenta</h2>
                     <dl class="mt-3 flex flex-col">
@@ -948,7 +1155,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         puede('mediciones.asignar') ||
                         puede('empresas.registrar')
                     "
-                    class="rounded-xl border border-linea bg-white p-5 text-sm"
+                    class="rounded-2xl border border-linea bg-white p-5 text-sm"
                 >
                     <h2 class="font-semibold">Acciones</h2>
                     <div class="mt-3 flex flex-col gap-2">

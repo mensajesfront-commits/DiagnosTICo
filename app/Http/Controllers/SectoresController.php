@@ -7,6 +7,7 @@ use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\SectorReasignado;
+use App\Rules\NombreUnico;
 use App\Support\CatalogoCiiu;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -151,9 +152,9 @@ class SectoresController extends Controller
     {
         /** @var array{nombre: string, descripcion?: string|null} $datos */
         $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:60', Rule::unique('sectores', 'nombre')->ignore($sector?->id)],
+            'nombre' => ['required', 'string', 'max:60', new NombreUnico('sectores', $sector?->id, 'Ya existe un sector con ese nombre.')],
             'descripcion' => ['nullable', 'string', 'max:255'],
-        ], ['nombre.unique' => 'Ya existe un sector con ese nombre.']);
+        ]);
 
         return ['nombre' => trim($datos['nombre']), 'descripcion' => $datos['descripcion'] ?? null];
     }

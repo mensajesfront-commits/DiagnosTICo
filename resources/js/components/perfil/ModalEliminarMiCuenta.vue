@@ -7,12 +7,14 @@
  *
  * Envía: DELETE /mi-perfil/cuenta con sucesor_id y confirmacion.
  */
+import { UserX } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 
 const props = defineProps<{
@@ -48,6 +50,8 @@ function eliminar(): void {
         v-model:abierto="abierto"
         titulo="Eliminar mi cuenta"
         descripcion="Eres la cuenta principal del Administrador: antes de irte, elige quién queda en tu lugar."
+        :icono="UserX"
+        tono="peligro"
     >
         <form
             id="form-eliminar-mi-cuenta"
@@ -86,11 +90,11 @@ function eliminar(): void {
                     :invalida="!!form.errors.confirmacion"
                 />
             </Campo>
-            <p class="rounded-md bg-aviso-suave px-3 py-2.5 text-xs text-aviso">
+            <Recuadro tono="peligro">
                 Tu sesión se cierra y ya no podrás entrar. Otro Administrador
                 puede recuperar la cuenta durante 90 días desde Usuarios y
                 roles.
-            </p>
+            </Recuadro>
         </form>
 
         <template #pie>

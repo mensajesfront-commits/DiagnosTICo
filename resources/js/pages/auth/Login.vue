@@ -16,6 +16,7 @@
  * volver del enlace de verificación, `correo` llega ya escrito.
  */
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
+import { Building2, LogIn } from '@lucide/vue';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import ModalAccesoBloqueado from '@/components/auth/ModalAccesoBloqueado.vue';
 import ModalCuentaDesactivada from '@/components/auth/ModalCuentaDesactivada.vue';
@@ -84,6 +85,13 @@ watch(
         if (errores?.cuenta_desactivada) {
             tituloDesactivada.value = 'Cuenta desactivada';
             mensajeDesactivada.value = errores.cuenta_desactivada;
+            modalDesactivada.value = true;
+        }
+
+        // La cuenta está activa pero su rol no (ERR-12).
+        if (errores?.rol_inactivo) {
+            tituloDesactivada.value = 'Rol inactivo';
+            mensajeDesactivada.value = errores.rol_inactivo;
             modalDesactivada.value = true;
         }
 
@@ -171,7 +179,9 @@ onBeforeUnmount(() => clearInterval(reloj));
             />
         </Campo>
 
-        <label class="flex items-center gap-2 text-sm text-tinta">
+        <label
+            class="flex cursor-pointer items-center gap-2 text-sm text-tinta"
+        >
             <input
                 type="checkbox"
                 name="remember"
@@ -190,18 +200,24 @@ onBeforeUnmount(() => clearInterval(reloj));
             <template v-if="segundos > 0">
                 Espera {{ segundos }} s para intentarlo de nuevo
             </template>
-            <template v-else>Iniciar sesión</template>
+            <template v-else>
+                <LogIn class="size-4" aria-hidden="true" />
+                Iniciar sesión
+            </template>
         </Boton>
 
-        <p class="text-center text-sm text-tinta-suave">
+        <div
+            class="flex items-center gap-3 text-xs text-tinta-suave"
+            aria-hidden="true"
+        >
+            <span class="h-px flex-1 bg-linea" />
             ¿Aún no tienes cuenta?
-            <Link
-                :href="register()"
-                class="font-medium text-marca underline underline-offset-2 hover:text-marca-hover"
-            >
-                Registrar mi empresa
-            </Link>
-        </p>
+            <span class="h-px flex-1 bg-linea" />
+        </div>
+        <Boton :href="register()" variante="secundario" class="w-full">
+            <Building2 class="size-4" aria-hidden="true" />
+            Registrar mi empresa
+        </Boton>
     </Form>
 
     <ModalCuentaDesactivada

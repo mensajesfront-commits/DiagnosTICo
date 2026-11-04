@@ -28,10 +28,10 @@ return [
     ],
 
     /*
-    | Correo de contacto que ve la empresa (E1, medición vencida).
-    | [INFORMACIÓN PENDIENTE] NuevasTIC confirma la dirección real.
+    | Correo de soporte que ven todas las pantallas, el PDF y los correos.
+    | Oficial desde el 4 de noviembre de 2026: contacto@captter.com.
     */
-    'soporte_email' => env('SOPORTE_EMAIL', 'soporte@nuevastic.co'),
+    'soporte_email' => env('SOPORTE_EMAIL', 'contacto@captter.com'),
 
     /*
     | Fecha límite de las mediciones (App\Support\Plazos): mínimo de días
@@ -41,12 +41,5 @@ return [
     */
     'plazo_minimo_dias' => (int) env('PLAZO_MINIMO_DIAS', 3),
     'zona_horaria' => env('ZONA_HORARIA_POR_DEFECTO', 'America/Bogota'),
-
-    /*
-    | Análisis de la IA sin conexión (App\Services\Ia\AnalizadorDePrueba):
-    | puntajes y textos de prueba, sin gastar llamadas a OpenAI. Solo para
-    | programar y para las pruebas automáticas; en producción va en false.
-    */
-    'ia_de_prueba' => (bool) env('IA_DE_PRUEBA', false),
 
 ];

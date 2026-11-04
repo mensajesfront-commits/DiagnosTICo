@@ -40,7 +40,7 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
    - cada opción tiene puntaje;
    - la importancia suma exactamente 100 %;
    - cada pregunta tiene indicación;
-   - cada selección múltiple puede llegar a 100 puntos.
+   - cada selección múltiple suma exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás).
 3. El sistema muestra A2.1c con los requisitos cumplidos y el campo "Nota de cambios".
 4. El Administrador escribe la nota.
 5. Si hay mediciones pendientes de la versión anterior, elige qué pasa con ellas: siguen con la anterior, o pasan a la nueva las que aún no empezaron.

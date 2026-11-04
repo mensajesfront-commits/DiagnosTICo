@@ -1,7 +1,9 @@
 <?php
 
+use App\Services\Ia\Analizador;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\LaravelPdf\Facades\Pdf;
+use Tests\Support\AnalizadorFalso;
 use Tests\TestCase;
 
 /*
@@ -21,6 +23,8 @@ pest()->extend(TestCase::class)
         // Al publicar un resultado se genera el PDF con Chromium (RN-024): en
         // las pruebas se simula siempre.
         Pdf::fake();
+        // La IA de verdad gasta saldo de OpenAI: en las pruebas se usa una falsa.
+        $this->app->bind(Analizador::class, AnalizadorFalso::class);
         // Mediodía en Colombia: "hoy" es el mismo día en UTC y en la hora de
         // las empresas (Plazos), así las pruebas no dependen de a qué hora corren.
         $this->travelTo(now('America/Bogota')->setTime(12, 0));

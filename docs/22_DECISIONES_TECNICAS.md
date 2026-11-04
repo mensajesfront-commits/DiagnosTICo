@@ -13,7 +13,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-005 | Monolito modular: una sola aplicación Laravel | Vigente |
 | DEC-006 | Entrega en el repositorio, sin despliegue | Vigente |
 | DEC-007 | PHP 8.4 fijado en Composer; Pest 5 con PHPUnit 13 | Vigente |
-| DEC-008 | Vitest del kit (Vite+) en lugar de Vitest 5 | Vigente |
+| DEC-008 | Vitest del kit (Vite+ 1.5, Vitest 5.1) | Vigente (actualizada el 4 de noviembre) |
 | DEC-009 | Guzzle 7 en lugar de Guzzle 8 | Vigente |
 | DEC-010 | Fuentes IBM Plex servidas desde el proyecto | Vigente |
 | DEC-011 | Chromium instalado con Playwright en la imagen de Sail | Vigente |
@@ -98,10 +98,15 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 ### DEC-008 — Vitest del kit
 
 - **Decisión:**
-  - Las pruebas del frontend usan el Vitest 4.1 que trae Vite+ (`vite-plus`, incluido en el kit).
+  - Las pruebas del frontend usan el Vitest que trae Vite+ (`vite-plus`, incluido en el kit).
   - Se corren con `npm test` (`vp test run`).
   - Se escriben en `resources/js/**/*.test.ts` e importan desde `vite-plus/test`.
-- **Por qué:** instalar Vitest 5 aparte choca con la versión fijada por Vite+ (conflicto de dependencias de npm).
+- **Por qué:** instalar Vitest aparte choca con la versión fijada por Vite+ (conflicto de dependencias de npm).
+- **Actualización del 4 de noviembre (ERR-08):** `vite-plus` pasó de 0.3.0 a **1.5.0**, que trae Vitest 5.1, para quitar las alertas críticas de `npm audit`.
+  - Como pide Vite+, `vite` apunta a `@voidzero-dev/vite-plus-core@1.5.0`, y `overrides` fija `vite` y `vitest` 5.1.0. Al actualizar `vite-plus`, se cambian los tres juntos.
+  - `vue-tsc` pasó a la 3 y queda fijo en **3.3.10**: la 3.3.13 y la 3.3.14 marcan errores falsos en `MiPerfil.vue` (dicen que `form` no tiene `.value`). Se puede subir cuando una versión nueva pase `npm run types:check`.
+  - `overrides` sube `glob` (14) y `minimatch` (11), que usa `@vue/test-utils` por `js-beautify`. Solo afecta las pruebas.
+  - Con esto, `npm audit` da 0 alertas (antes, 8: 2 críticas y 1 alta).
 - **Descartado:** quitar Vite+. El kit lo usa para compilar, formatear y revisar el código.
 
 ### DEC-009 — Guzzle 7
@@ -145,7 +150,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 
 - **Decisión:**
   - La contraseña fuerte (RN-001) es la misma en todos los entornos. Se quitó la regla del kit para producción (12 caracteres y revisión de filtraciones), que RN-001 no pide.
-  - El enlace de contraseña nueva no vence por tiempo (RN-006): `expire` de un año en `config/auth.php`.
+  - Enlaces de contraseña (RN-006, cambio del 4 de noviembre): recuperación de 10 minutos (broker `users`) e invitación hasta usarla (broker `invitaciones`, tabla aparte). L4 elige el broker con `ElegirEnlaceContrasena`.
   - El inicio de sesión revisa que la cuenta y su empresa estén activas, y "¿Olvidaste tu contraseña?" responde siempre lo mismo (RN-005).
   - Se agregaron las traducciones al español en `lang/es` en lugar de instalar un paquete de traducciones.
 - **Por qué:** las reglas de negocio piden algo distinto a lo que trae Fortify por defecto, y los evaluadores van a probar el acceso.

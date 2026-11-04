@@ -65,14 +65,27 @@ export function usePaginacion<T>(
 /**
  * Cuántas filas de una tabla caben en su caja (`contenedor`) en pantallas
  * grandes, para que la página no se desplace; en pantallas pequeñas,
- * `movil` por página. Mide la fila más alta que se ve y vuelve a medir al
+ * `movil` por página. Mide el alto típico de las filas que se ven (la
+ * mediana) y vuelve a medir al
  * cambiar el tamaño de la caja o cuando carga la letra. Llamar `medir()`
  * cuando la tabla pasa de vacía a tener filas y `ajustar()` después de
  * mostrar otra página (por si sus filas son más altas).
  */
 export function useFilasQueCaben(
     contenedor: Ref<HTMLElement | null>,
-    { movil = 10, minimo = 3 }: { movil?: number; minimo?: number } = {},
+    {
+        movil = 10,
+        minimo = 3,
+        fila = 'tbody tr',
+        encabezado = 'thead',
+    }: {
+        movil?: number;
+        minimo?: number;
+        /** Qué se cuenta como fila: filas de tabla o tarjetas de una lista. */
+        fila?: string;
+        /** Encabezado fijo dentro del contenedor; null si no hay. */
+        encabezado?: string | null;
+    } = {},
 ) {
     const porPagina = ref(movil);
     let observador: ResizeObserver | null = null;
@@ -91,16 +104,23 @@ export function useFilasQueCaben(
         }
 
         // Solo se mide al cambiar el tamaño (no al cambiar de página), así el
-        // número de filas no salta.
-        let altoFila = 0;
+        // número de filas no salta. Con el alto típico (la mediana) y no el
+        // de la fila más alta: una fila de tres líneas dejaba espacio vacío
+        // en las demás páginas. Si en una página no caben, `ajustar()` quita
+        // una.
+        const altos = [...caja.querySelectorAll(fila)]
+            .map((elemento) => elemento.getBoundingClientRect().height)
+            .filter((alto) => alto > 0)
+            .sort((a, b) => a - b);
+        const altoFila = altos.length
+            ? altos[Math.floor((altos.length - 1) / 2)]
+            : 0;
 
-        for (const fila of caja.querySelectorAll('tbody tr')) {
-            altoFila = Math.max(altoFila, fila.getBoundingClientRect().height);
-        }
-
-        const encabezado = caja.querySelector('thead')?.clientHeight ?? 40;
+        const altoEncabezado = encabezado
+            ? (caja.querySelector(encabezado)?.clientHeight ?? 40)
+            : 0;
         porPagina.value = filasQueCaben(
-            caja.clientHeight - encabezado,
+            caja.clientHeight - altoEncabezado,
             altoFila || 72,
             minimo,
         );

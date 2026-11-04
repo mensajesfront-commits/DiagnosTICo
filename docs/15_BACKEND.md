@@ -18,11 +18,12 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 | Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
 | Usuarios y roles | `/usuarios`, `/roles` | `UsuariosController`, `RolesController` | `usuarios.ver` / `usuarios.gestionar` | A5, A5.1–A5.5 | Hecho |
 | Colaboradores | `/colaboradores` | `ColaboradoresController` | `role:Empresa` + cuenta principal | E12 | Hecho |
+| Consultores | `/empresas/{id}/consultores` (POST vincular, DELETE quitar) | `ConsultoresController`, `DatosConsultores` | `usuarios.gestionar`; solo cuentas con el rol Consultor | A3.1 (pestaña Consultores), HU-085 | Hecho. Lo que ve el consultor lo filtra `User::puedeVerEmpresa()` (RN-030) en Empresas, historial, resultados, PDF y logos; su inicio es C1 (`InicioController`, con "Qué atender" de `DatosInicioConsultor`); `/empresas` le muestra "Mis empresas" (C2) |
 | Empresas y mediciones | `/empresas`, `/mediciones` | `EmpresasController`, `MedicionesController`, `DatosEmpresas`, `AsignarMedicion` | `empresas.ver`, `empresas.registrar`, `mediciones.asignar` | A3, A3.1, A3.1b–A3.1d, A3.1f, A3.2 | Hecho, con A3.1e (correo), A3.3–A3.5 y las solicitudes de nueva medición (HU-083) |
 | Responder medición | `/mi-diagnostico/{id}` | `ResponderController`, `DatosResponder` | `diagnostico.responder` + su empresa | E2–E4 | Hecho |
-| Resultados | `/resultados/{id}`, `/resultados/{id}/respuestas`, `/resultados/{id}/pdf` | `ResultadosController`, `DatosResultado` | `resultados.ver`, `resultados.pdf` + su empresa (interna: además `empresas.ver`) | E6, E9, E10, A3.3, A3.5 | Hecho |
+| Resultados | `/resultados/{id}`, `/resultados/{id}/respuestas`, `/resultados/{id}/pdf` (`?tipo=resumen` para el Administrador y el Consultor; la empresa siempre recibe el resumen) | `ResultadosController`, `DatosResultado`, `InformePdf` | `resultados.ver`, `resultados.pdf` + su empresa (interna: además `empresas.ver`) | E6, E9, E10, A3.3, A3.5 | Hecho |
 | Configuración de la IA | `/configuracion-ia` | `ConfiguracionIaController`, `DatosConfiguracionIa` | `ia.ver` / `ia.editar` | A4, A4.4–A4.7, A4.9 | Hecho |
-| Historial | `/historial`, `/empresas/{id}/historial` | `HistorialController`, `DatosHistorial` | E8: `resultados.ver` + su empresa (una cuenta interna recibe 404); A3.4: `empresas.ver` | E8, A3.4 | Hecho. Sale de `DatosEmpresas::ficha` para que coincida con A3.1; lista solo las terminadas con resultado |
+| Historial | `/historial`, `/empresas/{id}/historial` | `HistorialController`, `DatosHistorial` | E8: `resultados.ver` + su empresa (una cuenta interna recibe 404); A3.4: `empresas.ver` (el consultor, solo sus empresas) | E8, A3.4 | Hecho. Sale de `DatosEmpresas::ficha` para que coincida con A3.1; lista solo las terminadas con resultado |
 | Webhook del bot de WhatsApp | `/webhook/whatsapp` | — | Firma del proveedor, sin sesión | — | **Aplazado** (EP-013). **[FUNCIONALIDAD POR DEFINIR]** Si se retoma, va separado de empresas y mediciones (RN-029) |
 
 Los permisos son los 15 de `RolesYPermisosSeeder`. Todos los módulos están construidos; el bot de WhatsApp sigue aplazado.
@@ -132,7 +133,7 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | POST | `/diagnosticos/{id}/publicar` | HU-029 · nueva versión congelada; el diagnóstico queda publicado y sin borrador | `nota` (obligatoria, máx. 500), `pendientes` (`dejar` · `pasar`: las no iniciadas o vencidas sin respuestas pasan a la nueva) |
 
 - **Borrador (RN-010):** cada cambio va al borrador. Si el diagnóstico está publicado y no tiene borrador, el primer cambio abre el siguiente (`version_borrador` = última + 1). Las versiones publicadas no se tocan. Uno archivado no se edita.
-- **Requisitos para publicar (RN-012):** cada categoría con al menos 1 pregunta; cada pregunta de opciones con al menos 2 opciones con puntaje; la importancia suma 100%; toda pregunta con indicación; cada selección múltiple puede llegar a 100. Si falta alguno, publicar responde un error en `nota`.
+- **Requisitos para publicar (RN-012):** cada categoría con al menos 1 pregunta; cada pregunta de opciones con al menos 2 opciones con puntaje; la importancia suma 100%; toda pregunta con indicación; cada selección múltiple suma exactamente 100 con todas marcadas (`EstadoDiagnostico::sumaMaxima` no cuenta la opción `exclusiva`). Si falta alguno, publicar responde un error en `nota`.
 - La pregunta, las preguntas de otro diagnóstico o una parte de otro diagnóstico dan 404.
 
 ## Catálogo de categorías (T-049)
@@ -259,7 +260,7 @@ Tarea (HU-070): `mediciones:vencer` corre cada hora (a los :05) y marca `vencida
 | POST | `/mi-diagnostico/{medicion}/solicitud` | `responder.solicitar` | HU-082: solo si venció; una solicitud abierta por empresa; avisa por correo a los administradores (`NuevaMedicionSolicitada`). 5 por minuto |
 
 - **Se puede responder** si está no iniciada o en curso y no pasó la fecha límite (RN-016).
-- El correo de contacto de E1 sale de `SOPORTE_EMAIL` (**[INFORMACIÓN PENDIENTE]** la dirección real).
+- El correo de contacto de E1 sale de `SOPORTE_EMAIL` (contacto@captter.com).
 
 ## Configuración de la IA (A4, HU-041 a HU-045, HU-080, hecho)
 
@@ -286,9 +287,9 @@ Pruebas en `tests/Feature/ResultadosTest.php` y `tests/Feature/PruebaTecnica/Ana
 1. **`App\Jobs\AnalizarMedicion`** (al enviar): calcula el puntaje de las cerradas en `respuestas.puntaje` (`App\Services\Resultados\CalculadoraPuntajes`, RN-018), crea un `analisis_categoria` pendiente por categoría y manda cada uno a la cola.
 2. **`App\Jobs\AnalizarCategoria`** (una etapa por categoría, RN-021): arma el prompt (`App\Services\Ia\ArmadorPrompt`), lo guarda en `analisis_categoria.prompt`, llama al `Analizador` y guarda la respuesta, las observaciones y el puntaje de las abiertas. `tries = 3` con espera de 15 y 60 s. Tras el tercer fallo queda `fallido` y avisa a los administradores (`AnalisisFallido`); las demás categorías conservan su análisis.
 3. **`App\Services\Resultados\PublicarResultado`** (después de cada categoría): cuando todas están terminadas, con la fila de la medición bloqueada para publicar una sola vez, consolida puntajes, nivel (RN-019) y variación contra la medición anterior de la empresa (RN-020), guarda `resultados` (inmutable, RN-023), pasa la medición a `terminada`, avisa a las cuentas activas de la empresa (`ResultadoListo`) y manda `GenerarInformePdf`.
-4. **`App\Jobs\GenerarInformePdf`**: `App\Services\Resultados\InformePdf` arma `resources/views/pdf/informe.blade.php` (3 páginas, RN-024) y lo guarda en `storage/app/private/informes/{empresa}/informe_{empresa}_m{n}.pdf` (`resultados.pdf_ruta`). Si falla, el resultado queda publicado y se regenera al descargarlo.
+4. **`App\Jobs\GenerarInformePdf`**: `App\Services\Resultados\InformePdf` arma `resources/views/pdf/informe.blade.php` con `pdf/encabezado` y `pdf/pie` (número de página) a partir de `DatosResultado::informe()`, que delega en `App\Support\DatosInforme` (RN-024) y lo guarda en `storage/app/private/informes/{empresa}/informe_{empresa}_m{n}.pdf` (`resultados.pdf_ruta`). Si falla, el resultado queda publicado y se regenera al descargarlo.
 
-**Analizador.** `App\Services\Ia\Analizador` tiene dos implementaciones: `AnalizadorDeCategoria` (OpenAI con salida estructurada estricta; valida una entrada por pregunta y abiertas de 0 a 100) y `AnalizadorDePrueba` (`IA_DE_PRUEBA=true`, sin conexión; también en las pruebas).
+**Analizador.** `App\Services\Ia\Analizador` lo implementa `AnalizadorDeCategoria` (OpenAI con salida estructurada estricta; valida una entrada por pregunta y abiertas de 0 a 100). Las pruebas automáticas lo cambian por `Tests\Support\AnalizadorFalso` en `tests/Pest.php`.
 
 **Prompt por capas (RN-022).** General (fila `prompts` con `alcance = general`; si no existe, `ArmadorPrompt::GENERAL`), luego el ajuste del sector del diagnóstico y el de la empresa: en cada elemento (contexto, tarea, detalles, ejemplos) `usar` deja el anterior, `agregar` suma al final y `reemplazar` lo sustituye. Luego las preguntas respondidas con su respuesta, el puntaje de las cerradas, el "Ten en cuenta" solo de las opciones elegidas y el criterio de las abiertas (JSON, mensaje aparte), y el formato fijo.
 

@@ -169,6 +169,22 @@ it('calcula los 5 requisitos y lo que falta en cada categoría', function () {
         ->and($estado['completas'])->toBe(0);
 });
 
+it('pide que la selección múltiple sume exactamente 100, sin contar la opción que excluye', function () {
+    $pregunta = fn (array $opciones) => ['ref' => 'p1', 'tipo' => 'seleccion_multiple', 'indicacion' => 'Marca todas.', 'opciones' => $opciones];
+    $estado = fn (array $opciones) => EstadoDiagnostico::calcular(['categorias' => [
+        ['ref' => 'c1', 'importancia' => 100, 'preguntas' => [$pregunta($opciones)]],
+    ]]);
+
+    $sePasa = $estado([['puntaje' => 60], ['puntaje' => 50]]);
+    expect($sePasa['publicable'])->toBeFalse()
+        ->and($sePasa['requisitos'][4]['detalle'])->toBe('1 suma 110')
+        ->and($sePasa['preguntas']['p1'])->toBe(['La selección múltiple suma 110: se pasa de 100']);
+
+    $conNinguna = $estado([['puntaje' => 60], ['puntaje' => 40], ['puntaje' => 30, 'exclusiva' => true]]);
+    expect($conNinguna['publicable'])->toBeTrue()
+        ->and(EstadoDiagnostico::sumaMaxima($pregunta([['puntaje' => 60], ['puntaje' => 40], ['puntaje' => 30, 'exclusiva' => true]])))->toBe(100);
+});
+
 it('publica la v1 con nota; después, un cambio abre el borrador v2 sin tocar la v1', function () {
     $this->parte = $this->diagnostico->partes()->firstOrFail();
     agregarPregunta($this);

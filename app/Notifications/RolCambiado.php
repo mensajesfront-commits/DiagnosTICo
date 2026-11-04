@@ -22,7 +22,7 @@ class RolCambiado extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new Correo)
             ->subject('Tu rol en '.config('app.name').' cambió')
             ->greeting('Hola:')
             ->line("Ahora tu cuenta tiene el rol {$this->rolNuevo}.")

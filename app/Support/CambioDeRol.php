@@ -51,6 +51,11 @@ final class CambioDeRol
             // Las páginas que le dio su empresa como colaborador ya no aplican.
             $cuenta->syncPermissions([]);
 
+            // Las empresas vinculadas solo valen mientras sea Consultor (RN-030).
+            if ($rol->name !== 'Consultor') {
+                $cuenta->empresasAsesoradas()->detach();
+            }
+
             if (! $saleDeLaEmpresa) {
                 return;
             }

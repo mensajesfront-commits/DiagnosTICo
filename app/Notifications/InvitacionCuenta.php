@@ -34,7 +34,7 @@ class InvitacionCuenta extends Notification
             'email' => $usuario->getEmailForPasswordReset(),
         ], false));
 
-        $correo = (new MailMessage)
+        $correo = (new Correo)
             ->subject('Te invitaron a '.config('app.name'))
             ->greeting("Hola, {$usuario->name}:")
             ->line(($this->invitadaPor ? "{$this->invitadaPor} te invitó" : 'Te invitaron').' a '.config('app.name')." con el rol {$this->rol}.");

@@ -44,11 +44,15 @@ Después:
 - **Tareas programadas:** el cron `* * * * * php artisan schedule:run`.
 - **Variables obligatorias en producción:**
   - `OPENAI_API_KEY` y `OPENAI_MODEL`;
-  - `IA_DE_PRUEBA=false`;
   - `MAIL_*` con el servidor SMTP real;
   - `LARAVEL_PDF_CHROME_PATH`;
   - `ADMIN_EMAIL` para la cuenta principal del Administrador (la elige NuevasTIC). Configura `MAIL_*` antes de `db:seed`: a ese correo le llega "Crear mi contraseña". Si no llega, `php artisan admin:invitar` lo reenvía o muestra el enlace.
 - **Rutas de prueba técnica:** `/prueba-tecnica/*` solo existen con `APP_ENV=local`; en producción no se cargan.
+- **Seguridad del entorno (auditoría QA del 4 de noviembre, ERR-06/07):**
+  - `APP_ENV=production` y `APP_DEBUG=false`: con `local`, `/_inertia/devtools` deja leer a cualquiera las peticiones recientes con sus datos, y un error muestra el código y el SQL.
+  - `INERTIA_DEVTOOLS_ENABLED=false`.
+  - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`. El sistema ya manda `X-Frame-Options`, `nosniff`, `Referrer-Policy` y, con HTTPS, `Strict-Transport-Security` (`CabecerasSeguridad`).
+  - Antes de publicar: `composer audit` y `npm audit --omit=dev` sin alertas altas.
 
 ### Actualizar a una versión nueva
 

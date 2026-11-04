@@ -35,7 +35,7 @@ class AvisoMedicion extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $correo = (new MailMessage)
+        $correo = (new Correo)
             ->subject(($this->prueba ? '[Prueba] ' : '').$this->asunto)
             ->greeting(' ');
 

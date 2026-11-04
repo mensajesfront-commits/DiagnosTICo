@@ -61,7 +61,10 @@ function activo(item: ItemMenu): boolean {
         return item.hijos.some(activo);
     }
 
-    return item.href !== undefined && isCurrentOrParentUrl(item.href);
+    return (
+        (item.href !== undefined && isCurrentOrParentUrl(item.href)) ||
+        (item.tambien ?? []).some((ruta) => isCurrentOrParentUrl(ruta))
+    );
 }
 
 // Submenús abiertos; uno arranca abierto si contiene la página actual.

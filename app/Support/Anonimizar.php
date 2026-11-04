@@ -46,6 +46,7 @@ class Anonimizar
             }
 
             $archivos[] = $resultado->pdf_ruta;
+            $archivos[] = $resultado->pdf_resumen_ruta;
             /** @var list<array<string, mixed>> $categorias */
             $categorias = $resultado->por_categoria;
 
@@ -61,7 +62,7 @@ class Anonimizar
                 }
             }
 
-            $resultado->forceFill(['por_categoria' => $categorias, 'pdf_ruta' => null])->save();
+            $resultado->forceFill(['por_categoria' => $categorias, 'pdf_ruta' => null, 'pdf_resumen_ruta' => null])->save();
         }
 
         return array_values(array_filter($archivos));

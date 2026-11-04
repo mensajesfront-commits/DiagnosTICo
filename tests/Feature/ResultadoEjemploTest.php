@@ -85,12 +85,33 @@ it('muestra el resultado de ejemplo del borrador y de una versión con la pantal
     $this->actingAs($this->admin)->get(route('diagnosticos.resultado-ejemplo', [$this->diagnostico, 'version' => 9]))->assertNotFound();
 });
 
+it('sin borrador pendiente muestra la última versión publicada, no «Borrador v1»', function () {
+    $publicada = (int) $this->diagnostico->versiones()->max('numero');
+
+    $this->actingAs($this->admin)->get(route('diagnosticos.resultado-ejemplo', $this->diagnostico))
+        ->assertInertia(fn (Assert $p) => $p->where('ejemplo.etiqueta', "Versión {$publicada}")
+            ->where('medicion.version', $publicada));
+
+    $this->diagnostico->forceFill(['version_borrador' => $publicada + 1])->save();
+
+    $this->actingAs($this->admin)->get(route('diagnosticos.resultado-ejemplo', $this->diagnostico))
+        ->assertInertia(fn (Assert $p) => $p->where('ejemplo.etiqueta', 'Borrador v'.($publicada + 1)));
+});
+
 it('abre el formato del PDF con los datos de ejemplo', function () {
     Pdf::fake();
 
     $this->actingAs($this->admin)->get(route('diagnosticos.resultado-ejemplo.pdf', [$this->diagnostico, 'caso' => 'mejor']))->assertOk();
 
     Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->viewName === 'pdf.informe' && $pdf->viewData['informe']['empresa']['nombre'] === 'Empresa de ejemplo');
+});
+
+it('abre también el resumen que recibe la empresa, con los datos de ejemplo', function () {
+    Pdf::fake();
+
+    $this->actingAs($this->admin)->get(route('diagnosticos.resultado-ejemplo.pdf', [$this->diagnostico, 'caso' => 'peor', 'tipo' => 'resumen']))->assertOk();
+
+    Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->viewName === 'pdf.resumen' && $pdf->downloadName === 'resumen_de_ejemplo.pdf');
 });
 
 it('solo lo ve quien tiene diagnosticos.ver', function () {

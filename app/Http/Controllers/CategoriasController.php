@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Categoria;
 use App\Models\Diagnostico;
 use App\Models\DiagnosticoCategoria;
+use App\Rules\NombreUnico;
 use App\Support\DatosDiagnosticos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -135,9 +136,9 @@ class CategoriasController extends Controller
     {
         /** @var array{nombre: string, descripcion?: string|null} $datos */
         $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:40', Rule::unique('categorias', 'nombre')->ignore($categoria?->id)],
+            'nombre' => ['required', 'string', 'max:40', new NombreUnico('categorias', $categoria?->id, 'Ya existe una categoría con ese nombre.')],
             'descripcion' => ['nullable', 'string', 'max:255'],
-        ], ['nombre.unique' => 'Ya existe una categoría con ese nombre.']);
+        ]);
 
         return ['nombre' => trim($datos['nombre']), 'descripcion' => $datos['descripcion'] ?? null];
     }

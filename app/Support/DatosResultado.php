@@ -31,6 +31,58 @@ class DatosResultado
         ];
     }
 
+    /**
+     * Las mediciones terminadas de la misma empresa, de la primera a la última.
+     *
+     * @return list<array{id: int, numero: int, fecha: string, puntaje: int, nivel: string}>
+     */
+    public static function mediciones(Medicion $medicion): array
+    {
+        return array_values(Medicion::query()
+            ->where('empresa_id', $medicion->empresa_id)
+            ->where('estado', 'terminada')
+            ->whereHas('resultado')
+            ->with('resultado:id,medicion_id,puntaje_total,nivel,publicado_en')
+            ->orderBy('numero')
+            ->get(['id', 'numero'])
+            ->map(fn (Medicion $m) => [
+                'id' => $m->id,
+                'numero' => $m->numero,
+                'fecha' => (string) $m->resultado?->publicado_en->toDateString(),
+                'puntaje' => (int) $m->resultado?->puntaje_total,
+                'nivel' => (string) $m->resultado?->nivel,
+            ])
+            ->all());
+    }
+
+    /**
+     * A3.5 / E9 · Agrega el nivel de cada pregunta según su puntaje (RN de
+     * niveles), para el color del puntaje y el filtro "Para mejorar". Solo
+     * se lee: lo guardado no cambia (RN-023).
+     *
+     * @param  array<mixed>  $categorias
+     * @return array<mixed>
+     */
+    public static function conNivelPorPregunta(array $categorias): array
+    {
+        return array_map(function (mixed $c): mixed {
+            if (! is_array($c)) {
+                return $c;
+            }
+
+            /** @var list<array<string, mixed>> $preguntas */
+            $preguntas = is_array($c['preguntas'] ?? null) ? $c['preguntas'] : [];
+            $c['preguntas'] = array_map(fn (array $p): array => [
+                ...$p,
+                'nivel' => is_numeric($p['puntaje'] ?? null) && empty($p['extra'])
+                    ? Niveles::de((float) $p['puntaje'])
+                    : null,
+            ], $preguntas);
+
+            return $c;
+        }, $categorias);
+    }
+
     /** @return array<string, mixed> */
     public static function resultado(Resultado $resultado): array
     {
@@ -72,6 +124,12 @@ class DatosResultado
             'tiene_pdf' => $tienePdf,
             'categorias' => $categorias,
             'prioridades' => self::prioridades($categorias),
+            // Resumen de E6: cuántas categorías quedaron en cada nivel y la más fuerte.
+            'por_nivel' => array_map(fn (string $clave) => [
+                'clave' => $clave,
+                'cantidad' => count(array_filter($categorias, fn (array $c) => $c['nivel'] === $clave)),
+            ], array_keys(Niveles::NIVELES)),
+            'mas_fuerte' => count($categorias) > 1 ? (array_reverse(self::ordenadas($categorias))[0] ?? null) : null,
         ];
     }
 
@@ -101,6 +159,8 @@ class DatosResultado
             'puntaje' => $c['puntaje'],
             'nivel' => $c['nivel'],
             'recomendacion' => $c['recomendacion'],
+            // La principal completa (pasos, plazo e indicador), si la hay.
+            'principal' => $c['recomendaciones'][0] ?? null,
             'metodo' => $c['metodo'] ?? null,
         ], $categorias);
     }
@@ -112,50 +172,33 @@ class DatosResultado
      */
     public static function informe(Resultado $resultado): array
     {
-        $resultado->loadMissing('medicion');
+        $resultado->loadMissing(['medicion.empresa.actividadEconomica']);
+        $empresa = $resultado->medicion->empresa;
 
         return self::informeDe(
             self::cabecera($resultado->medicion),
             self::resultado($resultado),
             $resultado->medicion->enviada_en,
             $resultado->publicado_en,
+            [
+                'descripcion' => (string) $empresa->descripcion,
+                'actividad' => $empresa->actividadEconomica ? "{$empresa->actividadEconomica->codigo} · {$empresa->actividadEconomica->nombre}" : '',
+                'ubicacion' => collect([$empresa->ciudad, $empresa->departamento, $empresa->pais])->filter()->join(', '),
+                'sitio_web' => (string) $empresa->sitio_web,
+                'empleados' => (string) $empresa->numero_empleados,
+            ],
         );
     }
 
     /**
      * @param  array<string, mixed>  $cabecera  como `cabecera()`
      * @param  array<string, mixed>  $datos  como `pagina()`
+     * @param  array<string, string>|null  $empresa  datos de la ficha técnica; null en el resultado de ejemplo
+     * @param  bool  $ejemplo  resultado de ejemplo (HU-030): el PDF lo dice en cada página
      * @return array<string, mixed>
      */
-    public static function informeDe(array $cabecera, array $datos, ?CarbonInterface $enviada, CarbonInterface $generado): array
+    public static function informeDe(array $cabecera, array $datos, ?CarbonInterface $enviada, CarbonInterface $generado, ?array $empresa = null, bool $ejemplo = false): array
     {
-        /** @var list<array<string, mixed>> $categorias */
-        $categorias = $datos['categorias'];
-        $orden = self::ordenadas($categorias);
-
-        return [
-            ...$cabecera,
-            ...$datos,
-            'nivel_nombre' => Niveles::nombre((string) $datos['nivel']),
-            'niveles' => collect(Niveles::NIVELES)->map(fn (array $n, string $clave) => ['clave' => $clave, 'nombre' => $n[0], 'rango' => "{$n[1]}–{$n[2]}"])->values()->all(),
-            'fecha_respuesta' => $enviada ? CorreoAviso::fecha($enviada) : null,
-            'fecha_generado' => CorreoAviso::fecha($generado),
-            // Hasta 2 y 2, sin repetir una categoría en las dos listas.
-            'fuertes' => array_slice(array_reverse($orden), 0, min(2, intdiv(count($orden), 2))),
-            'debiles' => array_slice($orden, 0, min(2, intdiv(count($orden), 2))),
-            // Página 1: cuántas categorías quedaron en cada nivel.
-            'por_nivel' => collect(Niveles::NIVELES)->map(fn (array $n, string $clave) => [
-                'clave' => $clave,
-                'nombre' => $n[0],
-                'cantidad' => count(array_filter($categorias, fn (array $c) => $c['nivel'] === $clave)),
-            ])->values()->all(),
-            // Página 3: después de las 3 prioridades, el resto de la más débil a la más fuerte.
-            'otras' => array_slice($orden, 3),
-            'radar' => [
-                'etiquetas' => array_column($categorias, 'nombre'),
-                'actual' => array_column($categorias, 'puntaje'),
-                'anterior' => $datos['variacion'] === null ? null : array_map(fn (array $c) => $c['anterior'], $categorias),
-            ],
-        ];
+        return [...DatosInforme::armar($cabecera, $datos, $enviada, $generado, $empresa), 'ejemplo' => $ejemplo];
     }
 }

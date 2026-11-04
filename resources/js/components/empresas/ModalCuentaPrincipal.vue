@@ -8,6 +8,7 @@
  * Envía: POST /empresas/{id}/cuenta-principal con usuario_nombre, cargo,
  * email y usuario_telefono.
  */
+import { UserPlus } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -15,6 +16,7 @@ import Campo from '@/components/base/Campo.vue';
 import CampoTelefono from '@/components/base/CampoTelefono.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
 
 const props = defineProps<{
@@ -55,6 +57,7 @@ function guardar(): void {
         titulo="Dar una cuenta principal"
         :descripcion="`Con esta cuenta ${empresa.nombre} vuelve a entrar, responde sus diagnósticos y maneja sus colaboradores. Le enviamos un correo para que cree su contraseña.`"
         ancho="lg"
+        :icono="UserPlus"
     >
         <form
             id="form-cuenta-principal"
@@ -122,13 +125,10 @@ function guardar(): void {
                 </Campo>
             </div>
 
-            <p
-                v-if="!empresa.activa"
-                class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
-            >
+            <Recuadro tono="neutro" v-if="!empresa.activa">
                 La empresa está desactivada: después de darle la cuenta,
                 reactívala para que pueda entrar.
-            </p>
+            </Recuadro>
         </form>
 
         <template #pie>

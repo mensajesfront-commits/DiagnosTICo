@@ -6,7 +6,7 @@
 
 ## Quién lo pide
 
-**NuevasTIC** acompaña a las empresas en su marketing digital. El contacto de soporte que aparece en los wireframes es `soporte@nuevastic.co`.
+**NuevasTIC** acompaña a las empresas en su marketing digital. El correo de soporte oficial es `contacto@captter.com` (4 de noviembre de 2026); los wireframes mostraban `soporte@nuevastic.co`.
 
 **[INFORMACIÓN PENDIENTE]** Falta la descripción oficial de NuevasTIC: a qué se dedica, cuántas empresas atiende y quién es la persona responsable del proyecto. Debe tomarse de la descripción del proyecto que entregó NuevasTIC.
 
@@ -29,7 +29,7 @@ Un sistema web con dos lados:
 - **La empresa (y sus colaboradores):**
   - Responde el diagnóstico a su ritmo; las respuestas se guardan solas.
   - Revisa y envía.
-  - Recibe su resultado: puntaje de 0 a 100, nivel, puntaje por categoría, observaciones y recomendaciones de la IA, y un informe PDF de 3 páginas.
+  - Recibe su resultado: puntaje de 0 a 100, nivel, puntaje por categoría, observaciones y recomendaciones de la IA, y un informe PDF completo que explica cada resultado.
   - Puede repetir la medición y ver su evolución.
 
 Los cuatro niveles del resultado son:
@@ -46,8 +46,9 @@ Los cuatro niveles del resultado son:
 Tomadas de `05_REQUISITOS_FUNCIONALES.md`:
 
 - **Roles:**
-  - Hay tres: Administrador, Empresa y Colaborador.
-  - Consultor y Usuario quedan para un posible futuro.
+  - Hay cuatro: Administrador, Empresa, Colaborador y Consultor.
+  - El Consultor se agregó el 3 de noviembre (EP-014): es externo, lo invita el Administrador y solo mira las empresas que tiene vinculadas.
+  - Usuario queda para un posible futuro.
 - **Análisis de la IA:**
   - Se hace en una sola etapa por cada categoría.
   - No hay análisis FODA ni comparación con promedios.

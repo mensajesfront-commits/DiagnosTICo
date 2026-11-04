@@ -34,7 +34,7 @@ class ResumenSemanal extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $c = $this->cuenta;
-        $correo = (new MailMessage)
+        $correo = (new Correo)
             ->subject('Resumen semanal de mediciones pendientes')
             ->line('No iniciadas: '.($c['no_iniciada'] ?? 0).' · En curso: '.($c['en_curso'] ?? 0)
                 .' · En análisis: '.($c['enviada'] ?? 0).' · Vencidas: '.($c['vencida'] ?? 0).'.');

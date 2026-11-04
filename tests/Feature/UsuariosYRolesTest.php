@@ -90,7 +90,8 @@ it('muestra los roles con sus bloques de permisos', function () {
             ->where('roles.0.nombre', 'Administrador')
             ->where('roles.0.del_sistema', true)
             ->where('roles.3.nombre', 'Consultor')
-            ->where('roles.3.activo', false)
+            ->where('roles.3.activo', true)
+            ->where('roles.3.del_sistema', true)
             ->has('bloques', 6)
             ->where('rolId', Role::findByName('Consultor')->id));
 });
@@ -132,6 +133,8 @@ it('invita a una cuenta interna sin contraseña y le envía el enlace', function
 });
 
 it('no invita con un rol inactivo ni con un rol de empresa', function (string $rol) {
+    Role::findOrCreate('Rol en pausa')->forceFill(['activo' => false])->save();
+
     $this->actingAs($this->admin)
         ->post(route('usuarios.invitar'), [
             'name' => 'Mateo',
@@ -139,7 +142,7 @@ it('no invita con un rol inactivo ni con un rol de empresa', function (string $r
             'rol_id' => Role::findByName($rol)->id,
         ])
         ->assertSessionHasErrors('rol_id');
-})->with(['Consultor', 'Empresa']);
+})->with(['Rol en pausa', 'Empresa']);
 
 it('una invitación pendiente no puede iniciar sesión', function () {
     $invitada = User::factory()->create(['password' => null])->assignRole('Administrador');
@@ -198,12 +201,14 @@ it('no asigna Colaborador, ni Empresa a una cuenta interna, ni un rol inactivo',
 
     $this->actingAs($this->admin);
 
-    foreach (['Colaborador', 'Empresa', 'Consultor'] as $rol) {
+    Role::findOrCreate('Rol en pausa')->forceFill(['activo' => false])->save();
+
+    foreach (['Colaborador', 'Empresa', 'Rol en pausa'] as $rol) {
         $this->put(route('usuarios.cambiar-rol', $luis), ['rol_id' => Role::findByName($rol)->id])
             ->assertSessionHasErrors('rol_id');
     }
 
-    $this->post(route('roles.asignar', Role::findByName('Consultor')), ['cuenta_id' => $luis->id])
+    $this->post(route('roles.asignar', Role::findByName('Rol en pausa')), ['cuenta_id' => $luis->id])
         ->assertSessionHasErrors('cuenta_id');
 
     expect($luis->fresh()->getRoleNames()->all())->toBe(['Administrador']);
@@ -237,25 +242,28 @@ it('no crea un rol con nombre repetido ni con permisos que no existen', function
 });
 
 it('edita un rol creado pero no los del sistema', function () {
-    $consultor = Role::findByName('Consultor');
+    $revisor = Role::findOrCreate('Revisor');
+    $revisor->forceFill(['activo' => false])->save();
 
     $this->actingAs($this->admin)
-        ->put(route('roles.update', $consultor), [
-            'nombre' => 'Consultor',
-            'descripcion' => 'Acompaña a sus empresas.',
+        ->put(route('roles.update', $revisor), [
+            'nombre' => 'Revisor',
+            'descripcion' => 'Ve las empresas.',
             'activo' => true,
             'permisos' => ['empresas.ver'],
         ])
         ->assertSessionHasNoErrors();
 
-    expect((bool) $consultor->fresh()->activo)->toBeTrue()
-        ->and($consultor->fresh()->permissions)->toHaveCount(1);
+    expect((bool) $revisor->fresh()->activo)->toBeTrue()
+        ->and($revisor->fresh()->permissions)->toHaveCount(1);
 
-    $this->put(route('roles.update', Role::findByName('Empresa')), [
-        'nombre' => 'Empresa',
-        'activo' => true,
-        'permisos' => [],
-    ])->assertForbidden();
+    foreach (['Empresa', 'Consultor'] as $rol) {
+        $this->put(route('roles.update', Role::findByName($rol)), [
+            'nombre' => $rol,
+            'activo' => true,
+            'permisos' => ['diagnostico.responder'],
+        ])->assertForbidden();
+    }
 });
 
 it('elimina un rol creado solo si no tiene cuentas', function () {

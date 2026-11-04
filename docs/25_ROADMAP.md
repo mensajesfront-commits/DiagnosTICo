@@ -16,7 +16,6 @@
 | Alta | Cargar los diagnósticos reales de cada sector | NuevasTIC los genera con IA y los carga a mano en la aplicación cuando se lance (T-072). |
 | Alta | Revisar con NuevasTIC las instrucciones de la IA | Las escribió el equipo. Las frases de los niveles ya están aprobadas. |
 | Alta | Definir el servidor, el dominio, el correo SMTP y las llaves de Turnstile | Sin esto no se puede poner en línea (`20_DESPLIEGUE.md`). OpenAI lo paga NuevasTIC, con gpt-4.1-mini. |
-| Media | Correo de soporte real (`SOPORTE_EMAIL`) | Lo ve la empresa con una medición vencida. |
 
 ## 3. Mejoras propuestas
 
@@ -35,7 +34,6 @@
 | Qué | Estado | Qué falta para retomarlo |
 |---|---|---|
 | Bot de WhatsApp (EP-013, HU-071 a HU-075) | Lo hace otra persona del equipo, aparte de este repositorio | El texto del saludo (PA-001), cómo se configuran las preguntas (PA-002), un número de Meta y un servidor con HTTPS para el webhook (RN-029). |
-| Rol Consultor | Existe inactivo (PA-006) | Definir qué empresas ve cada consultor. Necesita una tabla `consultor_empresa` (`12_BASE_DE_DATOS.md`). |
 | Rol Usuario | Sin historias | Definir para qué sirve. |
 | Comparación con promedios | Fuera del alcance (RN-028) | Lo decide NuevasTIC. |
 

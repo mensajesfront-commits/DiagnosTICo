@@ -8,8 +8,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
 /**
- * HU-084 · Genera y guarda el PDF al publicar el resultado (RN-024). Si
- * falla tras 3 intentos, el resultado sigue publicado y el PDF se vuelve a
+ * HU-084 · Genera y guarda los dos PDF al publicar el resultado (RN-024):
+ * el informe completo y el resumen para la empresa. Si falla tras 3
+ * intentos, el resultado sigue publicado y el PDF que falte se vuelve a
  * intentar cuando alguien lo descarga (HU-066 CA-004).
  */
 class GenerarInformePdf implements ShouldQueue
@@ -29,8 +30,14 @@ class GenerarInformePdf implements ShouldQueue
     {
         $resultado = Resultado::with('medicion.empresa')->find($this->resultadoId);
 
-        if ($resultado !== null && $resultado->pdf_ruta === null) {
-            InformePdf::generar($resultado);
+        if ($resultado === null) {
+            return;
+        }
+
+        foreach (InformePdf::TIPOS as $tipo) {
+            if ($resultado->{InformePdf::columna($tipo)} === null) {
+                InformePdf::generar($resultado, $tipo);
+            }
         }
     }
 }

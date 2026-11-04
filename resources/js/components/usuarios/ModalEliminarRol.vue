@@ -6,9 +6,11 @@
  *
  * Envía: DELETE /roles/{id}.
  */
+import { ShieldX } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
 import type { Rol } from '@/types/usuarios';
 
@@ -29,6 +31,8 @@ function eliminar(): void {
     <Modal
         v-model:abierto="abierto"
         :titulo="`¿Eliminar el rol “${rol.nombre}”?`"
+        :icono="ShieldX"
+        tono="peligro"
     >
         <div class="flex flex-col gap-3 text-sm">
             <p>
@@ -46,13 +50,11 @@ function eliminar(): void {
                 }}. Se elimina junto con su configuración.
                 <strong>No se puede deshacer.</strong>
             </p>
-            <p
-                class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
-            >
+            <Recuadro tono="neutro">
                 Un rol con cuentas no se puede eliminar: primero hay que pasar
                 esas cuentas a otro rol. Los roles del sistema (Administrador,
                 Empresa y Colaborador) tampoco se eliminan.
-            </p>
+            </Recuadro>
         </div>
 
         <template #pie>

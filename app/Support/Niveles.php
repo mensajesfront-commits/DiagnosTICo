@@ -35,6 +35,41 @@ class Niveles
         'sigue' => 'Tu marketing digital está sólido. Mantén lo que haces y mide cada mes para no perder terreno.',
     ];
 
+    /**
+     * Qué quiere decir el nivel en una sola categoría (informe PDF).
+     *
+     * @var array<string, string>
+     */
+    public const array EN_CATEGORIA = [
+        'critico' => 'Prácticas digitales ausentes o con deficiencias importantes.',
+        'mejorar' => 'Existen prácticas, pero falta constancia, planificación o medición.',
+        'camino' => 'La base funciona; se requiere optimización y seguimiento.',
+        'sigue' => 'Prácticas consolidadas que deben mantenerse y revisarse.',
+    ];
+
+    /**
+     * Nombres formales del informe PDF (propuesta de reestructuración, 2 de
+     * noviembre de 2026). La pantalla conserva los del wireframe.
+     *
+     * @var array<string, string>
+     */
+    public const array NOMBRES_INFORME = [
+        'critico' => 'Crítico',
+        'mejorar' => 'Requiere mejora',
+        'camino' => 'Desempeño satisfactorio',
+        'sigue' => 'Desempeño óptimo',
+    ];
+
+    public static function nombreInforme(string $clave): string
+    {
+        return self::NOMBRES_INFORME[$clave] ?? self::nombre($clave);
+    }
+
+    public static function enCategoria(string $clave): string
+    {
+        return self::EN_CATEGORIA[$clave] ?? '';
+    }
+
     /** Clave del nivel de un puntaje de 0 a 100. */
     public static function de(int|float $puntaje): string
     {

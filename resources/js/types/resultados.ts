@@ -19,6 +19,16 @@ export type CabeceraResultado = {
 
 export type Recomendacion = { titulo: string; detalle: string };
 
+/** Recomendación con su plan: 3 pasos, plazo y cómo saber si funcionó. */
+export type RecomendacionCompleta = Recomendacion & {
+    pasos: string[];
+    plazo: string;
+    indicador: string;
+};
+
+/** Lo que encontró el método en uno de sus grupos (por ejemplo "Debilidades" en DOFA). */
+export type Hallazgo = { grupo: string; puntos: string[] };
+
 /** A2.6 · Resultado de ejemplo de un diagnóstico (HU-030). */
 export type EjemploResultado = {
     caso: 'mejor' | 'medio' | 'peor';
@@ -26,8 +36,10 @@ export type EjemploResultado = {
     etiqueta: string;
     /** URL de la vista previa. */
     volver: string;
-    /** URL del PDF de ejemplo (se abre en otra pestaña). */
+    /** URL del PDF completo de ejemplo (se abre en otra pestaña). */
     pdf: string;
+    /** URL del resumen de ejemplo, el que recibe la empresa. */
+    pdf_resumen: string;
 };
 
 /** Método con el que la IA analizó la categoría; null en resultados viejos. */
@@ -43,6 +55,8 @@ export type PreguntaResultado = {
     /** Opcional: dato extra que no cuenta en el puntaje (no viene en resultados viejos). */
     extra?: boolean;
     observacion: string | null;
+    /** Nivel según su puntaje (lo agrega el servidor en A3.5 / E9). */
+    nivel?: Exclude<Nivel, 'sin'> | null;
 };
 
 export type CategoriaResultado = {
@@ -56,7 +70,12 @@ export type CategoriaResultado = {
     variacion: number | null;
     observacion: string;
     metodo: MetodoAnalisis | null;
+    /** La principal, con título y detalle (todos los resultados la traen). */
     recomendacion: Recomendacion;
+    /** No vienen en resultados publicados antes del análisis completo. */
+    hallazgos?: Hallazgo[];
+    fortalezas?: string[];
+    recomendaciones?: RecomendacionCompleta[];
     preguntas: PreguntaResultado[];
 };
 
@@ -66,6 +85,8 @@ export type Prioridad = {
     puntaje: number;
     nivel: Exclude<Nivel, 'sin'>;
     recomendacion: Recomendacion;
+    /** La principal con pasos, plazo e indicador; null en resultados viejos. */
+    principal: RecomendacionCompleta | null;
     metodo: MetodoAnalisis | null;
 };
 
@@ -80,4 +101,8 @@ export type Resultado = {
     categorias: CategoriaResultado[];
     /** Las 3 categorías más débiles con su recomendación. */
     prioridades: Prioridad[];
+    /** Cuántas categorías quedaron en cada nivel. */
+    por_nivel?: { clave: Exclude<Nivel, 'sin'>; cantidad: number }[];
+    /** La categoría con mayor puntaje; null si hay una sola. */
+    mas_fuerte?: Prioridad | null;
 };

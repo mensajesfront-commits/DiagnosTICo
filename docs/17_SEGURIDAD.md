@@ -19,7 +19,7 @@ Hay tres roles del sistema. Son fijos: no se editan ni se eliminan, y cada cuent
 
 El Administrador puede crear roles nuevos con los permisos que elija (HU-049); cada uno tiene nombre, descripción opcional y si está activo. Un rol con cuentas no se elimina (RN-027).
 
-**Rol Consultor (PA-006, respondida el 6 de octubre):** existe pero está **inactivo** hasta que se le asigne a alguien; eso se probará más adelante. El seeder lo crea inactivo, con los 6 permisos de A5.2 (ver empresas, solo las vinculadas; responder; ver resultados; PDF; editar su perfil; cambiar su contraseña). No es del sistema: el Administrador lo puede editar o eliminar, y el seeder no pisa esos cambios.
+**Rol Consultor (RN-030, decisión del 3 de noviembre):** persona externa que invita el Administrador. Es **rol del sistema** y está activo, con 5 permisos fijos: ver empresas, ver resultados, PDF, editar su perfil y cambiar su contraseña. **No** tiene "Responder el diagnóstico" ni nada de diagnósticos, mediciones, IA o usuarios. Solo ve las empresas de la tabla `consultor_empresa`; la regla vive en `User::puedeVerEmpresa()` y la usan Empresas (lista y ficha), el historial, los resultados, las respuestas, el PDF y los logos. Entra a su propio inicio (C1), no a A1. Antes (PA-006, 6 de octubre) existía inactivo y editable; quedó cerrado porque, si alguien lo activaba, veía todas las empresas.
 
 Cada rol guarda `descripcion`, `activo` y `del_sistema` (columnas agregadas a la tabla `roles` de spatie). Un rol inactivo no se puede asignar.
 
@@ -45,7 +45,7 @@ Son los **15 permisos en 6 bloques** del wireframe A5.2 (A5.1 "Crear rol" usa la
 | Su cuenta | `perfil.editar` | Editar su perfil | Cambiar sus datos personales. En el rol Empresa, también los de la empresa | A6, E11 |
 | | `contrasena.cambiar` | Cambiar su contraseña | Cambiar su contraseña | A6, E11 |
 
-En la Empresa y el Colaborador, los permisos de "Mediciones y resultados" valen **solo para su empresa** (RN-007).
+En la Empresa y el Colaborador, los permisos de "Mediciones y resultados" valen **solo para su empresa** (RN-007). En el Consultor, "Ver empresas" y los de resultados valen **solo para sus empresas vinculadas** (RN-030); de otra, 404. Vincular o quitar consultores pide `usuarios.gestionar`.
 
 Lo que no tiene casilla en A5.2 se decide por el rol:
 
@@ -100,7 +100,7 @@ Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/
 | 3 | **Cuenta desactivada no entra** (RN-004), tampoco las cuentas de una empresa desactivada (RN-025). Si las desactivan con la sesión abierta, la sesión se cierra en la siguiente petición. Con la contraseña correcta, L1 muestra el modal "Su cuenta ha sido desactivada…" (`ModalCuentaDesactivada`). | `User::puedeEntrar()`, `Fortify::authenticateUsing` y el middleware `CerrarSesionCuentaInactiva` | `SeguridadAccesoTest` |
 | 4 | **Los avisos no revelan si un correo existe** (RN-005): el login responde "El correo o la contraseña no son correctos." cuando el correo no existe o la contraseña está mal, también en cuentas desactivadas. El aviso de cuenta desactivada solo lo ve quien escribe la contraseña correcta (decisión del equipo, 7 de octubre); "¿Olvidaste tu contraseña?" responde siempre "Si el correo está registrado, te enviamos un enlace…". | `lang/es/auth.php`, `AvisoRecuperacionResponse` | `SeguridadAccesoTest` |
 | 5 | **Contraseña fuerte en todos los entornos** (RN-001): mínimo 8 caracteres, una mayúscula, un número y un carácter especial. Se aplica al registrarse, al crear la contraseña nueva y al cambiarla en Mi perfil. Tampoco puede tener partes del correo (de 3 o más caracteres) ni ser igual a la anterior. En Mi perfil tampoco puede repetir 4 caracteres seguidos de la actual; al recuperarla o en los colaboradores no se pueden leer sus partes (está cifrada). En todos los casos la nueva no puede ser ninguna de las últimas 5, sin importar mayúsculas: se guardan en minúsculas cifradas con bcrypt (`contrasenas_anteriores`), nunca en texto. | `Password::defaults` en `AppServiceProvider` + reglas `TieneMayuscula`, `SinDatosDelCorreo` y `DistintaDeLaAnterior` | `SeguridadAccesoTest`, `SinDatosDelCorreoTest`, `ColaboradoresTest` |
-| 6 | **Enlace de contraseña nueva sin vencimiento por tiempo** (RN-006): sirve hasta guardar la contraseña; pedir otro invalida el anterior. | `config/auth.php` (`expire` de un año) | `SeguridadAccesoTest` |
+| 6 | **Enlaces de contraseña** (RN-006, cambio del 4 de noviembre): el de "¿Olvidaste tu contraseña?" vence a los **10 minutos**; el de una invitación sirve hasta usarlo. Cada uno va en su tabla (`password_reset_tokens` e `invitaciones_tokens`), pedir otro invalida el anterior y guardar la contraseña borra los dos. | `config/auth.php` (brokers `users` e `invitaciones`), `ElegirEnlaceContrasena`, `Invitaciones` | `SeguridadAccesoTest`, `AuditoriaQaTest` |
 | 7 | **Límite de intentos:** 5 por minuto en iniciar sesión (por correo e IP; al pasarse, L1 muestra el modal "Demasiados intentos" con la cuenta regresiva y el botón desactivado, `ModalAccesoBloqueado`), registrarse, pedir el enlace y crear la contraseña nueva (por IP). | Limitador `login` de Fortify y middleware `LimitarIntentosAcceso` | `SeguridadAccesoTest`, `AuthenticationTest` |
 | 8 | **Un correo, una cuenta** (RN-002); el correo se guarda y se compara en minúsculas. | Regla `unique` y `lowercase_usernames` de Fortify | `SeguridadAccesoTest` |
 | 9 | **Constancia de los términos:** se guarda cuándo se aceptaron (`users.terminos_aceptados_en`). | `CreateNewUser` | `SeguridadAccesoTest` |
@@ -119,7 +119,15 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
 - Claves (`APP_KEY`, base de datos, correo, OpenAI) solo en `.env`.
 
-**Términos y política de datos:** hay un borrador según la Ley 1581 de 2012, en `resources/js/lib/legales.ts`. Solo se abre en una ventana desde el registro (L2). **[INFORMACIÓN PENDIENTE]** NuevasTIC debe completar sus datos (razón social, NIT, domicilio, teléfono, vigencia, costo, proveedores) y hacerlo revisar por su asesor legal. Lo que falta se ve resaltado en el texto.
+**Términos y Condiciones y Política de Privacidad:** son los textos oficiales de Captter, entregados el 4 de noviembre de 2026 y copiados tal cual en `resources/js/lib/legales.ts`. Los Términos son del 16 de septiembre de 2025 y la Política, del 27 de mayo de 2025. Se abren en una ventana desde el registro (L2), y al aceptarlos se guarda la fecha. Contacto en los dos: contacto@captter.com.
+
+**[INCONSISTENCIA DETECTADA]** Los textos oficiales son de la plataforma Captter en general y no coinciden del todo con este sistema de diagnóstico. No se cambian aquí; la empresa decide si los ajusta:
+
+- **Pagos:** los Términos hablan casi solo de pagos con Openpay y PSE, y la Política nombra datos de pago y "proveedores de servicios de pago". Este sistema no cobra ni procesa pagos.
+- **Datos que no se piden:** la Política nombra dirección física, NIT, Certificado de Cámara de Comercio, cédula, ubicación del dispositivo, búsquedas y transacciones. El sistema no los pide.
+- **Proveedores que no se nombran:** las respuestas se analizan con OpenAI (Estados Unidos) y el registro usa Cloudflare Turnstile. La Ley 1581 pide informar la transmisión de datos a otros países; la Política no la menciona.
+- **Cookies:** la Política nombra cookies de analítica y de personalización. El sistema solo usa las necesarias: sesión, protección de formularios y "Recordarme".
+- **Uso del sistema:** los Términos no hablan del diagnóstico, de que la IA puede equivocarse, de "Ver como" ni de los plazos de borrado (7 días sin verificar el correo, 90 días para recuperar una cuenta).
 
 ## Comprobado en la prueba técnica
 

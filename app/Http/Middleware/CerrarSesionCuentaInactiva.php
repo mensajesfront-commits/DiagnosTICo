@@ -24,7 +24,7 @@ class CerrarSesionCuentaInactiva
             $request->session()->regenerateToken();
 
             // L1 lo muestra en el mismo modal que al intentar entrar.
-            return redirect()->route('login')->withErrors(['cuenta_desactivada' => trans('auth.desactivada')]);
+            return redirect()->route('login')->withErrors($usuario->errorSinAcceso());
         }
 
         return $next($request);

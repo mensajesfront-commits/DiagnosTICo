@@ -79,7 +79,7 @@ class CreateNewUser implements CreatesNewUsers
             'pais' => 'país',
             'name' => 'nombre del usuario',
             'email' => 'correo',
-            'terminos' => 'los términos de uso y la política de tratamiento de datos',
+            'terminos' => 'los Términos y Condiciones y la Política de Privacidad',
         ])->validate();
 
         return DB::transaction(function () use ($input): User {

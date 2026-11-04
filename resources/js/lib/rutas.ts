@@ -100,6 +100,12 @@ export const rutas = {
         desactivar: (id: number) => `/empresas/${id}/desactivar`,
         reactivar: (id: number) => `/empresas/${id}/reactivar`,
         cuentaPrincipal: (id: number) => `/empresas/${id}/cuenta-principal`,
+        // HU-085 · Consultores de la empresa (RN-030).
+        consultores: {
+            vincular: (id: number) => `/empresas/${id}/consultores`,
+            quitar: (id: number, consultorId: number) =>
+                `/empresas/${id}/consultores/${consultorId}`,
+        },
     },
     mediciones: {
         asignar: (empresaId?: number) =>
@@ -114,8 +120,22 @@ export const rutas = {
         probarCorreo: () => '/mediciones/correo/prueba',
     },
     responder: {
-        mostrar: (id: number, categoria?: number) =>
-            `/mi-diagnostico/${id}${categoria !== undefined ? `?categoria=${categoria}` : ''}`,
+        /** `pregunta`: ref de la pregunta a la que se baja y se pone el foco (E3). */
+        mostrar: (id: number, categoria?: number, pregunta?: string | null) => {
+            const params = new URLSearchParams();
+
+            if (categoria !== undefined) {
+                params.set('categoria', String(categoria));
+            }
+
+            if (pregunta) {
+                params.set('pregunta', pregunta);
+            }
+
+            const query = params.toString();
+
+            return `/mi-diagnostico/${id}${query ? `?${query}` : ''}`;
+        },
         guardar: (id: number) => `/mi-diagnostico/${id}/respuestas`,
         revisar: (id: number) => `/mi-diagnostico/${id}/revisar`,
         enviar: (id: number) => `/mi-diagnostico/${id}/enviar`,
@@ -148,6 +168,11 @@ export const rutas = {
         ver: (id: number) => `/resultados/${id}`,
         respuestas: (id: number, categoria?: string) =>
             `/resultados/${id}/respuestas${categoria ? `?categoria=${categoria}` : ''}`,
-        pdf: (id: number) => `/resultados/${id}/pdf`,
+        /**
+         * E10 · La empresa recibe siempre el resumen. El Administrador y el
+         * Consultor, el informe completo, o el resumen con `'resumen'`.
+         */
+        pdf: (id: number, tipo?: 'resumen') =>
+            `/resultados/${id}/pdf${tipo ? `?tipo=${tipo}` : ''}`,
     },
 };

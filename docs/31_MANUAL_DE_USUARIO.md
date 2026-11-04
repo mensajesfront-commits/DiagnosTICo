@@ -39,7 +39,7 @@ Antes de medir a una empresa, su sector necesita un diagnóstico **publicado**.
 5. Abre la **Vista previa** (A2.4):
    - Muestra lo que falta para publicar.
    - Puedes responder de prueba.
-   - **Resultado de ejemplo** (A2.6) muestra cómo quedaría el resultado en el mejor, el medio y el peor caso, con su PDF.
+   - **Resultado de ejemplo** (A2.6) muestra cómo quedaría el resultado en el mejor, el medio y el peor caso, con sus dos PDF: el completo y el resumen de la empresa.
 6. Pulsa **Publicar v1** (A2.1d) y escribe la nota de cambios.
 
 > Una versión publicada no cambia. Si editas después, preparas la v2. Las mediciones ya asignadas siguen con su versión.
@@ -99,7 +99,10 @@ En los tres casos la solicitud queda atendida.
   - el puntaje y el nivel;
   - el radar;
   - por cada categoría, el método de análisis que usó la IA, la observación y la recomendación.
-- **Ver respuestas** (A3.5) y **Ver informe PDF**.
+- **Ver respuestas** (A3.5).
+- Dos PDF (E10):
+  - **Informe completo PDF**: el «Informe de Diagnóstico y Estrategia de Marketing Digital», con portada, ficha técnica, resumen ejecutivo, metodología, resultados, una página por categoría, DOFA, conclusiones, fichas de acción, cronograma, KPI y glosario. En este informe los niveles tienen nombres más formales: «Se puede mejorar» es «Requiere mejora», «Vas en buen camino» es «Desempeño satisfactorio» y «Sigue así» es «Desempeño óptimo».
+  - **Resumen para la empresa**: el PDF corto que recibe la empresa. Sirve para entregárselo o revisarlo con ella.
 - **Ver historial completo** (A3.4).
 
 ## A.7 Configurar la IA
@@ -175,12 +178,23 @@ En el resultado (E6) ves:
   - Sigue así: 80–100.
 - **Variación:** cuánto subiste o bajaste frente a tu medición anterior, desde la segunda medición.
 - **Radar** con todas las categorías.
-- **Por cada categoría:** el puntaje, el método con el que se analizó, una observación y una recomendación.
+- **Por cada categoría:**
+  - el puntaje y el nivel;
+  - el diagnóstico: qué pasa, por qué y qué le cuesta a la empresa;
+  - lo que encontró el método de análisis, por grupos (por ejemplo Fortalezas y Debilidades en DOFA);
+  - lo que la empresa ya hace bien;
+  - 2 o 3 recomendaciones en orden, cada una con 3 pasos, el plazo y cómo saber si funcionó.
 
 Además:
 
 - **Ver mis respuestas** (E9): lo que respondiste, con una observación por pregunta.
-- **Ver informe PDF** (E10): un informe de 3 páginas para guardar o compartir.
+- **Ver informe PDF** (E10): el «Resumen de tu diagnóstico de marketing digital», para guardar, imprimir o compartir. Trae:
+  - tu calificación, tu nivel y cómo leer los niveles;
+  - tus categorías en barras;
+  - **Por dónde empezar**: las acciones de tus 3 categorías más débiles;
+  - por cada categoría, de la más urgente a la más fuerte: qué encontró el análisis, por qué importa, lo que haces bien, lo que debes mejorar y qué hacer, con pasos y plazo;
+  - los próximos pasos.
+- El equipo de NuevasTIC tiene además un informe completo, con la metodología, el DOFA, el plan, el cronograma y los indicadores.
 
 ## B.5 Tu historial
 
@@ -209,7 +223,6 @@ En **Mi perfil** (E11) cambias tus datos, tu foto y tu contraseña. La cuenta pr
 
 ## Preguntas frecuentes
 
-- **No me llegó el correo.** Revisa la carpeta de spam. Si no está, pide a NuevasTIC que lo reenvíe.
-  > **[INFORMACIÓN PENDIENTE]** Correo de soporte real de NuevasTIC (`SOPORTE_EMAIL`).
+- **No me llegó el correo.** Revisa la carpeta de spam. Si no está, escribe a **contacto@captter.com** para que te lo reenvíen.
 - **¿Puedo responder desde el celular?** Sí. Las pantallas se adaptan al ancho del celular.
 - **¿Quién ve mis respuestas?** Tu empresa, tus colaboradores y el equipo de NuevasTIC. Ninguna otra empresa (RN-007).

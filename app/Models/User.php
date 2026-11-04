@@ -9,13 +9,16 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -62,6 +65,19 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, SoftDeletes;
+
+    /**
+     * El correo se guarda siempre en minúsculas y sin espacios (ERR-02): dos
+     * cuentas no pueden diferir solo en mayúsculas.
+     *
+     * @return Attribute<string, string>
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $valor) => $valor === null ? null : Str::lower(trim($valor)),
+        );
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -137,6 +153,21 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->empresa_id === null || $this->empresa?->activa !== false;
     }
 
+    /**
+     * Error y mensaje de L1 cuando no puede entrar: rol inactivo (la cuenta
+     * sigue activa) o cuenta/empresa desactivada (ERR-12).
+     *
+     * @return array<string, string>
+     */
+    public function errorSinAcceso(): array
+    {
+        if ($this->activo !== false && $this->rolInactivo()) {
+            return ['rol_inactivo' => trans('auth.rol_inactivo')];
+        }
+
+        return ['cuenta_desactivada' => trans('auth.desactivada')];
+    }
+
     /** Su rol está desactivado (A5.1c). */
     public function rolInactivo(): bool
     {
@@ -147,6 +178,42 @@ class User extends Authenticatable implements MustVerifyEmail
     public function invitacionPendiente(): bool
     {
         return $this->password === null;
+    }
+
+    /** Consultor externo (RN-030): solo mira las empresas que tiene vinculadas. */
+    public function esConsultor(): bool
+    {
+        return $this->empresa_id === null && $this->hasRole('Consultor');
+    }
+
+    /**
+     * Empresas que acompaña como consultor (RN-030). Las vincula el
+     * Administrador en A3.1 o al invitarlo.
+     *
+     * @return BelongsToMany<Empresa, $this>
+     */
+    public function empresasAsesoradas(): BelongsToMany
+    {
+        return $this->belongsToMany(Empresa::class, 'consultor_empresa')->withTimestamps();
+    }
+
+    /**
+     * Si la cuenta puede ver una empresa, sus resultados y su historial:
+     * - de una empresa: solo la suya (RN-007);
+     * - interna: con `empresas.ver`; el consultor, solo las vinculadas.
+     */
+    public function puedeVerEmpresa(int $empresaId): bool
+    {
+        if ($this->empresa_id !== null) {
+            return $this->empresa_id === $empresaId;
+        }
+
+        if (! $this->can('empresas.ver')) {
+            return false;
+        }
+
+        return ! $this->esConsultor()
+            || $this->empresasAsesoradas()->whereKey($empresaId)->exists();
     }
 
     /** Cuenta principal de su empresa (rol Empresa). */
