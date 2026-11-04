@@ -539,7 +539,7 @@ const pasos = [
                             class="text-marca underline"
                             @click="legal = 'terminos'"
                         >
-                            términos de uso
+                            Términos y Condiciones
                         </button>
                         y la
                         <button
@@ -547,7 +547,7 @@ const pasos = [
                             class="text-marca underline"
                             @click="legal = 'politica'"
                         >
-                            política de tratamiento de datos
+                            Política de Privacidad
                         </button>
                     </span>
                 </label>

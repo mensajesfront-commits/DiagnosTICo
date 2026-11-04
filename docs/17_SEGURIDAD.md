@@ -119,7 +119,15 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
 - Claves (`APP_KEY`, base de datos, correo, OpenAI) solo en `.env`.
 
-**Términos y política de datos:** hay un borrador según la Ley 1581 de 2012, en `resources/js/lib/legales.ts`. Solo se abre en una ventana desde el registro (L2). **[INFORMACIÓN PENDIENTE]** NuevasTIC debe completar sus datos (razón social, NIT, domicilio, teléfono, vigencia, costo, proveedores) y hacerlo revisar por su asesor legal. Lo que falta se ve resaltado en el texto.
+**Términos y Condiciones y Política de Privacidad:** son los textos oficiales de Captter, entregados el 4 de noviembre de 2026 y copiados tal cual en `resources/js/lib/legales.ts`. Los Términos son del 16 de septiembre de 2025 y la Política, del 27 de mayo de 2025. Se abren en una ventana desde el registro (L2), y al aceptarlos se guarda la fecha. Contacto en los dos: contacto@captter.com.
+
+**[INCONSISTENCIA DETECTADA]** Los textos oficiales son de la plataforma Captter en general y no coinciden del todo con este sistema de diagnóstico. No se cambian aquí; la empresa decide si los ajusta:
+
+- **Pagos:** los Términos hablan casi solo de pagos con Openpay y PSE, y la Política nombra datos de pago y "proveedores de servicios de pago". Este sistema no cobra ni procesa pagos.
+- **Datos que no se piden:** la Política nombra dirección física, NIT, Certificado de Cámara de Comercio, cédula, ubicación del dispositivo, búsquedas y transacciones. El sistema no los pide.
+- **Proveedores que no se nombran:** las respuestas se analizan con OpenAI (Estados Unidos) y el registro usa Cloudflare Turnstile. La Ley 1581 pide informar la transmisión de datos a otros países; la Política no la menciona.
+- **Cookies:** la Política nombra cookies de analítica y de personalización. El sistema solo usa las necesarias: sesión, protección de formularios y "Recordarme".
+- **Uso del sistema:** los Términos no hablan del diagnóstico, de que la IA puede equivocarse, de "Ver como" ni de los plazos de borrado (7 días sin verificar el correo, 90 días para recuperar una cuenta).
 
 ## Comprobado en la prueba técnica
 

@@ -185,7 +185,7 @@ return [
         'idioma' => 'idioma',
         'empresa_nombre' => 'nombre de la empresa',
         'sector_id' => 'sector',
-        'terminos' => 'los términos de uso y la política de tratamiento de datos',
+        'terminos' => 'los Términos y Condiciones y la Política de Privacidad',
         'token' => 'enlace',
         'foto' => 'imagen',
     ],

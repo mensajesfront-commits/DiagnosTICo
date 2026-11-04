@@ -6,6 +6,12 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Cambiado (L2 · textos legales oficiales, 4 de noviembre)
+
+- Crear cuenta muestra los **Términos y Condiciones** (16 de septiembre de 2025) y la **Política de Privacidad** (27 de mayo de 2025) oficiales de Captter, copiados tal cual en `resources/js/lib/legales.ts`. Reemplazan el borrador anterior.
+- La casilla dice "Acepto los Términos y Condiciones y la Política de Privacidad". La ventana muestra la fecha de "Última actualización" y las subsecciones (1.1, 1.1.1) con su propio título.
+- **[INCONSISTENCIA DETECTADA]** Los textos hablan de pagos, cookies de analítica y datos que el sistema no pide, y no nombran a OpenAI ni a Cloudflare. Detalle en docs/17. La empresa decide si los ajusta.
+
 ### Agregado (E10 · PDF corto para la empresa, 4 de noviembre)
 
 Un empresario no va a leer un informe de 36 páginas (RN-024 y HU-066 actualizadas).
