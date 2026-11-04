@@ -16,7 +16,7 @@ Requisitos funcionales (RF), historias de usuario, criterios de aceptación y ba
 
 Sistema web para que NuevasTIC mida el nivel de marketing digital de empresas. Las empresas responden un diagnóstico propio de su sector, la IA analiza cada categoría y el sistema entrega un resultado con puntaje, nivel, observaciones, recomendaciones y un PDF. El Administrador de NuevasTIC configura sectores, categorías, diagnósticos, empresas, mediciones, la IA y las cuentas.
 
-Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa, Colaborador y Consultor (este último agregado el 3 de noviembre, solo de lectura; Usuario queda para un posible futuro); sin análisis FODA ni comparación con promedios; contraseña fuerte (8 caracteres, mayúscula, número y carácter especial); análisis de IA en una sola etapa por categoría; estados de medición Enviada y Terminada; medición vencida → la empresa pide otra por correo; el bot de WhatsApp es totalmente separado y queda **aplazado**; el simulador de inversión no existe.
+Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa, Colaborador y Consultor (este último agregado el 3 de noviembre, solo de lectura; Usuario queda para un posible futuro); sin análisis FODA ni comparación con promedios; contraseña fuerte (8 caracteres, mayúscula, número y carácter especial); análisis de IA en una sola etapa por categoría; estados de medición Enviada y Terminada; medición vencida → la empresa pide otra por correo; el bot de WhatsApp es totalmente separado y lo terminó otra persona del equipo fuera de este repositorio (4 de noviembre de 2026); el simulador de inversión no existe.
 
 # 2. Actores identificados
 
@@ -26,7 +26,7 @@ Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa, 
 | Empresa (usuario principal) | Cuenta de la empresa cliente; se registra sola o la crea el Administrador. | Responder el diagnóstico, ver resultados, historial y PDF; gestionar sus colaboradores y sus datos. |
 | Colaborador | Cuenta creada por la empresa, con casi los mismos permisos. | Responder y enviar el diagnóstico y ver resultados, historial y PDF; no crea colaboradores ni cambia datos de la empresa. |
 | Sistema | Procesos automáticos (cálculo, análisis de IA, publicación, vencimientos). | Producir resultados justos y consistentes sin intervención. |
-| Empresa por WhatsApp | Quien conversa con el bot (aplazado). | Hacer un diagnóstico rápido sin cuenta. |
+| Empresa por WhatsApp | Quien conversa con el bot (hecho fuera de este repositorio). | Hacer un diagnóstico rápido sin cuenta. |
 | Consultor | Persona externa a NuevasTIC que acompaña a una o varias empresas; la invita el Administrador (agregado el 3 de noviembre). | Ver la ficha, el historial, los resultados y el PDF de las empresas que tiene vinculadas. Solo mira: no responde ni toca diagnósticos. |
 | Usuario | Rol posible a futuro. **[FUNCIONALIDAD POR DEFINIR]** No tiene historias. | — |
 
@@ -47,7 +47,7 @@ Sistema de Diagnóstico de Marketing Digital
 ├── EP-010 Experiencia de la empresa
 ├── EP-011 Colaboradores
 ├── EP-012 Cálculo, IA y tareas automáticas
-└── EP-013 Diagnóstico por WhatsApp (aplazado)
+└── EP-013 Diagnóstico por WhatsApp (hecho fuera de este repositorio)
 ```
 
 # 4. Épicas
@@ -202,7 +202,7 @@ Sistema de Diagnóstico de Marketing Digital
 |---|---|
 | ID | EP-013 |
 | Nombre | Diagnóstico por WhatsApp |
-| Descripción | Diagnóstico rápido conversando con un bot, separado de la web (APLAZADO). |
+| Descripción | Diagnóstico rápido conversando con un bot, separado de la web. Lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026). |
 | Actor principal | Empresa (por WhatsApp) |
 | Objetivo | Hacer un diagnóstico rápido sin cuenta. |
 | Valor de negocio | Canal de entrada ligero; aplazado por decisión de Cristian. |
@@ -9163,7 +9163,7 @@ Entrega a la empresa un resultado final que no cambia y le avisa cuando está li
 
 **MoSCoW:** Should
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir y diseñar la sección del bot en el panel (sin vista en el prototipo).
 
@@ -9264,7 +9264,7 @@ Permite al Administrador cambiar las preguntas del bot sin depender de un desarr
 ### Riesgos
 
 - SIN VISTA EN EL PROTOTIPO: falta diseñar la sección del bot en el panel.
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -9280,7 +9280,7 @@ Permite al Administrador cambiar las preguntas del bot sin depender de un desarr
 
 **MoSCoW:** Should
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el texto exacto del saludo del bot.
 
@@ -9364,7 +9364,7 @@ Permite a una empresa iniciar un diagnóstico rápido por chat sin crear una cue
 
 - REQUIERE VALIDACIÓN: texto exacto del saludo.
 - Depende de HU-071 (preguntas configuradas).
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -9380,7 +9380,7 @@ Permite a una empresa iniciar un diagnóstico rápido por chat sin crear una cue
 
 **MoSCoW:** Should
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071).
 
@@ -9487,7 +9487,7 @@ Permite completar el diagnóstico desde el chat respondiendo una pregunta a la v
 ### Riesgos
 
 - Depende de HU-072.
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -9503,7 +9503,7 @@ Permite completar el diagnóstico desde el chat respondiendo una pregunta a la v
 
 **MoSCoW:** Could
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071), de los que depende la conversación.
 
@@ -9593,7 +9593,7 @@ Evita que la empresa tenga que empezar de nuevo si deja la conversación a media
 ### Riesgos
 
 - Depende de HU-073.
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -9609,7 +9609,7 @@ Evita que la empresa tenga que empezar de nuevo si deja la conversación a media
 
 **MoSCoW:** Should
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo y las preguntas del bot (HU-071 y HU-072), de los que depende el resultado.
 
@@ -9699,7 +9699,7 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 
 - Depende de HU-073.
 - Depende de la integración con Meta (verificación de mensajes).
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -10038,11 +10038,11 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-068 — Calcular los puntajes | RF-036 | Hecha |
 | HU-069 — Analizar cada categoría con la IA | RF-037 | Hecha |
 | HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003: una vencida no se responde en E2) |
-| HU-071 — Configurar las preguntas del bot | RF-039 | Aplazada |
-| HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Aplazada |
-| HU-073 — Responder las preguntas del bot | RF-040 | Aplazada |
-| HU-074 — Retomar la conversación | RF-040 | Aplazada |
-| HU-075 — Recibir el resultado por WhatsApp | RF-040 | Aplazada |
+| HU-071 — Configurar las preguntas del bot | RF-039 | Hecha fuera de este repositorio |
+| HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Hecha fuera de este repositorio |
+| HU-073 — Responder las preguntas del bot | RF-040 | Hecha fuera de este repositorio |
+| HU-074 — Retomar la conversación | RF-040 | Hecha fuera de este repositorio |
+| HU-075 — Recibir el resultado por WhatsApp | RF-040 | Hecha fuera de este repositorio |
 | HU-076 — Ver los colaboradores de mi empresa | RF-035 | Hecha |
 | HU-077 — Crear un colaborador | RF-035 | Hecha |
 | HU-078 — Cambiar la contraseña de un colaborador | RF-035 | Hecha |

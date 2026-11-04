@@ -11,7 +11,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-003 | Gráficas con Chart.js y vue-chartjs | Vigente |
 | DEC-004 | PDF con spatie/laravel-pdf, Browsershot y Chromium | Vigente |
 | DEC-005 | Monolito modular: una sola aplicación Laravel | Vigente |
-| DEC-006 | Entrega en el repositorio, sin despliegue | Vigente |
+| DEC-006 | Entrega en el repositorio, sin despliegue | Reemplazada el 4 de noviembre: se despliega |
 | DEC-007 | PHP 8.4 fijado en Composer; Pest 5 con PHPUnit 13 | Vigente |
 | DEC-008 | Vitest del kit (Vite+ 1.5, Vitest 5.1) | Vigente (actualizada el 4 de noviembre) |
 | DEC-009 | Guzzle 7 en lugar de Guzzle 8 | Vigente |
@@ -83,6 +83,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 
 - **Decisión:** se entrega el repositorio funcionando en local con Laravel Sail. No se publica en un servidor.
 - **Por qué:** es lo acordado en la propuesta técnica (sección 1).
+- **Cambio del 4 de noviembre de 2026:** el sistema **sí se va a desplegar**. Los pasos y la configuración de producción están en `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** El servidor, el dominio y quién mantiene el sistema.
 
 ### DEC-007 — PHP 8.4 fijado en Composer; Pest 5
 

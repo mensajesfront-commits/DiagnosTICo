@@ -12,7 +12,7 @@ Es un sistema web para que NuevasTIC mida el nivel de marketing digital de las e
 - El Administrador configura los sectores, las categorías, los diagnósticos, las empresas, las mediciones, la IA y las cuentas.
 
 - **Equipo:** Cristian Andrés Penagos Simanca (frontend) y Luis Carlos Sánchez Muñoz (backend).
-- **Plazo:** del 21 de septiembre al 6 de noviembre de 2026. Se entrega el repositorio; el sistema no se despliega.
+- **Plazo:** del 21 de septiembre al 6 de noviembre de 2026. Se entrega el repositorio **y el sistema se va a desplegar** (cambio del 4 de noviembre; antes solo se entregaba el repositorio). Pasos en `docs/20_DESPLIEGUE.md`.
 - **Fuente de verdad del alcance:** `docs/05_REQUISITOS_FUNCIONALES.md`. Si otro documento lo contradice, manda ese.
 
 ## Stack

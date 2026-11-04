@@ -6,6 +6,13 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Cambiado (cierre del 4 de noviembre)
+
+- **Logotipo de NuevasTIC en los PDF:** el símbolo del Login (aro azul con la "C" y el punto verde) va en la portada del informe completo y en la cabecera del resumen (`pdf/logo.blade.php`), en lugar del nombre en texto.
+- **Se despliega:** DEC-006 cambió. CLAUDE.md, docs/20, docs/22 y docs/25 lo dicen. **[INFORMACIÓN PENDIENTE]** Servidor y dominio.
+- **Bot de WhatsApp terminado** fuera de este repositorio. HU-071 a HU-075 pasan a "Hecha fuera de este repositorio" en docs/05.
+- **docs/01:** las llaves de Turnstile ya existen, los PDF están revisados y los textos legales son todo lo que entregó la empresa.
+
 ### Cambiado (correo de soporte, 4 de noviembre)
 
 - El correo de soporte es **contacto@captter.com**: `SOPORTE_EMAIL` en `.env.example` y el valor por defecto en `config/diagnostico.php`.
