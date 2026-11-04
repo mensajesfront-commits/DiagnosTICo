@@ -90,7 +90,7 @@ Hallazgos de la auditoría QA (informe aparte). Cada corrección tiene su prueba
 - **ERR-08 · Dependencias:**
   - `symfony/mime` 8.1.10 (CVE-2026-45070);
   - vite 8.3.5, puppeteer, concurrently, shell-quote, undici y zod actualizados. `npm audit --omit=dev`: 0 alertas.
-  - **Pendiente:** las alertas de desarrollo que quedan piden `vite-plus` 1.5 (versión mayor).
+  - `vite-plus` 1.5.0 (Vitest 5.1), `vue-tsc` 3.3.10 y `undici` 7.30.1; `glob` y `minimatch` subidos con `overrides`. `npm audit`: 0 alertas, también en desarrollo (DEC-008).
 - **ERR-07 · Despliegue:** en `.env.example` y en `docs/20` se documentan `APP_ENV=production`, `APP_DEBUG=false` e `INERTIA_DEVTOOLS_ENABLED=false`.
 - **ERR-09 · Enlace de recuperación de un año:** por decisión del 4 de noviembre, RN-006 cambia.
   - El enlace de "¿Olvidaste tu contraseña?" vence a los **10 minutos** (`AUTH_PASSWORD_RESET_EXPIRE`).

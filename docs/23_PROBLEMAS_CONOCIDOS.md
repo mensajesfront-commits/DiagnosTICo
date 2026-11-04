@@ -46,7 +46,8 @@ Problemas que aparecieron al instalar o al programar, con su solución. Formato:
 ### ISSUE-005 — Vitest 5 y Vite+
 
 - **Síntoma:** `npm install -D vitest@5` falla con ERESOLVE, porque `vite-plus` pide `vitest@4.1.11`.
-- **Solución:** usar el Vitest que trae Vite+ (DEC-008).
+- **Solución:** usar el Vitest que trae Vite+ (DEC-008). Desde el 4 de noviembre, Vite+ 1.5 trae Vitest 5.1.
+- **Nota:** `vue-tsc` 3.3.13 y 3.3.14 dan errores falsos en `MiPerfil.vue` ("Property 'value' does not exist on type 'InertiaForm'"). Queda fijo en 3.3.10 (DEC-008).
 
 ### ISSUE-006 — Guzzle y OpenAI
 

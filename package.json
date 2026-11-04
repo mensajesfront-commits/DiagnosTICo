@@ -44,9 +44,9 @@
         "jsdom": "^29.1.1",
         "puppeteer": "^25.12.0",
         "typescript": "^5.2.2",
-        "vite": "^8.0.0",
-        "vite-plus": "0.3.0",
-        "vue-tsc": "^2.2.4"
+        "vite": "npm:@voidzero-dev/vite-plus-core@1.5.0",
+        "vite-plus": "1.5.0",
+        "vue-tsc": "3.3.10"
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1",
@@ -56,5 +56,11 @@
         "@tailwindcss/oxide-win32-x64-msvc": "^4.0.1",
         "lightningcss-linux-x64-gnu": "^1.29.1",
         "lightningcss-win32-x64-msvc": "^1.29.1"
+    },
+    "overrides": {
+        "glob": "^14.0.3",
+        "minimatch": "^11.0.4",
+        "vite": "$vite",
+        "vitest": "5.1.0"
     }
 }

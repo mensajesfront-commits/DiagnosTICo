@@ -31,7 +31,7 @@ Es un sistema web para que NuevasTIC mida el nivel de marketing digital de las e
 | spatie/laravel-pdf + Browsershot | 2.14 / 5.4 | PDF con Chromium. |
 | Chart.js + vue-chartjs | 4.5 / 5.3 | Gráficas. |
 | Pest | 5 | Pruebas del backend. |
-| Vitest | 4.1 (incluido en Vite+) | Pruebas del frontend. |
+| Vitest | 5.1 (incluido en Vite+ 1.5) | Pruebas del frontend. |
 | Node | 24 (`.nvmrc`) | Compilar el frontend y correr Browsershot. |
 
 ## Comandos
