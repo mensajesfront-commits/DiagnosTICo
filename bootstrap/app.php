@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\CabecerasSeguridad;
 use App\Http\Middleware\CerrarSesionCuentaInactiva;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LimitarIntentosAcceso;
+use App\Http\Middleware\NormalizarCorreo;
 use App\Http\Middleware\VerComo;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,6 +28,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
+        ]);
+
+        // ERR-06: cabeceras de seguridad en todas las respuestas.
+        $middleware->append(CabecerasSeguridad::class);
+
+        // ERR-02: el correo llega en minúsculas a todas las validaciones.
+        $middleware->web(prepend: [
+            NormalizarCorreo::class,
         ]);
 
         $middleware->web(append: [

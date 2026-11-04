@@ -23,7 +23,7 @@ class EmpresaDesactivada extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $correo = (new MailMessage)
+        $correo = (new Correo)
             ->subject('Tu cuenta en '.config('app.name').' fue desactivada')
             ->line("La cuenta de {$this->empresa->nombre} fue desactivada: tú y tus colaboradores no podrán entrar por ahora.");
 

@@ -88,6 +88,13 @@ watch(
             modalDesactivada.value = true;
         }
 
+        // La cuenta está activa pero su rol no (ERR-12).
+        if (errores?.rol_inactivo) {
+            tituloDesactivada.value = 'Rol inactivo';
+            mensajeDesactivada.value = errores.rol_inactivo;
+            modalDesactivada.value = true;
+        }
+
         if (errores?.cuenta_eliminada) {
             tituloDesactivada.value = 'Cuenta eliminada';
             mensajeDesactivada.value = errores.cuenta_eliminada;

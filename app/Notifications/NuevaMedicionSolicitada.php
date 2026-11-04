@@ -33,7 +33,7 @@ class NuevaMedicionSolicitada extends Notification implements ShouldQueue
     {
         $fecha = $this->vencida->fecha_limite ? CorreoAviso::fecha($this->vencida->fecha_limite) : null;
 
-        return (new MailMessage)
+        return (new Correo)
             ->subject("{$this->empresa->nombre} pide una nueva medición")
             ->line("{$this->quien}, de {$this->empresa->nombre}, pide una nueva fecha: la medición {$this->vencida->numero} venció".($fecha ? " el {$fecha}" : '').'.')
             ->action('Asignar medición', route('mediciones.crear', ['empresa' => $this->empresa->id]))

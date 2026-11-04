@@ -39,7 +39,7 @@ class CodigoVerificacionCorreo extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new Correo)
             ->subject("{$this->codigo} es tu código de ".config('app.name'))
             ->greeting('Hola, '.($this->nombre !== '' ? $this->nombre : ($notifiable->name ?? '')).':')
             ->line($this->cambio

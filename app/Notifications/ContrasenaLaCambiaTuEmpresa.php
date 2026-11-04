@@ -26,7 +26,7 @@ class ContrasenaLaCambiaTuEmpresa extends Notification
     {
         $quien = $this->empresa ? "la cuenta principal de {$this->empresa}" : 'la cuenta principal de tu empresa';
 
-        return (new MailMessage)
+        return (new Correo)
             ->subject('Tu contraseña de '.config('app.name'))
             ->greeting('Hola:')
             ->line('Recibimos una solicitud para cambiar la contraseña de tu cuenta.')

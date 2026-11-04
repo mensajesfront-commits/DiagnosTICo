@@ -9,6 +9,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -63,6 +65,19 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, SoftDeletes;
+
+    /**
+     * El correo se guarda siempre en minúsculas y sin espacios (ERR-02): dos
+     * cuentas no pueden diferir solo en mayúsculas.
+     *
+     * @return Attribute<string, string>
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $valor) => $valor === null ? null : Str::lower(trim($valor)),
+        );
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -136,6 +151,21 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $this->empresa_id === null || $this->empresa?->activa !== false;
+    }
+
+    /**
+     * Error y mensaje de L1 cuando no puede entrar: rol inactivo (la cuenta
+     * sigue activa) o cuenta/empresa desactivada (ERR-12).
+     *
+     * @return array<string, string>
+     */
+    public function errorSinAcceso(): array
+    {
+        if ($this->activo !== false && $this->rolInactivo()) {
+            return ['rol_inactivo' => trans('auth.rol_inactivo')];
+        }
+
+        return ['cuenta_desactivada' => trans('auth.desactivada')];
     }
 
     /** Su rol está desactivado (A5.1c). */

@@ -9,9 +9,11 @@ use App\Http\Responses\AvisoRecuperacionResponse;
 use App\Http\Responses\RegistroResponse;
 use App\Models\Sector;
 use App\Models\User;
+use App\Notifications\Correo;
 use App\Services\Acceso\CodigoVerificacion;
 use App\Support\Captcha;
 use App\Support\Fechas;
+use App\Support\LimitadorLogin;
 use App\Support\Ubicaciones;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -29,6 +31,7 @@ use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Contracts\SuccessfulPasswordResetLinkRequestResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use Laravel\Fortify\LoginRateLimiter;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -42,6 +45,8 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->bind(SuccessfulPasswordResetLinkRequestResponse::class, AvisoRecuperacionResponse::class);
         // L2b: después de registrarse se espera la verificación del correo.
         $this->app->bind(RegisterResponse::class, RegistroResponse::class);
+        // ERR-01: el contador de intentos usa un hash del correo en la llave.
+        $this->app->singleton(LoginRateLimiter::class, LimitadorLogin::class);
     }
 
     /**
@@ -82,7 +87,7 @@ class FortifyServiceProvider extends ServiceProvider
             }
 
             if (! $usuario->puedeEntrar()) {
-                throw ValidationException::withMessages(['cuenta_desactivada' => trans('auth.desactivada')]);
+                throw ValidationException::withMessages($usuario->errorSinAcceso());
             }
 
             // L2b: sin verificar el correo no se entra. Solo lo sabe quien
@@ -115,7 +120,7 @@ class FortifyServiceProvider extends ServiceProvider
                 'email' => $usuario->getEmailForPasswordReset(),
             ], false));
 
-            return (new MailMessage)
+            return (new Correo)
                 ->subject('Cambia tu contraseña de '.config('app.name'))
                 ->greeting("Hola, {$usuario->name}:")
                 ->line('Recibimos una solicitud para cambiar la contraseña de tu cuenta.')
@@ -212,7 +217,9 @@ class FortifyServiceProvider extends ServiceProvider
         // el error `bloqueo` (segundos que faltan), que la pantalla muestra en
         // un modal con la cuenta regresiva.
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            // La llave va con un hash del correo (ERR-01): un correo muy largo
+            // pasaba de los 255 caracteres de cache.key y daba error 500.
+            $throttleKey = sha1(Str::lower((string) $request->input(Fortify::username()))).'|'.$request->ip();
 
             return Limit::perMinute(5)->by($throttleKey)->response(
                 fn (Request $request, array $headers) => redirect()->route('login')
