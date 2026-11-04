@@ -36,8 +36,10 @@ export type EjemploResultado = {
     etiqueta: string;
     /** URL de la vista previa. */
     volver: string;
-    /** URL del PDF de ejemplo (se abre en otra pestaña). */
+    /** URL del PDF completo de ejemplo (se abre en otra pestaña). */
     pdf: string;
+    /** URL del resumen de ejemplo, el que recibe la empresa. */
+    pdf_resumen: string;
 };
 
 /** Método con el que la IA analizó la categoría; null en resultados viejos. */

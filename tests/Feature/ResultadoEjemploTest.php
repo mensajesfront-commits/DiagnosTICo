@@ -106,6 +106,14 @@ it('abre el formato del PDF con los datos de ejemplo', function () {
     Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->viewName === 'pdf.informe' && $pdf->viewData['informe']['empresa']['nombre'] === 'Empresa de ejemplo');
 });
 
+it('abre también el resumen que recibe la empresa, con los datos de ejemplo', function () {
+    Pdf::fake();
+
+    $this->actingAs($this->admin)->get(route('diagnosticos.resultado-ejemplo.pdf', [$this->diagnostico, 'caso' => 'peor', 'tipo' => 'resumen']))->assertOk();
+
+    Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->viewName === 'pdf.resumen' && $pdf->downloadName === 'resumen_de_ejemplo.pdf');
+});
+
 it('solo lo ve quien tiene diagnosticos.ver', function () {
     $empresa = User::factory()->create()->assignRole('Empresa');
 

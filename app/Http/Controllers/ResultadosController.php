@@ -20,6 +20,11 @@ use Throwable;
  * (HU-066). El Administrador ve las mismas pantallas desde la ficha de la
  * empresa (A3.3 y A3.5).
  *
+ * E10 tiene dos PDF (decisión del 4 de noviembre): la empresa y su
+ * colaborador reciben siempre el resumen corto; el Administrador y el
+ * Consultor eligen entre el informe completo (por defecto) y el resumen
+ * (`?tipo=resumen`), por ejemplo para entregárselo a la empresa.
+ *
  * Permisos `resultados.ver` y `resultados.pdf`. La empresa y su colaborador
  * solo ven su empresa (RN-007; de otra, 404). Un usuario interno, además,
  * necesita `empresas.ver`; el consultor, que la empresa esté vinculada.
@@ -68,24 +73,32 @@ class ResultadosController extends Controller
         $this->puedeVer($request, $medicion);
         abort_unless($medicion->estado === 'terminada', 404);
 
+        // La empresa no recibe el completo aunque lo pida en la URL.
+        $tipo = $this->interno($request) && $request->query('tipo') !== InformePdf::RESUMEN
+            ? InformePdf::COMPLETO
+            : InformePdf::RESUMEN;
+        $columna = InformePdf::columna($tipo);
+
         $resultado = $this->resultado($medicion);
         $disco = Storage::disk('local');
 
-        if ($resultado->pdf_ruta === null || ! $disco->exists($resultado->pdf_ruta)) {
+        if ($resultado->{$columna} === null || ! $disco->exists($resultado->{$columna})) {
             try {
-                InformePdf::generar($resultado);
+                InformePdf::generar($resultado, $tipo);
             } catch (Throwable $e) {
                 report($e);
             }
         }
 
-        if ($resultado->pdf_ruta === null || ! $disco->exists($resultado->pdf_ruta)) {
+        $ruta = $resultado->{$columna};
+
+        if (! is_string($ruta) || ! $disco->exists($ruta)) {
             Inertia::flash('toast', ['type' => 'error', 'message' => 'No pudimos generar el PDF. Inténtalo de nuevo en un momento.']);
 
             return back();
         }
 
-        return $disco->download($resultado->pdf_ruta, InformePdf::nombreArchivo($resultado));
+        return $disco->download($ruta, InformePdf::nombreArchivo($resultado, $tipo));
     }
 
     /** Sin resultado todavía: la empresa vuelve a la espera (E4); los demás, 404. */

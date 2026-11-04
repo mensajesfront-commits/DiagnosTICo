@@ -6,6 +6,22 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Agregado (E10 · PDF corto para la empresa, 4 de noviembre)
+
+Un empresario no va a leer un informe de 36 páginas (RN-024 y HU-066 actualizadas).
+
+- **Resumen para la empresa** (`pdf/resumen.blade.php`):
+  - calificación, nivel, cómo leer los niveles y las categorías en barras;
+  - «Por dónde empezar»;
+  - por categoría, de la más urgente a la más fuerte: qué encontramos, por qué importa, lo que ya haces bien, lo que debes mejorar y qué hacer (pasos y plazo);
+  - próximos pasos.
+  - Copia lo que la IA ya guardó; no la vuelve a llamar. Usa los nombres de nivel de la pantalla. Con 6 categorías sale de unas 6 páginas.
+- **Quién recibe cuál:**
+  - la empresa y su colaborador reciben siempre el resumen, aunque pidan el completo en la URL;
+  - el Administrador y el Consultor descargan el completo por defecto y el resumen con `?tipo=resumen`;
+  - A3.3 tiene los botones «Resumen para la empresa» e «Informe completo PDF»; A2.6, «Ver resumen de la empresa».
+- **Guardado:** columna `resultados.pdf_resumen_ruta` (migración `2026_11_04_000003`). `GenerarInformePdf` genera los dos al publicar, y la descarga genera el que falte. Al anonimizar se borran los dos.
+
 ### Agregado (cierre funcional, 14 de octubre)
 
 - **HU-083 · Atender las solicitudes de nueva medición:**

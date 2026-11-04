@@ -678,8 +678,8 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                                     rutas.resultados.pdf(m.id)
                                                 "
                                                 class="ml-3 inline-flex size-7 items-center justify-center rounded-md align-middle text-tinta-suave hover:bg-lienzo hover:text-marca"
-                                                :aria-label="`Descargar el PDF de la medición ${m.numero}`"
-                                                title="Descargar PDF"
+                                                :aria-label="`Descargar el informe completo de la medición ${m.numero}`"
+                                                title="Descargar informe completo (PDF)"
                                             >
                                                 <FileDown
                                                     class="size-4"

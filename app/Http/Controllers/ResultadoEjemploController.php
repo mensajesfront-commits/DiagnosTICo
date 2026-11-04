@@ -47,11 +47,12 @@ class ResultadoEjemploController extends Controller
                 'etiqueta' => $this->numeroYEtiqueta($diagnostico, $version)[1],
                 'volver' => route('diagnosticos.vista-previa', array_filter(['diagnostico' => $diagnostico->id, 'version' => $version?->numero])),
                 'pdf' => route('diagnosticos.resultado-ejemplo.pdf', array_filter(['diagnostico' => $diagnostico->id, 'caso' => $caso, 'version' => $version?->numero])),
+                'pdf_resumen' => route('diagnosticos.resultado-ejemplo.pdf', array_filter(['diagnostico' => $diagnostico->id, 'caso' => $caso, 'version' => $version?->numero, 'tipo' => InformePdf::RESUMEN])),
             ],
         ]);
     }
 
-    /** "Ver formato del PDF": el mismo informe de 3 páginas, en el navegador. */
+    /** "Ver formato del PDF": el informe completo o el resumen de la empresa (`?tipo=resumen`), en el navegador. */
     public function pdf(Request $request, Diagnostico $diagnostico): PdfBuilder
     {
         [$contenido, $version] = $this->contenidoDe($request, $diagnostico);
@@ -59,8 +60,10 @@ class ResultadoEjemploController extends Controller
 
         $datos = DatosResultado::pagina(ResultadoEjemplo::calcular($contenido, $this->caso($request)), null, now(), false);
 
-        return InformePdf::desde(DatosResultado::informeDe($this->cabecera($diagnostico, $version), $datos, null, now(), ejemplo: true))
-            ->inline('informe_de_ejemplo.pdf');
+        $tipo = $request->query('tipo') === InformePdf::RESUMEN ? InformePdf::RESUMEN : InformePdf::COMPLETO;
+
+        return InformePdf::desde(DatosResultado::informeDe($this->cabecera($diagnostico, $version), $datos, null, now(), ejemplo: true), $tipo)
+            ->inline($tipo === InformePdf::RESUMEN ? 'resumen_de_ejemplo.pdf' : 'informe_de_ejemplo.pdf');
     }
 
     /** @return array{0: array<string, mixed>, 1: VersionDiagnostico|null} */

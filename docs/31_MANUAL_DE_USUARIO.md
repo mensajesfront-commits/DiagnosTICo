@@ -39,7 +39,7 @@ Antes de medir a una empresa, su sector necesita un diagnóstico **publicado**.
 5. Abre la **Vista previa** (A2.4):
    - Muestra lo que falta para publicar.
    - Puedes responder de prueba.
-   - **Resultado de ejemplo** (A2.6) muestra cómo quedaría el resultado en el mejor, el medio y el peor caso, con su PDF.
+   - **Resultado de ejemplo** (A2.6) muestra cómo quedaría el resultado en el mejor, el medio y el peor caso, con sus dos PDF: el completo y el resumen de la empresa.
 6. Pulsa **Publicar v1** (A2.1d) y escribe la nota de cambios.
 
 > Una versión publicada no cambia. Si editas después, preparas la v2. Las mediciones ya asignadas siguen con su versión.
@@ -99,7 +99,10 @@ En los tres casos la solicitud queda atendida.
   - el puntaje y el nivel;
   - el radar;
   - por cada categoría, el método de análisis que usó la IA, la observación y la recomendación.
-- **Ver respuestas** (A3.5) y **Ver informe PDF**.
+- **Ver respuestas** (A3.5).
+- Dos PDF (E10):
+  - **Informe completo PDF**: el «Informe de Diagnóstico y Estrategia de Marketing Digital», con portada, ficha técnica, resumen ejecutivo, metodología, resultados, una página por categoría, DOFA, conclusiones, fichas de acción, cronograma, KPI y glosario. En este informe los niveles tienen nombres más formales: «Se puede mejorar» es «Requiere mejora», «Vas en buen camino» es «Desempeño satisfactorio» y «Sigue así» es «Desempeño óptimo».
+  - **Resumen para la empresa**: el PDF corto que recibe la empresa. Sirve para entregárselo o revisarlo con ella.
 - **Ver historial completo** (A3.4).
 
 ## A.7 Configurar la IA
@@ -185,16 +188,13 @@ En el resultado (E6) ves:
 Además:
 
 - **Ver mis respuestas** (E9): lo que respondiste, con una observación por pregunta.
-- **Ver informe PDF** (E10): el «Informe de Diagnóstico y Estrategia de Marketing Digital», para guardar, imprimir o compartir. Trae:
-  - la portada y la ficha técnica;
-  - el resumen ejecutivo;
-  - la metodología: cómo se calcula la calificación, los niveles y los métodos;
-  - los resultados y el orden de prioridad;
-  - una página por categoría con su diagnóstico, impacto, hallazgos, recomendaciones y las respuestas como evidencia;
-  - el DOFA y las conclusiones;
-  - las fichas de acción, el cronograma por semanas y los indicadores (KPI);
-  - los próximos pasos y un glosario.
-- En el PDF los niveles tienen nombres más formales: «Se puede mejorar» es «Requiere mejora», «Vas en buen camino» es «Desempeño satisfactorio» y «Sigue así» es «Desempeño óptimo».
+- **Ver informe PDF** (E10): el «Resumen de tu diagnóstico de marketing digital», para guardar, imprimir o compartir. Trae:
+  - tu calificación, tu nivel y cómo leer los niveles;
+  - tus categorías en barras;
+  - **Por dónde empezar**: las acciones de tus 3 categorías más débiles;
+  - por cada categoría, de la más urgente a la más fuerte: qué encontró el análisis, por qué importa, lo que haces bien, lo que debes mejorar y qué hacer, con pasos y plazo;
+  - los próximos pasos.
+- El equipo de NuevasTIC tiene además un informe completo, con la metodología, el DOFA, el plan, el cronograma y los indicadores.
 
 ## B.5 Tu historial
 

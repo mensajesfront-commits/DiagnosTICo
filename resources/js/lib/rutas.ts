@@ -168,6 +168,11 @@ export const rutas = {
         ver: (id: number) => `/resultados/${id}`,
         respuestas: (id: number, categoria?: string) =>
             `/resultados/${id}/respuestas${categoria ? `?categoria=${categoria}` : ''}`,
-        pdf: (id: number) => `/resultados/${id}/pdf`,
+        /**
+         * E10 · La empresa recibe siempre el resumen. El Administrador y el
+         * Consultor, el informe completo, o el resumen con `'resumen'`.
+         */
+        pdf: (id: number, tipo?: 'resumen') =>
+            `/resultados/${id}/pdf${tipo ? `?tipo=${tipo}` : ''}`,
     },
 };

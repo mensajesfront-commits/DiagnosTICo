@@ -208,7 +208,7 @@ const enviada = computed(() =>
                     archivo
                     :href="rutas.resultados.pdf(medicion.id)"
                 >
-                    Ver informe PDF
+                    {{ interno ? 'Informe completo PDF' : 'Ver informe PDF' }}
                 </Boton>
             </div>
         </header>

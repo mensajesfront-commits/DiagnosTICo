@@ -18,6 +18,10 @@
  * Todo llega calculado y no cambia (RN-023). Sin FODA ni comparación con
  * promedios (RN-028).
  *
+ * E10 · PDF (decisión del 4 de noviembre): la empresa descarga el resumen
+ * corto. En A3.3 el Administrador y el Consultor tienen dos botones: el
+ * informe completo y el resumen que se le entrega a la empresa.
+ *
  * A2.6 · Resultado de ejemplo: arriba una franja de «Datos de muestra» (borde
  * punteado ámbar) que explica el caso elegido y deja cambiar entre «Mejor
  * caso», «Caso medio» y «Peor caso» con tarjetas con ícono.
@@ -416,6 +420,15 @@ const porcentaje = (n: number) =>
                     <FileText class="size-4" aria-hidden="true" />
                     Ver formato del PDF
                 </a>
+                <a
+                    :href="ejemplo.pdf_resumen"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex h-10 items-center gap-1.5 rounded-lg border border-linea bg-white px-4 text-sm font-medium text-tinta hover:bg-lienzo"
+                >
+                    <FileText class="size-4" aria-hidden="true" />
+                    Ver resumen de la empresa
+                </a>
             </div>
             <div v-else class="flex flex-wrap items-center gap-2">
                 <Boton
@@ -424,13 +437,22 @@ const porcentaje = (n: number) =>
                 >
                     {{ interno ? 'Ver respuestas' : 'Ver mis respuestas' }}
                 </Boton>
-                <Boton
-                    v-if="puede('resultados.pdf')"
-                    archivo
-                    :href="rutas.resultados.pdf(medicion.id)"
-                >
-                    Ver informe PDF
-                </Boton>
+                <template v-if="puede('resultados.pdf')">
+                    <Boton
+                        v-if="interno"
+                        variante="secundario"
+                        archivo
+                        :href="rutas.resultados.pdf(medicion.id, 'resumen')"
+                        title="El PDF corto que recibe la empresa"
+                    >
+                        Resumen para la empresa
+                    </Boton>
+                    <Boton archivo :href="rutas.resultados.pdf(medicion.id)">
+                        {{
+                            interno ? 'Informe completo PDF' : 'Ver informe PDF'
+                        }}
+                    </Boton>
+                </template>
             </div>
         </header>
 

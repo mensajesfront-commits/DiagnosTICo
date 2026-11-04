@@ -7825,6 +7825,8 @@ Permite recordar en qué se basó el resultado al leer las propias respuestas.
 
 El PDF se genera al terminar el análisis y se guarda; descargarlo no vuelve a llamar a la IA.
 
+**Cambio del 4 de noviembre de 2026:** un empresario no va a leer un informe de 36 páginas. La empresa recibe un **resumen corto** con lo que la IA escribió de cada categoría, en orden y con buen formato. El **informe completo** queda para el Administrador y el Consultor, que en A3.3 pueden descargar los dos (el resumen, para entregárselo a la empresa).
+
 ### Valor de negocio
 
 Permite compartir el resultado con el equipo mediante un informe descargable.
@@ -7842,15 +7844,27 @@ Permite compartir el resultado con el equipo mediante un informe descargable.
 
 **Cuando** descargo el PDF,
 
-**Entonces** tiene portada, ficha técnica y alcance, resumen ejecutivo, metodología y criterios, resultados generales, priorización, una página por categoría, DOFA consolidado, conclusiones, fichas de acción, cronograma, KPI y anexos, con encabezado y número de página en cada hoja.
+**Entonces** recibo el resumen: mi calificación, mi nivel y cómo leerlo; mis categorías en barras; «Por dónde empezar» (las acciones de mis 3 categorías más débiles); por cada categoría, de la más urgente a la más fuerte, qué encontró el análisis, por qué importa, lo que hago bien, lo que debo mejorar y qué hacer, con pasos y plazo; y los próximos pasos. Tiene encabezado y número de página en cada hoja.
 
-#### CA-002 — Radar y fecha
+**Y** aunque pida el informe completo en la dirección, recibo el resumen.
+
+#### CA-002 — Gráfica y fecha
 
 **Dado** que descargo el PDF,
 
 **Cuando** lo abro,
 
-**Entonces** incluye el radar y la fecha de la medición.
+**Entonces** incluye mis categorías en barras y la fecha de la medición. El radar va en el informe completo.
+
+#### CA-005 — Informe completo para el Administrador y el Consultor
+
+**Dado** que soy Administrador o Consultor y veo el resultado de una empresa (A3.3),
+
+**Cuando** pulso «Informe completo PDF»,
+
+**Entonces** descargo el informe con portada, ficha técnica y alcance, resumen ejecutivo, metodología y criterios, resultados generales, priorización, una página por categoría, DOFA consolidado, conclusiones, fichas de acción, cronograma, KPI y anexos.
+
+**Y** con «Resumen para la empresa» descargo el mismo resumen que recibe la empresa.
 
 #### CA-003 — Archivo guardado
 
@@ -7870,7 +7884,7 @@ Permite compartir el resultado con el equipo mediante un informe descargable.
 
 ### Reglas de negocio
 
-- RN-024 — Informe de Diagnóstico y Estrategia de Marketing Digital en PDF, según la propuesta de reestructuración del 2 de noviembre de 2026 (portada, ficha técnica, resumen ejecutivo, metodología, resultados, priorización, diagnóstico por categoría, DOFA, conclusiones, plan estratégico, cronograma, KPI y anexos), generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA.
+- RN-024 — Dos PDF por resultado, generados una vez al terminar el análisis y guardados; no vuelven a llamar a la IA. (1) El Informe de Diagnóstico y Estrategia de Marketing Digital completo, según la propuesta de reestructuración del 2 de noviembre de 2026 (portada, ficha técnica, resumen ejecutivo, metodología, resultados, priorización, diagnóstico por categoría, DOFA, conclusiones, plan estratégico, cronograma, KPI y anexos), para el Administrador y el Consultor. (2) El resumen para la empresa (decisión del 4 de noviembre de 2026): lo que la IA escribió de cada categoría, copiado en orden y sin detalle técnico. La empresa y su colaborador solo reciben el resumen.
 - RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
 
 ### Validaciones
@@ -9099,7 +9113,7 @@ Entrega a la empresa un resultado final que no cambia y le avisa cuando está li
 ### Reglas de negocio
 
 - RN-023 — El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable.
-- RN-024 — Informe de Diagnóstico y Estrategia de Marketing Digital en PDF, según la propuesta de reestructuración del 2 de noviembre de 2026 (portada, ficha técnica, resumen ejecutivo, metodología, resultados, priorización, diagnóstico por categoría, DOFA, conclusiones, plan estratégico, cronograma, KPI y anexos), generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA.
+- RN-024 — Dos PDF por resultado, generados una vez al terminar el análisis y guardados; no vuelven a llamar a la IA. (1) El Informe de Diagnóstico y Estrategia de Marketing Digital completo, según la propuesta de reestructuración del 2 de noviembre de 2026 (portada, ficha técnica, resumen ejecutivo, metodología, resultados, priorización, diagnóstico por categoría, DOFA, conclusiones, plan estratégico, cronograma, KPI y anexos), para el Administrador y el Consultor. (2) El resumen para la empresa (decisión del 4 de noviembre de 2026): lo que la IA escribió de cada categoría, copiado en orden y sin detalle técnico. La empresa y su colaborador solo reciben el resumen.
 - RN-015 — Estados de la medición: No iniciada, En curso, Enviada (mientras la IA analiza), Terminada (resultado publicado) y Vencida.
 - RN-018 — Puntaje: opción única = puntaje de la opción; selección múltiple = suma con tope 100; abiertas = 0–100 calificadas por la IA; categoría = promedio de sus preguntas; total = promedio ponderado por la importancia.
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
@@ -9879,7 +9893,7 @@ Cada aviso abre el resultado ("bajó" y "nuevo") o la ficha (lo pendiente). Se v
 | RN-021 | El análisis de IA es una sola etapa por categoría; si falla, se reintenta solo esa categoría hasta 3 veces y luego se avisa por correo al Administrador. | HU-041, HU-062, HU-063, HU-069 |
 | RN-022 | El prompt se arma con capas: instrucciones generales, ajuste del sector, ajuste de la empresa, preguntas con respuestas y formato fijo; se usa siempre lo más específico y los ajustes aplican a mediciones posteriores. | HU-041, HU-042, HU-043, HU-044, HU-045, HU-069, HU-080, HU-081 |
 | RN-023 | El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable. | HU-038, HU-063, HU-064, HU-084 |
-| RN-024 | Informe de Diagnóstico y Estrategia de Marketing Digital en PDF, según la propuesta de reestructuración del 2 de noviembre de 2026, generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA. | HU-066, HU-084 |
+| RN-024 | Dos PDF por resultado, generados una vez al terminar el análisis y guardados, sin volver a llamar a la IA: el informe completo (propuesta del 2 de noviembre de 2026) para el Administrador y el Consultor, y el resumen corto para la empresa (decisión del 4 de noviembre de 2026). | HU-066, HU-084 |
 | RN-025 | Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa. | HU-035, HU-048, HU-056, HU-076, HU-077, HU-078, HU-079 |
 | RN-026 | “Ver como” es solo de lectura y queda registrado quién lo usó y cuándo. | HU-053, HU-054 |
 | RN-027 | Los roles del sistema (Administrador, Empresa, Colaborador y, desde el 3 de noviembre, Consultor) son fijos; cada cuenta tiene un solo rol; solo se elimina un rol sin cuentas. | HU-048, HU-049, HU-050, HU-051, HU-052 |
