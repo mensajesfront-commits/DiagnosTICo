@@ -59,6 +59,7 @@ const vacia = (): OpcionForm => ({
     puntaje: 0,
     ten_en_cuenta: '',
     exclusiva: false,
+    con_texto: false,
 });
 
 /** "Ninguna", "Ninguno", "Nada": se marcan solas como excluyentes. */
@@ -72,6 +73,16 @@ const exclusiva = computed({
         form.opciones.forEach((o, j) => (o.exclusiva = j === i)),
 });
 
+/** "Otro", "Otra", "Otros": piden escribir cuál. */
+const pareceOtro = (texto: string) => /^otr[oa]s?\b/i.test(texto.trim());
+
+/** Índice de la opción "Otro" que pide escribir cuál, o -1. */
+const conTexto = computed({
+    get: () => form.opciones.findIndex((o) => o.con_texto),
+    set: (i: number) =>
+        form.opciones.forEach((o, j) => (o.con_texto = j === i)),
+});
+
 function revisarNinguna(i: number): void {
     if (
         form.tipo === 'seleccion_multiple' &&
@@ -79,6 +90,10 @@ function revisarNinguna(i: number): void {
         pareceNinguna(form.opciones[i].texto)
     ) {
         exclusiva.value = i;
+    }
+
+    if (conTexto.value === -1 && pareceOtro(form.opciones[i].texto)) {
+        conTexto.value = i;
     }
 }
 
@@ -381,6 +396,27 @@ const botonIcono =
                         <span class="w-full text-tinta-suave">
                             Como «Ninguna» o «Nada»: si la empresa la marca, se
                             desmarcan las otras.
+                        </span>
+                    </label>
+
+                    <label class="flex flex-wrap items-center gap-2 text-xs">
+                        Opción que pide escribir cuál
+                        <select
+                            v-model.number="conTexto"
+                            class="h-8 rounded-md border border-linea-fuerte bg-white px-2 text-xs"
+                        >
+                            <option :value="-1">Ninguna</option>
+                            <option
+                                v-for="(o, i) in form.opciones"
+                                :key="i"
+                                :value="i"
+                            >
+                                {{ LETRAS[i] }} · {{ o.texto || 'sin texto' }}
+                            </option>
+                        </select>
+                        <span class="w-full text-tinta-suave">
+                            Como «Otro»: si la empresa la elige, escribe cuál
+                            («¿Cuál otro canal?») y la IA lo lee.
                         </span>
                     </label>
 

@@ -9,6 +9,7 @@ use App\Models\Sector;
 use App\Models\SolicitudMedicion;
 use App\Models\User;
 use App\Notifications\NuevaMedicionSolicitada;
+use App\Services\Resultados\CalculadoraPuntajes;
 use App\Support\Niveles;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Support\Facades\Notification;
@@ -118,7 +119,11 @@ it('no envía con preguntas obligatorias sin responder; completo, queda enviada 
 
 it('un colaborador de la empresa responde; otra empresa no ve la medición', function () {
     $colaborador = User::factory()->create(['empresa_id' => $this->empresa->id])->assignRole('Colaborador');
-    $this->actingAs($colaborador)->get(route('responder.mostrar', $this->medicion))->assertOk();
+    // Sin la página "Responder el diagnóstico" (E12.1) no entra.
+    $this->actingAs($colaborador)->get(route('responder.mostrar', $this->medicion))->assertForbidden();
+
+    $colaborador->givePermissionTo('diagnostico.responder');
+    $this->actingAs($colaborador->fresh())->get(route('responder.mostrar', $this->medicion))->assertOk();
 
     $otra = User::factory()->create(['empresa_id' => Empresa::factory()->create()->id])->assignRole('Empresa');
     $this->actingAs($otra)->get(route('responder.mostrar', $this->medicion))->assertNotFound();
@@ -182,4 +187,27 @@ it('no deja marcar "Ninguna" junto con otras opciones', function () {
     // La empresa recibe cuál es la excluyente.
     $this->actingAs($this->laura)->get(route('responder.mostrar', $this->medicion))
         ->assertInertia(fn (Assert $p) => $p->where('categorias.0.preguntas.0.opciones.1.exclusiva', true));
+});
+
+it('con la opción "Otro" guarda lo que escribió y sin ella lo descarta', function () {
+    $contenido = $this->version->contenido;
+    $contenido['categorias'][0]['preguntas'][0] = [
+        'ref' => 'p900', 'texto' => '¿Qué canal usas más?', 'tipo' => 'opcion_unica', 'indicacion' => 'Elige uno.', 'obligatoria' => true, 'orden' => 0,
+        'opciones' => [
+            ['ref' => 'o901', 'texto' => 'Instagram', 'puntaje' => 100, 'exclusiva' => false, 'con_texto' => false],
+            ['ref' => 'o902', 'texto' => 'Otro', 'puntaje' => 50, 'exclusiva' => false, 'con_texto' => true],
+        ],
+    ];
+    $this->version->forceFill(['contenido' => $contenido])->save();
+    $ruta = route('responder.guardar', $this->medicion);
+
+    $this->actingAs($this->laura)->putJson($ruta, ['pregunta_ref' => 'p900', 'opciones' => ['o902'], 'texto' => ' TikTok '])->assertOk();
+    expect(Respuesta::where('pregunta_ref', 'p900')->value('texto'))->toBe('TikTok')
+        ->and(CalculadoraPuntajes::textoRespuesta($contenido['categorias'][0]['preguntas'][0], ['o902'], 'TikTok'))->toBe('Otro: TikTok');
+
+    $this->actingAs($this->laura)->putJson($ruta, ['pregunta_ref' => 'p900', 'opciones' => ['o901'], 'texto' => 'TikTok'])->assertOk();
+    expect(Respuesta::where('pregunta_ref', 'p900')->value('texto'))->toBeNull();
+
+    $this->actingAs($this->laura)->get(route('responder.mostrar', $this->medicion))
+        ->assertInertia(fn (Assert $p) => $p->where('categorias.0.preguntas.0.opciones.1.con_texto', true));
 });

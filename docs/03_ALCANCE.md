@@ -37,7 +37,7 @@ En total son 13 épicas y 84 historias, con 330 puntos estimados.
 | Análisis FODA y comparación con promedios | Decisión confirmada (RN-028). La propuesta técnica todavía los menciona (ver INC-001 en `05_REQUISITOS_FUNCIONALES.md`). |
 | Roles Consultor y Usuario | Quedan para un posible futuro. |
 | Simulador de inversión | No existe en el diseño. |
-| Bot de WhatsApp (HU-071 a HU-075) | **Aplazado** por decisión de Cristian. Ver la sección siguiente. |
+| Bot de WhatsApp (HU-071 a HU-075) | **Fuera de este repositorio:** lo hace otra persona del equipo 23 de octubre de 2026. Ver la sección siguiente. |
 
 ## Bot de WhatsApp: REQUIERE VALIDACIÓN
 

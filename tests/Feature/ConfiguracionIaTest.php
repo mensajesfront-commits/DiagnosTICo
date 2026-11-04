@@ -12,6 +12,7 @@ use App\Services\Ia\Analizador;
 use App\Services\Ia\AnalizadorDePrueba;
 use App\Services\Ia\ArmadorPrompt;
 use Database\Seeders\RolesYPermisosSeeder;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /*
@@ -158,4 +159,18 @@ it('reemplaza los datos automáticos al armar el prompt del análisis', function
         ->toContain('"'.$this->categoria['nombre'].'"')
         ->toContain(ArmadorPrompt::RESPUESTAS_EN_TEXTO)
         ->not->toContain('{');
+});
+
+it('permite 100 pruebas al día entre todos y dice cuántas quedan (PA-003)', function () {
+    $datos = ['medicion_id' => $this->medicion->id, 'categoria_ref' => $this->categoria['ref']];
+    $llave = 'ia_pruebas:'.now(config('diagnostico.zona_horaria'))->toDateString();
+
+    $this->actingAs($this->admin)->postJson(route('ia.probar'), $datos)
+        ->assertOk()->assertJsonPath('restantes', 99);
+
+    Cache::put($llave, 100, now()->addDay());
+
+    $this->actingAs($this->admin)->postJson(route('ia.probar'), $datos)
+        ->assertStatus(429)
+        ->assertJsonPath('message', 'Ya se hicieron las 100 pruebas de hoy. Mañana se puede volver a probar.');
 });

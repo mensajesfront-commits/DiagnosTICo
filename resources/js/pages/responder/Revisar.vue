@@ -9,6 +9,9 @@
  *   "Todo listo".
  * - Enviar pide confirmar: después no se cambian las respuestas (RN-017).
  *
+ * Mismo diseño que E2 para leer fácil (también con baja visión): hasta
+ * 64rem de ancho, letra de 16 a 18 px y filas grandes.
+ *
  * Envía: POST /mi-diagnostico/{id}/enviar y pasa a E4.
  */
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -78,10 +81,10 @@ const hora = computed(() =>
         :guardado="hora"
     />
 
-    <main class="mx-auto flex max-w-3xl flex-col gap-4 px-6 pt-8 pb-28">
+    <main class="mx-auto flex max-w-5xl flex-col gap-5 px-4 pt-8 pb-32 sm:px-8">
         <div>
-            <h1 class="text-2xl font-semibold">Revisa antes de enviar</h1>
-            <p class="mt-1 text-sm text-tinta-suave">
+            <h1 class="text-3xl font-semibold">Revisa antes de enviar</h1>
+            <p class="mt-2 text-base text-tinta-suave">
                 Puedes volver a cualquier categoría para cambiar tus respuestas.
                 Una vez enviado, el diagnóstico no se puede modificar.
             </p>
@@ -89,23 +92,25 @@ const hora = computed(() =>
 
         <section
             v-if="avance.completo"
-            class="rounded-xl border border-linea bg-white"
+            class="rounded-2xl border border-linea bg-white"
         >
-            <div class="flex items-center justify-between gap-3 px-5 py-4">
-                <span class="flex items-center gap-3">
+            <div
+                class="flex flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8"
+            >
+                <span class="flex items-center gap-4">
                     <span
-                        class="flex size-8 items-center justify-center rounded-full bg-exito-suave text-exito"
+                        class="flex size-10 shrink-0 items-center justify-center rounded-full bg-exito-suave text-lg text-exito"
                         aria-hidden="true"
                         >✓</span
                     >
                     <span>
-                        <span class="block font-semibold">
+                        <span class="block text-lg font-semibold">
                             {{ avance.categorias.length }}/{{
                                 avance.categorias.length
                             }}
                             categorías completas
                         </span>
-                        <span class="text-xs text-tinta-suave">
+                        <span class="text-base text-tinta-suave">
                             {{ avance.respondidas }} de {{ avance.total }}
                             preguntas respondidas
                         </span>
@@ -113,7 +118,7 @@ const hora = computed(() =>
                 </span>
                 <button
                     type="button"
-                    class="text-sm text-marca underline underline-offset-2"
+                    class="text-base text-marca underline underline-offset-2"
                     :aria-expanded="verDetalle"
                     @click="verDetalle = !verDetalle"
                 >
@@ -124,14 +129,14 @@ const hora = computed(() =>
 
         <ul
             v-if="!avance.completo || verDetalle"
-            class="divide-y divide-linea rounded-xl border border-linea bg-white"
+            class="divide-y divide-linea overflow-hidden rounded-2xl border border-linea bg-white"
         >
             <li
                 v-for="(c, i) in avance.categorias"
                 :key="c.ref"
                 :class="
                     cn(
-                        'flex items-center gap-3 px-5 py-3 text-sm',
+                        'flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 text-base sm:px-8',
                         c.faltan_obligatorias > 0 && 'bg-aviso-suave/50',
                     )
                 "
@@ -139,7 +144,7 @@ const hora = computed(() =>
                 <span
                     :class="
                         cn(
-                            'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                            'flex size-9 shrink-0 items-center justify-center rounded-full text-base font-bold',
                             c.faltan_obligatorias > 0
                                 ? 'bg-aviso text-white'
                                 : 'bg-exito-suave text-exito',
@@ -149,11 +154,13 @@ const hora = computed(() =>
                 >
                     {{ c.faltan_obligatorias > 0 ? '!' : '✓' }}
                 </span>
-                <span class="flex-1 font-medium">{{ c.nombre }}</span>
+                <span class="min-w-40 flex-1 text-lg font-semibold">{{
+                    c.nombre
+                }}</span>
                 <span
                     :class="
                         cn(
-                            'text-xs',
+                            'text-base',
                             c.faltan_obligatorias > 0
                                 ? 'font-medium text-aviso'
                                 : 'text-tinta-suave',
@@ -174,7 +181,14 @@ const hora = computed(() =>
                 </span>
                 <Link
                     :href="rutas.responder.mostrar(medicion.id, i)"
-                    class="w-20 text-right text-xs text-marca underline"
+                    :class="
+                        cn(
+                            'inline-flex h-11 min-w-28 items-center justify-center rounded-lg border px-4 text-base font-medium',
+                            c.faltan_obligatorias > 0
+                                ? 'border-aviso bg-white text-aviso hover:bg-aviso-suave'
+                                : 'border-linea-fuerte text-marca hover:bg-lienzo',
+                        )
+                    "
                 >
                     {{ c.faltan_obligatorias > 0 ? 'Completar' : 'Revisar' }}
                 </Link>
@@ -183,7 +197,7 @@ const hora = computed(() =>
 
         <p
             v-if="primera"
-            class="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-aviso-suave px-4 py-3 text-sm text-aviso"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-aviso-suave px-5 py-4 text-base text-aviso"
             role="alert"
         >
             <span>
@@ -207,20 +221,20 @@ const hora = computed(() =>
         </p>
         <p
             v-else
-            class="rounded-lg bg-exito-suave px-4 py-3 text-sm text-exito"
+            class="rounded-xl bg-exito-suave px-5 py-4 text-base text-exito"
             role="status"
         >
             ✓ Todo listo: respondiste las
             {{ avance.categorias.length }} categorías. Puedes enviar el
             diagnóstico.
         </p>
-        <p v-if="errorEnvio" class="text-sm text-aviso" role="alert">
+        <p v-if="errorEnvio" class="text-base text-aviso" role="alert">
             {{ errorEnvio }}
         </p>
     </main>
 
     <footer
-        class="fixed inset-x-0 bottom-0 flex items-center justify-between gap-4 border-t border-linea bg-white px-6 py-3"
+        class="fixed inset-x-0 bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-linea bg-white px-4 py-3 sm:px-6"
     >
         <Boton
             variante="secundario"
@@ -236,7 +250,7 @@ const hora = computed(() =>
         <span class="flex items-center gap-4">
             <span
                 v-if="!avance.completo"
-                class="hidden text-xs text-tinta-suave sm:inline"
+                class="hidden text-sm text-tinta-suave md:inline"
             >
                 Responde las preguntas obligatorias pendientes para enviar
             </span>
@@ -252,7 +266,7 @@ const hora = computed(() =>
         titulo="¿Enviar tu diagnóstico?"
         :descripcion="`${medicion.sector} · Medición ${medicion.numero} · ${avance.respondidas} preguntas respondidas`"
     >
-        <p class="text-sm">
+        <p class="text-base">
             Después de enviarlo
             <strong>no podrás cambiar tus respuestas</strong>. Empezaremos a
             analizarlas: suele tardar menos de un minuto; si tarda más, te

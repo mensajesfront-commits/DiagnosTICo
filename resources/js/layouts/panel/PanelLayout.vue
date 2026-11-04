@@ -10,6 +10,7 @@
 import { Link, router } from '@inertiajs/vue3';
 import { Menu, X } from '@lucide/vue';
 import { ref } from 'vue';
+import FranjaVerComo from '@/components/base/FranjaVerComo.vue';
 import MenuLateral from '@/components/base/MenuLateral.vue';
 import Logo from '@/components/marca/Logo.vue';
 import { Toaster } from '@/components/ui/sonner';
@@ -27,9 +28,10 @@ router.on('navigate', () => {
 </script>
 
 <template>
-    <div class="flex min-h-screen bg-lienzo text-tinta">
+    <FranjaVerComo />
+    <div class="panel-raiz flex min-h-screen bg-lienzo text-tinta">
         <div class="hidden shrink-0 bg-menu lg:block">
-            <div class="sticky top-0 h-screen">
+            <div class="menu-fijo sticky top-0 h-screen">
                 <MenuLateral />
             </div>
         </div>

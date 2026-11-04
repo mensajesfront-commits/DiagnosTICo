@@ -136,6 +136,13 @@ function teclas(e: KeyboardEvent): void {
                             >
                                 · excluye las demás
                             </span>
+                            <span
+                                v-if="o.con_texto"
+                                class="text-xs text-tinta-suave"
+                                title="Al elegirla, la empresa escribe cuál"
+                            >
+                                · pide escribir cuál
+                            </span>
                         </dd>
                         <dd class="font-mono text-xs">{{ o.puntaje }}</dd>
                     </div>

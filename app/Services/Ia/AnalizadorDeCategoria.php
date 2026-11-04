@@ -2,6 +2,7 @@
 
 namespace App\Services\Ia;
 
+use App\Support\MetodosAnalisis;
 use OpenAI\Laravel\Facades\OpenAI;
 
 /**
@@ -29,7 +30,7 @@ class AnalizadorDeCategoria implements Analizador
         return [
             'type' => 'object',
             'additionalProperties' => false,
-            'required' => ['preguntas', 'observacion_categoria', 'recomendacion'],
+            'required' => ['preguntas', 'metodo', 'metodo_motivo', 'observacion_categoria', 'recomendacion'],
             'properties' => [
                 'preguntas' => [
                     'type' => 'array',
@@ -41,12 +42,18 @@ class AnalizadorDeCategoria implements Analizador
                             'id' => ['type' => 'string'],
                             'puntaje' => [
                                 'type' => ['integer', 'null'],
-                                'description' => 'Solo para preguntas abiertas: 0 a 100. Null en las cerradas.',
+                                'description' => 'Obligatorio en las preguntas de tipo "abierta": un entero de 0 a 100. Null en las demás.',
                             ],
                             'observacion' => ['type' => 'string'],
                         ],
                     ],
                 ],
+                'metodo' => [
+                    'type' => 'string',
+                    'enum' => MetodosAnalisis::claves(),
+                    'description' => 'Método de análisis elegido según las respuestas de la empresa.',
+                ],
+                'metodo_motivo' => ['type' => 'string', 'description' => 'Una frase: por qué ese método encaja con lo que respondió la empresa.'],
                 'observacion_categoria' => ['type' => 'string'],
                 'recomendacion' => [
                     'type' => 'object',
@@ -94,7 +101,7 @@ class AnalizadorDeCategoria implements Analizador
      * que el trabajo en cola reintente esa categoría (RN-021).
      *
      * @param  array{preguntas: list<array<string, mixed>>}  $categoria
-     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, observacion_categoria: string, recomendacion: array{titulo: string, detalle: string}}
+     * @return array{preguntas: list<array{id: string, puntaje: int|null, observacion: string}>, metodo: string, metodo_motivo: string, observacion_categoria: string, recomendacion: array{titulo: string, detalle: string}}
      */
     public static function validar(string $contenido, array $categoria): array
     {
@@ -127,9 +134,16 @@ class AnalizadorDeCategoria implements Analizador
             $puntaje = null;
 
             if ($pregunta['tipo'] === 'abierta') {
-                $puntaje = $analisis['puntaje'] ?? null;
+                $valor = $analisis['puntaje'] ?? null;
 
-                if (! is_int($puntaje) || $puntaje < 0 || $puntaje > 100) {
+                // Algunos modelos devuelven 45.0 o "45": se aceptan si son un número.
+                if (! is_numeric($valor)) {
+                    throw new RespuestaIaInvalida("La IA no calificó la pregunta abierta {$id} (devolvió ".json_encode($valor).').');
+                }
+
+                $puntaje = (int) round((float) $valor);
+
+                if ($puntaje < 0 || $puntaje > 100) {
                     throw new RespuestaIaInvalida("Puntaje fuera de rango en la pregunta {$id}.");
                 }
             }
@@ -137,8 +151,16 @@ class AnalizadorDeCategoria implements Analizador
             $preguntas[] = ['id' => $id, 'puntaje' => $puntaje, 'observacion' => trim((string) ($analisis['observacion'] ?? ''))];
         }
 
+        $metodo = strtoupper(trim((string) ($datos['metodo'] ?? '')));
+
+        if (! in_array($metodo, MetodosAnalisis::claves(), true)) {
+            throw new RespuestaIaInvalida('La IA no dijo qué método usó (PESTEL, PORTER, VRIO, DOFA o CAME); devolvió '.json_encode($datos['metodo'] ?? null).'.');
+        }
+
         return [
             'preguntas' => $preguntas,
+            'metodo' => $metodo,
+            'metodo_motivo' => trim((string) ($datos['metodo_motivo'] ?? '')),
             'observacion_categoria' => trim((string) $datos['observacion_categoria']),
             'recomendacion' => [
                 'titulo' => trim((string) $datos['recomendacion']['titulo']),

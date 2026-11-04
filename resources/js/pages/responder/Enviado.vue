@@ -10,8 +10,11 @@
  *
  * Si alguna categoría falló tras los 3 intentos (RN-021), avisa y deja
  * reintentar solo esas (CA-004); el Administrador ya recibió un correo.
+ *
+ * Mismo estilo que E2 y E3 para leer fácil: tarjeta más ancha (48rem), letra
+ * de 16 a 18 px, pasos con círculos grandes y barra de avance gruesa.
  */
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import Aviso from '@/components/base/Aviso.vue';
 import Boton from '@/components/base/Boton.vue';
@@ -102,22 +105,22 @@ function reintentar(): void {
     <BarraResponder :con-salir="false" />
 
     <main
-        class="flex min-h-[calc(100dvh-57px)] items-center justify-center px-6"
+        class="flex min-h-[calc(100dvh-57px)] items-center justify-center px-4 py-8 sm:px-8"
     >
         <section
-            class="w-full max-w-lg rounded-xl border border-linea bg-white p-8"
+            class="w-full max-w-3xl rounded-2xl border border-linea bg-white px-6 py-8 sm:px-10 sm:py-10"
         >
-            <p class="font-mono text-xs text-tinta-suave">
+            <p class="font-mono text-sm text-tinta-suave">
                 DIAGNÓSTICO ENVIADO · MEDICIÓN {{ medicion.numero }}
             </p>
-            <h1 class="mt-1 text-2xl font-semibold">
+            <h1 class="mt-2 text-3xl font-semibold">
                 {{
                     listo
                         ? 'Tu resultado está listo'
                         : 'Estamos analizando tus respuestas'
                 }}
             </h1>
-            <p class="mt-1 text-sm text-tinta-suave">
+            <p class="mt-2 text-base text-tinta-suave">
                 {{
                     listo
                         ? 'Ya puedes ver tu puntaje, tu nivel y tus recomendaciones.'
@@ -126,7 +129,7 @@ function reintentar(): void {
             </p>
             <div
                 v-if="!listo"
-                class="mt-5 h-1.5 overflow-hidden rounded-full bg-lienzo-oscuro"
+                class="mt-6 h-3 overflow-hidden rounded-full bg-lienzo-oscuro"
                 role="progressbar"
                 :aria-valuenow="porcentaje"
                 aria-valuemin="0"
@@ -136,23 +139,23 @@ function reintentar(): void {
                 <div
                     :class="
                         cn(
-                            'h-1.5 rounded-full bg-marca transition-all',
+                            'h-3 rounded-full bg-marca transition-all',
                             !fallo && 'animate-pulse',
                         )
                     "
                     :style="{ width: `${Math.max(8, porcentaje)}%` }"
                 />
             </div>
-            <ul class="mt-5 flex flex-col gap-4 text-sm">
+            <ul class="mt-6 flex flex-col gap-3 text-base">
                 <li
                     v-for="paso in pasos"
                     :key="paso.texto"
-                    class="flex items-center gap-3"
+                    class="flex items-center gap-4 rounded-xl border border-linea px-4 py-4 sm:px-5"
                 >
                     <span
                         :class="
                             cn(
-                                'flex size-6 shrink-0 items-center justify-center rounded-full text-xs',
+                                'flex size-10 shrink-0 items-center justify-center rounded-full text-lg font-semibold',
                                 paso.estado === 'listo' &&
                                     'bg-exito-suave text-exito',
                                 paso.estado === 'curso' &&
@@ -173,33 +176,39 @@ function reintentar(): void {
                                   : '•'
                         }}
                     </span>
-                    <span class="flex-1">{{ paso.texto }}</span>
-                    <span class="font-mono text-xs text-tinta-suave">
+                    <span class="flex-1 leading-snug font-medium">{{
+                        paso.texto
+                    }}</span>
+                    <span class="font-mono text-sm text-tinta-suave">
                         {{ paso.detalle }}
                     </span>
                 </li>
             </ul>
-            <Aviso v-if="fallo" tono="error" class="mt-5">
+            <Aviso v-if="fallo" tono="error" class="mt-6 text-base">
                 <p>
                     No pudimos terminar el análisis de algunas categorías:
                     {{ analisis.fallidas.join(', ') }}. Ya le avisamos al equipo
                     de NuevasTIC.
                 </p>
                 <Boton
-                    tamano="sm"
-                    class="mt-2"
+                    class="mt-3"
                     :cargando="reintentando"
                     @click="reintentar"
                 >
                     Reintentar esas categorías
                 </Boton>
             </Aviso>
-            <p class="mt-6 border-t border-linea pt-4 text-xs text-tinta-suave">
-                Puedes cerrar esta ventana: tus respuestas ya están guardadas.
-                <Link :href="inicioEmpresa()" class="text-marca underline">
+            <div
+                class="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-linea pt-6"
+            >
+                <p class="text-base text-tinta-suave">
+                    Puedes cerrar esta ventana: tus respuestas ya están
+                    guardadas.
+                </p>
+                <Boton variante="secundario" :href="inicioEmpresa()">
                     Ir a mi inicio
-                </Link>
-            </p>
+                </Boton>
+            </div>
         </section>
     </main>
 </template>

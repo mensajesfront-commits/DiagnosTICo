@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\SesionVerComo;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -44,6 +45,8 @@ class HandleInertiaRequests extends Middleware
                 'rol' => $request->user()?->getRoleNames()->first(),
                 'permisos' => $request->user()?->getAllPermissions()->pluck('name')->values() ?? [],
             ],
+            // A5.4 · "Ver como" activo: la franja de aviso (RN-026).
+            'verComo' => SesionVerComo::compartido($request),
         ];
     }
 }

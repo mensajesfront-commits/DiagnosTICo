@@ -36,6 +36,8 @@ class DiagnosticosController extends Controller
             'sector' => $sector ? DatosDiagnosticos::sector($sector) : null,
             'resumen' => DatosDiagnosticos::resumen($sector),
             'diagnosticos' => DatosDiagnosticos::diagnosticos($sector),
+            // Ventana "Archivados" (HU-022): restaurar o eliminar.
+            'archivados' => DatosDiagnosticos::archivados($sector),
             // Para elegir la división CIIU al crear o editar un sector (DEC-018).
             'divisionesCiiu' => CatalogoCiiu::divisiones(),
         ]);
@@ -137,6 +139,43 @@ class DiagnosticosController extends Controller
         $diagnostico->forceFill(['estado' => Diagnostico::ARCHIVADO, 'archivado_en' => now()])->save();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "«{$diagnostico->nombre}» archivado."]);
+
+        return back();
+    }
+
+    /** Saca un diagnóstico del archivo: vuelve a publicado y se puede asignar. */
+    public function restaurar(Diagnostico $diagnostico): RedirectResponse
+    {
+        abort_unless($diagnostico->estado === Diagnostico::ARCHIVADO, 422, 'El diagnóstico no está archivado.');
+
+        $diagnostico->forceFill(['estado' => Diagnostico::PUBLICADO, 'archivado_en' => null])->save();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => "«{$diagnostico->nombre}» volvió a publicados."]);
+
+        return back();
+    }
+
+    /**
+     * Elimina para siempre un diagnóstico archivado, con sus versiones. Solo
+     * si ninguna empresa lo respondió: los resultados guardan la versión con
+     * la que se hicieron y no se pueden perder (RN-010, RN-023).
+     */
+    public function eliminarArchivado(Diagnostico $diagnostico): RedirectResponse
+    {
+        abort_unless($diagnostico->estado === Diagnostico::ARCHIVADO, 422, 'Solo se eliminan diagnósticos archivados.');
+
+        $mediciones = $diagnostico->mediciones()->count();
+
+        if ($mediciones > 0) {
+            throw ValidationException::withMessages(['diagnostico' => "No se puede eliminar: tiene {$mediciones} ".($mediciones === 1 ? 'medición' : 'mediciones').' de empresas y sus resultados dependen de él. Puede quedarse archivado.']);
+        }
+
+        DB::transaction(function () use ($diagnostico): void {
+            $diagnostico->versiones()->delete();
+            $diagnostico->delete();
+        });
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => "«{$diagnostico->nombre}» eliminado para siempre."]);
 
         return back();
     }

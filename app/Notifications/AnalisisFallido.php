@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\AnalisisCategoria;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,7 +25,8 @@ class AnalisisFallido extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        // Se puede apagar en Mi perfil (A6).
+        return $notifiable instanceof User && ! $notifiable->quiereAviso('ia_falla') ? [] : ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage

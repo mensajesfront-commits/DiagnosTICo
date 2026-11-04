@@ -4,9 +4,11 @@ use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
+use App\Notifications\CodigoVerificacionCorreo;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -100,18 +102,28 @@ it('deja a la cuenta principal cambiar los datos de la empresa, salvo el sector'
         ->and($empresa->sector_id)->toBe($sector);
 });
 
-it('no deja al colaborador cambiar los datos de la empresa (RN-025)', function () {
+it('el colaborador ve su perfil pero no cambia nada: ni datos, ni foto, ni contraseña', function () {
+    Storage::fake();
     $colaborador = cuentaDeEmpresa('Colaborador');
 
-    $this->actingAs($colaborador)
-        ->patch(route('profile.update'), datosPerfil($colaborador, [
-            'name' => 'Andrés Pérez',
-            'empresa' => ['nombre' => 'Otra', 'ciudad' => 'Otra', 'pais' => 'Colombia'],
-        ]))
-        ->assertSessionHasNoErrors();
+    $this->actingAs($colaborador)->get(route('profile.edit'))->assertOk();
 
-    expect($colaborador->fresh()->name)->toBe('Andrés Pérez')
-        ->and($colaborador->empresa->fresh()->nombre)->toBe('Restaurante La Esquina');
+    $this->actingAs($colaborador)
+        ->patch(route('profile.update'), datosPerfil($colaborador, ['name' => 'Andrés Pérez']))
+        ->assertForbidden();
+    $this->actingAs($colaborador)
+        ->post(route('perfil.foto'), ['foto' => UploadedFile::fake()->create('yo.png', 20, 'image/png')])
+        ->assertForbidden();
+    $this->actingAs($colaborador)
+        ->put(route('user-password.update'), [
+            'current_password' => 'password',
+            'password' => 'NuevaClave1!',
+            'password_confirmation' => 'NuevaClave1!',
+        ])
+        ->assertForbidden();
+
+    expect($colaborador->fresh()->name)->not->toBe('Andrés Pérez')
+        ->and(Hash::check('password', (string) $colaborador->fresh()->password))->toBeTrue();
 });
 
 it('cambia la contraseña con la actual y guarda cuándo', function () {
@@ -133,7 +145,7 @@ it('cambia la contraseña con la actual y guarda cuándo', function () {
 });
 
 it('pide la contraseña actual correcta', function () {
-    $usuario = User::factory()->create();
+    $usuario = User::factory()->create()->assignRole('Administrador');
 
     $this->actingAs($usuario)
         ->from(route('profile.edit'))
@@ -255,4 +267,161 @@ it('conserva una zona de antes que ya no está en la lista', function () {
 
     $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['zona_horaria' => 'Europe/Madrid']))
         ->assertSessionHasNoErrors();
+});
+
+/** El código que llegó al correo nuevo. */
+function codigoCambio(string $correo): string
+{
+    $codigo = '';
+    Notification::assertSentOnDemand(CodigoVerificacionCorreo::class, function (CodigoVerificacionCorreo $n, array $canales, object $destino) use ($correo, &$codigo) {
+        if (($destino->routes['mail'] ?? null) === $correo) {
+            $codigo = $n->codigo;
+
+            return true;
+        }
+
+        return false;
+    });
+
+    return $codigo;
+}
+
+it('cambiar el correo manda un código al correo nuevo y no lo cambia hasta confirmarlo', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['email' => 'viejo@nuevastic.co'])->assignRole('Administrador');
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, ['email' => 'Nuevo@NuevasTIC.co', 'name' => 'Cristian']))
+        ->assertRedirect(route('profile.edit'));
+
+    $admin->refresh();
+    expect($admin->email)->toBe('viejo@nuevastic.co')
+        ->and($admin->email_pendiente)->toBe('nuevo@nuevastic.co')
+        ->and($admin->name)->toBe('Cristian');
+
+    $this->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $p) => $p->where('usuario.email_pendiente', 'nuevo@nuevastic.co'));
+
+    $codigo = codigoCambio('nuevo@nuevastic.co');
+    $malo = $codigo === '111111' ? '222222' : '111111';
+    $this->post(route('perfil.correo.verificar'), ['codigo' => $malo])->assertSessionHasErrors('codigo');
+    expect($admin->fresh()->email)->toBe('viejo@nuevastic.co');
+
+    $this->post(route('perfil.correo.verificar'), ['codigo' => $codigo])->assertSessionHasNoErrors();
+    expect($admin->fresh()->email)->toBe('nuevo@nuevastic.co')
+        ->and($admin->fresh()->email_pendiente)->toBeNull();
+});
+
+it('cerrar la ventana descarta el correo nuevo', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['email' => 'viejo@nuevastic.co'])->assignRole('Administrador');
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['email' => 'nuevo@nuevastic.co']));
+    $this->post(route('perfil.correo.cancelar'))->assertRedirect(route('profile.edit'));
+
+    expect($admin->fresh()->email)->toBe('viejo@nuevastic.co')
+        ->and($admin->fresh()->email_pendiente)->toBeNull();
+});
+
+it('guardar sin cambiar el correo no manda código', function () {
+    Notification::fake();
+    $admin = User::factory()->create()->assignRole('Administrador');
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['name' => 'Otro nombre']));
+
+    Notification::assertNothingSent();
+    expect($admin->fresh()->email_pendiente)->toBeNull();
+});
+
+it('el dueño no puede ponerse en Mi perfil el cargo de un colaborador', function () {
+    $dueno = cuentaDeEmpresa();
+    User::factory()->create(['empresa_id' => $dueno->empresa_id, 'name' => 'Andrés Pérez', 'cargo' => 'Marketing'])->assignRole('Colaborador');
+
+    $this->actingAs($dueno)
+        ->patch(route('profile.update'), datosPerfil($dueno, ['cargo' => 'marketing']))
+        ->assertSessionHasErrors(['cargo' => 'Ese cargo ya lo tiene Andrés Pérez. El cargo del dueño de la empresa no se puede repetir.']);
+});
+
+it('el teléfono nuevo se confirma con un código al correo actual', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['email' => 'cristian@nuevastic.co', 'telefono' => '+57 3000000000'])->assignRole('Administrador');
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, ['telefono' => '+57 3111111111']))
+        ->assertSessionHasNoErrors();
+
+    $admin->refresh();
+    expect($admin->telefono)->toBe('+57 3000000000')
+        ->and($admin->telefono_pendiente)->toBe('+57 3111111111');
+
+    $this->actingAs($admin)->post(route('perfil.correo.verificar'), ['codigo' => '000000'])->assertSessionHasErrors('codigo');
+    $this->actingAs($admin)->post(route('perfil.correo.verificar'), ['codigo' => codigoCambio('cristian@nuevastic.co')])->assertSessionHasNoErrors();
+
+    $admin->refresh();
+    expect($admin->telefono)->toBe('+57 3111111111')
+        ->and($admin->telefono_pendiente)->toBeNull()
+        ->and($admin->email)->toBe('cristian@nuevastic.co');
+});
+
+it('cambiar correo y teléfono a la vez pide un solo código, al correo nuevo; cancelar deja los dos como estaban', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['email' => 'cristian@nuevastic.co', 'telefono' => '+57 3000000000'])->assignRole('Administrador');
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, ['email' => 'cristian.p@nuevastic.co', 'telefono' => '+57 3111111111']))
+        ->assertSessionHasNoErrors();
+    $this->actingAs($admin)->post(route('perfil.correo.cancelar'));
+
+    $admin->refresh();
+    expect($admin->email)->toBe('cristian@nuevastic.co')->and($admin->telefono)->toBe('+57 3000000000')
+        ->and($admin->telefono_pendiente)->toBeNull()->and($admin->email_pendiente)->toBeNull();
+
+    $this->actingAs($admin)
+        ->patch(route('profile.update'), datosPerfil($admin, ['email' => 'cristian.p@nuevastic.co', 'telefono' => '+57 3111111111']));
+    $this->actingAs($admin)->post(route('perfil.correo.verificar'), ['codigo' => codigoCambio('cristian.p@nuevastic.co')]);
+
+    $admin->refresh();
+    expect($admin->email)->toBe('cristian.p@nuevastic.co')->and($admin->telefono)->toBe('+57 3111111111');
+});
+
+it('quitar el teléfono no pide código', function () {
+    Notification::fake();
+    $admin = User::factory()->create(['telefono' => '+57 3000000000'])->assignRole('Administrador');
+
+    $this->actingAs($admin)->patch(route('profile.update'), datosPerfil($admin, ['telefono' => '']))->assertSessionHasNoErrors();
+
+    expect($admin->fresh()->telefono)->toBeNull();
+    Notification::assertNothingSent();
+});
+
+it('solo la cuenta principal se elimina a sí misma y deja a otro Administrador como principal', function () {
+    $principal = User::factory()->create(['email' => 'admin@nuevastic.co'])->assignRole('Administrador');
+    $principal->forceFill(['administrador_principal' => true])->save();
+    $ana = User::factory()->create(['name' => 'Ana Torres'])->assignRole('Administrador');
+    $invitada = User::factory()->create(['password' => null])->assignRole('Administrador');
+
+    // Otro Administrador no puede.
+    $this->actingAs($ana)->delete(route('perfil.eliminar'), ['sucesor_id' => $principal->id, 'confirmacion' => $ana->email])->assertForbidden();
+
+    $this->actingAs($principal)->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->has('principal.sucesores', 1)->where('principal.sucesores.0.nombre', 'Ana Torres'));
+
+    $this->actingAs($principal)->delete(route('perfil.eliminar'), ['sucesor_id' => $invitada->id, 'confirmacion' => 'admin@nuevastic.co'])
+        ->assertSessionHasErrors('sucesor_id');
+    $this->actingAs($principal)->delete(route('perfil.eliminar'), ['sucesor_id' => $ana->id, 'confirmacion' => 'otro@nuevastic.co'])
+        ->assertSessionHasErrors('confirmacion');
+
+    $this->actingAs($principal)->delete(route('perfil.eliminar'), ['sucesor_id' => $ana->id, 'confirmacion' => 'admin@nuevastic.co'])
+        ->assertRedirect(route('login'));
+
+    $this->assertGuest();
+    expect($principal->fresh()->trashed())->toBeTrue()
+        ->and($principal->fresh()->administrador_principal)->toBeFalse()
+        ->and($ana->fresh()->administrador_principal)->toBeTrue();
+});
+
+it('las demás cuentas no reciben la opción de eliminarse', function () {
+    $admin = User::factory()->create()->assignRole('Administrador');
+
+    $this->actingAs($admin)->get(route('profile.edit'))->assertInertia(fn (Assert $page) => $page->where('principal', null));
 });

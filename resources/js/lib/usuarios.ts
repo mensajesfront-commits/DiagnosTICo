@@ -43,6 +43,30 @@ export function avisoCuentaPrincipal(
         : `${inicio} Tiene la ${cuenta.medicion_pendiente}.`;
 }
 
+/**
+ * Aviso cuando una cuenta de empresa pasa a un rol interno (A5.5): deja la
+ * empresa, se borra su contraseña y le llega la invitación para crear otra.
+ * Si era la cuenta principal, la empresa queda desactivada (CambioDeRol).
+ */
+export function avisoSaleDeEmpresa(
+    cuenta: Pick<Cuenta, 'nombre' | 'correo' | 'empresa' | 'es_principal'>,
+    rolNuevo: string | null,
+): string | null {
+    if (
+        !cuenta.empresa ||
+        rolNuevo === null ||
+        ['Empresa', 'Colaborador'].includes(rolNuevo)
+    ) {
+        return null;
+    }
+
+    const empresa = cuenta.es_principal
+        ? `Deja de ser cuenta de ${cuenta.empresa}, que queda desactivada (sus mediciones y resultados se conservan).`
+        : `Deja de ser cuenta de ${cuenta.empresa}.`;
+
+    return `${cuenta.nombre} pasa al equipo de NuevasTIC con el rol ${rolNuevo}. ${empresa} Su contraseña se borra: le enviaremos a ${cuenta.correo} el enlace para crear una nueva.`;
+}
+
 /** Busca por nombre o correo, sin importar tildes ni mayúsculas. */
 export function coincide(
     cuenta: Pick<Cuenta, 'nombre' | 'correo'>,

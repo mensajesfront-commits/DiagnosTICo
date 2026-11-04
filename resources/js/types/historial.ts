@@ -1,4 +1,5 @@
 import type {
+    EvolucionCategoria,
     MedicionFicha,
     PendienteFicha,
     PuntoEvolucion,
@@ -14,6 +15,7 @@ export type Historial = {
     /** Solo las terminadas con resultado, de la más reciente a la primera. */
     mediciones: MedicionFicha[];
     evolucion: PuntoEvolucion[];
+    evolucion_categorias: EvolucionCategoria[];
     /** Lo abre el equipo de NuevasTIC (A3.4). */
     interno: boolean;
 };

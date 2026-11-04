@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Medicion;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -23,7 +24,8 @@ class ResultadoListo extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        // Se puede apagar en Mi perfil (E11).
+        return $notifiable instanceof User && ! $notifiable->quiereAviso('resultado_listo') ? [] : ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage

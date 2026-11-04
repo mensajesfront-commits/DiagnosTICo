@@ -7,13 +7,13 @@ const laura = {
     empresa: 'Restaurante La Esquina',
     es_principal: true,
     colaboradores_activos: 2,
-    medicion_pendiente: 'Medición 4 no iniciada (vence el 20 oct)',
+    medicion_pendiente: 'medición 4 no iniciada (vence el 20 de octubre)',
 };
 
 describe('avisoCuentaPrincipal', () => {
     it('avisa al desactivar la cuenta principal (A5.3b)', () => {
         expect(avisoCuentaPrincipal(laura, 'desactivar')).toBe(
-            'Es la cuenta principal de Restaurante La Esquina: la empresa y sus 2 colaboradores activos se quedan sin acceso hasta que la reactives. Tiene la Medición 4 no iniciada (vence el 20 oct): quedará en pausa.',
+            'Es la cuenta principal de Restaurante La Esquina: la empresa y sus 2 colaboradores activos se quedan sin acceso hasta que la reactives. Tiene la medición 4 no iniciada (vence el 20 de octubre): quedará en pausa.',
         );
     });
 

@@ -14,7 +14,7 @@ use Illuminate\Database\Seeder;
  * Las actividades que un sector tenía con la CIIU Rev. 4 y ya no existen en
  * la Rev. 5 (6820, 5514, 5519, 5520) quedan desactivadas, no se borran.
  *
- * [INFORMACIÓN PENDIENTE] NuevasTIC debe confirmar qué va en cada sector.
+ * NuevasTIC confirmó que es la lista real (23 de octubre de 2026).
  */
 class ActividadesEconomicasSeeder extends Seeder
 {

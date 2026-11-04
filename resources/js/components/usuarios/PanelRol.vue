@@ -6,6 +6,8 @@
  *   bloqueados; no se elimina (RN-027).
  * - Rol creado (A5.1c): se editan nombre, descripción, si está activo y los
  *   permisos (HU-050). Se elimina solo si no tiene cuentas (HU-051).
+ *   Desactivarlo bloquea a sus cuentas hasta que tengan otro rol; el propio
+ *   rol no se desactiva.
  *
  * Envía (rol creado): PUT /roles/{id} con nombre, descripcion, activo y
  * permisos[]. Los cambios aplican a todas las cuentas con ese rol.
@@ -17,10 +19,13 @@ import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import GrillaPermisos from '@/components/usuarios/GrillaPermisos.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { rutas } from '@/lib/rutas';
 import type { BloquePermisos, Rol } from '@/types/usuarios';
 
 const props = defineProps<{ rol: Rol; bloques: BloquePermisos[] }>();
+
+const { puede } = usePermisos();
 
 const emit = defineEmits<{
     asignar: [];
@@ -127,9 +132,10 @@ function guardar(): void {
             </Campo>
         </div>
 
-        <!-- Rol creado: se edita -->
-        <div
+        <!-- Rol creado: se edita (con usuarios.gestionar) -->
+        <fieldset
             v-else
+            :disabled="!puede('usuarios.gestionar')"
             class="grid items-start gap-4 sm:grid-cols-[1fr_1.4fr_auto]"
         >
             <Campo
@@ -154,15 +160,31 @@ function guardar(): void {
             >
                 <Entrada id="rol-descripcion" v-model="form.descripcion" />
             </Campo>
-            <label class="flex items-center gap-2 pt-7 text-sm">
-                <input
-                    v-model="form.activo"
-                    type="checkbox"
-                    class="size-4 accent-marca"
-                />
-                Rol activo
-            </label>
-        </div>
+            <div class="flex flex-col gap-1 pt-7">
+                <label class="flex items-center gap-2 text-sm">
+                    <input
+                        v-model="form.activo"
+                        type="checkbox"
+                        class="size-4 accent-marca"
+                    />
+                    Rol activo
+                </label>
+                <!-- Desactivarlo bloquea a sus cuentas (RolesController). -->
+                <p
+                    v-if="!form.activo && rol.activo && rol.cuentas_total > 0"
+                    class="max-w-56 text-xs text-aviso"
+                >
+                    {{
+                        rol.cuentas_total === 1
+                            ? 'Al guardar, la cuenta con este rol no podrá entrar hasta que le asignes otro rol.'
+                            : `Al guardar, las ${rol.cuentas_total} cuentas con este rol no podrán entrar hasta que les asignes otro rol.`
+                    }}
+                </p>
+                <p v-if="form.errors.activo" class="text-xs text-aviso">
+                    {{ form.errors.activo }}
+                </p>
+            </div>
+        </fieldset>
 
         <GrillaPermisos
             v-if="rol.del_sistema"
@@ -184,6 +206,7 @@ function guardar(): void {
             v-model="form.permisos"
             :bloques="bloques"
             :notas="rol.notas_permisos"
+            :bloqueada="!puede('usuarios.gestionar')"
             prefijo="editar"
         >
             <template #ayuda>
@@ -201,6 +224,7 @@ function guardar(): void {
                     Cuentas con este rol · {{ rol.cuentas_total }}
                 </h3>
                 <Boton
+                    v-if="puede('usuarios.gestionar')"
                     variante="secundario"
                     tamano="sm"
                     :disabled="!rol.activo"
@@ -226,8 +250,18 @@ function guardar(): void {
                     >
                         Tu cuenta
                     </span>
+                    <span
+                        v-else-if="cuenta.es_admin_principal"
+                        class="text-xs text-tinta-suave"
+                    >
+                        Administrador principal
+                    </span>
+                    <!-- Los colaboradores no cambian de rol (RN-025). -->
                     <button
-                        v-else
+                        v-else-if="
+                            puede('usuarios.gestionar') &&
+                            rol.nombre !== 'Colaborador'
+                        "
                         type="button"
                         class="text-sm text-marca hover:underline"
                         @click="emit('cambiarRol', cuenta.id)"
@@ -249,7 +283,12 @@ function guardar(): void {
                     Mostrando {{ rol.cuentas.length }} de
                     {{ rol.cuentas_total }}.
                 </template>
-                <template v-if="rol.nombre === 'Administrador'">
+                <template
+                    v-if="
+                        rol.nombre === 'Administrador' &&
+                        puede('usuarios.gestionar')
+                    "
+                >
                     Para sumar a otra persona del equipo de NuevasTIC, usa
                     <button
                         type="button"
@@ -270,8 +309,9 @@ function guardar(): void {
                     </Link>
                 </template>
                 <template v-else-if="rol.nombre === 'Colaborador'">
-                    Los colaboradores los crea cada empresa desde su menú; aquí
-                    solo puedes verlos o desactivarlos.
+                    Los colaboradores los crea cada empresa desde su menú y no
+                    cambian de rol; aquí solo puedes verlos, desactivarlos o
+                    eliminarlos.
                     <Link
                         :href="rutas.usuarios.lista('Colaborador')"
                         class="text-marca underline underline-offset-2"
@@ -284,6 +324,7 @@ function guardar(): void {
 
         <!-- Pie -->
         <div
+            v-if="puede('usuarios.gestionar')"
             class="flex flex-wrap items-center gap-3 border-t border-linea pt-5"
         >
             <template v-if="rol.del_sistema">

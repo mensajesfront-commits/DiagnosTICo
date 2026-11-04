@@ -11,6 +11,7 @@ import { Link } from '@inertiajs/vue3';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { Sector } from '@/types/diagnosticos';
+import { usePermisos } from '@/composables/usePermisos';
 
 defineProps<{
     sectores: Sector[];
@@ -18,6 +19,8 @@ defineProps<{
     sectorActualId: number | null;
     totalDiagnosticos: number;
 }>();
+
+const { puede } = usePermisos();
 
 defineEmits<{ crear: [] }>();
 
@@ -70,6 +73,7 @@ const claseItem = (activo: boolean) =>
             </li>
         </ul>
         <button
+            v-if="puede('diagnosticos.editar')"
             type="button"
             class="mt-3 w-full shrink-0 rounded-md border border-dashed border-linea-fuerte py-2 text-xs text-tinta hover:border-marca hover:text-marca"
             @click="$emit('crear')"

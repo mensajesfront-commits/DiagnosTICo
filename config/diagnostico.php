@@ -3,12 +3,12 @@
 return [
 
     /*
-    | Cuenta inicial del Administrador que crea `php artisan db:seed` (T-046).
-    | Sin contraseña, el seeder genera una y la muestra en la terminal.
+    | Cuenta principal del Administrador que crea `php artisan db:seed`
+    | (T-046). Se crea sin contraseña: le llega el correo para crearla
+    | (RN-006). Se reenvía con `php artisan admin:invitar`.
     */
     'admin' => [
         'email' => env('ADMIN_EMAIL', 'admin@nuevastic.co'),
-        'password' => env('ADMIN_PASSWORD'),
     ],
 
     /*
@@ -20,10 +20,27 @@ return [
     ],
 
     /*
+    | Días que espera un registro sin verificar el correo (L2b) antes de que
+    | `cuentas:purgar` lo borre, con su empresa. Así el correo queda libre.
+    */
+    'sin_verificar' => [
+        'dias' => (int) env('DIAS_REGISTRO_SIN_VERIFICAR', 7),
+    ],
+
+    /*
     | Correo de contacto que ve la empresa (E1, medición vencida).
     | [INFORMACIÓN PENDIENTE] NuevasTIC confirma la dirección real.
     */
     'soporte_email' => env('SOPORTE_EMAIL', 'soporte@nuevastic.co'),
+
+    /*
+    | Fecha límite de las mediciones (App\Support\Plazos): mínimo de días
+    | para responder al asignar o cambiar la fecha, y la zona horaria que se
+    | usa si la empresa no tiene cuenta principal. Cada empresa cuenta el día
+    | en la zona de su Mi perfil.
+    */
+    'plazo_minimo_dias' => (int) env('PLAZO_MINIMO_DIAS', 3),
+    'zona_horaria' => env('ZONA_HORARIA_POR_DEFECTO', 'America/Bogota'),
 
     /*
     | Análisis de la IA sin conexión (App\Services\Ia\AnalizadorDePrueba):

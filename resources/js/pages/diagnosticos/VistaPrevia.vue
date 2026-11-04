@@ -9,8 +9,8 @@
  *   Se puede responder para probar, pero nada se guarda (CA-004).
  * - Con `?version=` muestra una versión publicada en solo lectura.
  *
- * [FUNCIONALIDAD POR DEFINIR] "Resultado de ejemplo" (A2.6, HU-030) llega con
- * Resultados (semana 5).
+ * "Resultado de ejemplo" abre A2.6 (HU-030) con el mismo contenido (borrador o
+ * versión).
  */
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
@@ -19,6 +19,7 @@ import Boton from '@/components/base/Boton.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import ModalVersiones from '@/components/editor/ModalVersiones.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type {
@@ -37,6 +38,8 @@ const props = defineProps<{
     versiones: VersionHistorial[];
     pendientes: number;
 }>();
+
+const { puede } = usePermisos();
 
 const indice = ref(
     Math.max(
@@ -143,6 +146,10 @@ const pistas = {
 
 const modalVersiones = ref(false);
 const esBorrador = computed(() => props.version === null);
+/** Borrador que esta cuenta puede editar (permiso diagnosticos.editar). */
+const editable = computed(
+    () => esBorrador.value && puede('diagnosticos.editar'),
+);
 const nadaQuePublicar = computed(
     () =>
         !props.diagnostico.hay_borrador &&
@@ -160,7 +167,7 @@ const nadaQuePublicar = computed(
             <div>
                 <Link
                     :href="
-                        esBorrador
+                        editable
                             ? rutas.diagnosticos.editar(diagnostico.id)
                             : rutas.diagnosticos.sector(diagnostico.sector.id)
                     "
@@ -168,7 +175,7 @@ const nadaQuePublicar = computed(
                 >
                     <ArrowLeft class="size-4" aria-hidden="true" />
                     {{
-                        esBorrador
+                        editable
                             ? 'Volver al editor'
                             : `Diagnósticos · ${diagnostico.sector.nombre}`
                     }}
@@ -189,7 +196,10 @@ const nadaQuePublicar = computed(
                     </Etiqueta>
                 </div>
             </div>
-            <div v-if="esBorrador" class="flex flex-col items-end gap-1">
+            <div
+                v-if="esBorrador && puede('diagnosticos.publicar')"
+                class="flex flex-col items-end gap-1"
+            >
                 <Boton
                     :disabled="!estado.publicable || nadaQuePublicar"
                     @click="modalVersiones = true"
@@ -301,7 +311,7 @@ const nadaQuePublicar = computed(
                                 </span>
                             </span>
                             <Link
-                                v-if="esBorrador"
+                                v-if="editable"
                                 :href="corregir(c)"
                                 class="text-xs text-marca underline"
                             >
@@ -324,12 +334,17 @@ const nadaQuePublicar = computed(
                         >
                             Cuestionario
                         </span>
-                        <span
-                            class="px-3 py-1 text-tinta-suave"
-                            title="Llega con Resultados (HU-030)"
+                        <Link
+                            :href="
+                                rutas.diagnosticos.resultadoEjemplo(
+                                    diagnostico.id,
+                                    version?.numero,
+                                )
+                            "
+                            class="rounded-md px-3 py-1 text-tinta-suave hover:text-marca"
                         >
-                            Resultado de ejemplo · Próximamente
-                        </span>
+                            Resultado de ejemplo
+                        </Link>
                     </div>
                     <label
                         v-if="categorias.length"
@@ -413,7 +428,7 @@ const nadaQuePublicar = computed(
                             >
                                 ⚠ {{ problema }}. La empresa la vería así.
                                 <Link
-                                    v-if="esBorrador && categoria.parte_id"
+                                    v-if="editable && categoria.parte_id"
                                     :href="
                                         rutas.diagnosticos.editar(
                                             diagnostico.id,
@@ -460,8 +475,23 @@ const nadaQuePublicar = computed(
                                     {{ o.texto }}
                                 </button>
                             </div>
+                            <input
+                                v-if="
+                                    p.tipo !== 'abierta' &&
+                                    p.opciones.some(
+                                        (o) =>
+                                            o.con_texto &&
+                                            marcada(p.ref, o.ref),
+                                    )
+                                "
+                                type="text"
+                                maxlength="255"
+                                placeholder="¿Cuál?"
+                                :aria-label="`¿Cuál? Pregunta ${i + 1}`"
+                                class="mt-2 h-9 w-full max-w-md rounded-md border border-linea-fuerte px-3 text-sm focus-visible:border-marca focus-visible:outline-none"
+                            />
                             <textarea
-                                v-else
+                                v-if="p.tipo === 'abierta'"
                                 v-model="respuestas[p.ref] as string"
                                 rows="2"
                                 maxlength="1000"

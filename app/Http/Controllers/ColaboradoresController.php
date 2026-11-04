@@ -3,10 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Rules\CargoDelDueno;
+use App\Rules\DistintaDeLaAnterior;
+use App\Rules\SinDatosDelCorreo;
+use App\Support\HistorialContrasenas;
+use App\Support\PaginasColaborador;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -20,6 +26,10 @@ use Inertia\Response;
  * cuentas de sus colaboradores con correo y contraseña que ella misma
  * comparte; no se envía correo. Nunca toca cuentas de otra empresa (404) ni
  * la propia cuenta principal (403).
+ *
+ * La cuenta principal elige qué páginas ve cada colaborador
+ * (PaginasColaborador) y es la única que cambia sus datos y su contraseña:
+ * el colaborador no edita su perfil.
  */
 class ColaboradoresController extends Controller
 {
@@ -44,9 +54,11 @@ class ColaboradoresController extends Controller
                     'es_principal' => $u->is($yo),
                     'activo' => $u->activo,
                     'cargo' => $u->cargo,
+                    'paginas' => $u->is($yo) ? [] : PaginasColaborador::de($u),
                 ])
                 ->values()
                 ->all(),
+            'paginas' => PaginasColaborador::opciones(),
         ]);
     }
 
@@ -57,14 +69,12 @@ class ColaboradoresController extends Controller
 
         $request->merge(['email' => Str::lower(trim((string) $request->input('email')))]);
 
-        $datos = $request->validate([
+        $datos = $this->validarConPaginas($request, [
             'name' => ['required', 'string', 'max:255'],
             // Área o cargo dentro de la empresa ("Marketing", "Producción").
-            'cargo' => ['required', 'string', 'min:2', 'max:255'],
+            'cargo' => ['required', 'string', 'min:2', 'max:255', new CargoDelDueno($yo->empresa_id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)],
-            'password' => ['required', 'string', Password::default()],
-        ], [
-            'email.unique' => 'Ya hay una cuenta con este correo.',
+            'password' => ['required', 'string', Password::default(), new SinDatosDelCorreo($request->string('email')->value())],
         ]);
 
         $colaborador = DB::transaction(function () use ($datos, $yo): User {
@@ -76,8 +86,11 @@ class ColaboradoresController extends Controller
                 'empresa_id' => $yo->empresa_id,
                 'activo' => true,
             ]);
-            $colaborador->forceFill(['contrasena_actualizada_en' => now()])->save();
+            // Lo crea su empresa, que ya verificó su correo: no pasa por la verificación.
+            $colaborador->forceFill(['contrasena_actualizada_en' => now(), 'email_verified_at' => now()])->save();
+            HistorialContrasenas::registrar($colaborador, $datos['password']);
             $colaborador->assignRole('Colaborador');
+            PaginasColaborador::asignar($colaborador, $datos['paginas']);
 
             return $colaborador;
         });
@@ -98,13 +111,11 @@ class ColaboradoresController extends Controller
 
         $request->merge(['email' => Str::lower(trim((string) $request->input('email')))]);
 
-        $datos = $request->validate([
+        $datos = $this->validarConPaginas($request, [
             'name' => ['required', 'string', 'max:255'],
-            'cargo' => ['required', 'string', 'min:2', 'max:255'],
+            'cargo' => ['required', 'string', 'min:2', 'max:255', new CargoDelDueno($colaborador->empresa_id, false, $colaborador->id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($colaborador->id)],
-            'password' => ['nullable', 'string', Password::default()],
-        ], [
-            'email.unique' => 'Ya hay una cuenta con este correo.',
+            'password' => ['nullable', 'string', Password::default(), new SinDatosDelCorreo($request->string('email')->value()), new DistintaDeLaAnterior($colaborador)],
         ]);
 
         $cambiaCorreo = $datos['email'] !== $colaborador->email;
@@ -128,6 +139,11 @@ class ColaboradoresController extends Controller
         }
 
         $colaborador->save();
+        PaginasColaborador::asignar($colaborador, $datos['paginas']);
+
+        if ($cambiaContrasena) {
+            HistorialContrasenas::registrar($colaborador, $datos['password']);
+        }
 
         if ($cambiaCorreo || $cambiaContrasena) {
             $this->cerrarSesiones($colaborador);
@@ -187,6 +203,24 @@ class ColaboradoresController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => "{$colaborador->name} puede volver a entrar."]);
 
         return back();
+    }
+
+    /**
+     * Valida los datos del colaborador y las páginas que puede ver.
+     *
+     * @param  array<string, list<mixed>>  $reglas
+     * @return array<string, mixed>
+     */
+    private function validarConPaginas(Request $request, array $reglas): array
+    {
+        $validador = Validator::make($request->all(), [...$reglas, ...PaginasColaborador::reglas()], [
+            'email.unique' => 'Ya hay una cuenta con este correo.',
+            'paginas.required' => 'Elige al menos una página.',
+            'paginas.min' => 'Elige al menos una página.',
+        ], ['paginas' => 'páginas']);
+        $validador->after(PaginasColaborador::revisar(...));
+
+        return $validador->validate();
     }
 
     /** La cuenta principal de una empresa (HU-076 CA-001). */

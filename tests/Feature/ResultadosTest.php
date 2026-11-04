@@ -120,7 +120,11 @@ it('al enviar analiza cada categoría, publica el resultado inmutable y avisa a 
         ->and($resultado->por_categoria[0]['preguntas'][1]['puntaje'])->toBe(100)
         ->and($resultado->por_categoria[0]['preguntas'][2]['puntaje'])->toBe(40)
         ->and($resultado->por_categoria[0]['preguntas'][3]['respuesta'])->toBeNull()
-        ->and($resultado->por_categoria[1]['recomendacion']['titulo'])->toBe('Mejora Automatización');
+        ->and($resultado->por_categoria[1]['recomendacion']['titulo'])->toBe('Mejora Automatización')
+        // La IA de prueba elige el método por el nombre de la categoría.
+        ->and($resultado->por_categoria[0]['metodo']['clave'])->toBe('VRIO')
+        ->and($resultado->por_categoria[0]['metodo']['nombre'])->toBe('VRIO')
+        ->and($resultado->por_categoria[1]['metodo']['clave'])->toBe('DOFA');
 
     // Puntajes y observaciones guardados por respuesta.
     expect(Respuesta::where('medicion_id', $this->medicion->id)->where('pregunta_ref', 'p3')->value('puntaje'))->toBe(40)
@@ -272,4 +276,52 @@ it('la plantilla del PDF tiene 3 páginas con radar, tabla y recomendaciones', f
         ->toContain('Mejora Automatización')
         ->toContain('new Chart(')
         ->not->toContain('cdn.');
+});
+
+// --- Decisiones de NuevasTIC (23 de octubre de 2026) ------------------------------
+
+it('una opcional respondida es un dato extra: la IA la lee, pero no cuenta en el puntaje', function () {
+    $this->actingAs($this->laura)->putJson(route('responder.guardar', $this->medicion), ['pregunta_ref' => 'p4', 'texto' => str_repeat('b', 200)])->assertOk();
+    responderYEnviar($this, $this->medicion);
+
+    $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
+    $p4 = $resultado->por_categoria[0]['preguntas'][3];
+
+    // Igual que sin responderla: 73 en la categoría y 52 en total.
+    expect($resultado->por_categoria[0]['puntaje'])->toBe(73)
+        ->and($resultado->puntaje_total)->toBe(52)
+        ->and($p4['respuesta'])->toBe(str_repeat('b', 200))
+        ->and($p4['extra'])->toBeTrue()
+        ->and($p4['puntaje'])->toBeNull()
+        ->and(AnalisisCategoria::where('medicion_id', $this->medicion->id)->where('categoria_ref', 'c1')->value('prompt'))
+        ->toContain('dato_extra');
+});
+
+it('al borrar para siempre la empresa conserva sus mediciones terminadas sin nombre', function () {
+    responderYEnviar($this, $this->medicion);
+    $pendiente = nuevaMedicion($this, 2);
+    $resultado = Resultado::where('medicion_id', $this->medicion->id)->firstOrFail();
+    $pdf = $resultado->pdf_ruta;
+
+    $this->laura->delete();
+    $this->empresa->delete();
+    $this->travel(91)->days();
+    $this->artisan('cuentas:purgar')->assertSuccessful();
+
+    $medicion = $this->medicion->fresh();
+    $resultado->refresh();
+    expect(Empresa::withTrashed()->find($this->empresa->id))->toBeNull()
+        ->and($medicion)->not->toBeNull()
+        ->and($medicion->empresa_id)->toBeNull()
+        ->and($pendiente->fresh())->toBeNull()
+        ->and($resultado->puntaje_total)->toBe(52)
+        ->and($resultado->pdf_ruta)->toBeNull()
+        ->and($resultado->por_categoria[0]['preguntas'][2]['respuesta'])->toBeNull()
+        ->and($resultado->por_categoria[0]['preguntas'][0]['respuesta'])->toBe('Cada semana')
+        ->and(Respuesta::where('medicion_id', $medicion->id)->whereNotNull('texto')->exists())->toBeFalse()
+        ->and(AnalisisCategoria::where('medicion_id', $medicion->id)->whereNotNull('prompt')->exists())->toBeFalse();
+    Storage::disk('local')->assertMissing($pdf);
+
+    // Nadie la ve como resultado de una empresa.
+    $this->actingAs($this->admin)->get(route('resultados.ver', $medicion))->assertNotFound();
 });

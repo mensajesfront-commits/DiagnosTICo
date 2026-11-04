@@ -16,3 +16,13 @@ export type Auth = {
     /** Permisos de la cuenta, para ocultar en el menú lo que no puede abrir. */
     permisos: string[];
 };
+
+/** A5.4 · "Ver como" activo (RN-026): para la franja de aviso. */
+export type VerComo = {
+    /** Cuenta que se está viendo. */
+    cuenta: string;
+    rol: string | null;
+    empresa: string | null;
+    /** Quién la está viendo. */
+    administrador: string;
+};

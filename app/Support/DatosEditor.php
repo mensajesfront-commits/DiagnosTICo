@@ -48,6 +48,7 @@ class DatosEditor
                         'puntaje' => $o->puntaje,
                         'ten_en_cuenta' => $o->ten_en_cuenta,
                         'exclusiva' => $o->exclusiva,
+                        'con_texto' => $o->con_texto,
                     ])->values()->all(),
                 ])->values()->all(),
             ])->values()->all(),

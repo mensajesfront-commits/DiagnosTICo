@@ -10,6 +10,10 @@
  *
  * Registrar empresas y asignar mediciones no se hace aquí, sino en Empresas
  * (A3).
+ *
+ * HU-083: si alguna empresa pidió una medición nueva porque la suya venció,
+ * junto al título de la tabla aparece el aviso; lleva a la pestaña Vencidas,
+ * donde esas filas van primero con "Asignar nueva".
  */
 import { Head } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
@@ -30,6 +34,8 @@ const props = defineProps<{
     mediciones: FilaMedicion[];
     niveles: Record<Nivel, number>;
     sectores: SectorInicio[];
+    /** Empresas con una solicitud de medición nueva abierta (HU-083). */
+    solicitudes: number;
 }>();
 
 // --- Pestañas (HU-007) ---------------------------------------------------------
@@ -140,7 +146,22 @@ const tarjetas = computed(() => {
                 <header
                     class="flex shrink-0 flex-wrap items-center justify-between gap-3 px-5 py-3"
                 >
-                    <h2 class="text-base font-semibold">Mediciones</h2>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <h2 class="text-base font-semibold">Mediciones</h2>
+                        <button
+                            v-if="solicitudes > 0"
+                            type="button"
+                            class="rounded-full bg-aviso-suave px-2.5 py-0.5 text-xs font-medium text-aviso hover:underline"
+                            @click="pestana = 'vencida'"
+                        >
+                            {{
+                                solicitudes === 1
+                                    ? '1 empresa pidió una medición nueva'
+                                    : `${solicitudes} empresas pidieron una medición nueva`
+                            }}
+                            <span v-if="pestana !== 'vencida'"> · Ver</span>
+                        </button>
+                    </div>
                     <SelectorCompacto
                         v-model="pestana"
                         :opciones="opciones"

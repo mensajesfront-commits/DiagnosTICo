@@ -17,9 +17,14 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    // Al publicar un resultado se genera el PDF con Chromium (RN-024): en las
-    // pruebas se simula siempre.
-    ->beforeEach(fn () => Pdf::fake())
+    ->beforeEach(function () {
+        // Al publicar un resultado se genera el PDF con Chromium (RN-024): en
+        // las pruebas se simula siempre.
+        Pdf::fake();
+        // Mediodía en Colombia: "hoy" es el mismo día en UTC y en la hora de
+        // las empresas (Plazos), así las pruebas no dependen de a qué hora corren.
+        $this->travelTo(now('America/Bogota')->setTime(12, 0));
+    })
     ->in('Feature');
 
 /*

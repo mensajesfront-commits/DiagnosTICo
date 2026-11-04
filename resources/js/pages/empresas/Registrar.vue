@@ -23,7 +23,11 @@ import type { FormularioEmpresa } from '@/components/empresas/CamposEmpresa.vue'
 import { rutas } from '@/lib/rutas';
 import type { OpcionesEmpresa } from '@/types/empresas';
 
-const props = defineProps<{ opciones: OpcionesEmpresa }>();
+const props = defineProps<{
+    opciones: OpcionesEmpresa;
+    /** Fecha límite más cercana que se acepta (3 días). */
+    fechaMinima: string;
+}>();
 
 const form = useForm<
     FormularioEmpresa & {
@@ -63,7 +67,8 @@ watch(diagnosticos, (lista) => {
     form.diagnostico_id = lista.length === 1 ? lista[0].id : '';
 });
 
-const hoy = new Date().toLocaleDateString('en-CA');
+/** Fecha límite más cercana: 3 días desde hoy (la calcula el servidor). */
+const hoy = props.fechaMinima;
 
 function registrar(): void {
     form.transform((d) => ({

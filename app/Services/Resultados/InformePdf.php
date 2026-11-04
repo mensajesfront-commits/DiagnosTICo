@@ -29,7 +29,18 @@ class InformePdf
 
     public static function construir(Resultado $resultado): PdfBuilder
     {
-        return Pdf::view('pdf.informe', ['informe' => DatosResultado::informe($resultado)])
+        return self::desde(DatosResultado::informe($resultado));
+    }
+
+    /**
+     * El PDF a partir de los datos ya armados (también el resultado de
+     * ejemplo de HU-030, que no se guarda).
+     *
+     * @param  array<string, mixed>  $informe
+     */
+    public static function desde(array $informe): PdfBuilder
+    {
+        return Pdf::view('pdf.informe', ['informe' => $informe])
             ->format(Format::Letter)
             ->margins(14, 14, 14, 14)
             // La plantilla marca window.radarListo cuando Chart.js terminó de dibujar.

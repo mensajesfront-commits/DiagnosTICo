@@ -36,7 +36,7 @@ import ModalCambiarFecha from '@/components/empresas/ModalCambiarFecha.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import { fechaCorreo } from '@/lib/correo';
 import type { ValoresCorreo } from '@/lib/correo';
-import { diaYMes, fechaLocal } from '@/lib/fechas';
+import { diaYMes, fechaLocal, haceCuanto } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { DiagnosticosDelSector, EmpresaAsignable } from '@/types/empresas';
@@ -46,12 +46,15 @@ const props = defineProps<{
     /** Por sector: publicados y borradores. */
     diagnosticos: Record<string, DiagnosticosDelSector>;
     empresaInicial: number | null;
+    /** Fecha límite más cercana antes de elegir la empresa (3 días). */
+    fechaMinima: string;
     /** Plantilla general del correo de aviso (A3.1e). */
     plantilla: { asunto: string; cuerpo: string };
 }>();
 
 const MAX_MENSAJE = 500;
-const hoy = new Date().toLocaleDateString('en-CA');
+/** Fecha límite más cercana: 3 días, en la hora de la empresa (servidor). */
+const hoy = computed(() => empresa.value?.fecha_minima ?? props.fechaMinima);
 
 const form = useForm({
     empresa_id: (props.empresas.some((e) => e.id === props.empresaInicial)
@@ -396,6 +399,17 @@ const estadoPendiente: Record<string, string> = {
                     </span>
                 </div>
 
+                <p
+                    v-if="empresa?.solicitud"
+                    class="rounded-md bg-aviso-suave px-3 py-2 text-xs text-aviso"
+                    role="status"
+                >
+                    <strong
+                        >{{ empresa.nombre }} pidió una medición nueva
+                        {{ haceCuanto(empresa.solicitud) }}.</strong
+                    >
+                    Al asignarla, la solicitud queda atendida.
+                </p>
                 <p
                     v-if="empresa?.pendiente"
                     class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta"

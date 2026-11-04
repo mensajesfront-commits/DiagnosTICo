@@ -21,12 +21,12 @@ it('da los 15 permisos al Administrador', function () {
     expect(Role::findByName('Administrador')->permissions)->toHaveCount(15);
 });
 
-it('da 5 permisos a la Empresa y al Colaborador', function () {
+it('da 5 permisos a la Empresa y ninguno al rol Colaborador', function () {
     $empresa = Role::findByName('Empresa')->permissions->pluck('name');
-    $colaborador = Role::findByName('Colaborador')->permissions->pluck('name');
 
+    // Las páginas del colaborador las elige su empresa (PaginasColaborador).
     expect($empresa)->toHaveCount(5)->toContain('perfil.editar')
-        ->and($colaborador)->toHaveCount(5)->toContain('perfil.editar');
+        ->and(Role::findByName('Colaborador')->permissions)->toBeEmpty();
 });
 
 it('marca los roles del sistema y deja al Consultor inactivo', function () {

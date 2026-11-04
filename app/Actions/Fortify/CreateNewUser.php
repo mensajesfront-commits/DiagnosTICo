@@ -8,7 +8,11 @@ use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Rules\DepartamentoDelPais;
+use App\Rules\TelefonoValido;
+use App\Support\Captcha;
+use App\Support\HistorialContrasenas;
 use App\Support\Ubicaciones;
+use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -56,10 +60,18 @@ class CreateNewUser implements CreatesNewUsers
             'ciudad' => ['required', 'string', 'min:2', 'max:255'],
             ...$this->profileRules(),
             'cargo' => ['required', 'string', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:30'],
-            'password' => $this->passwordRules(),
+            'telefono' => ['nullable', 'string', 'max:30', new TelefonoValido],
+            'password' => $this->passwordRules(is_string($input['email'] ?? null) ? $input['email'] : null),
             'terminos' => ['accepted'],
-        ], [], [
+            // Captcha (Cloudflare Turnstile) antes de crear la cuenta.
+            'captcha' => [Rule::requiredIf(Captcha::activo()), function (string $atributo, mixed $valor, Closure $fallar): void {
+                if (! Captcha::valido(is_string($valor) ? $valor : null, request()->ip())) {
+                    $fallar('Confirma que no eres un robot y vuelve a pulsar "Registrar empresa".');
+                }
+            }],
+        ], [
+            'captcha.required' => 'Confirma que no eres un robot y vuelve a pulsar "Registrar empresa".',
+        ], [
             'empresa_nombre' => 'nombre de la empresa',
             'sector_id' => 'sector',
             'actividad_economica_id' => 'actividad económica',
@@ -94,6 +106,7 @@ class CreateNewUser implements CreatesNewUsers
 
             // Constancia de que aceptó los términos y la política de datos.
             $usuario->forceFill(['terminos_aceptados_en' => now()])->save();
+            HistorialContrasenas::registrar($usuario, $input['password']);
 
             $usuario->assignRole('Empresa');
 

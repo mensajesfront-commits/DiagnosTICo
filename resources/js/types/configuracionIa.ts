@@ -115,7 +115,11 @@ export type ResultadoPrueba = {
             puntaje: number | null;
             observacion: string;
         }[];
+        metodo: string;
+        metodo_motivo: string;
         observacion_categoria: string;
         recomendacion: { titulo: string; detalle: string };
     };
+    /** Pruebas que quedan hoy (100 al día entre todos, PA-003). */
+    restantes: number;
 };

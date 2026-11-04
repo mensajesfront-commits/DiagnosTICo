@@ -55,7 +55,7 @@
         .escala div { flex: 1; font-size: 9px; color: #5f6470; }
         .escala i { display: block; height: 5px; border-radius: 2px; margin-bottom: 4px; }
         .nota { margin-top: auto; font-size: 9.5px; color: #5f6470; line-height: 1.5; }
-        .radar { width: 100%; height: 300px; }
+        .radar { width: 100%; height: 320px; }
         .leyenda { font-size: 9px; color: #5f6470; text-align: right; }
         table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         th { text-align: left; font-weight: 400; color: #5f6470; font-size: 9px; border-bottom: 1px solid #e3e2dd; padding: 4px 4px; }
@@ -67,8 +67,16 @@
         .reco .cab { display: flex; gap: 8px; align-items: center; color: #5f6470; font-size: 10px; }
         .reco b { display: block; font-size: 11.5px; font-weight: 600; margin: 6px 0 3px; }
         .reco p { margin: 0; line-height: 1.5; color: #1e2533; }
+        .reco .metodo { margin-top: 4px; font-size: 9.5px; color: #5f6470; }
         .siguiente { margin-top: auto; background: #f5f4f0; border-radius: 6px; padding: 10px 12px; font-size: 10px; line-height: 1.5; }
         .cuerpo.columna { display: flex; flex-direction: column; }
+        .niveles { display: flex; gap: 8px; }
+        .niveles div { flex: 1; background: #f9f8f4; border-radius: 4px; padding: 8px 10px; }
+        .niveles b { display: block; font-size: 20px; font-weight: 600; line-height: 1.1; }
+        .niveles span { font-size: 9.5px; color: #5f6470; }
+        .contenido { margin-top: 14px; font-size: 10px; line-height: 1.7; color: #5f6470; }
+        .contenido b { color: #1e2533; font-weight: 600; }
+        .otras td { font-size: 10px; padding: 5px 4px; }
     </style>
 </head>
 <body>
@@ -115,6 +123,30 @@
                 @endforeach
             </div>
 
+            <h2 style="margin-top: 26px">Tus categorías por nivel</h2>
+            <p class="sub">{{ count($i['categorias']) }} categorías analizadas.</p>
+            <div class="niveles">
+                @foreach ($i['por_nivel'] as $n)
+                    <div style="border-top: 4px solid {{ $colores[$n['clave']][0] }}">
+                        <b class="mono">{{ $n['cantidad'] }}</b>
+                        <span>{{ $n['nombre'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+
+            @if ($i['fuertes'] !== [])
+            <div class="resumen">
+                <div><b>Lo más fuerte:</b> {{ collect($i['fuertes'])->map(fn ($c) => "{$c['nombre']} ({$c['puntaje']})")->join(' y ') }}.</div>
+                <div><b>Lo más débil:</b> {{ collect($i['debiles'])->map(fn ($c) => "{$c['nombre']} ({$c['puntaje']})")->join(' y ') }}.</div>
+            </div>
+            @endif
+
+            <div class="contenido">
+                <b>En este informe</b>
+                <div>Página 2 · El puntaje de cada categoría y cuánto pesa en el total.</div>
+                <div>Página 3 · Qué hacer primero, de la categoría más débil a la más fuerte.</div>
+            </div>
+
             <p class="nota">
                 Este informe resume las respuestas de tu empresa. Las preguntas de opción única y de selección múltiple
                 suman según su puntaje; las abiertas las califica una IA de 0 a 100. Las recomendaciones también las
@@ -155,13 +187,6 @@
                     @endforeach
                 </tbody>
             </table>
-
-            @if ($i['fuertes'] !== [])
-            <div class="resumen">
-                <div><b>Lo más fuerte:</b> {{ collect($i['fuertes'])->map(fn ($c) => "{$c['nombre']} ({$c['puntaje']})")->join(' y ') }}.</div>
-                <div><b>Lo más débil:</b> {{ collect($i['debiles'])->map(fn ($c) => "{$c['nombre']} ({$c['puntaje']})")->join(' y ') }}.</div>
-            </div>
-            @endif
         </div>
         <div class="pie"><span>{{ $pie }}</span><span>Página 2 de 3</span></div>
     </section>
@@ -176,11 +201,33 @@
             @foreach ($i['prioridades'] as $n => $p)
                 <div class="reco">
                     <div class="cab"><span class="mono">{{ str_pad((string) ($n + 1), 2, '0', STR_PAD_LEFT) }}</span>
-                        <span class="etiqueta" style="background: {{ $colores[$p['nivel']][1] }}; color: {{ $colores[$p['nivel']][2] }}">{{ $p['nombre'] }} · {{ $p['puntaje'] }}</span></div>
+                        <span class="etiqueta" style="background: {{ $colores[$p['nivel']][1] }}; color: {{ $colores[$p['nivel']][2] }}">{{ $p['nombre'] }} · {{ $p['puntaje'] }}</span>
+                        @if (! empty($p['metodo']))
+                            <span class="etiqueta" style="background: #e5eff9; color: #2d4a7a">{{ $p['metodo']['nombre'] }}</span>
+                        @endif
+                    </div>
                     <b>{{ $p['recomendacion']['titulo'] }}</b>
                     <p>{{ $p['recomendacion']['detalle'] }}</p>
+                    @if (! empty($p['metodo']['motivo']))
+                        <p class="metodo">Analizado con {{ $p['metodo']['nombre'] }}: {{ $p['metodo']['motivo'] }}</p>
+                    @endif
                 </div>
             @endforeach
+
+            @if ($i['otras'] !== [])
+                <h2 style="margin-top: 20px">Las demás categorías</h2>
+                <table class="otras">
+                    @foreach ($i['otras'] as $o)
+                        <tr>
+                            <td style="width: 30%">{{ $o['nombre'] }}</td>
+                            <td class="mono" style="width: 5%"><b>{{ $o['puntaje'] }}</b></td>
+                            <td style="width: 20%">{!! $etiqueta($o['nivel']) !!}</td>
+                            <td>{{ $o['recomendacion']['titulo'] }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+                <p class="sub" style="margin-top: 6px">El detalle de cada recomendación está en tu resultado en línea.</p>
+            @endif
 
             <div class="siguiente">
                 <b>Siguiente paso:</b> el equipo de NuevasTIC puede asignarte una nueva medición para ver cuánto avanzaste.
@@ -199,6 +246,36 @@
             document.fonts.load("9px 'IBM Plex Mono'"),
             document.fonts.load("11px 'IBM Plex Sans'"),
         ]).then(dibujarRadar);
+
+        /** El puntaje va al final de la última línea: "automatización · 0". */
+        function conPuntaje(lineas, puntaje) {
+            const lista = Array.isArray(lineas) ? [...lineas] : [lineas];
+            lista[lista.length - 1] += ` · ${puntaje}`;
+
+            return lista.length === 1 ? lista[0] : lista;
+        }
+
+        /** "Herramientas de automatización" → ["Herramientas de", "automatización"]. */
+        function partir(texto, max = 20) {
+            if (texto.length <= max) {
+                return texto;
+            }
+
+            const palabras = texto.split(' ');
+            const lineas = [''];
+
+            for (const p of palabras) {
+                const actual = lineas[lineas.length - 1];
+
+                if (actual && (actual + ' ' + p).length > max && lineas.length < 2) {
+                    lineas.push(p);
+                } else {
+                    lineas[lineas.length - 1] = actual ? actual + ' ' + p : p;
+                }
+            }
+
+            return lineas;
+        }
 
         function dibujarRadar() {
             const series = [{
@@ -223,9 +300,11 @@
 
             new Chart(document.getElementById('radar'), {
                 type: 'radar',
-                data: { labels: radar.etiquetas.map((e, n) => `${e} · ${radar.actual[n]}`), datasets: series },
+                // Nombres largos en dos líneas para que no se corten en el borde.
+                data: { labels: radar.etiquetas.map((e, n) => conPuntaje(partir(e), radar.actual[n])), datasets: series },
                 options: {
                     animation: false,
+                    layout: { padding: { left: 12, right: 12 } },
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },

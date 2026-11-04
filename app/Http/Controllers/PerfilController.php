@@ -7,11 +7,19 @@ use App\Http\Requests\Perfil\CambiarContrasenaRequest;
 use App\Models\ActividadEconomica;
 use App\Models\Empresa;
 use App\Models\User;
+use App\Services\Acceso\CodigoVerificacion;
+use App\Support\HistorialContrasenas;
 use App\Support\OpcionesPerfil;
 use App\Support\Ubicaciones;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -21,6 +29,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class PerfilController extends Controller
 {
+    public function __construct(private readonly CodigoVerificacion $codigos) {}
+
     public function edit(Request $request): Response
     {
         /** @var User $usuario */
@@ -29,6 +39,7 @@ class PerfilController extends Controller
         $rol = $usuario->getRoleNames()->first();
 
         return Inertia::render('perfil/MiPerfil', [
+            'status' => $request->session()->get('status'),
             'usuario' => [
                 'name' => $usuario->name,
                 'email' => $usuario->email,
@@ -44,8 +55,16 @@ class PerfilController extends Controller
                 'ultimo_acceso_en' => $usuario->ultimo_acceso_en?->toIso8601String(),
                 'creado_en' => $usuario->created_at?->toIso8601String(),
                 'contrasena_actualizada_en' => ($usuario->contrasena_actualizada_en ?? $usuario->created_at)?->toIso8601String(),
+                // Correo nuevo que espera el código (abre la ventana de verificación).
+                'email_pendiente' => $usuario->email_pendiente,
+                // Teléfono nuevo que espera el código al correo.
+                'telefono_pendiente' => $usuario->telefono_pendiente,
             ],
             'rol' => $rol,
+            // Solo la cuenta principal del Administrador se elimina a sí misma.
+            'principal' => $usuario->administrador_principal ? [
+                'sucesores' => self::sucesores($usuario)->map(fn (User $u) => ['id' => $u->id, 'nombre' => $u->name, 'correo' => $u->email])->values()->all(),
+            ] : null,
             'empresa' => $empresa ? [
                 'nombre' => $empresa->nombre,
                 'sector' => $empresa->sector?->nombre,
@@ -84,9 +103,7 @@ class PerfilController extends Controller
 
         $usuario->fill([
             'name' => $datos['name'],
-            'email' => $datos['email'],
             'cargo' => $datos['cargo'] ?? null,
-            'telefono' => $datos['telefono'] ?? null,
             'ciudad' => $datos['ciudad'] ?? null,
             'departamento' => $datos['departamento'] ?? null,
             'pais' => $datos['pais'] ?? null,
@@ -98,10 +115,28 @@ class PerfilController extends Controller
             ),
         ]);
 
-        // [FUNCIONALIDAD POR DEFINIR] E11 dice que al cambiar el correo se
-        // envía un enlace para verificarlo. La verificación está quitada
-        // (DEC-012), así que por ahora el cambio se guarda directo.
+        // El correo y el teléfono nuevos no se guardan todavía: llega un
+        // código y se confirman en la ventana de verificación (DEC-020). El
+        // código va al correo nuevo si cambia; si no, al actual. Hasta
+        // confirmarlo se siguen usando los anteriores. Quitar el teléfono no
+        // pide código.
+        $correoNuevo = mb_strtolower(trim((string) $datos['email']));
+        $cambiaCorreo = $correoNuevo !== mb_strtolower($usuario->email);
+        $usuario->email_pendiente = $cambiaCorreo ? $correoNuevo : null;
+
+        $telefonoNuevo = filled($datos['telefono'] ?? null) ? trim((string) $datos['telefono']) : null;
+        $cambiaTelefono = $telefonoNuevo !== null && $telefonoNuevo !== $usuario->telefono;
+        $usuario->telefono_pendiente = $cambiaTelefono ? $telefonoNuevo : null;
+
+        if ($telefonoNuevo === null) {
+            $usuario->telefono = null;
+        }
+
         $usuario->save();
+
+        if ($cambiaCorreo || $cambiaTelefono) {
+            $this->codigos->enviar($usuario, $cambiaCorreo ? $correoNuevo : $usuario->email);
+        }
 
         if ($request->editaEmpresa() && $usuario->empresa) {
             $usuario->empresa->update([
@@ -116,9 +151,145 @@ class PerfilController extends Controller
             ]);
         }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Cambios guardados.']);
+        $que = match (true) {
+            $cambiaCorreo && $cambiaTelefono => 'el correo y el teléfono',
+            $cambiaCorreo => 'el correo',
+            default => 'el teléfono',
+        };
+        Inertia::flash('toast', ['type' => 'success', 'message' => $cambiaCorreo || $cambiaTelefono
+            ? "Cambios guardados. Para cambiar {$que}, escribe el código que enviamos a ".($cambiaCorreo ? $correoNuevo : $usuario->email).'.'
+            : 'Cambios guardados.']);
 
         return to_route('profile.edit');
+    }
+
+    /** Confirma el correo o el teléfono nuevos con el código que llegó al correo. */
+    public function verificarCorreo(Request $request): RedirectResponse
+    {
+        $datos = $request->validate(
+            ['codigo' => ['required', 'digits:6']],
+            ['codigo.required' => 'Escribe el código de 6 dígitos.', 'codigo.digits' => 'El código tiene 6 dígitos.'],
+        );
+
+        /** @var User $usuario */
+        $usuario = $request->user();
+        $nuevo = $usuario->email_pendiente;
+        $telefono = $usuario->telefono_pendiente;
+
+        if ($nuevo === null && $telefono === null) {
+            return to_route('profile.edit');
+        }
+
+        // Otra cuenta pudo tomar el correo mientras tanto.
+        if ($nuevo !== null && User::withTrashed()->where('email', $nuevo)->whereKeyNot($usuario->id)->exists()) {
+            $usuario->forceFill(['email_pendiente' => null])->save();
+
+            return back()->withErrors(['email' => 'Ya hay una cuenta con este correo.']);
+        }
+
+        $error = $this->codigos->comprobar($usuario, $datos['codigo']);
+
+        if ($error !== null) {
+            return back()->withErrors(['codigo' => $error]);
+        }
+
+        if ($nuevo !== null) {
+            $usuario->forceFill(['email' => $nuevo, 'email_pendiente' => null, 'email_verified_at' => now()]);
+        }
+
+        if ($telefono !== null) {
+            $usuario->forceFill(['telefono' => $telefono, 'telefono_pendiente' => null]);
+        }
+
+        $usuario->save();
+        Inertia::flash('toast', ['type' => 'success', 'message' => match (true) {
+            $nuevo !== null && $telefono !== null => "Listo: tu correo ahora es {$nuevo} y tu teléfono, {$telefono}.",
+            $nuevo !== null => "Listo: tu correo ahora es {$nuevo}.",
+            default => "Listo: tu teléfono ahora es {$telefono}.",
+        }]);
+
+        return to_route('profile.edit');
+    }
+
+    public function reenviarCodigoCorreo(Request $request): RedirectResponse
+    {
+        /** @var User $usuario */
+        $usuario = $request->user();
+
+        if ($usuario->email_pendiente !== null || $usuario->telefono_pendiente !== null) {
+            $this->codigos->enviar($usuario, $usuario->email_pendiente ?? $usuario->email);
+        }
+
+        return back()->with('status', 'Te enviamos un código nuevo. Revisa también la carpeta de spam.');
+    }
+
+    /** Cerrar la ventana: el correo y el teléfono siguen siendo los anteriores. */
+    public function cancelarCambioCorreo(Request $request): RedirectResponse
+    {
+        /** @var User $usuario */
+        $usuario = $request->user();
+        $usuario->forceFill(['email_pendiente' => null, 'telefono_pendiente' => null, 'codigo_verificacion' => null, 'codigo_vence_en' => null])->save();
+
+        return to_route('profile.edit');
+    }
+
+    /**
+     * A6 · La cuenta principal del Administrador se elimina a sí misma
+     * (DEC-017: recuperable 90 días). Antes elige a otro Administrador
+     * activo como nueva cuenta principal y escribe su propio correo.
+     */
+    public function eliminarCuenta(Request $request): RedirectResponse
+    {
+        /** @var User $yo */
+        $yo = $request->user();
+        abort_unless($yo->administrador_principal, 403, 'Solo la cuenta principal del Administrador se elimina desde aquí.');
+
+        $datos = $request->validate([
+            'sucesor_id' => ['required', 'integer', Rule::in(self::sucesores($yo)->modelKeys())],
+            'confirmacion' => ['required', 'string'],
+        ], [
+            'sucesor_id.required' => 'Elige quién queda como cuenta principal.',
+            'sucesor_id.in' => 'Elige un Administrador activo.',
+            'confirmacion.required' => 'Escribe tu correo para confirmar.',
+        ]);
+
+        if (trim($datos['confirmacion']) !== $yo->email) {
+            throw ValidationException::withMessages(['confirmacion' => 'El correo no coincide. Escríbelo exactamente como aparece.']);
+        }
+
+        /** @var User $sucesor */
+        $sucesor = User::findOrFail($datos['sucesor_id']);
+
+        DB::transaction(function () use ($yo, $sucesor): void {
+            $yo->forceFill(['administrador_principal' => false])->save();
+            $sucesor->forceFill(['administrador_principal' => true])->save();
+            DB::table('password_reset_tokens')->where('email', $yo->email)->delete();
+            $yo->delete();
+        });
+
+        Log::info('Cuenta principal eliminada por sí misma (recuperable)', ['cuenta_id' => $yo->id, 'nueva_principal' => $sucesor->id]);
+
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return to_route('login')->with('status', "Eliminaste tu cuenta. {$sucesor->name} es ahora la cuenta principal del Administrador.");
+    }
+
+    /**
+     * Administradores que pueden quedar como cuenta principal: activos, con
+     * contraseña creada y sin eliminar.
+     *
+     * @return Collection<int, User>
+     */
+    private static function sucesores(User $yo): Collection
+    {
+        return User::role('Administrador')
+            ->whereKeyNot($yo->id)
+            ->where('activo', true)
+            ->whereNotNull('password')
+            ->orderBy('name')
+            ->get();
     }
 
     public function contrasena(CambiarContrasenaRequest $request): RedirectResponse
@@ -130,6 +301,7 @@ class PerfilController extends Controller
             'password' => $request->string('password')->value(),
             'contrasena_actualizada_en' => now(),
         ])->save();
+        HistorialContrasenas::registrar($usuario, $request->string('password')->value());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Contraseña actualizada. Tu sesión sigue abierta.']);
 

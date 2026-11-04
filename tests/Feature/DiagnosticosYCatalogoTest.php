@@ -8,7 +8,10 @@ use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\SectorReasignado;
 use App\Support\DatosDiagnosticos;
+use Database\Seeders\CategoriasSeeder;
+use Database\Seeders\DiagnosticoEjemploSeeder;
 use Database\Seeders\RolesYPermisosSeeder;
+use Database\Seeders\SectoresSeeder;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -263,4 +266,56 @@ it('no elimina una categoría que ya tiene respuestas (RN-009)', function () {
     $libre = Categoria::factory()->create();
     $this->actingAs($this->admin)->delete(route('categorias.destroy', $libre))->assertRedirect();
     expect(Categoria::find($libre->id))->toBeNull();
+});
+
+it('los archivados se ven en su ventana, se restauran y se eliminan si nadie los respondió', function () {
+    $admin = User::factory()->create()->assignRole('Administrador');
+    $sector = Sector::factory()->create();
+    $sinUso = Diagnostico::factory()->publicado()->create(['sector_id' => $sector->id, 'nombre' => 'Sin uso']);
+    $usado = Diagnostico::factory()->publicado()->create(['sector_id' => $sector->id, 'nombre' => 'Usado']);
+    Medicion::factory()->create([
+        'empresa_id' => Empresa::factory()->create(['sector_id' => $sector->id])->id,
+        'version_diagnostico_id' => $usado->versiones()->firstOrFail()->id,
+        'numero' => 1,
+    ]);
+
+    $this->actingAs($admin);
+    $this->post(route('diagnosticos.archivar', $sinUso));
+    $this->post(route('diagnosticos.archivar', $usado));
+
+    $this->get(route('diagnosticos.index', ['sector' => $sector->id]))
+        ->assertInertia(fn (Assert $p) => $p->has('archivados', 2)->has('diagnosticos', 0));
+
+    // Con mediciones no se elimina.
+    $this->delete(route('diagnosticos.eliminar-archivado', $usado))->assertSessionHasErrors('diagnostico');
+    expect(Diagnostico::find($usado->id))->not->toBeNull();
+
+    // Sin mediciones se elimina con sus versiones.
+    $this->delete(route('diagnosticos.eliminar-archivado', $sinUso))->assertSessionHasNoErrors();
+    expect(Diagnostico::find($sinUso->id))->toBeNull();
+
+    // Restaurar lo devuelve a publicados.
+    $this->post(route('diagnosticos.restaurar', $usado))->assertSessionHasNoErrors();
+    expect($usado->fresh()->estado)->toBe(Diagnostico::PUBLICADO)
+        ->and($usado->fresh()->archivado_en)->toBeNull();
+
+    // Un publicado no se borra por esta ruta.
+    $this->delete(route('diagnosticos.eliminar-archivado', $usado))->assertStatus(422);
+});
+
+it('el diagnóstico de ejemplo se publica en Comidas con 7 preguntas en Presencia en línea y no se duplica', function () {
+    $this->seed([SectoresSeeder::class, CategoriasSeeder::class]);
+
+    $this->seed(DiagnosticoEjemploSeeder::class);
+    $this->seed(DiagnosticoEjemploSeeder::class);
+
+    $diagnosticos = Diagnostico::where('nombre', DiagnosticoEjemploSeeder::NOMBRE)->get();
+    expect($diagnosticos)->toHaveCount(1);
+
+    $contenido = $diagnosticos->first()->versiones()->firstOrFail()->contenido;
+    expect($contenido['categorias'])->toHaveCount(3)
+        ->and($contenido['categorias'][0]['nombre'])->toBe('Presencia en línea')
+        ->and($contenido['categorias'][0]['preguntas'])->toHaveCount(7)
+        ->and(collect($contenido['categorias'][0]['preguntas'])->pluck('tipo')->unique()->sort()->values()->all())
+        ->toBe(['abierta', 'opcion_unica', 'seleccion_multiple']);
 });

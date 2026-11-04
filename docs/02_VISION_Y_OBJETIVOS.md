@@ -47,7 +47,7 @@ Cada objetivo se cumple con una o más épicas de `05_REQUISITOS_FUNCIONALES.md`
 ## Qué no es
 
 - No publica el sistema en un servidor: se entrega el repositorio (`03_ALCANCE.md`).
-- No hace análisis FODA ni compara con promedios de otras empresas (RN-028).
+- No compara con promedios de otras empresas (RN-028). La IA puede usar DOFA y otros métodos para analizar cada categoría.
 - No incluye el bot de WhatsApp, que está aplazado, ni el simulador de inversión.
 
 ## Cómo se mide el éxito

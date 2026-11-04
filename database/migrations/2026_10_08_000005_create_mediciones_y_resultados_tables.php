@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Schema;
  * `categoria_ref`), no por llave foránea: así siguen valiendo aunque el
  * borrador cambie (RN-010).
  *
- * [FUNCIONALIDAD POR DEFINIR] Al borrar para siempre una empresa (DEC-017)
- * se borran sus mediciones y resultados (cascade). Falta decidir si se
- * conservan anonimizados para las estadísticas.
+ * Al borrar para siempre una empresa (DEC-017), sus mediciones terminadas se
+ * conservan sin nombre para las estadísticas: lo cambia la migración
+ * 2026_10_23_000002 (decisión de NuevasTIC).
  */
 return new class extends Migration
 {

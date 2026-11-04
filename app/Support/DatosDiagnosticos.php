@@ -122,6 +122,35 @@ class DatosDiagnosticos
     }
 
     /**
+     * Diagnósticos archivados (HU-022), del más reciente al más antiguo, para
+     * la ventana "Archivados" de A2: se restauran o, si ninguna empresa los
+     * respondió, se eliminan.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function archivados(?Sector $sector): array
+    {
+        return array_values(Diagnostico::query()
+            ->where('estado', Diagnostico::ARCHIVADO)
+            ->when($sector, fn (Builder $q) => $q->where('sector_id', $sector?->id))
+            ->with('sector:id,nombre')
+            ->withCount('mediciones')
+            ->withMax('versiones', 'numero')
+            ->orderByDesc('archivado_en')
+            ->get()
+            ->map(fn (Diagnostico $d) => [
+                'id' => $d->id,
+                'nombre' => $d->nombre,
+                'sector_nombre' => $d->sector?->nombre,
+                'version_publicada' => $d->getAttribute('versiones_max_numero') !== null ? (int) $d->getAttribute('versiones_max_numero') : null,
+                'archivado_en' => $d->archivado_en?->toIso8601String(),
+                'mediciones' => (int) $d->getAttribute('mediciones_count'),
+                'empresas' => $d->mediciones()->distinct()->count('mediciones.empresa_id'),
+            ])
+            ->all());
+    }
+
+    /**
      * Empresas de un sector con su diagnóstico asignado, su última medición
      * y su puntaje. Ya no se muestra en A2 (se quitó para ganar espacio);
      * queda para la lista de Empresas filtrada por sector (A3, semanas 4–5).

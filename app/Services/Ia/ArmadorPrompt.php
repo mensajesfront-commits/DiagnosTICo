@@ -23,7 +23,8 @@ use App\Services\Resultados\CalculadoraPuntajes;
  * {respuestas_categoria}) se reemplazan al armar. Cada parte guarda de qué
  * capa salió, para que A4.4 la marque con su color.
  *
- * Las preguntas opcionales sin responder no se envían.
+ * Las preguntas opcionales sin responder no se envían; las respondidas van
+ * marcadas como dato extra (no cuentan en el puntaje).
  */
 class ArmadorPrompt
 {
@@ -74,8 +75,14 @@ class ArmadorPrompt
         'detalles' => <<<'TXT'
         - Criterios para las abiertas: 0–29 la práctica no existe o la respuesta no aplica; 30–59 existe pero es informal; 60–79 está definida y tiene algo de medición; 80–100 está definida, se mide y se mejora con datos.
         - Las preguntas cerradas ya traen su puntaje: úsalo para entender a la empresa, no lo recalifiques. Si una respuesta trae "ten_en_cuenta", tenlo en cuenta al calificar y al redactar.
-        - Apóyate en estas herramientas según el tema de la categoría, sin nombrarlas en el texto: PESTEL para el entorno (mercado, normas, tecnología), las 5 Fuerzas de Porter para la competencia, VRIO para los recursos y la marca, DOFA para cruzar fortalezas y debilidades con oportunidades y amenazas, y CAME (corregir, afrontar, mantener, explotar) para convertir el análisis en una acción.
-        - La recomendación ataca la debilidad más importante de la categoría.
+        - Elige UN método de análisis según lo que respondió la empresa (no siempre el mismo) y úsalo para la observación de la categoría y la recomendación:
+          - PESTEL: factores del entorno (políticos, económicos, sociales, tecnológicos, ecológicos y legales). Úsalo cuando las respuestas dependen de normas, economía, tecnología o cambios del mercado.
+          - PORTER (5 Fuerzas de Porter): competidores, poder de clientes y proveedores, sustitutos y nuevos competidores. Úsalo cuando las respuestas tratan de la competencia, los precios o el poder de clientes y proveedores.
+          - VRIO: si los recursos propios son valiosos, raros, difíciles de imitar y si la empresa está organizada para aprovecharlos. Úsalo cuando las respuestas tratan de la marca, el equipo, el contenido, las herramientas o los datos.
+          - DOFA: debilidades, oportunidades, fortalezas y amenazas. Úsalo cuando las respuestas mezclan lo interno con lo externo.
+          - CAME: corregir, afrontar, mantener y explotar. Úsalo cuando el problema ya está claro y hace falta convertirlo en acciones.
+          Si una respuesta trae "ten_en_cuenta" que pide un método, usa ese.
+        - La recomendación ataca la debilidad más importante que muestre el método elegido.
         - Escribe en español de Colombia, en segunda persona (tú), con frases cortas y sin palabras técnicas ni siglas. Basa todo en lo que la empresa respondió, sin suponer; no compares con otras empresas ni con promedios.
         TXT,
         'ejemplos' => <<<'TXT'
@@ -86,7 +93,7 @@ class ArmadorPrompt
 
     /** Capa 5: formato fijo; la salida estructurada lo exige igual (AnalizadorDeCategoria::esquema). */
     public const string FORMATO = <<<'TXT'
-    Responde solo con un objeto JSON con: "preguntas" (una entrada por cada pregunta recibida, con su "id", "puntaje" —0 a 100 en las abiertas, null en las demás— y "observacion"), "observacion_categoria" y "recomendacion" (con "titulo" y "detalle").
+    Responde solo con un objeto JSON con: "preguntas" (una entrada por cada pregunta recibida, con su "id", "puntaje" —0 a 100 en las abiertas, null en las demás— y "observacion"), "metodo" (el método de análisis que usaste según las respuestas: PESTEL, PORTER, VRIO, DOFA o CAME), "metodo_motivo" (una frase: por qué ese método encaja con lo que respondió la empresa), "observacion_categoria" y "recomendacion" (con "titulo" y "detalle").
     TXT;
 
     /**
@@ -341,8 +348,15 @@ class ArmadorPrompt
                 'puntaje' => $p['tipo'] === 'abierta' ? null : CalculadoraPuntajes::cerrada($p, $r['opciones'] ?? []),
             ];
 
+            // Opcional respondida: dato extra para entender a la empresa (NuevasTIC).
+            if (! (bool) ($p['obligatoria'] ?? true)) {
+                $item['dato_extra'] = 'Pregunta opcional: úsala para entender mejor a la empresa; no cuenta en el puntaje.';
+            }
+
             if ($p['tipo'] === 'abierta') {
                 $item['criterio'] = (string) ($p['criterio_ia'] ?? '');
+                // Los modelos pequeños a veces dejan la abierta sin calificar.
+                $item['calificar'] = 'Califica esta respuesta con un entero de 0 a 100 según el criterio.';
             } else {
                 /** @var list<array<string, mixed>> $opciones */
                 $opciones = $p['opciones'] ?? [];

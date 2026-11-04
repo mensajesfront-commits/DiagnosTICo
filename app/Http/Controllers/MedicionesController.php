@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
+use App\Models\SolicitudMedicion;
 use App\Models\User;
 use App\Notifications\AvisoMedicion;
 use App\Services\Mediciones\AsignarMedicion;
 use App\Services\Mediciones\EnviarAviso;
 use App\Support\CorreoAviso;
 use App\Support\DatosEmpresas;
+use App\Support\Plazos;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,6 +43,8 @@ class MedicionesController extends Controller
             ->with(['version:id,diagnostico_id,numero', 'version.diagnostico:id,nombre'])
             ->withExists('respuestas')
             ->whereIn('empresa_id', $empresas->modelKeys())->get()->keyBy('empresa_id');
+        $solicitudes = SolicitudMedicion::abiertasDe($empresas->modelKeys());
+        Plazos::precargar($empresas->modelKeys());
 
         return Inertia::render('mediciones/Asignar', [
             'empresas' => $empresas->map(fn (Empresa $e) => [
@@ -53,10 +57,15 @@ class MedicionesController extends Controller
                     'numero' => $p->numero,
                     'estado' => DatosEmpresas::estadoVisible($p),
                     'vence' => $p->fecha_limite?->toDateString(),
+                    'fecha_minima' => Plazos::fechaMinima($e->id),
                     'diagnostico' => $p->version?->diagnostico?->nombre,
                     'version' => $p->version?->numero,
                     'tiene_respuestas' => (bool) $p->getAttribute('respuestas_exists'),
                 ] : null,
+                // HU-083: la empresa pidió una medición nueva (fecha ISO).
+                'solicitud' => $solicitudes[$e->id] ?? null,
+                // La fecha límite más cercana que se acepta, en la hora de la empresa.
+                'fecha_minima' => Plazos::fechaMinima($e->id),
                 'siguiente' => ((int) $e->mediciones()->where('estado', '!=', 'cancelada')->max('numero')) + 1,
                 // Para "Para:" y {nombre_usuario} del correo (A3.1e).
                 'principal' => ($u = $principales->get($e->id)) ? ['name' => $u->name, 'email' => $u->email] : null,
@@ -70,6 +79,8 @@ class MedicionesController extends Controller
                         ->orderBy('nombre')->get(['id', 'nombre'])->toArray(),
                 ]]),
             'empresaInicial' => $request->integer('empresa') ?: null,
+            // Antes de elegir la empresa: la fecha mínima en la zona del sistema.
+            'fechaMinima' => Plazos::fechaMinima(null),
             'plantilla' => CorreoAviso::plantilla(),
         ]);
     }
@@ -77,10 +88,11 @@ class MedicionesController extends Controller
     /** Asigna; si ya hay una pendiente, solo con `reemplazar` (A3.1c). */
     public function guardar(Request $request): RedirectResponse
     {
+        $empresaId = $request->integer('empresa_id') ?: null;
         $datos = $request->validate([
             'empresa_id' => ['required', 'integer', 'exists:empresas,id'],
             'diagnostico_id' => ['required', 'integer', 'exists:diagnosticos,id'],
-            'fecha_limite' => ['nullable', 'date', 'after_or_equal:today'],
+            'fecha_limite' => Plazos::reglas($empresaId),
             'mensaje' => ['nullable', 'string', 'max:500'],
             'aviso' => ['boolean'],
             'reemplazar' => ['boolean'],
@@ -89,7 +101,7 @@ class MedicionesController extends Controller
             'correo_cuerpo' => ['nullable', 'required_with:correo_asunto', 'string', 'max:5000'],
             'guardar_plantilla' => ['boolean'],
         ], [
-            'fecha_limite.after_or_equal' => 'La fecha límite no puede ser anterior a hoy.',
+            'fecha_limite.after_or_equal' => Plazos::mensaje($empresaId),
         ], ['empresa_id' => 'empresa', 'diagnostico_id' => 'diagnóstico', 'fecha_limite' => 'fecha límite']);
 
         $empresa = Empresa::query()->findOrFail((int) $datos['empresa_id']);
@@ -128,6 +140,8 @@ class MedicionesController extends Controller
     {
         $this->soloPendiente($medicion);
         $medicion->forceFill(['estado' => 'cancelada', 'cancelada_en' => now()])->save();
+        // Cancelar la vencida también responde la solicitud de la empresa (HU-083).
+        SolicitudMedicion::atender($medicion->empresa_id);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Medición {$medicion->numero} cancelada."]);
 
@@ -142,14 +156,15 @@ class MedicionesController extends Controller
     {
         $this->soloPendiente($medicion);
         $datos = $request->validate([
-            'fecha_limite' => ['nullable', 'date', 'after_or_equal:today'],
-        ], ['fecha_limite.after_or_equal' => 'La fecha límite no puede ser anterior a hoy.'], ['fecha_limite' => 'fecha límite']);
+            'fecha_limite' => Plazos::reglas($medicion->empresa_id),
+        ], ['fecha_limite.after_or_equal' => Plazos::mensaje($medicion->empresa_id)], ['fecha_limite' => 'fecha límite']);
 
         $estado = $medicion->estado === 'vencida'
             ? ($medicion->respuestas()->exists() ? 'en_curso' : 'no_iniciada')
             : $medicion->estado;
 
         $medicion->forceFill(['fecha_limite' => $datos['fecha_limite'] ?? null, 'estado' => $estado])->save();
+        SolicitudMedicion::atender($medicion->empresa_id);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Nueva fecha para la medición {$medicion->numero}."]);
 

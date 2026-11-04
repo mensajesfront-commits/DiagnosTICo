@@ -8,6 +8,7 @@ use App\Models\Medicion;
 use App\Models\Respuesta;
 use App\Models\SolicitudMedicion;
 use App\Models\User;
+use App\Notifications\DiagnosticoEnviado;
 use App\Notifications\NuevaMedicionSolicitada;
 use App\Support\DatosResponder;
 use Illuminate\Http\JsonResponse;
@@ -99,7 +100,12 @@ class ResponderController extends Controller
         if (count($opciones) > 1 && array_intersect($opciones, $exclusivas) !== []) {
             throw ValidationException::withMessages(['opciones' => 'Esa opción no se puede marcar junto con otras.']);
         }
-        $texto = $pregunta['tipo'] === 'abierta' ? trim((string) ($datos['texto'] ?? '')) : '';
+        // Abierta: el texto es la respuesta. Cerrada: solo si se eligió la
+        // opción "Otro" que pide escribir cuál (`con_texto`).
+        $conTexto = array_column(array_filter($pregunta['opciones'], fn (array $o) => $o['con_texto']), 'ref');
+        $texto = $pregunta['tipo'] === 'abierta' || array_intersect($opciones, $conTexto) !== []
+            ? trim((string) ($datos['texto'] ?? ''))
+            : '';
 
         DB::transaction(function () use ($medicion, $pregunta, $opciones, $texto, $request): void {
             if ($opciones === [] && $texto === '') {
@@ -161,6 +167,9 @@ class ResponderController extends Controller
         $medicion->forceFill(['estado' => 'enviada', 'enviada_en' => now()])->save();
 
         AnalizarMedicion::dispatch($medicion->id);
+
+        $admins = User::role('Administrador')->where('activo', true)->get();
+        Notification::send($admins, new DiagnosticoEnviado($medicion));
 
         return to_route('responder.enviado', $medicion);
     }

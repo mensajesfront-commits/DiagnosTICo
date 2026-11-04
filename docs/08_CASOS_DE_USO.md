@@ -8,11 +8,11 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
 
 | ID | Caso de uso | Actor principal | Estado del código |
 |---|---|---|---|
-| CU-001 | Publicar una versión del diagnóstico | Administrador | Pendiente (semana 4) |
-| CU-002 | Asignar una medición | Administrador | Pendiente (semanas 4–5) |
-| CU-003 | Responder y enviar la medición | Empresa o Colaborador | Pendiente (semana 5) |
-| CU-004 | Analizar con la IA cuando algo falla | Sistema | Pendiente (semana 5) |
-| CU-005 | Ver el sistema como otra cuenta | Administrador | Pendiente (semana 6) |
+| CU-001 | Publicar una versión del diagnóstico | Administrador | Hecho |
+| CU-002 | Asignar una medición | Administrador | Hecho |
+| CU-003 | Responder y enviar la medición | Empresa o Colaborador | Hecho |
+| CU-004 | Analizar con la IA cuando algo falla | Sistema | Hecho |
+| CU-005 | Ver el sistema como otra cuenta | Administrador | Hecho |
 | CU-006 | Diagnóstico por WhatsApp | Empresa por WhatsApp | Aplazado |
 
 ---
@@ -200,12 +200,12 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
   - la categoría queda `fallido`;
   - se avisa por correo al Administrador (si tiene activo "Cuando falla el análisis de la IA" en Mi perfil);
   - la medición sigue `enviada`, la empresa sigue viendo E5 y las demás categorías conservan su resultado.
-- **A4. El Administrador reintenta desde A1:** la categoría fallida vuelve a `pendiente` con `intentos = 0`, y sigue el flujo principal.
+- **A4. La empresa reintenta desde E4:** "Reintentar" vuelve a poner las categorías fallidas en la cola y sigue el flujo principal.
 
 **Excepciones**
 
 - **E1. Falta la clave de OpenAI o no es válida:** todas las categorías fallan y se sigue A3. **[INFORMACIÓN PENDIENTE]** La clave del proyecto (DEC-013).
-- **E2. Falla la generación del PDF (Chromium):** el resultado se publica igual; el PDF se reintenta en la cola. **[FUNCIONALIDAD POR DEFINIR]** Qué ve la empresa en "Descargar PDF" mientras tanto.
+- **E2. Falla la generación del PDF (Chromium):** el resultado se publica igual; el PDF se reintenta en la cola. Si la empresa lo descarga antes, se genera en ese momento; si vuelve a fallar, ve "No pudimos generar el PDF. Inténtalo de nuevo en un momento."
 
 **Postcondiciones**
 

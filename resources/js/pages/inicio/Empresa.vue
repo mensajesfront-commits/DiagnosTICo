@@ -20,7 +20,7 @@
  *
  * "Ver historial completo" abre E8 (HU-067).
  */
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { CalendarDays, Mail } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -29,12 +29,15 @@ import EtiquetaNivel from '@/components/base/EtiquetaNivel.vue';
 import Variacion from '@/components/empresas/Variacion.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
 import MiniEvolucion from '@/components/graficas/MiniEvolucion.vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { InicioEmpresa } from '@/types/responder';
 
 const props = defineProps<Partial<InicioEmpresa> & { sinEmpresa?: boolean }>();
+
+const { puede } = usePermisos();
 
 const plural = (n: number, uno: string, varios: string) =>
     `${n} ${n === 1 ? uno : varios}`;
@@ -73,7 +76,9 @@ const quedan = computed(() => {
         return null;
     }
 
-    return d === 0 ? 'Vence hoy' : `Quedan ${plural(d, 'día', 'días')}`;
+    return d === 0
+        ? 'Vence hoy a las 11:59 p. m.'
+        : `Quedan ${plural(d, 'día', 'días')}`;
 });
 
 const evolucion = computed(() =>
@@ -100,6 +105,9 @@ function pedirNueva(): void {
 }
 
 const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
+
+// A5.4 · En "Ver como" no se responde ni se piden fechas (solo lectura).
+const enVerComo = computed(() => !!usePage().props.verComo);
 </script>
 
 <template>
@@ -322,9 +330,19 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     </div>
                 </div>
 
+                <!-- Colaborador sin "Responder el diagnóstico" (E12.1). -->
+                <p
+                    v-if="!puede('diagnostico.responder')"
+                    class="text-center text-xs text-tinta-suave"
+                >
+                    Tu empresa no te dio acceso para responder el diagnóstico.
+                </p>
                 <Boton
-                    v-if="p.estado === 'no_iniciada' || p.estado === 'en_curso'"
+                    v-else-if="
+                        p.estado === 'no_iniciada' || p.estado === 'en_curso'
+                    "
                     :href="rutas.responder.mostrar(p.id)"
+                    :disabled="enVerComo"
                 >
                     {{
                         p.estado === 'en_curso'
@@ -332,29 +350,39 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             : 'Iniciar diagnóstico'
                     }}
                 </Boton>
-                <Boton
-                    v-else-if="p.estado === 'enviada'"
-                    variante="secundario"
-                    :href="rutas.responder.enviado(p.id)"
-                >
-                    Ver el avance del análisis
-                </Boton>
-                <template v-else>
+                <template v-if="puede('diagnostico.responder')">
+                    <p
+                        v-if="enVerComo && p.estado !== 'enviada'"
+                        class="text-center text-xs text-tinta-suave"
+                    >
+                        No disponible en Ver como
+                    </p>
                     <Boton
-                        v-if="!p.solicitud_abierta"
+                        v-else-if="p.estado === 'enviada'"
                         variante="secundario"
-                        :cargando="pidiendo"
-                        @click="pedirNueva"
+                        :href="rutas.responder.enviado(p.id)"
                     >
-                        Pedir una nueva fecha
+                        Ver el avance del análisis
                     </Boton>
-                    <a
-                        :href="`mailto:${soporte}`"
-                        class="flex items-center justify-center gap-1.5 text-xs text-tinta-suave hover:text-marca"
-                    >
-                        <Mail class="size-3.5" aria-hidden="true" />
-                        {{ soporte }}
-                    </a>
+                    <!-- Solo la vencida pide una nueva fecha (HU-082). -->
+                    <template v-else-if="p.estado === 'vencida'">
+                        <Boton
+                            v-if="!p.solicitud_abierta"
+                            variante="secundario"
+                            :cargando="pidiendo"
+                            :disabled="enVerComo"
+                            @click="pedirNueva"
+                        >
+                            Pedir una nueva fecha
+                        </Boton>
+                        <a
+                            :href="`mailto:${soporte}`"
+                            class="flex items-center justify-center gap-1.5 text-xs text-tinta-suave hover:text-marca"
+                        >
+                            <Mail class="size-3.5" aria-hidden="true" />
+                            {{ soporte }}
+                        </a>
+                    </template>
                 </template>
             </div>
         </section>
@@ -422,6 +450,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                 </ol>
             </section>
             <p
+                v-if="puede('resultados.ver')"
                 class="rounded-xl border border-dashed border-linea-fuerte bg-white p-6 text-center text-sm"
             >
                 <strong>Aquí verás tus resultados</strong>
@@ -606,6 +635,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                     Ver resultado
                                 </Link>
                                 <a
+                                    v-if="puede('resultados.pdf')"
                                     :href="rutas.resultados.pdf(m.id)"
                                     :class="cn(enlace, 'ml-3')"
                                 >

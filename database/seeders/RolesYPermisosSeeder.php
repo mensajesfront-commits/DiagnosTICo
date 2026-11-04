@@ -71,16 +71,12 @@ class RolesYPermisosSeeder extends Seeder
             'perfil.editar',
             'contrasena.cambiar',
         ],
-        // RN-025: igual que la empresa, pero no cambia los datos de la empresa
-        // ni gestiona colaboradores (eso lo decide el rol, no un permiso).
-        // Sí edita su propio perfil (respuesta del equipo, 6 de octubre).
-        'Colaborador' => [
-            'diagnostico.responder',
-            'resultados.ver',
-            'resultados.pdf',
-            'perfil.editar',
-            'contrasena.cambiar',
-        ],
+        // RN-025: no cambia los datos de la empresa ni gestiona colaboradores.
+        // Las páginas que ve las elige la cuenta principal para cada uno
+        // (permisos directos, App\Support\PaginasColaborador). Su perfil y su
+        // contraseña los cambia la cuenta principal (pedido del equipo, 26 de
+        // octubre).
+        'Colaborador' => [],
     ];
 
     /**

@@ -29,7 +29,10 @@ withDefaults(
             <span
                 class="shrink-0 font-mono text-xs whitespace-nowrap text-tinta-suave"
             >
-                <template v-if="pregunta.puntaje !== null">
+                <template v-if="pregunta.extra && pregunta.respuesta !== null"
+                    >Dato extra</template
+                >
+                <template v-else-if="pregunta.puntaje !== null">
                     {{ pregunta.puntaje }} pts<template
                         v-if="pregunta.tipo === 'abierta'"
                     >
@@ -52,6 +55,13 @@ withDefaults(
         </p>
         <p v-else class="mt-1 text-sm text-tinta-suave italic">
             Sin responder (opcional). No cuenta en el puntaje.
+        </p>
+        <p
+            v-if="pregunta.extra && pregunta.respuesta !== null"
+            class="mt-1 text-xs text-tinta-suave"
+        >
+            Pregunta opcional: la IA la tiene en cuenta, pero no cuenta en el
+            puntaje.
         </p>
         <p
             v-if="pregunta.observacion"

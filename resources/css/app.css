@@ -164,3 +164,27 @@
         @apply bg-background text-foreground;
     }
 }
+
+/*
+  A5.4 · "Ver como": la franja de aviso ocupa --alto-ver-como arriba. Las
+  páginas de alto fijo (lg:h-dvh) y el menú lateral lo descuentan para que
+  no aparezca scroll de página. Va fuera de las capas para ganar a la utilidad.
+*/
+:root {
+    --alto-ver-como: 2.5rem;
+}
+
+html.ver-como .panel-raiz {
+    min-height: calc(100dvh - var(--alto-ver-como));
+}
+
+html.ver-como .menu-fijo {
+    top: var(--alto-ver-como);
+    height: calc(100vh - var(--alto-ver-como));
+}
+
+@media (width >= 64rem) {
+    html.ver-como .lg\:h-dvh {
+        height: calc(100dvh - var(--alto-ver-como));
+    }
+}

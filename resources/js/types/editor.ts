@@ -13,6 +13,8 @@ export type OpcionEditor = {
     ten_en_cuenta: string | null;
     /** Selección múltiple: al marcarla se desmarcan las demás ("Ninguna"). */
     exclusiva: boolean;
+    /** "Otro": al elegirla, la empresa escribe cuál. */
+    con_texto: boolean;
 };
 
 export type PreguntaEditor = {
@@ -111,6 +113,11 @@ export type CategoriaVistaPrevia = {
         indicacion: string;
         obligatoria: boolean;
         problemas: string[];
-        opciones: { ref: string; texto: string; exclusiva: boolean }[];
+        opciones: {
+            ref: string;
+            texto: string;
+            exclusiva: boolean;
+            con_texto: boolean;
+        }[];
     }[];
 };

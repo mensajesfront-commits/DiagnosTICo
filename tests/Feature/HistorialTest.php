@@ -27,7 +27,9 @@ beforeEach(function () {
 
     foreach ([[1, 41], [2, 49]] as [$n, $puntaje]) {
         $m = $medicion($n, 'terminada', ['terminada_en' => now()->subMonths(6 - $n)]);
-        Resultado::create(['medicion_id' => $m->id, 'puntaje_total' => $puntaje, 'nivel' => 'mejorar', 'por_categoria' => [], 'publicado_en' => now()]);
+        Resultado::create(['medicion_id' => $m->id, 'puntaje_total' => $puntaje, 'nivel' => 'mejorar', 'publicado_en' => now(), 'por_categoria' => [
+            ['ref' => 'c1', 'nombre' => 'Redes sociales', 'puntaje' => $puntaje + 10],
+        ]]);
     }
 
     $this->pendiente = $medicion(3, 'en_curso', ['fecha_limite' => today()->addDays(7)]);
@@ -45,6 +47,8 @@ it('muestra a la empresa sus mediciones terminadas, la evolución y la pendiente
             ->where('mediciones.0.variacion', 8)
             ->where('mediciones.1.variacion', null)
             ->has('evolucion', 2)
+            ->where('evolucion_categorias.0.nombre', 'Redes sociales')
+            ->where('evolucion_categorias.0.puntos.1.puntaje', 59)
             ->where('pendiente.numero', 3)
             ->where('pendiente.estado', 'en_curso')
             ->missing('pendiente.ultimo_aviso'));
