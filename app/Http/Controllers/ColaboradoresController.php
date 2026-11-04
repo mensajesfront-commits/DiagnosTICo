@@ -7,6 +7,7 @@ use App\Rules\CargoDelDueno;
 use App\Rules\DistintaDeLaAnterior;
 use App\Rules\SinDatosDelCorreo;
 use App\Support\HistorialContrasenas;
+use App\Support\Invitaciones;
 use App\Support\PaginasColaborador;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -165,7 +166,7 @@ class ColaboradoresController extends Controller
         $this->deMiEmpresa($request, $colaborador);
 
         DB::transaction(function () use ($colaborador): void {
-            DB::table('password_reset_tokens')->where('email', $colaborador->email)->delete();
+            Invitaciones::borrarEnlaces($colaborador->email);
             $this->cerrarSesiones($colaborador);
             $colaborador->delete();
         });

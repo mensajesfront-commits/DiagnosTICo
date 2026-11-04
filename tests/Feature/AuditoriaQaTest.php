@@ -164,3 +164,22 @@ it('una cuenta desactivada sigue recibiendo "cuenta desactivada"', function () {
     $this->post(route('login.store'), ['email' => $cuenta->email, 'password' => 'Clave-Segura-2026'])
         ->assertSessionHasErrors('cuenta_desactivada');
 });
+
+// --- ERR-09 · Enlaces de invitación aparte ----------------------------------------
+
+it('la migración pasa las invitaciones pendientes a su tabla y deja la recuperación', function () {
+    $migracion = require database_path('migrations/2026_11_04_000002_enlaces_de_invitacion_aparte.php');
+    $migracion->down();
+
+    $invitada = User::factory()->create(['password' => null]);
+    $conClave = User::factory()->create();
+    DB::table('password_reset_tokens')->insert([
+        ['email' => $invitada->email, 'token' => 'x', 'created_at' => now()],
+        ['email' => $conClave->email, 'token' => 'y', 'created_at' => now()],
+    ]);
+
+    $migracion->up();
+
+    expect(DB::table('invitaciones_tokens')->pluck('email')->all())->toBe([$invitada->email])
+        ->and(DB::table('password_reset_tokens')->pluck('email')->all())->toBe([$conClave->email]);
+});

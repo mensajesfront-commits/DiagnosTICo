@@ -5,6 +5,7 @@ namespace App\Actions\Fortify;
 use App\Concerns\PasswordValidationRules;
 use App\Models\User;
 use App\Support\HistorialContrasenas;
+use App\Support\Invitaciones;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\ResetsUserPasswords;
@@ -39,5 +40,9 @@ class ResetUserPassword implements ResetsUserPasswords
         ])->save();
 
         HistorialContrasenas::registrar($user, $input['password']);
+
+        // Con la contraseña guardada no queda ningún otro enlace vivo: ni la
+        // invitación ni una recuperación pedida antes (ERR-09).
+        Invitaciones::borrarEnlaces($user->email);
     }
 }

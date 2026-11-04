@@ -92,7 +92,13 @@ Hallazgos de la auditoría QA (informe aparte). Cada corrección tiene su prueba
   - vite 8.3.5, puppeteer, concurrently, shell-quote, undici y zod actualizados. `npm audit --omit=dev`: 0 alertas.
   - **Pendiente:** las alertas de desarrollo que quedan piden `vite-plus` 1.5 (versión mayor).
 - **ERR-07 · Despliegue:** en `.env.example` y en `docs/20` se documentan `APP_ENV=production`, `APP_DEBUG=false` e `INERTIA_DEVTOOLS_ENABLED=false`.
-- **ERR-09 sin cambio:** los enlaces de recuperación siguen valiendo un año por RN-006. **[FUNCIONALIDAD POR DEFINIR]** Separar invitaciones (largas) de recuperación (cortas).
+- **ERR-09 · Enlace de recuperación de un año:** por decisión del 4 de noviembre, RN-006 cambia.
+  - El enlace de "¿Olvidaste tu contraseña?" vence a los **10 minutos** (`AUTH_PASSWORD_RESET_EXPIRE`).
+  - El de la invitación sigue sirviendo hasta usarlo: va en su propia tabla, `invitaciones_tokens`, con el broker `invitaciones`.
+  - El middleware `ElegirEnlaceContrasena` hace que L4 acepte los dos.
+  - Al crear la contraseña se borran los dos enlaces de la cuenta.
+  - La migración `2026_11_04_000002` pasa a la tabla nueva las invitaciones que ya estaban pendientes.
+  - L3 y el correo de recuperación dicen "vence a los 10 minutos".
 
 ### Corregido (A3.3 · cambiar de medición conserva la pestaña, 4 de noviembre)
 

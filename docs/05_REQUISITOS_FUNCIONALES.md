@@ -562,7 +562,7 @@ Permite recuperar el acceso a quien olvidó su contraseña sin exponer qué corr
 
 - RN-004 — Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar.
 - RN-005 — Los avisos de inicio de sesión y recuperación no revelan si un correo está registrado.
-- RN-006 — El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas.
+- RN-006 — El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026, auditoría QA ERR-09).
 
 ### Validaciones
 
@@ -679,7 +679,7 @@ Permite fijar una contraseña nueva y segura para recuperar el acceso a la cuent
 ### Reglas de negocio
 
 - RN-001 — Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
-- RN-006 — El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas.
+- RN-006 — El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026, auditoría QA ERR-09).
 
 ### Validaciones
 
@@ -3851,7 +3851,7 @@ Permite dar de alta a una empresa que no se registra sola y dejarla lista para r
 
 - RN-002 — Un correo no puede pertenecer a más de una cuenta.
 - RN-003 — Solo se ofrecen sectores activos al registrar empresas; no existe la opción “Otro”.
-- RN-006 — El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas.
+- RN-006 — El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026, auditoría QA ERR-09).
 - RN-014 — Solo hay una medición pendiente por empresa y solo se asignan diagnósticos publicados del sector de la empresa.
 
 ### Validaciones
@@ -4082,7 +4082,7 @@ Mantiene al día los datos de la empresa y de su usuario principal.
 ### Reglas de negocio
 
 - RN-002 — Un correo no puede pertenecer a más de una cuenta.
-- RN-006 — El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas.
+- RN-006 — El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026, auditoría QA ERR-09).
 - RN-008 — Un sector con empresas o mediciones no se elimina: se reasigna o se desactiva; las mediciones hechas se conservan.
 
 ### Validaciones
@@ -9861,7 +9861,7 @@ Cada aviso abre el resultado ("bajó" y "nuevo") o la ficha (lo pendiente). Se v
 | RN-003 | Solo se ofrecen sectores activos al registrar empresas; no existe la opción “Otro”. | HU-002, HU-012, HU-013, HU-014, HU-015, HU-032 |
 | RN-004 | Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar. Además, el Administrador puede **eliminar** una cuenta escribiendo su correo exacto para confirmar; se puede recuperar durante 90 días y después se borra para siempre (decisión del equipo, 8 de octubre de 2026, DEC-017). | HU-001, HU-003, HU-035, HU-047, HU-079 |
 | RN-005 | Los avisos de inicio de sesión y recuperación no revelan si un correo está registrado. | HU-001, HU-003 |
-| RN-006 | El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas. | HU-003, HU-004, HU-032, HU-034 |
+| RN-006 | El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026). | HU-003, HU-004, HU-032, HU-034 |
 | RN-007 | Cada rol ve solo las secciones que le corresponden; empresa y colaborador ven solo la información de su propia empresa. | HU-001, HU-046, HU-048, HU-053, HU-056, HU-057, HU-065, HU-076 |
 | RN-008 | Un sector con empresas o mediciones no se elimina: se reasigna o se desactiva; las mediciones hechas se conservan. | HU-013, HU-014, HU-015, HU-016, HU-034 |
 | RN-009 | El nombre de una categoría es obligatorio, de máximo 40 caracteres y único; una categoría con respuestas se archiva en lugar de borrarse. | HU-017, HU-018, HU-019, HU-026 |

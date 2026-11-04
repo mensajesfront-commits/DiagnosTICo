@@ -145,7 +145,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 
 - **Decisión:**
   - La contraseña fuerte (RN-001) es la misma en todos los entornos. Se quitó la regla del kit para producción (12 caracteres y revisión de filtraciones), que RN-001 no pide.
-  - El enlace de contraseña nueva no vence por tiempo (RN-006): `expire` de un año en `config/auth.php`.
+  - Enlaces de contraseña (RN-006, cambio del 4 de noviembre): recuperación de 10 minutos (broker `users`) e invitación hasta usarla (broker `invitaciones`, tabla aparte). L4 elige el broker con `ElegirEnlaceContrasena`.
   - El inicio de sesión revisa que la cuenta y su empresa estén activas, y "¿Olvidaste tu contraseña?" responde siempre lo mismo (RN-005).
   - Se agregaron las traducciones al español en `lang/es` en lugar de instalar un paquete de traducciones.
 - **Por qué:** las reglas de negocio piden algo distinto a lo que trae Fortify por defecto, y los evaluadores van a probar el acceso.

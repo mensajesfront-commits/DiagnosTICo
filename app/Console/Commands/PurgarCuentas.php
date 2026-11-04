@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Support\Anonimizar;
+use App\Support\Invitaciones;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -48,7 +49,7 @@ class PurgarCuentas extends Command
                 $empresa = $usuario->empresa_id ? Empresa::withTrashed()->find($usuario->empresa_id) : null;
                 $archivos[] = $usuario->foto_ruta;
                 DB::table('sessions')->where('user_id', $usuario->id)->delete();
-                DB::table('password_reset_tokens')->where('email', $usuario->email)->delete();
+                Invitaciones::borrarEnlaces($usuario->email);
                 $usuario->forceDelete();
                 $registros++;
 
@@ -63,7 +64,7 @@ class PurgarCuentas extends Command
             foreach (User::onlyTrashed()->where('deleted_at', '<=', $limite)->get() as $usuario) {
                 $archivos[] = $usuario->foto_ruta;
                 DB::table('sessions')->where('user_id', $usuario->id)->delete();
-                DB::table('password_reset_tokens')->where('email', $usuario->email)->delete();
+                Invitaciones::borrarEnlaces($usuario->email);
                 // forceDelete también quita sus roles (HasRoles).
                 $usuario->forceDelete();
                 $cuentas++;

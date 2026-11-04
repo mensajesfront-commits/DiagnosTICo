@@ -152,7 +152,7 @@ sequenceDiagram
     end
     L-->>U: Siempre: "Si el correo está registrado, te enviamos un enlace…" (RN-005)
     U->>L: Abre el enlace y escribe la contraseña nueva (L4)
-    L->>L: Enlace válido (no vence por tiempo, RN-006) y contraseña fuerte (RN-001)
+    L->>L: Enlace válido (recuperación: 10 minutos; invitación: hasta usarlo; RN-006) y contraseña fuerte (RN-001)
     L-->>U: Vuelve a L1 con "Tu contraseña se actualizó"
 ```
 

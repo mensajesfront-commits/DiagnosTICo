@@ -9,6 +9,7 @@ use App\Models\Empresa;
 use App\Models\User;
 use App\Services\Acceso\CodigoVerificacion;
 use App\Support\HistorialContrasenas;
+use App\Support\Invitaciones;
 use App\Support\OpcionesPerfil;
 use App\Support\Ubicaciones;
 use Illuminate\Database\Eloquent\Collection;
@@ -268,7 +269,7 @@ class PerfilController extends Controller
         DB::transaction(function () use ($yo, $sucesor): void {
             $yo->forceFill(['administrador_principal' => false])->save();
             $sucesor->forceFill(['administrador_principal' => true])->save();
-            DB::table('password_reset_tokens')->where('email', $yo->email)->delete();
+            Invitaciones::borrarEnlaces($yo->email);
             $yo->delete();
         });
 

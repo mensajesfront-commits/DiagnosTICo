@@ -157,7 +157,7 @@ class UsuariosController extends Controller
 
         DB::transaction(function () use ($ids, $correos, $empresa, $ahora): void {
             DB::table('sessions')->whereIn('user_id', $ids)->delete();
-            DB::table('password_reset_tokens')->whereIn('email', $correos)->delete();
+            Invitaciones::borrarEnlaces($correos);
             User::whereKey($ids)->update(['deleted_at' => $ahora]);
             $empresa?->forceFill(['deleted_at' => $ahora])->save();
         });

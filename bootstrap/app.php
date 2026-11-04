@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CabecerasSeguridad;
 use App\Http\Middleware\CerrarSesionCuentaInactiva;
+use App\Http\Middleware\ElegirEnlaceContrasena;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LimitarIntentosAcceso;
 use App\Http\Middleware\NormalizarCorreo;
@@ -40,6 +41,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             CerrarSesionCuentaInactiva::class,
+            // ERR-09: L4 valida con el broker de invitación o el de recuperación.
+            ElegirEnlaceContrasena::class,
             // Después de revisar la cuenta real y antes de compartir los datos.
             VerComo::class,
             LimitarIntentosAcceso::class,

@@ -109,7 +109,7 @@ class FortifyServiceProvider extends ServiceProvider
 
     /**
      * Correo de "¿Olvidaste tu contraseña?" en español y con el nombre del
-     * sistema. El enlace no vence por tiempo (RN-006, config/auth.php).
+     * sistema. El enlace vence a los 10 minutos (RN-006, ERR-09, config/auth.php).
      */
     private function configureResetEmail(): void
     {
@@ -126,7 +126,7 @@ class FortifyServiceProvider extends ServiceProvider
                 ->line('Recibimos una solicitud para cambiar la contraseña de tu cuenta.')
                 ->action('Cambiar contraseña', $url)
                 ->line('La contraseña nueva debe ser distinta de la anterior y no puede tener partes de tu correo.')
-                ->line('El enlace sirve hasta que guardes la contraseña nueva. Si pides otro, solo funciona el último.')
+                ->line('El enlace vence en 10 minutos. Si pides otro, solo funciona el último.')
                 ->line('Si no pediste el cambio, ignora este correo: tu contraseña sigue igual.')
                 ->salutation('El equipo de NuevasTIC');
         });

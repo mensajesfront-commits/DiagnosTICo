@@ -4,8 +4,8 @@
  *
  * Fortify recibe `email`. Por seguridad, el aviso es el mismo aunque el correo
  * no exista en el sistema (RN-005); aquí se muestra cuando el servidor
- * devuelve `status`. El enlace no vence por tiempo: sirve hasta que se cambie
- * la contraseña (RN-006). El texto no afirma que el correo exista (RN-005).
+ * devuelve `status`. El enlace vence a los 10 minutos (RN-006, ERR-09). El
+ * texto no afirma que el correo exista (RN-005).
  *
  * Dos estados en la misma tarjeta:
  * - Formulario: el correo, "Enviar enlace" y "Volver a iniciar sesión".
@@ -54,7 +54,7 @@ watch(
 
 const pasos = [
     'Abre el correo «Cambia tu contraseña de Captter».',
-    'Toca el botón «Cambiar contraseña».',
+    'Toca el botón «Cambiar contraseña» antes de 10 minutos.',
     'Escribe tu contraseña nueva y entra.',
 ];
 </script>
@@ -93,8 +93,8 @@ const pasos = [
                 class="flex items-start gap-2 rounded-xl bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
             >
                 <Info class="mt-px size-3.5 shrink-0" aria-hidden="true" />
-                El enlace no vence por tiempo: sirve hasta que cambies la
-                contraseña.
+                El enlace vence a los 10 minutos. Si se te pasa el tiempo, pide
+                otro aquí mismo.
             </p>
 
             <Boton
