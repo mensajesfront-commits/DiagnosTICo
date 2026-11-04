@@ -205,11 +205,31 @@ class DatosDiagnosticos
     public static function categorias(): array
     {
         $categorias = Categoria::query()
-            ->with(['usos.diagnostico.sector:id,nombre', 'usos.diagnostico.versiones:id,diagnostico_id,numero'])
+            ->with([
+                'usos' => fn ($q) => $q->withCount('preguntas'),
+                'usos.diagnostico.sector:id,nombre',
+                'usos.diagnostico.versiones:id,diagnostico_id,numero',
+            ])
             ->withCount('usos')
             ->orderByRaw('archivado_en is not null')
             ->orderBy('nombre')
             ->get();
+
+        // Versiones que incluyen cada categoría y cuáles ya tienen respuestas,
+        // en dos consultas para todo el catálogo en vez de tres por categoría (ERR-10).
+        $versionesDe = [];
+        foreach (VersionDiagnostico::query()->get(['id', 'contenido']) as $version) {
+            /** @var list<array{categoria_id?: int|string|null}> $partes */
+            $partes = $version->contenido['categorias'] ?? [];
+            foreach ($partes as $parte) {
+                if (isset($parte['categoria_id'])) {
+                    $versionesDe[(int) $parte['categoria_id']][$version->id] = true;
+                }
+            }
+        }
+        $conRespuestas = Medicion::query()
+            ->whereIn('estado', ['en_curso', 'enviada', 'terminada', 'vencida'])
+            ->distinct()->pluck('version_diagnostico_id')->flip();
 
         $lista = [];
 
@@ -226,15 +246,14 @@ class DatosDiagnosticos
                 }
 
                 $activos++;
-                $preguntas += $uso->preguntas()->count();
+                $preguntas += (int) $uso->getAttribute('preguntas_count');
 
                 if (self::esBorrador($diagnostico)) {
                     $borradores[] = self::nombreBorrador($diagnostico);
                 }
             }
 
-            $versiones = VersionDiagnostico::query()
-                ->whereJsonContains('contenido->categorias', ['categoria_id' => $categoria->id]);
+            $versiones = array_keys($versionesDe[$categoria->id] ?? []);
 
             $lista[] = [
                 'id' => $categoria->id,
@@ -242,14 +261,11 @@ class DatosDiagnosticos
                 'descripcion' => $categoria->descripcion,
                 'diagnosticos' => $activos,
                 'preguntas' => $preguntas,
-                'versiones_publicadas' => (clone $versiones)->count(),
+                'versiones_publicadas' => count($versiones),
                 'borradores' => $borradores,
                 // Alguna empresa ya respondió una versión que la incluye:
                 // se archiva en vez de borrarse (RN-009).
-                'tiene_respuestas' => Medicion::query()
-                    ->whereIn('version_diagnostico_id', (clone $versiones)->select('id'))
-                    ->whereIn('estado', ['en_curso', 'enviada', 'terminada', 'vencida'])
-                    ->exists(),
+                'tiene_respuestas' => collect($versiones)->contains(fn (int $id) => $conRespuestas->has($id)),
                 'archivada' => $categoria->archivada(),
             ];
         }

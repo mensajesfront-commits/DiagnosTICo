@@ -171,7 +171,7 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
         </header>
 
         <!-- Indicadores -->
-        <dl class="grid shrink-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid shrink-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div
                 class="flex items-center gap-4 rounded-2xl border border-linea bg-white p-4"
             >
@@ -180,7 +180,7 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                 >
                     <Building2 class="size-5" aria-hidden="true" />
                 </span>
-                <div class="min-w-0">
+                <dl class="min-w-0">
                     <dt class="text-xs font-medium text-tinta-suave">
                         Empresas registradas
                     </dt>
@@ -197,7 +197,7 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                             )
                         }}
                     </dd>
-                </div>
+                </dl>
             </div>
 
             <div class="rounded-2xl border border-linea bg-white p-4">
@@ -207,7 +207,7 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                     >
                         <ClipboardList class="size-5" aria-hidden="true" />
                     </span>
-                    <div class="min-w-0">
+                    <dl class="min-w-0">
                         <dt class="text-xs font-medium text-tinta-suave">
                             Mediciones pendientes
                         </dt>
@@ -216,9 +216,9 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                         >
                             {{ indicadores.pendientes }}
                         </dd>
-                    </div>
+                    </dl>
                 </div>
-                <dd v-if="indicadores.pendientes > 0" class="mt-2">
+                <div v-if="indicadores.pendientes > 0" class="mt-2">
                     <span
                         class="flex h-2 overflow-hidden rounded-full bg-lienzo-oscuro"
                         aria-hidden="true"
@@ -246,10 +246,10 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                             {{ x.texto }}
                         </span>
                     </span>
-                </dd>
-                <dd v-else class="mt-1 text-xs text-tinta-suave">
+                </div>
+                <p v-else class="mt-1 text-xs text-tinta-suave">
                     Ninguna por ahora
-                </dd>
+                </p>
             </div>
 
             <div
@@ -260,7 +260,7 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                 >
                     <CircleCheckBig class="size-5" aria-hidden="true" />
                 </span>
-                <div class="min-w-0">
+                <dl class="min-w-0">
                     <dt class="text-xs font-medium text-tinta-suave">
                         Diagnósticos completados
                     </dt>
@@ -268,7 +268,7 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                         {{ indicadores.completados_mes }}
                     </dd>
                     <dd class="text-xs text-tinta-suave">este mes</dd>
-                </div>
+                </dl>
             </div>
 
             <div
@@ -288,7 +288,7 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                 >
                     <Gauge class="size-5" aria-hidden="true" />
                 </span>
-                <div class="min-w-0">
+                <dl class="min-w-0">
                     <dt class="text-xs font-medium text-tinta-suave">
                         Puntaje promedio
                     </dt>
@@ -306,9 +306,9 @@ const hoy = hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1);
                                 : ''
                         }}último diagnóstico de cada empresa
                     </dd>
-                </div>
+                </dl>
             </div>
-        </dl>
+        </div>
 
         <!-- Requiere tu atención -->
         <button

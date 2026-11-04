@@ -45,6 +45,9 @@ class MedicionesController extends Controller
             ->whereIn('empresa_id', $empresas->modelKeys())->get()->keyBy('empresa_id');
         $solicitudes = SolicitudMedicion::abiertasDe($empresas->modelKeys());
         Plazos::precargar($empresas->modelKeys());
+        // Último número de medición por empresa en una sola consulta (ERR-10).
+        $ultimos = Medicion::query()->whereIn('empresa_id', $empresas->modelKeys())->where('estado', '!=', 'cancelada')
+            ->groupBy('empresa_id')->selectRaw('empresa_id, max(numero) as ultimo')->pluck('ultimo', 'empresa_id');
 
         return Inertia::render('mediciones/Asignar', [
             'empresas' => $empresas->map(fn (Empresa $e) => [
@@ -66,7 +69,7 @@ class MedicionesController extends Controller
                 'solicitud' => $solicitudes[$e->id] ?? null,
                 // La fecha límite más cercana que se acepta, en la hora de la empresa.
                 'fecha_minima' => Plazos::fechaMinima($e->id),
-                'siguiente' => ((int) $e->mediciones()->where('estado', '!=', 'cancelada')->max('numero')) + 1,
+                'siguiente' => ((int) ($ultimos[$e->id] ?? 0)) + 1,
                 // Para "Para:" y {nombre_usuario} del correo (A3.1e).
                 'principal' => ($u = $principales->get($e->id)) ? ['name' => $u->name, 'email' => $u->email] : null,
             ])->values(),

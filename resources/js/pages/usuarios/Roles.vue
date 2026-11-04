@@ -123,9 +123,10 @@ const rolesInternos = computed(() =>
                                     rol.id === elegidoId
                                         ? 'bg-marca text-white'
                                         : 'hover:bg-lienzo',
+                                    // Gris sin bajar el contraste del texto (ERR-11).
                                     !rol.activo &&
                                         rol.id !== elegidoId &&
-                                        'opacity-70',
+                                        'grayscale',
                                 )
                             "
                             @click="elegir(rol)"

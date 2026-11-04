@@ -360,7 +360,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
             "
         >
             <div class="flex flex-col gap-4 lg:min-h-0">
-                <dl class="grid shrink-0 gap-3 sm:grid-cols-3">
+                <div class="grid shrink-0 gap-3 sm:grid-cols-3">
                     <div
                         class="flex items-center gap-4 rounded-2xl border border-linea bg-linear-to-br from-marca-suave/70 to-white p-4"
                     >
@@ -376,7 +376,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             aria-hidden="true"
                             >–</span
                         >
-                        <div class="min-w-0">
+                        <dl class="min-w-0">
                             <dt class="text-xs font-medium text-tinta-suave">
                                 Último puntaje
                             </dt>
@@ -391,9 +391,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                             >
                                 Medición {{ ultimo.numero }}
                             </dd>
-                        </div>
+                        </dl>
                     </div>
-                    <div class="rounded-2xl border border-linea bg-white p-4">
+                    <dl class="rounded-2xl border border-linea bg-white p-4">
                         <dt
                             class="flex items-center gap-1.5 text-xs font-medium text-tinta-suave"
                         >
@@ -422,7 +422,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         <dd v-else class="mt-1 text-sm text-tinta-suave">
                             Aparece desde la 2.ª medición.
                         </dd>
-                    </div>
+                    </dl>
                     <div
                         class="flex items-center gap-3 rounded-2xl border border-linea bg-white p-4"
                     >
@@ -441,7 +441,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                         >
                             <ClipboardList class="size-5" />
                         </span>
-                        <div class="min-w-0">
+                        <dl class="min-w-0">
                             <dt class="text-xs font-medium text-tinta-suave">
                                 {{
                                     pendiente
@@ -471,9 +471,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                         : 'terminadas'
                                 }}
                             </dd>
-                        </div>
+                        </dl>
                     </div>
-                </dl>
+                </div>
 
                 <section
                     class="flex shrink-0 flex-col rounded-2xl border border-linea bg-white px-5 py-4"

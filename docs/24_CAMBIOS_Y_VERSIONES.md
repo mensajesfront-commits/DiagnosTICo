@@ -70,6 +70,30 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Corregido (auditoría QA, 4 de noviembre)
+
+Hallazgos de la auditoría QA (informe aparte). Cada corrección tiene su prueba en `tests/Feature/AuditoriaQaTest.php`.
+
+- **ERR-02 · Correos repetidos por mayúsculas:** se podía invitar `SOFIA@ElTrigal.co` aunque existiera `sofia@eltrigal.co`.
+  - El middleware `NormalizarCorreo` pasa el campo `email` a minúsculas antes de validar, y `User` lo guarda así.
+  - Índice único `lower(email)`: la migración `2026_11_04_000001` se detiene y lista los correos repetidos si ya los hay.
+- **ERR-01 · Error 500 con un correo muy largo en el login:** las llaves de los dos contadores de intentos (`login` y el de Fortify, `LimitadorLogin`) usan un hash del correo; `cache.key` es de 255 caracteres.
+- **ERR-03 · Enlaces inyectados en los correos:** un nombre como `[Haz clic](https://…)` se volvía un enlace real. Los correos usan `App\Notifications\Correo`, que escapa el Markdown de cada línea y del saludo.
+- **ERR-06 · Cabeceras de seguridad:** `CabecerasSeguridad` manda `X-Frame-Options`, `frame-ancestors`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y, con HTTPS, HSTS.
+- **ERR-04 · Sectores y categorías repetidos por mayúsculas:** regla `NombreUnico`, que no mira mayúsculas ni espacios de más (como los diagnósticos).
+- **ERR-05 · Mensajes en inglés:** `lang/es/validation.php` tiene ya todas las reglas de Laravel y nombres para `empresas.*`, `opciones.*` y `paginas.*`. "El :attribute elegido" pasó a "El valor elegido en :attribute", sin género.
+- **ERR-12 · Rol inactivo:** recibe su propio mensaje ("Su cuenta está activa, pero su rol… está inactivo") y el modal se titula "Rol inactivo", en vez de "cuenta desactivada".
+- **ERR-14 · PDF:** si una fuente o una gráfica falla, el informe se imprime igual en vez de esperar 30 s hasta agotarse (`window.radarListo` en `finally`).
+- **ERR-11 · Accesibilidad:** listas `<dl>` bien formadas en A1, A3.1 y C1. Las filas inactivas de A5 y de roles van en gris (`grayscale`) en vez de bajarles la opacidad, que dejaba el texto sin contraste.
+- **ERR-10 · Consultas repetidas:** `/categorias` pasó de 55 a 13 consultas, la ficha de 42 a 24 y Asignar medición de 46 a 23.
+- **ERR-13 · Datos de demostración:** `DatosDemoSeeder` les pone actividad económica a las empresas.
+- **ERR-08 · Dependencias:**
+  - `symfony/mime` 8.1.10 (CVE-2026-45070);
+  - vite 8.3.5, puppeteer, concurrently, shell-quote, undici y zod actualizados. `npm audit --omit=dev`: 0 alertas.
+  - **Pendiente:** las alertas de desarrollo que quedan piden `vite-plus` 1.5 (versión mayor).
+- **ERR-07 · Despliegue:** en `.env.example` y en `docs/20` se documentan `APP_ENV=production`, `APP_DEBUG=false` e `INERTIA_DEVTOOLS_ENABLED=false`.
+- **ERR-09 sin cambio:** los enlaces de recuperación siguen valiendo un año por RN-006. **[FUNCIONALIDAD POR DEFINIR]** Separar invitaciones (largas) de recuperación (cortas).
+
 ### Corregido (A3.3 · cambiar de medición conserva la pestaña, 4 de noviembre)
 
 - **El problema:** en el resultado, al elegir otra medición (M1, M2… o las flechas) estando en "Categorías" o "Recomendaciones", la página volvía a "Resumen".

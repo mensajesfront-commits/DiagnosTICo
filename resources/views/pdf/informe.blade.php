@@ -781,7 +781,12 @@
         const total = {{ (int) $i['puntaje'] }};
 
         // El canvas no espera a las fuentes: se dibuja cuando Inter ya cargó.
-        Promise.all([document.fonts.load("9px 'Inter'"), document.fonts.load("600 9px 'Montserrat'")]).then(dibujar);
+        // Pase lo que pase, el PDF no se queda esperando (ERR-14): si una fuente o
+        // una gráfica falla, se imprime igual sin ella en vez de agotar los 30 s.
+        Promise.all([document.fonts.load("9px 'Inter'"), document.fonts.load("600 9px 'Montserrat'")])
+            .then(dibujar)
+            .catch((error) => console.error(error))
+            .finally(() => { window.radarListo = true; });
 
         /** "Herramientas de automatización" → ["Herramientas de", "automatización"]. */
         function partir(texto, max = 22) {

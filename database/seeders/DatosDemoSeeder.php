@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ActividadEconomica;
 use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
@@ -160,6 +161,11 @@ class DatosDemoSeeder extends Seeder
             'nombre' => $nombre,
             'descripcion' => 'Empresa de demostración para ver Captter con datos.',
             'sector_id' => $version->diagnostico->sector_id,
+            // Obligatoria al registrar y al editar (ERR-13): una actividad del sector.
+            'actividad_economica_id' => ActividadEconomica::query()
+                ->where('sector_id', $version->diagnostico->sector_id)->where('activo', true)
+                ->orderBy('codigo')->skip($i % 3)->value('id')
+                ?? ActividadEconomica::query()->where('sector_id', $version->diagnostico->sector_id)->value('id'),
             'ciudad' => $ciudad,
             'departamento' => $departamento,
             'pais' => 'Colombia',

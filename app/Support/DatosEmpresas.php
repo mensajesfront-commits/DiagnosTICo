@@ -239,14 +239,26 @@ class DatosEmpresas
      */
     public static function diagnosticosPublicados(int $sectorId): array
     {
-        return array_values(Diagnostico::query()
-            ->where('sector_id', $sectorId)
+        return array_values(self::diagnosticosPorSector([$sectorId])[$sectorId] ?? []);
+    }
+
+    /**
+     * Lo mismo para varios sectores en una sola consulta (ERR-10).
+     *
+     * @param  array<int, int|string>  $sectorIds
+     * @return array<int|string, array<int, array<string, mixed>>>
+     */
+    private static function diagnosticosPorSector(array $sectorIds): array
+    {
+        return Diagnostico::query()
+            ->whereIn('sector_id', $sectorIds)
             ->where('estado', Diagnostico::PUBLICADO)
             ->with('ultimaVersion')
             ->orderBy('nombre')
             ->get()
             ->filter(fn (Diagnostico $d) => $d->ultimaVersion !== null)
-            ->map(function (Diagnostico $d): array {
+            ->groupBy('sector_id')
+            ->map(fn (Collection $grupo) => $grupo->map(function (Diagnostico $d): array {
                 /** @var list<array{preguntas?: list<mixed>}> $categorias */
                 $categorias = $d->ultimaVersion->contenido['categorias'] ?? [];
 
@@ -257,9 +269,8 @@ class DatosEmpresas
                     'categorias' => count($categorias),
                     'preguntas' => array_sum(array_map(fn (array $c) => count($c['preguntas'] ?? []), $categorias)),
                 ];
-            })
-            ->values()
-            ->all());
+            })->values()->all())
+            ->all();
     }
 
     /**
@@ -269,15 +280,21 @@ class DatosEmpresas
      */
     public static function opciones(): array
     {
+        $sectores = Sector::query()->orderBy('nombre')->get(['id', 'nombre', 'activo']);
+        // Actividades y diagnósticos de todos los sectores en dos consultas (ERR-10).
+        $actividades = ActividadEconomica::query()->where('activo', true)->orderBy('codigo')
+            ->get(['id', 'sector_id', 'codigo', 'nombre'])->groupBy('sector_id');
+        $diagnosticos = self::diagnosticosPorSector($sectores->modelKeys());
+
         return [
-            'sectores' => Sector::query()->orderBy('nombre')->get(['id', 'nombre', 'activo'])
+            'sectores' => $sectores
                 ->map(fn (Sector $s) => [
                     'id' => $s->id,
                     'nombre' => $s->nombre,
                     'activo' => $s->activo,
-                    'actividades' => ActividadEconomica::where('sector_id', $s->id)->where('activo', true)->orderBy('codigo')
-                        ->get(['id', 'codigo', 'nombre'])->toArray(),
-                    'diagnosticos' => self::diagnosticosPublicados($s->id),
+                    'actividades' => ($actividades->get($s->id) ?? collect())
+                        ->map(fn (ActividadEconomica $a) => ['id' => $a->id, 'codigo' => $a->codigo, 'nombre' => $a->nombre])->values()->all(),
+                    'diagnosticos' => $diagnosticos[$s->id] ?? [],
                 ])->all(),
             'paises' => Ubicaciones::paises(),
             'empleados' => OpcionesPerfil::RANGOS_EMPLEADOS,

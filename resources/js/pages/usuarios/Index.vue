@@ -410,8 +410,9 @@ const estadoCuenta: Record<EstadoCuenta, { texto: string; punto: string }> = {
                                             cn(
                                                 'flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
                                                 tonoRol(cuenta.rol).avatar,
+                                                // Gris sin bajar el contraste del texto (ERR-11).
                                                 cuenta.estado !== 'activa' &&
-                                                    'opacity-60',
+                                                    'grayscale',
                                             )
                                         "
                                         aria-hidden="true"

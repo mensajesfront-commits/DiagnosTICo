@@ -298,9 +298,9 @@ const distribucion = computed(() =>
                             {{ resumen.bajaron }}
                         </span>
                     </dd>
-                    <p class="mt-0.5 text-xs text-tinta-suave">
+                    <dd class="mt-0.5 text-xs text-tinta-suave">
                         mejoraron · bajaron
-                    </p>
+                    </dd>
                 </div>
                 <div class="rounded-2xl border border-linea bg-white p-4">
                     <dt
