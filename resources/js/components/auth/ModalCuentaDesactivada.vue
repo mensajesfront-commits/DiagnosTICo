@@ -9,7 +9,7 @@
  * equivocada no aparece, para no revelar qué cuentas existen (RN-005).
  *
  * [INFORMACIÓN PENDIENTE] El correo de soporte es el mismo del panel de
- * acceso (soporte@nuevastic.co); falta confirmarlo con NuevasTIC.
+ * acceso (SOPORTE_EMAIL, hoy contacto@captter.com).
  *
  * Diseño: el mensaje del servidor tal cual y una tarjeta de soporte con el
  * correo y el botón "Escribir a soporte" (abre el correo con el asunto).
@@ -17,6 +17,7 @@
 import { CircleSlash, LifeBuoy, Mail } from '@lucide/vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import { useCorreoSoporte } from '@/lib/soporte';
 
 withDefaults(defineProps<{ mensaje: string; titulo?: string }>(), {
     titulo: 'Cuenta desactivada',
@@ -24,7 +25,7 @@ withDefaults(defineProps<{ mensaje: string; titulo?: string }>(), {
 
 const abierto = defineModel<boolean>('abierto', { default: false });
 
-const SOPORTE = 'soporte@nuevastic.co';
+const SOPORTE = useCorreoSoporte();
 const enlace = (titulo: string) =>
     `mailto:${SOPORTE}?subject=${encodeURIComponent(`${titulo} en Captter`)}`;
 </script>

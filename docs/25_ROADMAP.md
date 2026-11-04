@@ -16,7 +16,6 @@
 | Alta | Cargar los diagnósticos reales de cada sector | NuevasTIC los genera con IA y los carga a mano en la aplicación cuando se lance (T-072). |
 | Alta | Revisar con NuevasTIC las instrucciones de la IA | Las escribió el equipo. Las frases de los niveles ya están aprobadas. |
 | Alta | Definir el servidor, el dominio, el correo SMTP y las llaves de Turnstile | Sin esto no se puede poner en línea (`20_DESPLIEGUE.md`). OpenAI lo paga NuevasTIC, con gpt-4.1-mini. |
-| Media | Correo de soporte real (`SOPORTE_EMAIL`) | Lo ve la empresa con una medición vencida. |
 
 ## 3. Mejoras propuestas
 

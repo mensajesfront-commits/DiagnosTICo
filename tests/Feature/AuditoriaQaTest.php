@@ -183,3 +183,12 @@ it('la migración pasa las invitaciones pendientes a su tabla y deja la recupera
     expect(DB::table('invitaciones_tokens')->pluck('email')->all())->toBe([$invitada->email])
         ->and(DB::table('password_reset_tokens')->pluck('email')->all())->toBe([$conClave->email]);
 });
+
+// --- Correo de soporte (4 de noviembre) ----------------------------------------------
+
+it('todas las pantallas reciben el correo de soporte de SOPORTE_EMAIL', function () {
+    config(['diagnostico.soporte_email' => 'contacto@captter.com']);
+
+    $this->get(route('login'))
+        ->assertInertia(fn ($p) => $p->where('soporte', 'contacto@captter.com'));
+});

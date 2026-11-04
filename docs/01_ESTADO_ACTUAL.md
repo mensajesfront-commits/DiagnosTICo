@@ -65,9 +65,8 @@ Lo construido, de punta a punta:
 
 ## Pendiente con NuevasTIC
 
-- **[INFORMACIÓN PENDIENTE]** El correo de soporte (`SOPORTE_EMAIL`).
 - **[INFORMACIÓN PENDIENTE]** Las llaves reales de Cloudflare Turnstile (el captcha del registro).
-- **[INFORMACIÓN PENDIENTE]** Los datos del responsable en la política de datos (razón social, NIT, domicilio, vigencia).
+- Los Términos y Condiciones y la Política de Privacidad ya son los oficiales de Captter (4 de noviembre). **[INCONSISTENCIA DETECTADA]** No coinciden del todo con el sistema (pagos, cookies, OpenAI y Cloudflare sin nombrar); detalle en docs/17.
 - **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Lo vigente es una etapa por categoría y el informe PDF completo de RN-024.
 
 ## Cómo verificar lo hecho

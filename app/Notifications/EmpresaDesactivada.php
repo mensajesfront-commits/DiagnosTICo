@@ -32,7 +32,7 @@ class EmpresaDesactivada extends Notification
         }
 
         return $correo
-            ->line('Tus mediciones y resultados se conservan. Escribe a soporte@nuevastic.co si tienes preguntas.')
+            ->line('Tus mediciones y resultados se conservan. Escribe a '.config('diagnostico.soporte_email').' si tienes preguntas.')
             ->salutation('El equipo de NuevasTIC');
     }
 }

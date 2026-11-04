@@ -47,6 +47,8 @@ class HandleInertiaRequests extends Middleware
             ],
             // A5.4 · "Ver como" activo: la franja de aviso (RN-026).
             'verComo' => SesionVerComo::compartido($request),
+            // Correo de soporte que muestran las pantallas (SOPORTE_EMAIL).
+            'soporte' => (string) config('diagnostico.soporte_email'),
         ];
     }
 }

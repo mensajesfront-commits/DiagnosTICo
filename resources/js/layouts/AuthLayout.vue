@@ -16,6 +16,9 @@
 import { ClipboardList, LifeBuoy, Sparkles, TrendingUp } from '@lucide/vue';
 import { onBeforeUnmount, onMounted } from 'vue';
 import Logo from '@/components/marca/Logo.vue';
+import { useCorreoSoporte } from '@/lib/soporte';
+
+const soporte = useCorreoSoporte();
 
 const {
     title = '',
@@ -122,10 +125,10 @@ onBeforeUnmount(() => document.documentElement.classList.remove('sin-barra'));
                     <span>
                         ¿Necesitas ayuda? Escribe al equipo de NuevasTIC:
                         <a
-                            href="mailto:soporte@nuevastic.co"
+                            :href="`mailto:${soporte}`"
                             class="text-white underline underline-offset-2"
                         >
-                            soporte@nuevastic.co
+                            {{ soporte }}
                         </a>
                     </span>
                 </p>
@@ -165,8 +168,8 @@ onBeforeUnmount(() => document.documentElement.classList.remove('sin-barra'));
                     <LifeBuoy class="size-3.5 shrink-0" aria-hidden="true" />
                     <span>
                         ¿Necesitas ayuda? Escribe a
-                        <a href="mailto:soporte@nuevastic.co" class="underline">
-                            soporte@nuevastic.co
+                        <a :href="`mailto:${soporte}`" class="underline">
+                            {{ soporte }}
                         </a>
                     </span>
                 </p>

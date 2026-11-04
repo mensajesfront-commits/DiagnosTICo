@@ -8,8 +8,7 @@
  * cada rol. El 500 solo se ve con APP_DEBUG apagado; el 419 no llega aquí
  * (vuelve atrás con un aviso).
  *
- * [INFORMACIÓN PENDIENTE] El correo de soporte (soporte@nuevastic.co) falta
- * confirmarlo con NuevasTIC, igual que en el panel de acceso.
+ * El correo de soporte sale de SOPORTE_EMAIL (contacto@captter.com).
  */
 import { Head } from '@inertiajs/vue3';
 import {
@@ -25,6 +24,9 @@ import type { Component } from 'vue';
 import { computed } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Logo from '@/components/marca/Logo.vue';
+import { useCorreoSoporte } from '@/lib/soporte';
+
+const soporte = useCorreoSoporte();
 
 const props = defineProps<{ codigo: number }>();
 
@@ -144,9 +146,9 @@ function volver(): void {
                 <span>
                     ¿Sigue pasando? Escribe a
                     <a
-                        :href="`mailto:soporte@nuevastic.co?subject=${encodeURIComponent(`Error ${codigo} en Captter`)}`"
+                        :href="`mailto:${soporte}?subject=${encodeURIComponent(`Error ${codigo} en Captter`)}`"
                         class="underline underline-offset-2"
-                        >soporte@nuevastic.co</a
+                        >{{ soporte }}</a
                     >
                 </span>
             </p>

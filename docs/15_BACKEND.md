@@ -260,7 +260,7 @@ Tarea (HU-070): `mediciones:vencer` corre cada hora (a los :05) y marca `vencida
 | POST | `/mi-diagnostico/{medicion}/solicitud` | `responder.solicitar` | HU-082: solo si venció; una solicitud abierta por empresa; avisa por correo a los administradores (`NuevaMedicionSolicitada`). 5 por minuto |
 
 - **Se puede responder** si está no iniciada o en curso y no pasó la fecha límite (RN-016).
-- El correo de contacto de E1 sale de `SOPORTE_EMAIL` (**[INFORMACIÓN PENDIENTE]** la dirección real).
+- El correo de contacto de E1 sale de `SOPORTE_EMAIL` (contacto@captter.com).
 
 ## Configuración de la IA (A4, HU-041 a HU-045, HU-080, hecho)
 

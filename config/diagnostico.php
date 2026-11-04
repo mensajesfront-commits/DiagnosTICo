@@ -31,7 +31,7 @@ return [
     | Correo de contacto que ve la empresa (E1, medición vencida).
     | [INFORMACIÓN PENDIENTE] NuevasTIC confirma la dirección real.
     */
-    'soporte_email' => env('SOPORTE_EMAIL', 'soporte@nuevastic.co'),
+    'soporte_email' => env('SOPORTE_EMAIL', 'contacto@captter.com'),
 
     /*
     | Fecha límite de las mediciones (App\Support\Plazos): mínimo de días

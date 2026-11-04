@@ -6,7 +6,7 @@
 
 ## Quién lo pide
 
-**NuevasTIC** acompaña a las empresas en su marketing digital. El contacto de soporte que aparece en los wireframes es `soporte@nuevastic.co`.
+**NuevasTIC** acompaña a las empresas en su marketing digital. El correo de soporte oficial es `contacto@captter.com` (4 de noviembre de 2026); los wireframes mostraban `soporte@nuevastic.co`.
 
 **[INFORMACIÓN PENDIENTE]** Falta la descripción oficial de NuevasTIC: a qué se dedica, cuántas empresas atiende y quién es la persona responsable del proyecto. Debe tomarse de la descripción del proyecto que entregó NuevasTIC.
 

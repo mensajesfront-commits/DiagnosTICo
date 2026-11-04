@@ -223,7 +223,6 @@ En **Mi perfil** (E11) cambias tus datos, tu foto y tu contraseña. La cuenta pr
 
 ## Preguntas frecuentes
 
-- **No me llegó el correo.** Revisa la carpeta de spam. Si no está, pide a NuevasTIC que lo reenvíe.
-  > **[INFORMACIÓN PENDIENTE]** Correo de soporte real de NuevasTIC (`SOPORTE_EMAIL`).
+- **No me llegó el correo.** Revisa la carpeta de spam. Si no está, escribe a **contacto@captter.com** para que te lo reenvíen.
 - **¿Puedo responder desde el celular?** Sí. Las pantallas se adaptan al ancho del celular.
 - **¿Quién ve mis respuestas?** Tu empresa, tus colaboradores y el equipo de NuevasTIC. Ninguna otra empresa (RN-007).

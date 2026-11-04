@@ -6,6 +6,14 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
+### Cambiado (correo de soporte, 4 de noviembre)
+
+- El correo de soporte es **contacto@captter.com**: `SOPORTE_EMAIL` en `.env.example` y el valor por defecto en `config/diagnostico.php`.
+- Las pantallas ya no lo tienen escrito. Lo leen de `SOPORTE_EMAIL`, que se comparte con todas las páginas (`HandleInertiaRequests`, `useCorreoSoporte`):
+  - panel de acceso (L1–L4), cuenta desactivada y páginas de error;
+  - inicio de la empresa (E1) y responder;
+  - el PDF y el correo de "empresa desactivada".
+
 ### Cambiado (L2 · textos legales oficiales, 4 de noviembre)
 
 - Crear cuenta muestra los **Términos y Condiciones** (16 de septiembre de 2025) y la **Política de Privacidad** (27 de mayo de 2025) oficiales de Captter, copiados tal cual en `resources/js/lib/legales.ts`. Reemplazan el borrador anterior.
