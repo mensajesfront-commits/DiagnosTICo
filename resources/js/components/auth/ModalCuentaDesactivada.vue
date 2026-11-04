@@ -8,8 +8,8 @@
  * desactivada, o si la desactivan con la sesión abierta. Con una contraseña
  * equivocada no aparece, para no revelar qué cuentas existen (RN-005).
  *
- * [INFORMACIÓN PENDIENTE] El correo de soporte es el mismo del panel de
- * acceso (SOPORTE_EMAIL, hoy contacto@captter.com).
+ * El correo de soporte es el mismo del panel de acceso (SOPORTE_EMAIL,
+ * contacto@captter.com).
  *
  * Diseño: el mensaje del servidor tal cual y una tarjeta de soporte con el
  * correo y el botón "Escribir a soporte" (abre el correo con el asunto).

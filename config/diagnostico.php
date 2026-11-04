@@ -28,8 +28,8 @@ return [
     ],
 
     /*
-    | Correo de contacto que ve la empresa (E1, medición vencida).
-    | [INFORMACIÓN PENDIENTE] NuevasTIC confirma la dirección real.
+    | Correo de soporte que ven todas las pantallas, el PDF y los correos.
+    | Oficial desde el 4 de noviembre de 2026: contacto@captter.com.
     */
     'soporte_email' => env('SOPORTE_EMAIL', 'contacto@captter.com'),
 
