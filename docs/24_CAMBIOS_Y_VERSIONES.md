@@ -70,6 +70,11 @@ La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se ag
 - Corregido: "Publicar versión" ahora pide el permiso "Publicar versiones" (`diagnosticos.publicar`); antes bastaba con "Editar".
 - Corregido (A5.1c): al desmarcar "Rol activo" y guardar no pasaba nada ni salía un mensaje. Ahora se muestra el error del servidor.
 
+### Corregido (A3.3 · cambiar de medición conserva la pestaña, 4 de noviembre)
+
+- **El problema:** en el resultado, al elegir otra medición (M1, M2… o las flechas) estando en "Categorías" o "Recomendaciones", la página volvía a "Resumen".
+- **La solución:** el enlace lleva la pestaña en la URL (`?pestana=recomendaciones`) y, en "Categorías", también la categoría abierta (`&categoria=c9`) si existe en la otra medición. `Resultado.vue` las lee al abrir.
+
 ### Cambiado (E6 / A3.3 · pestaña Recomendaciones, 3 de noviembre)
 
 - **Agrupadas por prioridad:** "Atender primero" (Crítico), "Después" (Se puede mejorar) y "Para mantener" (Vas en buen camino o Sigue así), cada grupo con cuántas categorías tiene. El número de cada tarjeta sigue el orden de prioridad.

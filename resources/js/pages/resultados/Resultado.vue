@@ -22,7 +22,7 @@
  * punteado ámbar) que explica el caso elegido y deja cambiar entre «Mejor
  * caso», «Caso medio» y «Peor caso» con tarjetas con ícono.
  */
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     CalendarClock,
@@ -145,7 +145,15 @@ const pestanas = [
     { valor: 'recomendaciones' as const, etiqueta: 'Recomendaciones' },
 ];
 
-const pestana = ref<Pestana>('resumen');
+// Al pasar a otra medición se conserva la pestaña (y la categoría abierta):
+// llegan en la URL (?pestana=…&categoria=…). Se lee de Inertia, no de window.
+const consulta = new URLSearchParams(usePage().url.split('?')[1] ?? '');
+const pestanaUrl = consulta.get('pestana');
+const pestana = ref<Pestana>(
+    pestanas.some((p) => p.valor === pestanaUrl)
+        ? (pestanaUrl as Pestana)
+        : 'resumen',
+);
 
 // Resumen: las categorías en barras (por defecto) o en el mapa (radar).
 const vistas = [
@@ -221,7 +229,29 @@ const ordenadas = computed(() =>
 );
 
 // Pestaña Categorías: abre la más débil.
-const elegida = ref(ordenadas.value[0]?.ref ?? '');
+const categoriaUrl = consulta.get('categoria');
+const elegida = ref(
+    props.resultado.categorias.some((c) => c.ref === categoriaUrl)
+        ? (categoriaUrl as string)
+        : (ordenadas.value[0]?.ref ?? ''),
+);
+
+/** Enlace a otra medición en la misma pestaña (y categoría, si aplica). */
+function enlaceMedicion(id: number): string {
+    const params = new URLSearchParams();
+
+    if (pestana.value !== 'resumen') {
+        params.set('pestana', pestana.value);
+    }
+
+    if (pestana.value === 'categorias' && elegida.value) {
+        params.set('categoria', elegida.value);
+    }
+
+    const query = params.toString();
+
+    return rutas.resultados.ver(id) + (query ? `?${query}` : '');
+}
 const categoria = computed(
     () =>
         props.resultado.categorias.find((c) => c.ref === elegida.value) ??
@@ -474,7 +504,7 @@ const porcentaje = (n: number) =>
             >
                 <Link
                     v-if="anteriorMedicion"
-                    :href="rutas.resultados.ver(anteriorMedicion.id)"
+                    :href="enlaceMedicion(anteriorMedicion.id)"
                     class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-linea bg-white text-tinta-suave hover:border-marca hover:text-marca"
                     :aria-label="`Medición ${anteriorMedicion.numero}`"
                     preserve-scroll
@@ -486,7 +516,7 @@ const porcentaje = (n: number) =>
                 >
                     <li v-for="m in mediciones" :key="m.id">
                         <Link
-                            :href="rutas.resultados.ver(m.id)"
+                            :href="enlaceMedicion(m.id)"
                             :aria-current="
                                 m.id === medicion.id ? 'page' : undefined
                             "
@@ -516,7 +546,7 @@ const porcentaje = (n: number) =>
                 </ol>
                 <Link
                     v-if="siguienteMedicion"
-                    :href="rutas.resultados.ver(siguienteMedicion.id)"
+                    :href="enlaceMedicion(siguienteMedicion.id)"
                     class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-linea bg-white text-tinta-suave hover:border-marca hover:text-marca"
                     :aria-label="`Medición ${siguienteMedicion.numero}`"
                     preserve-scroll
