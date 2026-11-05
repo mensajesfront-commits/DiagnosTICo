@@ -1,6 +1,6 @@
 # Estado actual
 
-**Estado:** EN CURSO (T-037). Se actualiza al cerrar cada semana. El detalle de cada cambio está en `24_CAMBIOS_Y_VERSIONES.md`.
+**Estado:** COMPLETO (T-037). Estado del proyecto en la entrega `v1.0.0` (5 de noviembre de 2026). El detalle de cada cambio está en `24_CAMBIOS_Y_VERSIONES.md`.
 
 **Última actualización:** 5 de noviembre de 2026, antes de la entrega.
 
@@ -47,7 +47,7 @@ Lo construido, de punta a punta:
 
 Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 
-**Documentación:** todos los documentos del índice tienen archivo. Los que dicen REQUIERE VALIDACIÓN esperan la revisión de NuevasTIC o del equipo (`00_INDICE.md`).
+**Documentación:** los 32 documentos del índice están en COMPLETO. NuevasTIC aprobó los de negocio el 5 de noviembre de 2026 (`00_INDICE.md`).
 
 ## Reparto del trabajo
 
@@ -61,12 +61,11 @@ Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 | ~~Unir a `develop` la rama `claude/zealous-babbage-7s6joa` (PR #11)~~ | Luis | **Hecho** el 5 de noviembre. El último commit (logotipo en los PDF, despliegue y bot) va en un PR nuevo. Después de actualizar: `php artisan migrate` (3 migraciones del 4 de noviembre) |
 | ~~Recorrer el flujo completo con la clave real de OpenAI~~ | Cristian | **Hecho**: funciona (confirmado el 5 de noviembre) |
 | ~~Revisar a ojo los dos PDF~~ | Cristian | **Hecho** el 4 de noviembre |
-| Revisar con NuevasTIC las instrucciones de la IA | NuevasTIC | En A4 (Configuración IA). Las de fábrica están en `App\Services\Ia\ArmadorPrompt::GENERAL` |
 | Desplegar en el servidor | Equipo | `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio |
 | Revisión pantalla por pantalla (diseño, textos y funciones) | Cristian | Los ajustes se anotan en `18_UI_UX.md` |
 | Instalar desde cero con el README en un equipo limpio (T-021) | Equipo | Con Sail |
-| PR de `develop` a `main` y etiqueta `v1.0.0` (T-152) | Equipo | `main` va 75 commits detrás de `develop` (5 de noviembre). `20_DESPLIEGUE.md` |
-| Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160) | Equipo y NuevasTIC | `00_INDICE.md` |
+| ~~PR de `develop` a `main` y etiqueta `v1.0.0` (T-152)~~ | Equipo | **Hecho** el 5 de noviembre: PR #13 y etiqueta `v1.0.0` sobre `main` |
+| ~~Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160)~~ | Equipo y NuevasTIC | **Hecho** el 5 de noviembre |
 
 ## Decisiones de NuevasTIC (23 de octubre de 2026)
 
@@ -82,18 +81,18 @@ Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 - El bot de WhatsApp lo hace otra persona del equipo, fuera de este repositorio. **Terminado** (confirmado el 4 de noviembre).
 - El resumen semanal se queda como está: los lunes a las 7:50 a. m.
 
-## Confirmado el 4 de noviembre
+## Confirmado el 4 y 5 de noviembre
 
 - **Llaves reales de Cloudflare Turnstile:** ya existen. Van solo en el `.env` del servidor.
 - **Logotipo de NuevasTIC:** es el símbolo del Login (aro azul con la "C" y el punto verde). Ya va en la portada de los dos PDF (`pdf/logo.blade.php`).
 - **Textos legales:** los Términos y Condiciones y la Política de Privacidad son los oficiales de la página de Captter y es todo lo que entregó la empresa. **[INCONSISTENCIA DETECTADA]** No coinciden del todo con el sistema (pagos, cookies, OpenAI y Cloudflare sin nombrar); queda anotado en docs/17 por si la empresa los ajusta después.
 - **Diagnósticos reales:** la empresa los carga a mano.
 - **Bot de WhatsApp:** terminado, fuera de este repositorio. **[INFORMACIÓN PENDIENTE]** Si se conecta con este sistema y cómo.
+- **Instrucciones de la IA:** las de fábrica las escribió el equipo; NuevasTIC las ajusta cuando quiera en A4 (permiso «Editar prompts»). Los cambios solo aplican a los análisis nuevos, y cada análisis guarda el texto que se usó. El texto de fábrica está en `App\Services\Ia\ArmadorPrompt::GENERAL`.
 
 ## Pendiente con NuevasTIC
 
 - **[INFORMACIÓN PENDIENTE]** El servidor y el dominio donde se despliega.
-- Revisar y aprobar las instrucciones de la IA (A4).
 - **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Lo vigente es una etapa por categoría y los dos PDF de RN-024.
 
 ## Cómo verificar lo hecho

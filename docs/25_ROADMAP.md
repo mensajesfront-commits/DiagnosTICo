@@ -1,6 +1,6 @@
 # Roadmap
 
-**Estado:** REQUIERE VALIDACIÓN (T-157). Lo que viene después de la entrega del 6 de noviembre de 2026. Las prioridades las propone el equipo y NuevasTIC debe confirmarlas.
+**Estado:** COMPLETO (T-157), aprobado por NuevasTIC el 5 de noviembre de 2026. Lo que viene después de la entrega del 6 de noviembre de 2026.
 
 ## 1. Dónde queda el proyecto en la entrega
 
@@ -14,7 +14,7 @@
 | Prioridad | Qué | Por qué |
 |---|---|---|
 | Alta | Cargar los diagnósticos reales de cada sector | NuevasTIC los genera con IA y los carga a mano en la aplicación cuando se lance (T-072). Confirmado el 4 de noviembre. |
-| Alta | Revisar con NuevasTIC las instrucciones de la IA | Las escribió el equipo. Las frases de los niveles ya están aprobadas. |
+| Media | Ajustar las instrucciones de la IA si hace falta | NuevasTIC las edita cuando quiera en A4, sin programar. Las de fábrica las escribió el equipo; las frases de los niveles ya están aprobadas. |
 | Alta | Definir el servidor, el dominio y el correo SMTP | Sin esto no se puede poner en línea (`20_DESPLIEGUE.md`). Las llaves reales de Turnstile ya existen (4 de noviembre). OpenAI lo paga NuevasTIC, con gpt-4.1-mini. |
 
 ## 3. Mejoras propuestas (después de desplegar)

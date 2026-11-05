@@ -1,6 +1,6 @@
 # Manual de usuario
 
-**Estado:** REQUIERE VALIDACIÓN (T-142, T-163). Lo revisa NuevasTIC con el sistema funcionando. Los nombres de botones son los de la pantalla; entre paréntesis va el código del wireframe.
+**Estado:** COMPLETO (T-142, T-163), aprobado por NuevasTIC el 5 de noviembre de 2026. Los nombres de botones son los de la pantalla; entre paréntesis va el código del wireframe.
 
 Hay dos partes:
 

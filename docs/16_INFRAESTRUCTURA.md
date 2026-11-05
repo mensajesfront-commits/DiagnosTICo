@@ -1,6 +1,6 @@
 # Infraestructura
 
-**Estado:** COMPLETO (T-154). El sistema no se despliega (DEC-006): se entrega el repositorio. Este documento describe la infraestructura del entorno local y lo que necesitaría quien lo instale en un servidor.
+**Estado:** COMPLETO (T-154). Describe la infraestructura del entorno local y lo que necesita el servidor. El sistema se va a desplegar (DEC-006 cambió el 4 de noviembre); los pasos están en `20_DESPLIEGUE.md`.
 
 ## 1. Entorno local (Sail)
 

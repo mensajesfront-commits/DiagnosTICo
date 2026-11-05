@@ -1,8 +1,8 @@
 # Entornos
 
-**Estado:** EN CURSO (T-032)
+**Estado:** COMPLETO (T-032).
 
-El sistema solo tiene **entorno local**, porque no se despliega (DEC-006). Los dos desarrolladores usan el mismo entorno con Laravel Sail.
+Los dos desarrolladores usan el mismo **entorno local** con Laravel Sail. El sistema se va a desplegar (DEC-006 cambió el 4 de noviembre): el entorno de producción se describe en `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio.
 
 ## Entorno local con Sail
 

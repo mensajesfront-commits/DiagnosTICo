@@ -1,6 +1,6 @@
 # Glosario
 
-**Estado:** EN CURSO (T-036). Se completa cada semana con los términos nuevos.
+**Estado:** COMPLETO (T-036). Términos del sistema en la entrega `v1.0.0`.
 
 ## Términos del negocio
 

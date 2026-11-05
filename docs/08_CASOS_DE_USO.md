@@ -1,6 +1,6 @@
 # Casos de uso
 
-**Estado:** REQUIERE VALIDACIÓN (T-041). Se aprueban junto con el MER en el hito T-044.
+**Estado:** COMPLETO (T-041), aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 Casos de uso de los flujos complejos. Los flujos simples (crear un sector, editar el perfil…) se describen bien en sus historias de usuario (`05_REQUISITOS_FUNCIONALES.md`) y no se repiten aquí.
 

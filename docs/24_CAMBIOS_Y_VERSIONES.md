@@ -1,6 +1,6 @@
 # Cambios y versiones
 
-**Estado:** EN CURSO (T-037). Se agrega una sección por semana; lo más nuevo va arriba.
+**Estado:** COMPLETO (T-037) hasta la versión `v1.0.0`. Lo más nuevo va arriba; los cambios siguientes se anotan como una versión nueva.
 
 La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan por semana del cronograma.
 
@@ -14,7 +14,8 @@ La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan p
   - dos PDF por resultado;
   - textos legales oficiales de Captter y correo de soporte contacto@captter.com.
 - Al actualizar un equipo o el servidor: `composer install`, `npm install`, `php artisan migrate` (3 migraciones del 4 de noviembre) y `npm run build`.
-- **[INFORMACIÓN PENDIENTE]** La etiqueta `v1.0.0` sobre `main`: la crea el equipo en GitHub (Releases → Draft a new release), porque el entorno de trabajo no puede subir etiquetas.
+- Etiqueta `v1.0.0` sobre `main` (commit `2838f4a`), creada por el equipo el 5 de noviembre.
+- **Documentación cerrada:** los 32 documentos quedaron en COMPLETO. NuevasTIC aprobó los de negocio el 5 de noviembre (02 a 08, 18, 25 y 31).
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 

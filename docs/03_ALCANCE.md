@@ -1,6 +1,6 @@
 # Alcance
 
-**Estado:** REQUIERE VALIDACIÓN (T-029)
+**Estado:** COMPLETO (T-029), aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 **Fuentes:**
 
@@ -33,7 +33,7 @@ En total son 13 épicas y 84 historias, con 330 puntos estimados.
 
 | Qué | Por qué |
 |---|---|
-| Publicar el sistema en un servidor | Se entrega el repositorio funcionando en local (Sail) con un README para instalarlo. `20_DESPLIEGUE.md` lo marcará NO APLICA. |
+| Publicar el sistema en un servidor | **Cambió el 4 de noviembre de 2026: sí se despliega** (DEC-006). Pasos en `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio. |
 | Análisis FODA y comparación con promedios | Decisión confirmada (RN-028). La propuesta técnica todavía los menciona (ver INC-001 en `05_REQUISITOS_FUNCIONALES.md`). |
 | Rol Usuario | Queda para un posible futuro. El rol Consultor **sí entra** desde el 3 de noviembre, solo de lectura (EP-014, RN-030). |
 | Simulador de inversión | No existe en el diseño. |

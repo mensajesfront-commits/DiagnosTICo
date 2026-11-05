@@ -1,6 +1,6 @@
 # Seguridad
 
-**Estado:** EN CURSO. La matriz de roles y permisos sigue el wireframe A5.2 (T-006). La seguridad del acceso (L1–L4) está completa y probada (6 de octubre).
+**Estado:** COMPLETO. La matriz de roles y permisos sigue el wireframe A5.2 (T-006). Incluye la auditoría QA del 4 de noviembre y los textos legales oficiales.
 
 Más adelante se completan:
 

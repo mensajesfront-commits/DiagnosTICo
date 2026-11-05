@@ -1,6 +1,6 @@
 # Problemas conocidos
 
-**Estado:** EN CURSO (T-035)
+**Estado:** COMPLETO (T-035). Problemas conocidos en la entrega `v1.0.0`.
 
 Problemas que aparecieron al instalar o al programar, con su solución. Formato: ISSUE-XXX.
 
