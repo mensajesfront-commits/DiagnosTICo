@@ -14,7 +14,7 @@
 | Prioridad | Qué | Por qué |
 |---|---|---|
 | Alta | Cargar los diagnósticos reales de cada sector | NuevasTIC los genera con IA y los carga a mano en la aplicación cuando se lance (T-072). Confirmado el 4 de noviembre. |
-| Alta | Revisar con NuevasTIC las instrucciones de la IA | Las escribió el equipo. Las frases de los niveles ya están aprobadas. |
+| Media | Ajustar las instrucciones de la IA si hace falta | NuevasTIC las edita cuando quiera en A4, sin programar. Las de fábrica las escribió el equipo; las frases de los niveles ya están aprobadas. |
 | Alta | Definir el servidor, el dominio y el correo SMTP | Sin esto no se puede poner en línea (`20_DESPLIEGUE.md`). Las llaves reales de Turnstile ya existen (4 de noviembre). OpenAI lo paga NuevasTIC, con gpt-4.1-mini. |
 
 ## 3. Mejoras propuestas (después de desplegar)
