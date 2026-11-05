@@ -2,7 +2,19 @@
 
 **Estado:** EN CURSO (T-037). Se agrega una sección por semana; lo más nuevo va arriba.
 
-La versión de entrega será `v1.0.0` (T-152). Hasta entonces, los cambios se agrupan por semana del cronograma.
+La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan por semana del cronograma.
+
+## v1.0.0 · versión de entrega (5 de noviembre de 2026)
+
+- `develop` se unió a `main` con el PR #13 (commit `2838f4a`), después de #11 y #12. CI en verde.
+- Trae todo lo de las secciones de abajo:
+  - rediseño de las pantallas;
+  - rol Consultor;
+  - auditoría QA con sus 14 correcciones;
+  - dos PDF por resultado;
+  - textos legales oficiales de Captter y correo de soporte contacto@captter.com.
+- Al actualizar un equipo o el servidor: `composer install`, `npm install`, `php artisan migrate` (3 migraciones del 4 de noviembre) y `npm run build`.
+- **[INFORMACIÓN PENDIENTE]** La etiqueta `v1.0.0` sobre `main`: la crea el equipo en GitHub (Releases → Draft a new release), porque el entorno de trabajo no puede subir etiquetas.
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 
