@@ -67,8 +67,11 @@ php artisan queue:restart
 php artisan up
 ```
 
-## 4. Lo que no aplica
+## 4. Despliegue (decisión del 4 de noviembre de 2026)
 
-- Servidores de staging y producción, dominio y certificado: **NO APLICA** (sin despliegue).
-- Despliegue automático desde GitHub Actions: **NO APLICA**. CI solo corre las pruebas.
-- **[INFORMACIÓN PENDIENTE]** Si NuevasTIC decide desplegarlo después, debe definir el servidor, el dominio, quién paga OpenAI y quién mantiene el sistema (`21_MANTENIMIENTO.md`).
+El sistema **se va a desplegar** (DEC-006 cambió). La sección 3 tiene los pasos.
+
+- **[INFORMACIÓN PENDIENTE]** El servidor, el dominio, el certificado HTTPS y quién mantiene el sistema (`21_MANTENIMIENTO.md`).
+- OpenAI lo paga NuevasTIC, con gpt-4.1-mini.
+- Las llaves reales de Cloudflare Turnstile ya existen (4 de noviembre). Van solo en el `.env` del servidor (`TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`), nunca en el repositorio.
+- Despliegue automático desde GitHub Actions: **NO APLICA** por ahora. CI solo corre las pruebas.

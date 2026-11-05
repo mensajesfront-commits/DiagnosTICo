@@ -2,11 +2,13 @@
 
 **Estado:** EN CURSO (T-037). Se actualiza al cerrar cada semana. El detalle de cada cambio está en `24_CAMBIOS_Y_VERSIONES.md`.
 
-**Última actualización:** 4 de noviembre de 2026, antes de la entrega.
+**Última actualización:** 5 de noviembre de 2026, antes de la entrega.
 
 ## Resumen
 
-**El sistema está completo en funcionalidad.** De las 84 historias, 79 están hechas y las 5 del bot de WhatsApp (HU-071 a HU-075) están aplazadas (`05_REQUISITOS_FUNCIONALES.md`).
+**El sistema está completo en funcionalidad.** De las 84 historias, 79 están hechas en este repositorio. Las 5 del bot de WhatsApp (HU-071 a HU-075) las terminó otra persona del equipo, fuera de este repositorio (`05_REQUISITOS_FUNCIONALES.md`).
+
+**Se va a desplegar** (cambio del 4 de noviembre; antes solo se entregaba el repositorio). Pasos en `20_DESPLIEGUE.md`.
 
 Lo construido, de punta a punta:
 
@@ -56,12 +58,14 @@ Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 
 | Qué | Quién | Notas |
 |---|---|---|
-| Unir a `develop` la rama `claude/zealous-babbage-7s6joa` | Luis revisa el PR | CI en verde. Después: `php artisan migrate` (3 migraciones del 4 de noviembre) |
-| Recorrer el flujo completo con la clave real de OpenAI | Cristian | Asignar, responder, análisis y los dos PDF |
-| Revisar a ojo los dos PDF | Cristian | En el entorno de pruebas Chromium no mostraba las fuentes |
+| ~~Unir a `develop` la rama `claude/zealous-babbage-7s6joa` (PR #11)~~ | Luis | **Hecho** el 5 de noviembre. El último commit (logotipo en los PDF, despliegue y bot) va en un PR nuevo. Después de actualizar: `php artisan migrate` (3 migraciones del 4 de noviembre) |
+| ~~Recorrer el flujo completo con la clave real de OpenAI~~ | Cristian | **Hecho**: funciona (confirmado el 5 de noviembre) |
+| ~~Revisar a ojo los dos PDF~~ | Cristian | **Hecho** el 4 de noviembre |
+| Revisar con NuevasTIC las instrucciones de la IA | NuevasTIC | En A4 (Configuración IA). Las de fábrica están en `App\Services\Ia\ArmadorPrompt::GENERAL` |
+| Desplegar en el servidor | Equipo | `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio |
 | Revisión pantalla por pantalla (diseño, textos y funciones) | Cristian | Los ajustes se anotan en `18_UI_UX.md` |
 | Instalar desde cero con el README en un equipo limpio (T-021) | Equipo | Con Sail |
-| PR de `develop` a `main` y etiqueta `v1.0.0` (T-152) | Equipo | `20_DESPLIEGUE.md` |
+| PR de `develop` a `main` y etiqueta `v1.0.0` (T-152) | Equipo | `main` va 75 commits detrás de `develop` (5 de noviembre). `20_DESPLIEGUE.md` |
 | Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160) | Equipo y NuevasTIC | `00_INDICE.md` |
 
 ## Decisiones de NuevasTIC (23 de octubre de 2026)
@@ -75,14 +79,21 @@ Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 - La contraseña sigue pidiendo carácter especial (RN-001).
 - Los diagnósticos los genera NuevasTIC con IA y los carga a mano cuando se lance la aplicación.
 - OpenAI lo paga NuevasTIC, con el modelo gpt-4.1-mini.
-- El bot de WhatsApp lo hace otra persona del equipo, fuera de este repositorio.
+- El bot de WhatsApp lo hace otra persona del equipo, fuera de este repositorio. **Terminado** (confirmado el 4 de noviembre).
 - El resumen semanal se queda como está: los lunes a las 7:50 a. m.
+
+## Confirmado el 4 de noviembre
+
+- **Llaves reales de Cloudflare Turnstile:** ya existen. Van solo en el `.env` del servidor.
+- **Logotipo de NuevasTIC:** es el símbolo del Login (aro azul con la "C" y el punto verde). Ya va en la portada de los dos PDF (`pdf/logo.blade.php`).
+- **Textos legales:** los Términos y Condiciones y la Política de Privacidad son los oficiales de la página de Captter y es todo lo que entregó la empresa. **[INCONSISTENCIA DETECTADA]** No coinciden del todo con el sistema (pagos, cookies, OpenAI y Cloudflare sin nombrar); queda anotado en docs/17 por si la empresa los ajusta después.
+- **Diagnósticos reales:** la empresa los carga a mano.
+- **Bot de WhatsApp:** terminado, fuera de este repositorio. **[INFORMACIÓN PENDIENTE]** Si se conecta con este sistema y cómo.
 
 ## Pendiente con NuevasTIC
 
-- **[INFORMACIÓN PENDIENTE]** Las llaves reales de Cloudflare Turnstile (el captcha del registro).
-- **[INFORMACIÓN PENDIENTE]** El logotipo de NuevasTIC para los PDF; hoy va el nombre en texto.
-- Los Términos y Condiciones y la Política de Privacidad ya son los oficiales de Captter (4 de noviembre). **[INCONSISTENCIA DETECTADA]** No coinciden del todo con el sistema (pagos, cookies, OpenAI y Cloudflare sin nombrar); detalle en docs/17.
+- **[INFORMACIÓN PENDIENTE]** El servidor y el dominio donde se despliega.
+- Revisar y aprobar las instrucciones de la IA (A4).
 - **Cronograma desactualizado:** todavía habla de FODA, de 3 etapas de IA y de un PDF de 4 páginas (T-098, T-099, T-113, T-122, T-127). Lo vigente es una etapa por categoría y los dos PDF de RN-024.
 
 ## Cómo verificar lo hecho

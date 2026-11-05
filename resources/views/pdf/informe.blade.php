@@ -98,8 +98,8 @@
 
         /* Portada */
         .portada { background: var(--azul); color: #fff; padding: 34pt 34pt 30pt; min-height: 225mm; display: flex; flex-direction: column; }
-        .portada .marca { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 11pt; letter-spacing: .04em; }
-        .portada .marca span { color: var(--naranja); }
+        .portada .marca { display: flex; align-items: center; gap: 8pt; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 11pt; letter-spacing: .04em; }
+        .portada .marca .punto { color: var(--naranja); }
         .portada .ante { font-size: 8.5pt; letter-spacing: .14em; text-transform: uppercase; color: #C9D3E2; margin-top: 54pt; }
         .portada h1 { color: #fff; font-size: 26pt; font-weight: 700; line-height: 1.15; margin: 8pt 0 6pt; }
         .portada .raya { width: 54pt; height: 3pt; background: var(--naranja); margin: 12pt 0 16pt; }
@@ -161,8 +161,8 @@
 <body>
     {{-- Portada --}}
     <section class="portada">
-        {{-- [INFORMACIÓN PENDIENTE] Logotipo de NuevasTIC: no está en el repositorio; va el nombre en texto. --}}
-        <div class="marca">NuevasTIC <span>·</span> Captter</div>
+        {{-- Símbolo de NuevasTIC (confirmado el 4 de noviembre: el del Login). --}}
+        <div class="marca">@include('pdf.logo', ['tam' => 26]) <span>NuevasTIC <span class="punto">·</span> Captter</span></div>
         <div class="ante">Informe de diagnóstico</div>
         <h1>Informe de Diagnóstico y Estrategia de Marketing Digital</h1>
         <div class="raya"></div>

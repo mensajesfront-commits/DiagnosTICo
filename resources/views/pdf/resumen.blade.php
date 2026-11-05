@@ -70,8 +70,8 @@
 
         /* 1 · Tu resultado */
         .cabecera { background: var(--azul); color: #fff; border-radius: 6pt; padding: 18pt 20pt 16pt; }
-        .cabecera .marca { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 9.5pt; letter-spacing: .04em; }
-        .cabecera .marca span { color: var(--naranja); }
+        .cabecera .marca { display: flex; align-items: center; gap: 7pt; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 9.5pt; letter-spacing: .04em; }
+        .cabecera .marca .punto { color: var(--naranja); }
         .cabecera h1 { color: #fff; font-size: 21pt; font-weight: 700; line-height: 1.15; margin: 12pt 0 4pt; }
         .cabecera .empresa { font-family: 'Montserrat', sans-serif; font-size: 13pt; font-weight: 600; }
         .cabecera .datos { color: #C9D3E2; font-size: 8.5pt; margin-top: 4pt; }
@@ -121,8 +121,8 @@
     {{-- 1 · Tu resultado --}}
     <section>
         <div class="cabecera">
-            {{-- [INFORMACIÓN PENDIENTE] Logotipo de NuevasTIC: no está en el repositorio; va el nombre en texto. --}}
-            <div class="marca">NuevasTIC <span>·</span> Captter</div>
+            {{-- Símbolo de NuevasTIC (confirmado el 4 de noviembre: el del Login). --}}
+            <div class="marca">@include('pdf.logo', ['tam' => 22]) <span>NuevasTIC <span class="punto">·</span> Captter</span></div>
             <h1>Resumen de tu diagnóstico de marketing digital</h1>
             <div class="empresa">{{ $i['empresa']['nombre'] }}</div>
             <div class="datos">
