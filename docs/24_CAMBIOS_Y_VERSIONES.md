@@ -16,6 +16,15 @@ La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan p
 - Al actualizar un equipo o el servidor: `composer install`, `npm install`, `php artisan migrate` (3 migraciones del 4 de noviembre) y `npm run build`.
 - Etiqueta `v1.0.0` sobre `main` (commit `2838f4a`), creada por el equipo el 5 de noviembre.
 - **Documentación cerrada:** los 32 documentos quedaron en COMPLETO. NuevasTIC aprobó los de negocio el 5 de noviembre (02 a 08, 18, 25 y 31).
+- **Documentación revisada a fondo (5 de noviembre):** cada documento se puso al día con lo hecho después del 14 de octubre:
+  - el Consultor: EP-014, HU-085 y HU-086, RN-030, CU-007, C1 y C2, y una parte nueva del manual;
+  - los dos PDF y el logotipo;
+  - la auditoría QA: middlewares, cabeceras y enlaces de 10 minutos;
+  - las tablas y columnas nuevas en docs/12 (`consultor_empresa`, `invitaciones_tokens`, `pdf_resumen_ruta`, verificación del correo);
+  - las pruebas por archivo;
+  - las decisiones DEC-021 a DEC-023;
+  - los problemas ISSUE-010 a ISSUE-012;
+  - el despliegue, el bot terminado y los totales (14 épicas, 86 historias, 340 puntos).
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 

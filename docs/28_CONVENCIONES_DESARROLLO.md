@@ -33,7 +33,7 @@ Una tarea de documentación está terminada cuando:
 | `tarea/T-XXX-descripcion-corta` | Una tarea del cronograma | Sale de `develop` y vuelve por pull request. Ejemplo: `tarea/T-051-pantallas-acceso`. |
 | `arreglo/descripcion-corta` | Corrección de un error | Igual que las ramas de tarea. |
 
-**[INFORMACIÓN PENDIENTE]** La rama `develop` y la protección de `main` y `develop` se configuran en GitHub (T-015, a cargo de Luis).
+La rama `develop` existe y recibió los PR de la entrega (#11 a #15); `main` tiene la versión `v1.0.0` (5 de noviembre de 2026). Cada versión se marca con una etiqueta (`v1.0.0`) y se anota en `24_CAMBIOS_Y_VERSIONES.md`.
 
 ## Commits
 

@@ -6,13 +6,17 @@ Los dos desarrolladores usan el mismo **entorno local** con Laravel Sail. El sis
 
 ## Entorno local con Sail
 
-`compose.yaml` levanta tres servicios:
+`compose.yaml` levanta cinco servicios:
 
 | Servicio | Imagen | Puerto en el equipo | Para qué |
 |---|---|---|---|
 | `laravel.test` | `sail-8.4/app` (construida desde `docker/8.4/Dockerfile`) | `80` (`APP_PORT`) y `5173` (`VITE_PORT`) | PHP 8.4, Node 24, Composer y Chromium. Corre la aplicación, las colas y Vite. |
 | `pgsql` | `postgres:18-alpine` | `5432` (`FORWARD_DB_PORT`) | Base de datos. Al arrancar por primera vez crea también la base `testing` (`docker/pgsql/create-testing-database.sql`). |
 | `mailpit` | `axllent/mailpit` | `1025` para SMTP y `8025` para la web | Atrapa todos los correos. Se revisan en `http://localhost:8025`. |
+| `queue` | `sail-8.4/app` | — | Corre la cola (`queue:work`): el análisis de la IA, los dos PDF y los correos. |
+| `scheduler` | `sail-8.4/app` | — | Corre las tareas programadas (`schedule:work`): vencer mediciones, purgar cuentas y el resumen semanal. |
+
+En Windows, si un puerto cae en un rango que reserva el sistema, Docker no lo puede abrir: se cambia en el `.env` (ISSUE-011).
 
 Los datos de PostgreSQL viven en el volumen `sail-pgsql`. Con `./vendor/bin/sail down -v` se borran.
 
@@ -53,15 +57,20 @@ Todas están explicadas en `.env.example`.
 - `php artisan prueba:ia` hace una llamada real para comprobar que todo funciona (gasta una llamada).
 - Sin clave no se puede analizar: no hay modo de prueba en la aplicación. Las pruebas automáticas usan `Tests\Support\AnalizadorFalso` y no gastan saldo.
 - El análisis corre en la cola. El servicio `queue` de `compose.yaml` arranca solo con `sail up`; sin él, una medición enviada se queda en "Estamos analizando". Con la cola corriendo tarda 1 o 2 minutos (una llamada por categoría).
-- **[INFORMACIÓN PENDIENTE]** Falta saber quién aporta la clave y el saldo para el desarrollo (propuesta técnica, sección 5).
+- En producción la clave y el saldo los aporta NuevasTIC, con el modelo `gpt-4.1-mini` (23 de octubre de 2026).
 
-## WhatsApp (aplazado)
+## Captcha (Cloudflare Turnstile)
 
-El bot está aplazado (`03_ALCANCE.md`). Si se retoma, se documentan aquí:
+- En local se pueden dejar vacías `TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`: el sistema usa las llaves de prueba de Cloudflare, que siempre aprueban.
+- En el servidor van las llaves reales, que ya existen (4 de noviembre de 2026). Sin ellas, nadie se registra.
 
-- el número de prueba de Meta;
-- el túnel (Cloudflare Tunnel o ngrok) para que el webhook llegue al equipo;
-- las variables, sin claves reales.
+## Producción
+
+El sistema se va a desplegar (DEC-006 cambió el 4 de noviembre). Las variables de producción y los pasos están en `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio.
+
+## WhatsApp
+
+El bot lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026). Su entorno no se documenta aquí.
 
 ## Integración continua
 

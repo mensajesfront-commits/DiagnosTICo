@@ -1,9 +1,10 @@
 # Captter · Diagnóstico de marketing digital
 
-Sistema de Diagnóstico de Marketing Digital para **NuevasTIC**. Las empresas responden un diagnóstico de su sector, la IA analiza cada categoría y el sistema entrega un puntaje, un nivel, recomendaciones y un informe PDF. El Administrador configura sectores, categorías, diagnósticos, empresas, mediciones, la IA y las cuentas.
+Sistema de Diagnóstico de Marketing Digital para **NuevasTIC**. Las empresas responden un diagnóstico de su sector, la IA analiza cada categoría y el sistema entrega un puntaje, un nivel, recomendaciones y dos PDF: un resumen para la empresa y el informe completo para el equipo de NuevasTIC y los consultores. El Administrador configura sectores, categorías, diagnósticos, empresas, mediciones, la IA y las cuentas.
 
 - **Stack:** Laravel 13 · Vue 3 + Inertia 3 · Tailwind CSS 4 · PostgreSQL 18 · OpenAI.
 - **Equipo:** Cristian Andrés Penagos Simanca (frontend) y Luis Carlos Sánchez Muñoz (backend).
+- **Versión de entrega:** `v1.0.0` (5 de noviembre de 2026). El sistema se va a desplegar: pasos en [`docs/20_DESPLIEGUE.md`](docs/20_DESPLIEGUE.md).
 - **Documentación:** [`docs/00_INDICE.md`](docs/00_INDICE.md). Las reglas para trabajar en el repositorio están en [`CLAUDE.md`](CLAUDE.md).
 
 ## Requisitos
@@ -36,6 +37,9 @@ Abre `.env` y completa por lo menos estas variables; las demás ya sirven para S
 
 - `OPENAI_API_KEY` y `OPENAI_MODEL`, para el análisis de la IA.
 - `MAIL_FROM_ADDRESS`, el remitente de los correos.
+- `ADMIN_EMAIL`, el correo del Administrador principal.
+
+En local, `TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` se pueden dejar vacías: el captcha del registro usa las llaves de prueba de Cloudflare. El `.env` no se sube al repositorio; las claves reales van solo ahí.
 
 Cada variable tiene un comentario que explica para qué sirve.
 
@@ -98,7 +102,7 @@ Si cambias código de PHP, reinícialos para que lo tomen: `./vendor/bin/sail re
 ./vendor/bin/sail artisan prueba:ia                     # una llamada real a OpenAI (necesita la clave)
 ```
 
-`migrate --seed` crea los roles con sus permisos, los sectores de ejemplo y la **cuenta principal** del Administrador, con el correo de `ADMIN_EMAIL` en `.env` (NuevasTIC lo elige al lanzar el proyecto). La cuenta se crea **sin contraseña**: a ese correo le llega "Crear mi contraseña", así nadie más la conoce. En local el correo cae en Mailpit (<http://localhost:8025>). Si el correo falla, la terminal muestra el enlace; para reenviarlo: `./vendor/bin/sail artisan admin:invitar`. Ningún otro Administrador desactiva ni elimina esta cuenta. El seeder se puede correr de nuevo sin duplicar nada (`./vendor/bin/sail artisan db:seed`).
+`migrate --seed` crea los roles con sus permisos, los sectores, actividades y categorías reales y la **cuenta principal** del Administrador, con el correo de `ADMIN_EMAIL` en `.env` (NuevasTIC lo elige al lanzar el proyecto). La cuenta se crea **sin contraseña**: a ese correo le llega "Crear mi contraseña", así nadie más la conoce. En local el correo cae en Mailpit (<http://localhost:8025>). Si el correo falla, la terminal muestra el enlace; para reenviarlo: `./vendor/bin/sail artisan admin:invitar`. Ningún otro Administrador desactiva ni elimina esta cuenta. El seeder se puede correr de nuevo sin duplicar nada (`./vendor/bin/sail artisan db:seed`).
 
 - **Cuenta de empresa:** regístrate en `/register`. Queda con el rol Empresa y su menú.
 - **Cuenta de Administrador:** abre el correo "Crear mi contraseña" en Mailpit, crea la contraseña y entra. Las pantallas de la prueba técnica y las vistas previas (`/prueba-tecnica/*`) solo existen con `APP_ENV=local`.
@@ -193,3 +197,6 @@ Están explicados, con su solución, en [`docs/23_PROBLEMAS_CONOCIDOS.md`](docs/
 | "requires php ^8.4" | ISSUE-003 |
 | El PDF falla con "Target closed" | ISSUE-007 |
 | El puerto 80 o el 5432 ya están ocupados | Cambia `APP_PORT` o `FORWARD_DB_PORT` en `.env` |
+| "ports are not available" en Docker Desktop (Windows) | ISSUE-011 |
+| `git pull` se detiene por `package-lock.json` | ISSUE-012 |
+| `npm run types:check` falla en `MiPerfil.vue` | ISSUE-010 |

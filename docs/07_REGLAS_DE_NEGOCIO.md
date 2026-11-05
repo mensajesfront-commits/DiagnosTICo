@@ -9,7 +9,7 @@ Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validaci
 | Regla | Qué exige | Se cumple en | Se ve en | Pruebas |
 |---|---|---|---|---|
 | RN-001 | Contraseña de mínimo 8 caracteres, con una mayúscula, un número y un carácter especial. Además (17 de octubre): sin partes del correo de 3 o más caracteres ("juan", "1102", "empresa"), sin importar mayúsculas ni tildes, y distinta de la anterior. En Mi perfil, donde se escribe la actual, la nueva tampoco puede repetir 4 caracteres seguidos de ella (22 de octubre). | `Password::defaults()` en `AppServiceProvider`, reglas `TieneMayuscula`, `SinDatosDelCorreo`, `DistintaDeLaAnterior` y `SinPartesDeLaAnterior` | L2, L4, A6, E11, E12 (lista de requisitos en vivo, `lib/contrasena.ts`) | `SeguridadAccesoTest`, `contrasena.test.ts` |
-| RN-002 | Un correo pertenece a una sola cuenta. | `unique:users,email` en `CreateNewUser`, `DatosEmpresaRequest`, colaboradores e invitaciones | L2, A3.2, A3.1d, E12 | `SeguridadAccesoTest` |
+| RN-002 | Un correo pertenece a una sola cuenta, sin distinguir mayúsculas ni espacios (auditoría QA, ERR-02). | `NormalizarCorreo` lo pasa a minúsculas antes de validar; `unique:users,email` en `CreateNewUser`, `DatosEmpresaRequest`, colaboradores e invitaciones; índice único `lower(email)` (migración `2026_11_04_000001`) | L2, A3.2, A3.1d, E12 | `SeguridadAccesoTest`, `AuditoriaQaTest` |
 | RN-003 | Al registrar una empresa solo se ofrecen sectores activos; no hay opción "Otro". | `Sector::activos()` y la validación `exists` con `activo = true` | L2, A3.2 | `EmpresasTest` |
 | RN-004 | Una cuenta desactivada no entra y no pierde datos; se reactiva. Una cuenta eliminada se recupera durante 90 días y después se borra (DEC-017). | `FortifyServiceProvider` (login), middleware `CerrarSesionCuentaInactiva`, `SoftDeletes` y la tarea `cuentas:purgar` | L1 (modal de cuenta desactivada), A5, A3.1, E12 | `SeguridadAccesoTest`, `UsuariosYRolesTest`, `ColaboradoresTest` |
 | RN-005 | Los avisos de inicio de sesión y recuperación no dicen si un correo existe. | `FortifyServiceProvider` y `AvisoRecuperacionResponse` (mismo mensaje en ambos casos) | L1, L3 | `SeguridadAccesoTest` |
@@ -47,7 +47,7 @@ Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validaci
 | RN-022 | El prompt se arma por capas: general, sector, empresa, preguntas con respuestas y formato fijo. Lo más específico manda y los cambios valen para las mediciones siguientes. | `ArmadorPrompt` | A4, A4 "Cómo se arma" | `ConfiguracionIaTest`, `AnalisisIaTest` |
 | RN-023 | El resultado se publica sin revisión y no cambia. | `PublicarResultado` crea el resultado una vez; no hay rutas para editarlo | E6, A3.3 | `ResultadosTest` |
 | RN-024 | Dos PDF por resultado, generados una vez al terminar y guardados, sin volver a llamar a la IA: el informe completo (propuesta de reestructuración, fase 1) para el Administrador y el Consultor, y el resumen corto para la empresa (4 de noviembre). La empresa y su colaborador solo reciben el resumen. | `GenerarInformePdf` e `InformePdf` (`pdf.informe` y `pdf.resumen`; columnas `pdf_ruta` y `pdf_resumen_ruta`); `ResultadosController::pdf` elige el tipo según la cuenta y lo regenera si falta | E6, E8, A3.3 | `ResultadosTest` (con `Pdf::fake()`) |
-| RN-028 | El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026). | Esquema de respuesta de `AnalizadorDeCategoria` | E6, PDF | — |
+| RN-028 | El resultado no compara con promedios. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026). El informe PDF completo (propuesta del 2 de noviembre) agrupa en una sección «Análisis estratégico DOFA» las fortalezas, debilidades, oportunidades y amenazas que escribió la IA en cada categoría; el resumen de la empresa no la trae. | Esquema de respuesta de `AnalizadorDeCategoria` | E6, PDF | — |
 
 ## Colaboradores, roles y "Ver como"
 
@@ -55,13 +55,14 @@ Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validaci
 |---|---|---|---|---|
 | RN-025 | Colaboradores sin límite, con casi los permisos de la empresa (no crean colaboradores ni cambian los datos de la empresa). Se desactivan con la empresa. Ningún colaborador puede tener el cargo del dueño (cuenta principal), comparado sin mayúsculas, tildes ni espacios de más. | Rol `Colaborador` del seeder, `role:Empresa` en las rutas de E12 y `CerrarSesionCuentaInactiva`; regla `CargoDelDueno` | E12, E11 | `ColaboradoresTest`, `PerfilTest` |
 | RN-026 | "Ver como" es solo de lectura y queda registrado. | Middleware `VerComo` (bloquea todo lo que no sea GET) y tabla `registros_ver_como` | Franja de aviso (`FranjaVerComo`) | `VerComoTest` |
-| RN-027 | Los roles Administrador, Empresa y Colaborador son fijos; cada cuenta tiene un rol; un rol solo se elimina si no tiene cuentas. | `RolesController` y `UsuariosController::cambiarRol` | A5, A5.2–A5.5 | `UsuariosYRolesTest` |
+| RN-027 | Los roles Administrador, Empresa, Colaborador y Consultor (desde el 3 de noviembre) son fijos; cada cuenta tiene un rol; un rol solo se elimina si no tiene cuentas. | `RolesController` y `UsuariosController::cambiarRol` | A5, A5.2–A5.5 | `UsuariosYRolesTest` |
+| RN-030 | El Consultor es externo e invitado; solo mira las empresas que el Administrador le vincula (una o varias): ficha, historial, resultados, respuestas y los dos PDF. No responde, no asigna, no cambia datos ni toca diagnósticos (3 de noviembre). | Tabla `consultor_empresa`; `User::puedeVerEmpresa()` en cada controlador de empresas y resultados (otra empresa: 404); `ConsultoresController` (vincular y quitar, con `usuarios.gestionar`) | C1, C2, A3.1 (pestaña Consultores), A3.3–A3.5, A5 | `ConsultorTest` |
 
-## WhatsApp (aplazado)
+## WhatsApp (fuera de este repositorio)
 
 | Regla | Qué exige | Estado |
 |---|---|---|
-| RN-029 | El diagnóstico por WhatsApp va separado de la web: sin cuentas, mediciones ni PDF; máximo 10 preguntas. | No se construyó: el bot está aplazado (`03_ALCANCE.md`). |
+| RN-029 | El diagnóstico por WhatsApp va separado de la web: sin cuentas, mediciones ni PDF; máximo 10 preguntas. | El bot lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026). Este repositorio no tiene código del bot. |
 
 ## Decisiones del equipo que amplían las reglas
 
@@ -69,10 +70,9 @@ Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validaci
 - **Opción "Otro" (E2):** una opción por pregunta puede pedir que la empresa escriba cuál. Lo que escribe va a la IA como "Otro: …"; el puntaje es el de la opción.
 - **Métodos de análisis (DEC-019):** la IA elige por categoría PESTEL, Porter, VRIO, DOFA o CAME según las respuestas, y el resultado muestra cuál usó.
 
-## Por confirmar con NuevasTIC
+## Decisiones de NuevasTIC
 
 - **Resuelto (NuevasTIC, 23 de octubre de 2026):** la IA puede usar DOFA, PESTEL y los demás métodos (DEC-019); RN-028 se ajustó.
 - **Preguntas opcionales (NuevasTIC, 23 de octubre de 2026):** sin responder no se tienen en cuenta; respondidas son un dato extra que la IA lee, pero no cuentan en el puntaje.
-- **[INFORMACIÓN PENDIENTE]** Las frases de cada nivel (`Niveles::FRASES`) las escribió el equipo.
-- **[INFORMACIÓN PENDIENTE]** Una pregunta opcional sin responder no cuenta en el promedio de su categoría. Falta confirmar que así lo quiere NuevasTIC.
-- **[INFORMACIÓN PENDIENTE]** El límite por día de "Probar con un ejemplo" en A4 (hoy solo hay límite por minuto).
+- **Frases de los niveles (NuevasTIC, 23 de octubre de 2026):** aprobadas (`Niveles::FRASES`).
+- **Límite de "Probar con un ejemplo" (NuevasTIC, 23 de octubre de 2026):** 100 pruebas al día entre todos los administradores, además de 10 por minuto (`ConfiguracionIaController::PRUEBAS_POR_DIA`, PA-003).

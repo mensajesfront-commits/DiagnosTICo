@@ -2,20 +2,16 @@
 
 **Estado:** COMPLETO. La matriz de roles y permisos sigue el wireframe A5.2 (T-006). Incluye la auditoría QA del 4 de noviembre y los textos legales oficiales.
 
-Más adelante se completan:
-
-- login, manejo de secretos y límite de intentos (T-065);
-- "Ver como" y desactivación de cuentas (T-138).
-
 ## Roles
 
-Hay tres roles del sistema. Son fijos: no se editan ni se eliminan, y cada cuenta tiene un solo rol (RN-027).
+Hay cuatro roles del sistema. Son fijos: no se editan ni se eliminan, y cada cuenta tiene un solo rol (RN-027).
 
 | Rol | Quién es | Cómo se crea |
 |---|---|---|
 | Administrador | Persona de NuevasTIC | Seeder inicial (T-046); después, desde Usuarios y roles (A5) |
 | Empresa | Usuario principal de una empresa cliente | Registro propio (L2) o por el Administrador (A3.2) |
 | Colaborador | Persona de la empresa con su propia cuenta | La crea la empresa (E12.1); la empresa define el correo y la contraseña (RN-025) |
+| Consultor | Persona externa que acompaña a una o varias empresas (desde el 3 de noviembre) | La invita el Administrador (A5), que le vincula las empresas (A3.1, pestaña Consultores) (RN-030) |
 
 El Administrador puede crear roles nuevos con los permisos que elija (HU-049); cada uno tiene nombre, descripción opcional y si está activo. Un rol con cuentas no se elimina (RN-027).
 
@@ -37,7 +33,7 @@ Son los **15 permisos en 6 bloques** del wireframe A5.2 (A5.1 "Crear rol" usa la
 | | `mediciones.asignar` | Asignar mediciones | Asignar mediciones, dar nueva fecha, recordatorios, correo de aviso y solicitudes | A1b–A1d, A3.1b, A3.1e |
 | Mediciones y resultados | `diagnostico.responder` | Responder el diagnóstico | Responder, revisar y enviar el diagnóstico | E2–E5 |
 | | `resultados.ver` | Ver resultados y respuestas | Ver resultados, historial y respuestas | A3.3–A3.5, E6–E10 |
-| | `resultados.pdf` | Descargar PDF | Descargar el informe PDF | E6, A3.3 |
+| | `resultados.pdf` | Descargar PDF | Descargar el PDF del resultado. La empresa y su colaborador reciben siempre el resumen; las cuentas internas y el Consultor, el informe completo o el resumen (RN-024) | E6, E8, E9, A3.3–A3.5 |
 | Configuración IA | `ia.ver` | Ver configuración | Ver prompts, ajustes y el prompt final | A4 |
 | | `ia.editar` | Editar prompts | Editar prompts y ajustes por sector o empresa; probarlos | A4–A4.9 |
 | Usuarios y roles | `usuarios.ver` | Ver usuarios | Ver cuentas y roles | A5 |
@@ -59,24 +55,24 @@ Para todas las cuentas, sin permiso: iniciar y cerrar sesión y recuperar la con
 
 Los roles del sistema tienen permisos fijos (RN-027). Así los muestra A5.2:
 
-| Permiso | Administrador | Empresa | Colaborador |
-|---|:---:|:---:|:---:|
-| `diagnosticos.ver` | ✓ | | |
-| `diagnosticos.editar` | ✓ | | |
-| `diagnosticos.publicar` | ✓ | | |
-| `empresas.ver` | ✓ | | |
-| `empresas.registrar` | ✓ | | |
-| `mediciones.asignar` | ✓ | | |
-| `diagnostico.responder` | ✓ | ✓ | elige su empresa |
-| `resultados.ver` | ✓ | ✓ | elige su empresa |
-| `resultados.pdf` | ✓ | ✓ | elige su empresa |
-| `ia.ver` | ✓ | | |
-| `ia.editar` | ✓ | | |
-| `usuarios.ver` | ✓ | | |
-| `usuarios.gestionar` | ✓ | | |
-| `perfil.editar` | ✓ | ✓ | |
-| `contrasena.cambiar` | ✓ | ✓ | |
-| **Total** | **15** | **5** | **0 en el rol** |
+| Permiso | Administrador | Empresa | Colaborador | Consultor |
+|---|:---:|:---:|:---:|:---:|
+| `diagnosticos.ver` | ✓ | | |  |
+| `diagnosticos.editar` | ✓ | | |  |
+| `diagnosticos.publicar` | ✓ | | |  |
+| `empresas.ver` | ✓ | | | ✓ (sus empresas) |
+| `empresas.registrar` | ✓ | | |  |
+| `mediciones.asignar` | ✓ | | |  |
+| `diagnostico.responder` | ✓ | ✓ | elige su empresa |  |
+| `resultados.ver` | ✓ | ✓ | elige su empresa | ✓ (sus empresas) |
+| `resultados.pdf` | ✓ | ✓ | elige su empresa | ✓ (sus empresas) |
+| `ia.ver` | ✓ | | |  |
+| `ia.editar` | ✓ | | |  |
+| `usuarios.ver` | ✓ | | |  |
+| `usuarios.gestionar` | ✓ | | |  |
+| `perfil.editar` | ✓ | ✓ | | ✓ |
+| `contrasena.cambiar` | ✓ | ✓ | | ✓ |
+| **Total** | **15** | **5** | **0 en el rol** | **5** |
 
 - El Administrador tiene los 15, también "Responder el diagnóstico", aunque no responde por ninguna empresa (no tiene `empresa_id`).
 - **Colaborador (cambio del 26 de octubre):** el rol no trae permisos. La cuenta principal elige, para cada colaborador, qué páginas ve: "Responder el diagnóstico", "Resultados y Mi historial" y "Descargar el informe PDF" (este último pide también los resultados). Se guardan como permisos directos de su cuenta (`App\Support\PaginasColaborador`); para dar una página nueva se agrega ahí su permiso. Inicio y Mi perfil siempre los ve.
@@ -96,19 +92,23 @@ Dónde está: `database/seeders/RolesYPermisosSeeder.php` (con prueba en `tests/
 | # | Regla | Cómo se cumple | Prueba |
 |---|---|---|---|
 | 1 | **Cada ruta lleva su middleware** (`role:` o `permission:`). El menú oculta lo que no se puede abrir (T-052), pero eso no reemplaza el bloqueo del servidor. | Alias en `bootstrap/app.php` | `PermisosTest` |
-| 2 | **La empresa y el colaborador solo ven datos de su empresa** (RN-007). Además del permiso, cada consulta se filtra por `empresa_id`. | Mi perfil y sus imágenes ya lo hacen; el resto, con *policies* al crear cada módulo | `PerfilTest` |
+| 2 | **La empresa y el colaborador solo ven datos de su empresa** (RN-007), y el Consultor solo las vinculadas (RN-030). Además del permiso, cada consulta se filtra por empresa; otra empresa da 404. | `User::puedeVerEmpresa()`, `deMiEmpresa()` y `puedeVer()` en los controladores de empresas, historial y resultados | `PerfilTest` |
 | 3 | **Cuenta desactivada no entra** (RN-004), tampoco las cuentas de una empresa desactivada (RN-025). Si las desactivan con la sesión abierta, la sesión se cierra en la siguiente petición. Con la contraseña correcta, L1 muestra el modal "Su cuenta ha sido desactivada…" (`ModalCuentaDesactivada`). | `User::puedeEntrar()`, `Fortify::authenticateUsing` y el middleware `CerrarSesionCuentaInactiva` | `SeguridadAccesoTest` |
 | 4 | **Los avisos no revelan si un correo existe** (RN-005): el login responde "El correo o la contraseña no son correctos." cuando el correo no existe o la contraseña está mal, también en cuentas desactivadas. El aviso de cuenta desactivada solo lo ve quien escribe la contraseña correcta (decisión del equipo, 7 de octubre); "¿Olvidaste tu contraseña?" responde siempre "Si el correo está registrado, te enviamos un enlace…". | `lang/es/auth.php`, `AvisoRecuperacionResponse` | `SeguridadAccesoTest` |
 | 5 | **Contraseña fuerte en todos los entornos** (RN-001): mínimo 8 caracteres, una mayúscula, un número y un carácter especial. Se aplica al registrarse, al crear la contraseña nueva y al cambiarla en Mi perfil. Tampoco puede tener partes del correo (de 3 o más caracteres) ni ser igual a la anterior. En Mi perfil tampoco puede repetir 4 caracteres seguidos de la actual; al recuperarla o en los colaboradores no se pueden leer sus partes (está cifrada). En todos los casos la nueva no puede ser ninguna de las últimas 5, sin importar mayúsculas: se guardan en minúsculas cifradas con bcrypt (`contrasenas_anteriores`), nunca en texto. | `Password::defaults` en `AppServiceProvider` + reglas `TieneMayuscula`, `SinDatosDelCorreo` y `DistintaDeLaAnterior` | `SeguridadAccesoTest`, `SinDatosDelCorreoTest`, `ColaboradoresTest` |
 | 6 | **Enlaces de contraseña** (RN-006, cambio del 4 de noviembre): el de "¿Olvidaste tu contraseña?" vence a los **10 minutos**; el de una invitación sirve hasta usarlo. Cada uno va en su tabla (`password_reset_tokens` e `invitaciones_tokens`), pedir otro invalida el anterior y guardar la contraseña borra los dos. | `config/auth.php` (brokers `users` e `invitaciones`), `ElegirEnlaceContrasena`, `Invitaciones` | `SeguridadAccesoTest`, `AuditoriaQaTest` |
 | 7 | **Límite de intentos:** 5 por minuto en iniciar sesión (por correo e IP; al pasarse, L1 muestra el modal "Demasiados intentos" con la cuenta regresiva y el botón desactivado, `ModalAccesoBloqueado`), registrarse, pedir el enlace y crear la contraseña nueva (por IP). | Limitador `login` de Fortify y middleware `LimitarIntentosAcceso` | `SeguridadAccesoTest`, `AuthenticationTest` |
-| 8 | **Un correo, una cuenta** (RN-002); el correo se guarda y se compara en minúsculas. | Regla `unique` y `lowercase_usernames` de Fortify | `SeguridadAccesoTest` |
+| 8 | **Un correo, una cuenta** (RN-002); el correo se guarda y se compara en minúsculas y sin espacios. | `NormalizarCorreo` (antes de validar), regla `unique`, `lowercase_usernames` de Fortify e índice único `lower(email)` | `SeguridadAccesoTest`, `AuditoriaQaTest` |
 | 9 | **Constancia de los términos:** se guarda cuándo se aceptaron (`users.terminos_aceptados_en`). | `CreateNewUser` | `SeguridadAccesoTest` |
 | 10 | **El Administrador no restablece contraseñas de otras cuentas** (RN-006). No existe esa ruta; las cuentas internas se invitan y la persona crea su contraseña. | `UsuariosController::invitar` | `UsuariosYRolesTest` |
 | 13 | **Usuarios y roles:** nada sobre la propia cuenta (ni desactivarla ni eliminarla); eliminar pide el correo exacto, no deja sin Administrador al sistema, deja la cuenta 90 días recuperable antes de borrarla para siempre y, si es la cuenta principal, elimina también la empresa y sus colaboradores (DEC-017); los roles del sistema no se editan ni se eliminan; un rol con cuentas no se elimina; los inactivos no se asignan (RN-027). | `UsuariosController`, `RolesController` | `UsuariosYRolesTest` |
 | 14 | **Colaboradores (E12):** solo la cuenta principal crea, cambia la contraseña, desactiva o reactiva, y solo a colaboradores de su empresa (otra empresa: 404). Cambiar la contraseña o desactivar cierra las sesiones del colaborador. Es la única pantalla donde una cuenta define la contraseña de otra (RN-025, HU-078). También elige las páginas que ve cada colaborador; el colaborador no cambia su contraseña ni la recupera por correo. | `ColaboradoresController`, `PaginasColaborador`, `User::sendPasswordResetNotification` | `ColaboradoresTest`, `PerfilTest` |
 | 11 | **Contraseñas cifradas** con bcrypt (`hashed` en el modelo); nunca se guardan ni se muestran en texto. La excepción es E12.2: muestra una sola vez la contraseña que la empresa acaba de escribir, desde el navegador; el servidor no la devuelve. | `User::casts()` | — |
 | 12 | **Protección CSRF y sesión nueva al entrar**, de Laravel e Inertia. | Middleware `web` | — |
+| 15 | **Cabeceras de seguridad** en todas las respuestas: `X-Frame-Options: SAMEORIGIN`, `Content-Security-Policy: frame-ancestors 'self'`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y, con HTTPS, HSTS (ERR-06). | `CabecerasSeguridad` | `AuditoriaQaTest` |
+| 16 | **Los correos no arman enlaces con los datos:** el nombre de una empresa o un motivo con Markdown se muestra como texto (ERR-03). | `Notifications\Correo::escapar()` | `AuditoriaQaTest` |
+| 17 | **Un correo muy largo no rompe el login:** las llaves de los contadores de intentos usan un hash del correo (ERR-01). | `LimitadorLogin` y `LimitarIntentosAcceso` | `AuditoriaQaTest` |
+| 18 | **Rol inactivo:** una cuenta activa con su rol inactivo no entra y recibe su propio mensaje (ERR-12). | `FortifyServiceProvider` | `AuditoriaQaTest` |
 
 Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación también (`FortifyServiceProvider::configureResetEmail`).
 
@@ -116,8 +116,11 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 
 - `APP_DEBUG=false`. Con `true`, un error muestra código y datos de la base, como la pantalla de error de Laravel.
 - `APP_ENV=production`. Así no existen las rutas `/prueba-tecnica/*`.
+- `INERTIA_DEVTOOLS_ENABLED=false`. Con `local`, `/_inertia/devtools` deja leer las peticiones recientes con sus datos (ERR-07).
 - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
-- Claves (`APP_KEY`, base de datos, correo, OpenAI) solo en `.env`.
+- Claves (`APP_KEY`, base de datos, correo, OpenAI, Turnstile) solo en `.env`.
+
+**Auditoría QA (4 de noviembre de 2026):** se corrigieron los 14 hallazgos (ERR-01 a ERR-14). Los de seguridad están en las reglas 6, 8 y 15 a 18. Cada uno tiene su prueba en `tests/Feature/AuditoriaQaTest.php` y el detalle está en `24_CAMBIOS_Y_VERSIONES.md`. `composer audit` y `npm audit` quedaron en 0.
 
 **Términos y Condiciones y Política de Privacidad:** son los textos oficiales de Captter, entregados el 4 de noviembre de 2026 y copiados tal cual en `resources/js/lib/legales.ts`. Los Términos son del 16 de septiembre de 2025 y la Política, del 27 de mayo de 2025. Se abren en una ventana desde el registro (L2), y al aceptarlos se guarda la fecha. Contacto en los dos: contacto@captter.com.
 
@@ -136,7 +139,7 @@ Todos los mensajes salen en español (`lang/es/`), y el correo de recuperación 
 
 ## Secretos
 
-- Las claves (OpenAI, correo, base de datos) van solo en `.env`, que no se sube al repositorio.
+- Las claves (OpenAI, correo, base de datos, Turnstile) van solo en `.env`, que no se sube al repositorio (`.gitignore`).
 - `.env.example` lleva placeholders y un comentario por variable.
 - Antes de entregar se revisa que ninguna clave haya quedado en el código (T-147).
 

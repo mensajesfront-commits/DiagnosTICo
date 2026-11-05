@@ -1,6 +1,6 @@
 # API e integraciones
 
-**Estado:** COMPLETO (T-113). Actualizado el 14 de octubre de 2026.
+**Estado:** COMPLETO (T-113). Actualizado para la entrega `v1.0.0` (5 de noviembre de 2026).
 
 ## 1. ¿Hay una API?
 
@@ -86,7 +86,7 @@ Las rutas completas, con su controlador y permiso, están en `15_BACKEND.md`. La
 
 ### Costo
 
-Cada medición hace una llamada por categoría (normalmente 10). En desarrollo se usó `gpt-4.1-nano` con un saldo de prueba de 5 USD. **[INFORMACIÓN PENDIENTE]** El modelo y quién paga en producción los decide NuevasTIC.
+Cada medición hace una llamada por categoría (normalmente 10). En desarrollo se usó `gpt-4.1-nano` con un saldo de prueba de 5 USD. En producción OpenAI lo paga NuevasTIC, con el modelo `gpt-4.1-mini` (23 de octubre de 2026). "Probar con un ejemplo" (A4) tiene un límite de 100 pruebas al día.
 
 ## 3. Correo (SMTP)
 
@@ -94,8 +94,10 @@ En local todo va a Mailpit (`27_ENTORNOS.md`). En otro servidor se configura `MA
 
 | Correo | Cuándo sale | Para quién | En cola |
 |---|---|---|---|
-| `InvitacionCuenta` | Al invitar una cuenta (A5) o registrar una empresa (A3.2) | La cuenta nueva | No |
-| Restablecer contraseña (Fortify) | Al pedirlo en L3 | Quien lo pide, si existe | No |
+| `InvitacionCuenta` | Al invitar una cuenta (A5), incluido un Consultor, o registrar una empresa (A3.2) | La cuenta nueva | No |
+| `CodigoVerificacionCorreo` | Al registrarse (L2) y al pedir otro código (L2b) | Quien se registra | No |
+| Restablecer contraseña (Fortify) | Al pedirlo en L3. El enlace vence a los 10 minutos (RN-006) | Quien lo pide, si existe | No |
+| `ContrasenaLaCambiaTuEmpresa` | Un colaborador pide "¿Olvidaste tu contraseña?" | El colaborador: su contraseña la cambia la cuenta principal (E12.3) | No |
 | `AvisoMedicion` | Al asignar con aviso, al recordar o reenviar (A3.1e, A1) | Cuenta principal de la empresa | Sí |
 | `NuevaMedicionSolicitada` | La empresa pide una nueva medición (HU-082) | Administradores activos | Sí |
 | `DiagnosticoEnviado` | Una empresa envía su diagnóstico | Administradores activos con el aviso encendido | Sí |
@@ -105,6 +107,8 @@ En local todo va a Mailpit (`27_ENTORNOS.md`). En otro servidor se configura `MA
 | `EmpresaDesactivada` | Al desactivar una empresa | Sus cuentas | No |
 | `RolCambiado` | Al cambiar el rol de una cuenta | Esa cuenta | No |
 | `SectorReasignado` | Al pasar las empresas a otro sector | Las empresas movidas | No |
+
+Todos los correos usan la plantilla con la identidad de Captter (`Notifications\Correo`, `resources/views/vendor/mail`). Los textos que vienen de los datos, como el nombre de una empresa, se escapan para que no se vuelvan enlaces (auditoría QA, ERR-03).
 
 **Preferencias (Mi perfil, A6 y E11).** Cada cuenta enciende o apaga sus avisos y cada correo lo respeta (`User::quiereAviso`):
 
@@ -117,10 +121,10 @@ Los que van en cola necesitan `php artisan queue:work` (en local con `QUEUE_CONN
 
 ## 4. Chromium (PDF)
 
-- `spatie/laravel-pdf` con Browsershot abre Chromium sin interfaz y convierte una vista Blade (`resources/views/pdf/informe.blade.php`) en PDF.
+- `spatie/laravel-pdf` con Browsershot abre Chromium sin interfaz y convierte una vista Blade en PDF. Son dos por resultado (RN-024): `pdf/informe.blade.php` (completo) y `pdf/resumen.blade.php` (para la empresa).
 - Variables: `LARAVEL_PDF_CHROME_PATH` y `LARAVEL_PDF_NO_SANDBOX`.
 - Chromium trabaja sin internet: Chart.js, las fuentes y el logo se incrustan en el HTML (`RecursosPdf`).
-- El PDF se genera en la cola al publicar y se guarda en `storage/app/private`. Si falta, se genera al descargarlo.
+- Los dos se generan en la cola al publicar y se guardan en `storage/app/private/informes`. Si falta uno, se genera al descargarlo.
 
 ## 5. Catálogos externos (archivos del repositorio)
 
@@ -131,9 +135,13 @@ Los que van en cola necesitan `php artisan queue:work` (en local con `QUEUE_CONN
 
 No se consultan en línea: están en el repositorio y no cambian mientras el sistema corre.
 
-## 6. WhatsApp (aplazado)
+## 6. Cloudflare Turnstile (captcha del registro)
 
-El bot de WhatsApp (EP-013, HU-071 a HU-075) está aplazado (`03_ALCANCE.md`). No hay código ni variables. Si se retoma:
+- El registro (L2) muestra el captcha de Cloudflare y el servidor confirma el token con `siteverify` (`Support\Captcha`).
+- Variables: `CAPTCHA_ACTIVO`, `TURNSTILE_SITE_KEY` (pública) y `TURNSTILE_SECRET_KEY` (secreta), solo en el `.env`.
+- Sin llaves, en local se usan las de prueba de Cloudflare, que siempre aprueban. En producción, sin llaves, el registro se rechaza.
+- Las llaves reales ya existen (4 de noviembre de 2026).
 
-- el webhook iría en `/webhook/whatsapp`, protegido con la firma del proveedor y sin sesión;
-- sus tablas irían separadas de `empresas` y `mediciones` (RN-029).
+## 7. WhatsApp (fuera de este repositorio)
+
+El bot de WhatsApp (EP-013, HU-071 a HU-075) lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026). Aquí no hay código, rutas ni variables del bot. **[INFORMACIÓN PENDIENTE]** Si se conecta con este sistema y cómo.

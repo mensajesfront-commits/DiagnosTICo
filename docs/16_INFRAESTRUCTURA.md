@@ -40,9 +40,9 @@ Los comandos y las variables por entorno están en `27_ENTORNOS.md`.
 | Frontend | `npm run build` una vez (o `npm run dev` mientras se programa) | No cargan las pantallas |
 | SSR (opcional) | `npm run build:ssr` y `php artisan inertia:start-ssr` | Las páginas se arman solo en el navegador |
 
-## 3. Requisitos para instalarlo en un servidor
+## 3. Requisitos del servidor
 
-Si NuevasTIC decide ponerlo en línea, necesita como mínimo:
+El sistema se va a desplegar (DEC-006 cambió el 4 de noviembre de 2026). **[INFORMACIÓN PENDIENTE]** El servidor y el dominio. Necesita como mínimo:
 
 | Pieza | Requisito |
 |---|---|
@@ -51,7 +51,8 @@ Si NuevasTIC decide ponerlo en línea, necesita como mínimo:
 | Node | 24, para compilar el frontend y para Browsershot |
 | Chromium | Instalado en el servidor, con su ruta en `LARAVEL_PDF_CHROME_PATH` |
 | Correo | Un servidor SMTP (`MAIL_*`) |
-| OpenAI | Clave y modelo (`OPENAI_API_KEY`, `OPENAI_MODEL`) |
+| OpenAI | Clave y modelo (`OPENAI_API_KEY`, `OPENAI_MODEL=gpt-4.1-mini`), que paga NuevasTIC |
+| Cloudflare Turnstile | Llaves reales del captcha del registro (`TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`); sin ellas nadie se registra |
 | Supervisor o similar | Para mantener vivo `queue:work` |
 | Cron | `* * * * * php artisan schedule:run` |
 | HTTPS | Certificado; con `APP_URL` en `https://` |
@@ -62,14 +63,14 @@ Los pasos están en `20_DESPLIEGUE.md`.
 
 | Qué | Dónde | Disco |
 |---|---|---|
-| Informes PDF | `storage/app/private/informes/` | `local` (privado; se descargan por una ruta con permiso) |
+| Informes PDF (el completo y el resumen de cada resultado) | `storage/app/private/informes/{empresa}/` | `local` (privado; se descargan por una ruta con permiso) |
 | Fotos de perfil y logos | `storage/app/private/fotos/` y `storage/app/private/logos/` | `local` (se sirven por `/imagenes/{tipo}/{id}`) |
 | Registros de errores | `storage/logs/laravel.log` | — |
 | Sesiones, caché y cola | Tablas `sessions`, `cache`, `jobs`, `failed_jobs` | PostgreSQL |
 
 ## 5. Copias de seguridad
 
-**[INFORMACIÓN PENDIENTE]** No hay servidor, así que no hay copias programadas. Si se instala, hay que respaldar:
+**[INFORMACIÓN PENDIENTE]** Todavía no hay servidor, así que no hay copias programadas. Al desplegar, hay que respaldar:
 
 - la base de datos (`pg_dump`), que tiene todo lo importante (diagnósticos, versiones congeladas, respuestas y resultados);
 - `storage/app/private` (PDF, fotos y logos). Los PDF se pueden volver a generar desde el resultado guardado;

@@ -2,14 +2,21 @@
 
 **Estado:** COMPLETO (T-027). Todos los documentos quedaron cerrados para la entrega `v1.0.0` (5 de noviembre de 2026).
 
-Lista de los documentos del proyecto con su estado. Cada documento se escribe en la semana del cronograma que le corresponde. Al cerrar el proyecto, todos deben quedar en COMPLETO o NO APLICA (T-160).
+Lista de los documentos del proyecto con su estado. Cada documento se escribió en la semana del cronograma que le correspondía. Al cerrar el proyecto, todos debían quedar en COMPLETO o NO APLICA (T-160): se cumplió el 5 de noviembre de 2026, con la versión `v1.0.0`.
+
+**Por dónde empezar:**
+
+- **Qué es y en qué quedó:** `01_CONTEXTO_PROYECTO.md` y `01_ESTADO_ACTUAL.md`.
+- **Qué hace el sistema:** `05_REQUISITOS_FUNCIONALES.md` (fuente de verdad), `29_FUNCIONALIDADES.md` y `31_MANUAL_DE_USUARIO.md`.
+- **Cómo instalarlo y desplegarlo:** `../README.md`, `27_ENTORNOS.md` y `20_DESPLIEGUE.md`.
+- **Qué cambió y cuándo:** `24_CAMBIOS_Y_VERSIONES.md`.
 
 **Estados**
 
 - **COMPLETO:** terminado y revisado.
 - **EN CURSO:** tiene contenido y sigue en trabajo.
-- **REQUIERE VALIDACIÓN:** escrito, pero falta que NuevasTIC o el equipo lo confirmen.
-- **PENDIENTE:** todavía no existe el archivo.
+- **REQUIERE VALIDACIÓN:** escrito, pero falta que NuevasTIC o el equipo lo confirmen. (Ya no queda ninguno.)
+- **PENDIENTE:** todavía no existe el archivo. (Ya no queda ninguno.)
 - **NO APLICA:** no corresponde a este proyecto.
 
 | N.º | Documento | Estado | Semana | Tarea |
@@ -56,7 +63,7 @@ Todos los documentos tienen archivo y quedaron en COMPLETO para la entrega `v1.0
 |---|---|
 | [`../README.md`](../README.md) | Requisitos e instalación paso a paso. |
 | [`../CLAUDE.md`](../CLAUDE.md) | Stack, comandos y reglas del proyecto. |
-| [`../.env.example`](../.env.example) | Variables de entorno, con un comentario en cada una. |
+| [`../.env.example`](../.env.example) | Variables de entorno, con un comentario en cada una. Solo marcadores: las claves reales van en el `.env` de cada equipo o del servidor, que no se sube. |
 
 ## Notas
 
