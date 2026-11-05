@@ -2,7 +2,7 @@
 
 **Estado:** EN CURSO (T-037). Se actualiza al cerrar cada semana. El detalle de cada cambio está en `24_CAMBIOS_Y_VERSIONES.md`.
 
-**Última actualización:** 4 de noviembre de 2026, antes de la entrega.
+**Última actualización:** 5 de noviembre de 2026, antes de la entrega.
 
 ## Resumen
 
@@ -58,14 +58,14 @@ Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 
 | Qué | Quién | Notas |
 |---|---|---|
-| Unir a `develop` la rama `claude/zealous-babbage-7s6joa` (PR #11) | Luis, **en revisión** | CI en verde. Después: `php artisan migrate` (3 migraciones del 4 de noviembre) |
-| Recorrer el flujo completo con la clave real de OpenAI | Cristian, **pendiente** | En su equipo, con `OPENAI_API_KEY` en su `.env`: asignar, responder, análisis y los dos PDF |
+| ~~Unir a `develop` la rama `claude/zealous-babbage-7s6joa` (PR #11)~~ | Luis | **Hecho** el 5 de noviembre. El último commit (logotipo en los PDF, despliegue y bot) va en un PR nuevo. Después de actualizar: `php artisan migrate` (3 migraciones del 4 de noviembre) |
+| ~~Recorrer el flujo completo con la clave real de OpenAI~~ | Cristian | **Hecho**: funciona (confirmado el 5 de noviembre) |
 | ~~Revisar a ojo los dos PDF~~ | Cristian | **Hecho** el 4 de noviembre |
 | Revisar con NuevasTIC las instrucciones de la IA | NuevasTIC | En A4 (Configuración IA). Las de fábrica están en `App\Services\Ia\ArmadorPrompt::GENERAL` |
 | Desplegar en el servidor | Equipo | `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio |
 | Revisión pantalla por pantalla (diseño, textos y funciones) | Cristian | Los ajustes se anotan en `18_UI_UX.md` |
 | Instalar desde cero con el README en un equipo limpio (T-021) | Equipo | Con Sail |
-| PR de `develop` a `main` y etiqueta `v1.0.0` (T-152) | Equipo | `20_DESPLIEGUE.md` |
+| PR de `develop` a `main` y etiqueta `v1.0.0` (T-152) | Equipo | `main` va 75 commits detrás de `develop` (5 de noviembre). `20_DESPLIEGUE.md` |
 | Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160) | Equipo y NuevasTIC | `00_INDICE.md` |
 
 ## Decisiones de NuevasTIC (23 de octubre de 2026)
