@@ -30,8 +30,12 @@ export type ItemMenu = {
     icono?: Component;
     permiso?: string;
     roles?: string[];
+    /** Roles que no la ven aunque tengan el permiso. */
+    sinRoles?: string[];
     /** Submenú plegable. */
     hijos?: ItemMenu[];
+    /** Otras rutas en las que se marca como activa (p. ej. un resultado). */
+    tambien?: string[];
 };
 
 export const menuAdministrador: ItemMenu[] = [
@@ -47,6 +51,17 @@ export const menuAdministrador: ItemMenu[] = [
         href: '/empresas',
         icono: Building2,
         permiso: 'empresas.ver',
+        // RN-030: el consultor tiene "Mis empresas" (C2) en su lugar.
+        sinRoles: ['Consultor'],
+        tambien: ['/resultados'],
+    },
+    {
+        titulo: 'Mis empresas',
+        href: '/empresas',
+        icono: Building2,
+        permiso: 'empresas.ver',
+        roles: ['Consultor'],
+        tambien: ['/resultados'],
     },
     // HU-041 CA-001: "Configuración IA" va sin submenú de fases.
     {
@@ -99,6 +114,10 @@ export function filtrarMenu(
         }
 
         if (item.roles && (rol === null || !item.roles.includes(rol))) {
+            return [];
+        }
+
+        if (item.sinRoles && rol !== null && item.sinRoles.includes(rol)) {
             return [];
         }
 

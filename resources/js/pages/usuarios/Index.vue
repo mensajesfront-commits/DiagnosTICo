@@ -17,13 +17,28 @@
  *   eliminar pide escribir el correo exacto. Las desactivadas tienen
  *   "Reactivar · Eliminar" y las invitaciones "Reenviar · Eliminar".
  * - No existe "restablecer contraseña" (RN-006).
+ *
+ * Diseño: accesos rápidos por estado con su conteo (como A3), búsqueda con
+ * lupa, cada cuenta con un círculo de iniciales del color de su rol, el rol
+ * en una píldora, la empresa con ícono, el estado con un punto y las
+ * acciones como botones con ícono.
  */
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import {
+    Building2,
+    Eye,
+    Plus,
+    RotateCcw,
+    Search,
+    Send,
+    ShieldCheck,
+    Trash2,
+    UserX,
+} from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import Boton from '@/components/base/Boton.vue';
 import Entrada from '@/components/base/Entrada.vue';
-import Etiqueta from '@/components/base/Etiqueta.vue';
 import Paginacion from '@/components/base/Paginacion.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import EncabezadoUsuarios from '@/components/usuarios/EncabezadoUsuarios.vue';
@@ -35,6 +50,7 @@ import { diaYMes } from '@/lib/fechas';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import { coincide } from '@/lib/usuarios';
+import { cn } from '@/lib/utils';
 import { edit as perfil } from '@/routes/profile';
 import type { Cuenta, EstadoCuenta, Rol } from '@/types/usuarios';
 
@@ -44,6 +60,8 @@ const props = defineProps<{
         Rol,
         'id' | 'nombre' | 'descripcion' | 'activo' | 'del_sistema' | 'aviso'
     >[];
+    /** Para elegir las empresas de un Consultor al invitarlo (HU-085). */
+    empresas: { id: number; nombre: string }[];
 }>();
 
 const { puede } = usePermisos();
@@ -56,13 +74,6 @@ const rolInicial =
 const busqueda = ref('');
 const filtroRol = ref(rolInicial);
 const filtroEstado = ref<EstadoCuenta | ''>('');
-
-const estados: Record<EstadoCuenta, string> = {
-    activa: 'Activa',
-    desactivada: 'Desactivada',
-    invitacion: 'Invitación pendiente',
-    eliminada: 'Eliminadas (se pueden recuperar)',
-};
 
 const filtradas = computed(() =>
     props.cuentas.filter(
@@ -151,105 +162,229 @@ function verComo(cuenta: Cuenta): void {
     router.post(rutas.usuarios.verComo(cuenta.id));
 }
 
-const enlace = 'text-marca hover:underline';
-const enlaceEliminar = 'text-aviso hover:underline';
+const accion =
+    'inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-tinta-suave transition hover:bg-lienzo hover:text-marca';
+const accionPeligro =
+    'inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-tinta-suave transition hover:bg-aviso-suave hover:text-aviso';
+
+/** Accesos rápidos por estado, con su conteo. */
+const rapidos = computed(() => {
+    const c = props.cuentas;
+    const n = (e: EstadoCuenta) => c.filter((x) => x.estado === e).length;
+
+    return [
+        {
+            clave: '' as const,
+            texto: 'Todas',
+            n: c.filter((x) => x.estado !== 'eliminada').length,
+            tono: null,
+        },
+        {
+            clave: 'activa' as const,
+            texto: 'Activas',
+            n: n('activa'),
+            tono: 'bg-exito',
+        },
+        {
+            clave: 'invitacion' as const,
+            texto: 'Invitaciones',
+            n: n('invitacion'),
+            tono: 'bg-alerta',
+        },
+        {
+            clave: 'desactivada' as const,
+            texto: 'Desactivadas',
+            n: n('desactivada'),
+            tono: 'bg-nivel-sin',
+        },
+        {
+            clave: 'eliminada' as const,
+            texto: 'Eliminadas',
+            n: n('eliminada'),
+            tono: 'bg-aviso',
+        },
+    ];
+});
+
+const iniciales = (nombre: string) =>
+    nombre
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((p) => p[0]?.toUpperCase())
+        .join('');
+
+/** Color del círculo y de la píldora según el rol. */
+function tonoRol(rol: string | null): { avatar: string; pildora: string } {
+    if (rol === 'Administrador') {
+        return {
+            avatar: 'bg-marca text-white',
+            pildora: 'bg-marca-suave text-marca',
+        };
+    }
+
+    if (rol === 'Empresa') {
+        return {
+            avatar: 'bg-exito-suave text-exito',
+            pildora: 'bg-exito-suave text-exito',
+        };
+    }
+
+    if (rol === 'Colaborador') {
+        return {
+            avatar: 'bg-nivel-camino-suave text-nivel-camino-texto',
+            pildora: 'bg-nivel-camino-suave text-nivel-camino-texto',
+        };
+    }
+
+    return {
+        avatar: 'bg-lienzo-oscuro text-tinta',
+        pildora: 'bg-lienzo-oscuro text-tinta',
+    };
+}
+
+const estadoCuenta: Record<EstadoCuenta, { texto: string; punto: string }> = {
+    activa: { texto: 'Activa', punto: 'bg-exito' },
+    invitacion: { texto: 'Invitación pendiente', punto: 'bg-alerta' },
+    desactivada: { texto: 'Desactivada', punto: 'bg-nivel-sin' },
+    eliminada: { texto: 'Eliminada', punto: 'bg-aviso' },
+};
 </script>
 
 <template>
     <Head title="Usuarios" />
 
-    <div class="flex flex-col gap-5 p-6 lg:h-dvh lg:overflow-hidden">
+    <div class="flex flex-col gap-4 p-6 lg:h-dvh lg:overflow-hidden">
         <EncabezadoUsuarios class="shrink-0" pestana="usuarios">
             <Boton
                 v-if="puede('usuarios.gestionar')"
+                class="gap-1.5"
                 @click="modalInvitar = true"
             >
-                + Invitar usuario
+                <Plus class="size-4" aria-hidden="true" />
+                Invitar usuario
             </Boton>
         </EncabezadoUsuarios>
 
-        <div class="grid shrink-0 gap-3 md:grid-cols-[1fr_13rem_13rem]">
-            <div class="flex flex-col gap-1.5">
-                <label for="buscar-cuenta" class="text-xs font-medium">
-                    Buscar
-                </label>
-                <Entrada
-                    id="buscar-cuenta"
-                    v-model="busqueda"
-                    type="search"
-                    placeholder="Nombre o correo"
-                    autocomplete="off"
+        <div
+            class="flex shrink-0 flex-wrap gap-2"
+            role="group"
+            aria-label="Filtrar por estado"
+        >
+            <button
+                v-for="r in rapidos"
+                :key="r.clave || 'todas'"
+                type="button"
+                :aria-pressed="filtroEstado === r.clave"
+                :class="
+                    cn(
+                        'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition',
+                        filtroEstado === r.clave
+                            ? 'border-marca bg-marca text-white'
+                            : 'border-linea bg-white hover:border-marca/40',
+                    )
+                "
+                @click="filtroEstado = r.clave"
+            >
+                <span
+                    v-if="r.tono"
+                    :class="cn('size-2 rounded-full', r.tono)"
+                    aria-hidden="true"
                 />
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="filtro-rol" class="text-xs font-medium">Rol</label>
-                <Seleccion id="filtro-rol" v-model="filtroRol">
-                    <option value="">Todos los roles</option>
-                    <option
-                        v-for="rol in roles"
-                        :key="rol.id"
-                        :value="rol.nombre"
-                    >
-                        {{ rol.nombre }}
-                    </option>
-                </Seleccion>
-            </div>
-            <div class="flex flex-col gap-1.5">
-                <label for="filtro-estado" class="text-xs font-medium">
-                    Estado
-                </label>
-                <Seleccion id="filtro-estado" v-model="filtroEstado">
-                    <option value="">Todos los estados</option>
-                    <option
-                        v-for="(texto, clave) in estados"
-                        :key="clave"
-                        :value="clave"
-                    >
-                        {{ texto }}
-                    </option>
-                </Seleccion>
-            </div>
+                {{ r.texto }}
+                <span
+                    :class="
+                        cn(
+                            'rounded-full px-1.5 font-mono text-xs font-semibold',
+                            filtroEstado === r.clave
+                                ? 'bg-white/20'
+                                : 'bg-lienzo-oscuro',
+                        )
+                    "
+                >
+                    {{ r.n }}
+                </span>
+            </button>
         </div>
 
-        <p
-            v-if="puede('usuarios.gestionar')"
-            class="-mt-2 shrink-0 text-xs text-tinta-suave"
-        >
-            Las cuentas de empresa se crean al registrar la empresa en
-            <Link :href="rutas.empresas.lista()" class="text-marca underline">
-                Empresas</Link
-            >; los colaboradores los crea cada empresa desde su menú. Para sumar
-            a alguien del equipo de NuevasTIC, usa
-            <button
-                type="button"
-                class="text-marca underline"
-                @click="modalInvitar = true"
-            >
-                Invitar usuario</button
-            >. Para cambiar el rol de una cuenta, usa "Cambiar rol" en su fila.
-        </p>
-
         <section
-            class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0 lg:flex-1"
+            class="flex flex-col rounded-2xl border border-linea bg-white lg:min-h-0 lg:flex-1"
         >
+            <div class="flex shrink-0 flex-wrap items-end gap-3 px-5 pt-4 pb-3">
+                <div class="relative min-w-60 flex-1">
+                    <label for="buscar-cuenta" class="sr-only">Buscar</label>
+                    <Search
+                        class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-tinta-suave"
+                        aria-hidden="true"
+                    />
+                    <Entrada
+                        id="buscar-cuenta"
+                        v-model="busqueda"
+                        type="search"
+                        placeholder="Buscar por nombre o correo"
+                        autocomplete="off"
+                        class="h-9 pl-9"
+                    />
+                </div>
+                <div class="w-full sm:w-52">
+                    <label for="filtro-rol" class="sr-only">Rol</label>
+                    <Seleccion
+                        id="filtro-rol"
+                        v-model="filtroRol"
+                        class="h-9 text-sm"
+                    >
+                        <option value="">Todos los roles</option>
+                        <option
+                            v-for="rol in roles"
+                            :key="rol.id"
+                            :value="rol.nombre"
+                        >
+                            {{ rol.nombre }}
+                        </option>
+                    </Seleccion>
+                </div>
+                <p
+                    v-if="puede('usuarios.gestionar')"
+                    class="w-full text-xs text-tinta-suave"
+                >
+                    Las cuentas de empresa se crean al registrar la empresa en
+                    <Link
+                        :href="rutas.empresas.lista()"
+                        class="text-marca underline"
+                    >
+                        Empresas</Link
+                    >; los colaboradores los crea cada empresa desde su menú.
+                    Para sumar a alguien del equipo de NuevasTIC, usa
+                    <button
+                        type="button"
+                        class="text-marca underline"
+                        @click="modalInvitar = true"
+                    >
+                        Invitar usuario</button
+                    >.
+                </p>
+            </div>
+
             <div
                 ref="contenedor"
                 class="min-h-0 flex-1 overflow-x-auto overflow-y-hidden"
             >
                 <table class="w-full border-collapse text-sm">
                     <thead>
-                        <tr class="border-b border-linea text-left">
+                        <tr
+                            class="border-y border-linea bg-lienzo/60 text-left"
+                        >
                             <th
                                 v-for="columna in [
                                     'Cuenta',
                                     'Rol',
-                                    'Empresa asociada',
+                                    'Empresa',
                                     'Estado',
                                     'Acciones',
                                 ]"
                                 :key="columna"
                                 scope="col"
-                                class="px-5 py-3 text-xs font-normal text-tinta-suave"
+                                class="px-5 py-2.5 text-xs font-medium text-tinta-suave"
                             >
                                 {{ columna }}
                             </th>
@@ -259,54 +394,100 @@ const enlaceEliminar = 'text-aviso hover:underline';
                         <tr
                             v-for="cuenta in visibles"
                             :key="cuenta.id"
-                            class="border-b border-linea last:border-b-0"
+                            :class="
+                                cn(
+                                    'border-b border-linea transition-colors last:border-b-0 hover:bg-lienzo/40',
+                                    cuenta.estado !== 'activa' &&
+                                        cuenta.estado !== 'invitacion' &&
+                                        'text-tinta-suave',
+                                )
+                            "
                         >
                             <td class="px-5 py-3">
-                                <p class="font-medium">{{ cuenta.nombre }}</p>
-                                <p
-                                    v-if="cuenta.es_admin_principal"
-                                    class="text-xs font-medium text-marca"
-                                >
-                                    Administrador principal
-                                </p>
-                                <p class="text-xs text-tinta-suave">
-                                    {{ cuenta.correo }}
-                                </p>
+                                <div class="flex min-w-56 items-center gap-3">
+                                    <span
+                                        :class="
+                                            cn(
+                                                'flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
+                                                tonoRol(cuenta.rol).avatar,
+                                                // Gris sin bajar el contraste del texto (ERR-11).
+                                                cuenta.estado !== 'activa' &&
+                                                    'grayscale',
+                                            )
+                                        "
+                                        aria-hidden="true"
+                                    >
+                                        {{ iniciales(cuenta.nombre) }}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p class="font-medium text-tinta">
+                                            {{ cuenta.nombre }}
+                                            <span
+                                                v-if="cuenta.es_tuya"
+                                                class="ml-1 rounded-full bg-marca-suave px-1.5 py-0.5 text-[10px] font-medium text-marca"
+                                                >Tú</span
+                                            >
+                                        </p>
+                                        <p
+                                            v-if="cuenta.es_admin_principal"
+                                            class="text-xs font-medium text-marca"
+                                        >
+                                            Administrador principal
+                                        </p>
+                                        <p class="text-xs text-tinta-suave">
+                                            {{ cuenta.correo }}
+                                        </p>
+                                    </div>
+                                </div>
                             </td>
                             <td class="px-5 py-3">
-                                <Etiqueta
-                                    :tono="
-                                        cuenta.rol === 'Administrador'
-                                            ? 'marca'
-                                            : 'neutro'
+                                <span
+                                    :class="
+                                        cn(
+                                            'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap',
+                                            tonoRol(cuenta.rol).pildora,
+                                        )
                                     "
                                 >
+                                    <ShieldCheck
+                                        v-if="cuenta.rol === 'Administrador'"
+                                        class="size-3"
+                                        aria-hidden="true"
+                                    />
                                     {{ cuenta.rol ?? 'Sin rol' }}
-                                </Etiqueta>
+                                </span>
                             </td>
                             <td class="px-5 py-3">
-                                {{ cuenta.empresa ?? '—' }}
+                                <span
+                                    v-if="cuenta.empresa"
+                                    class="inline-flex items-center gap-1.5"
+                                >
+                                    <Building2
+                                        class="size-3.5 text-tinta-suave"
+                                        aria-hidden="true"
+                                    />
+                                    {{ cuenta.empresa }}
+                                </span>
+                                <span v-else class="text-xs text-tinta-suave">
+                                    Equipo NuevasTIC
+                                </span>
                             </td>
                             <td class="px-5 py-3">
-                                <Etiqueta
-                                    v-if="cuenta.estado === 'activa'"
-                                    tono="exito"
+                                <span
+                                    class="inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap"
                                 >
-                                    ✓ Activa
-                                </Etiqueta>
-                                <Etiqueta
-                                    v-else-if="cuenta.estado === 'invitacion'"
-                                    tono="alerta"
-                                >
-                                    ✉ Invitación pendiente
-                                </Etiqueta>
-                                <Etiqueta
-                                    v-else-if="cuenta.estado === 'eliminada'"
-                                    tono="aviso"
-                                >
-                                    ✕ Eliminada
-                                </Etiqueta>
-                                <Etiqueta v-else>○ Desactivada</Etiqueta>
+                                    <span
+                                        :class="
+                                            cn(
+                                                'size-2 rounded-full',
+                                                estadoCuenta[cuenta.estado]
+                                                    .punto,
+                                            )
+                                        "
+                                        aria-hidden="true"
+                                    />
+                                    {{ estadoCuenta[cuenta.estado].texto }}
+                                </span>
                                 <p
                                     v-if="cuenta.rol_inactivo"
                                     class="mt-1 text-xs text-aviso"
@@ -340,13 +521,14 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                     }}
                                 </p>
                             </td>
-                            <td class="px-5 py-3 whitespace-nowrap">
-                                <template v-if="cuenta.es_tuya">
-                                    Tu cuenta ·
-                                    <Link :href="perfil()" :class="enlace">
-                                        Mi perfil
-                                    </Link>
-                                </template>
+                            <td class="px-5 py-2 whitespace-nowrap">
+                                <Link
+                                    v-if="cuenta.es_tuya"
+                                    :href="perfil()"
+                                    :class="accion"
+                                >
+                                    Ir a Mi perfil
+                                </Link>
                                 <span
                                     v-else-if="!puede('usuarios.gestionar')"
                                     class="text-xs text-tinta-suave"
@@ -363,26 +545,33 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                 <button
                                     v-else-if="cuenta.estado === 'eliminada'"
                                     type="button"
-                                    :class="enlace"
+                                    :class="accion"
                                     @click="recuperar(cuenta)"
                                 >
+                                    <RotateCcw
+                                        class="size-3.5"
+                                        aria-hidden="true"
+                                    />
                                     Recuperar
                                 </button>
                                 <span
                                     v-else-if="cuenta.estado === 'invitacion'"
-                                    class="inline-flex flex-wrap items-center gap-x-2"
+                                    class="inline-flex flex-wrap items-center gap-0.5"
                                 >
                                     <button
                                         type="button"
-                                        :class="enlace"
+                                        :class="accion"
                                         @click="reenviar(cuenta)"
                                     >
+                                        <Send
+                                            class="size-3.5"
+                                            aria-hidden="true"
+                                        />
                                         Reenviar invitación
                                     </button>
-                                    <span class="text-tinta-suave">·</span>
                                     <button
                                         type="button"
-                                        :class="enlaceEliminar"
+                                        :class="accionPeligro"
                                         @click="
                                             desactivarOEliminar(
                                                 cuenta,
@@ -390,57 +579,68 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                             )
                                         "
                                     >
+                                        <Trash2
+                                            class="size-3.5"
+                                            aria-hidden="true"
+                                        />
                                         Eliminar
                                     </button>
                                 </span>
                                 <span
                                     v-else
-                                    class="inline-flex flex-wrap items-center gap-x-2"
+                                    class="inline-flex flex-wrap items-center gap-0.5"
                                 >
-                                    <template
+                                    <button
                                         v-if="cuenta.rol !== 'Administrador'"
+                                        type="button"
+                                        :class="accion"
+                                        @click="verComo(cuenta)"
                                     >
-                                        <button
-                                            type="button"
-                                            :class="enlace"
-                                            @click="verComo(cuenta)"
-                                        >
-                                            Ver como
-                                        </button>
-                                        <span class="text-tinta-suave">·</span>
-                                    </template>
-                                    <template
+                                        <Eye
+                                            class="size-3.5"
+                                            aria-hidden="true"
+                                        />
+                                        Ver como
+                                    </button>
+                                    <button
                                         v-if="cuenta.rol !== 'Colaborador'"
+                                        type="button"
+                                        :class="accion"
+                                        @click="cambiarRol(cuenta)"
                                     >
-                                        <button
-                                            type="button"
-                                            :class="enlace"
-                                            @click="cambiarRol(cuenta)"
-                                        >
-                                            Cambiar rol
-                                        </button>
-                                        <span class="text-tinta-suave">·</span>
-                                    </template>
+                                        <ShieldCheck
+                                            class="size-3.5"
+                                            aria-hidden="true"
+                                        />
+                                        Cambiar rol
+                                    </button>
                                     <button
                                         v-if="cuenta.estado === 'activa'"
                                         type="button"
-                                        :class="enlace"
+                                        :class="accionPeligro"
                                         @click="desactivarOEliminar(cuenta)"
                                     >
+                                        <UserX
+                                            class="size-3.5"
+                                            aria-hidden="true"
+                                        />
                                         Desactivar / Eliminar
                                     </button>
                                     <template v-else>
                                         <button
                                             type="button"
-                                            :class="enlace"
+                                            :class="accion"
                                             @click="reactivar(cuenta)"
                                         >
+                                            <RotateCcw
+                                                class="size-3.5"
+                                                aria-hidden="true"
+                                            />
                                             Reactivar
                                         </button>
-                                        <span class="text-tinta-suave">·</span>
                                         <button
                                             type="button"
-                                            :class="enlaceEliminar"
+                                            :class="accionPeligro"
                                             @click="
                                                 desactivarOEliminar(
                                                     cuenta,
@@ -448,6 +648,10 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                                 )
                                             "
                                         >
+                                            <Trash2
+                                                class="size-3.5"
+                                                aria-hidden="true"
+                                            />
                                             Eliminar
                                         </button>
                                     </template>
@@ -459,6 +663,10 @@ const enlaceEliminar = 'text-aviso hover:underline';
                                 colspan="5"
                                 class="px-5 py-10 text-center text-sm text-tinta-suave"
                             >
+                                <Search
+                                    class="mx-auto mb-2 size-6"
+                                    aria-hidden="true"
+                                />
                                 Ninguna cuenta coincide con la búsqueda o los
                                 filtros.
                             </td>
@@ -481,6 +689,7 @@ const enlaceEliminar = 'text-aviso hover:underline';
     <ModalInvitarUsuario
         v-model:abierto="modalInvitar"
         :roles="rolesInternos"
+        :empresas="empresas"
     />
     <ModalDesactivarEliminar
         v-if="elegida"

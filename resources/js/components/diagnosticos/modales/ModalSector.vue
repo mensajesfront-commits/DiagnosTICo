@@ -12,6 +12,7 @@
  * opciones no guardan los cambios del formulario.
  */
 import { useForm } from '@inertiajs/vue3';
+import { FolderPen, FolderPlus, Layers } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
@@ -19,10 +20,12 @@ import Combobox from '@/components/base/Combobox.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
+import Interruptor from '@/components/base/Interruptor.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import TarjetaOpcion from '@/components/base/TarjetaOpcion.vue';
 import { rutas } from '@/lib/rutas';
-import { normalizar } from '@/lib/texto';
+import { normalizar, plural } from '@/lib/texto';
 import type {
     DivisionCiiu,
     ResumenDiagnosticos,
@@ -168,6 +171,7 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
                 : 'Un sector agrupa empresas parecidas y los diagnósticos que se le asignan. Los campos son obligatorios salvo los marcados como opcionales.'
         "
         ancho="lg"
+        :icono="editando ? FolderPen : FolderPlus"
     >
         <form
             id="form-sector"
@@ -252,17 +256,35 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
                 </div>
             </Campo>
 
-            <p
+            <div
                 v-if="divisionElegida && (!editando || cambiaDivision)"
-                class="-mt-2 rounded-md bg-marca-suave px-3 py-2 text-xs"
+                class="-mt-2 flex items-start gap-3 rounded-xl bg-marca-suave/60 px-3.5 py-3 text-sm"
             >
-                Se agregarán sus
-                <strong>{{ divisionElegida.clases }} subsectores</strong>.
-                <template v-if="editando">
-                    Los subsectores que no sean de esta división se desactivan;
-                    las empresas que ya los tienen los conservan.
-                </template>
-            </p>
+                <span
+                    class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white text-marca shadow-sm"
+                    aria-hidden="true"
+                >
+                    <Layers class="size-4" />
+                </span>
+                <p>
+                    <span class="font-mono font-semibold">
+                        {{ divisionElegida.codigo }}
+                    </span>
+                    · {{ divisionElegida.nombre }}
+                    <span class="mt-0.5 block text-xs text-tinta-suave">
+                        Se agregarán sus
+                        <strong class="text-tinta">
+                            {{ divisionElegida.clases }} subsectores
+                        </strong>
+                        como actividades económicas.
+                        <template v-if="editando">
+                            Los subsectores que no sean de esta división se
+                            desactivan; las empresas que ya los tienen los
+                            conservan.
+                        </template>
+                    </span>
+                </p>
+            </div>
             <p
                 v-else-if="editando && sector"
                 class="-mt-2 text-xs text-tinta-suave"
@@ -287,40 +309,46 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
                 />
             </Campo>
 
-            <label v-if="!editando" class="flex items-center gap-2 text-sm">
-                <input
-                    v-model="form.activo"
-                    type="checkbox"
-                    class="size-4 accent-marca"
-                />
-                <span class="font-medium">Sector activo</span>
-                <span class="text-xs text-tinta-suave">
-                    Se ofrece al registrar empresas nuevas
-                </span>
-            </label>
-
-            <p
+            <div
                 v-if="!editando"
-                class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
+                class="rounded-xl border border-linea px-3.5 py-1"
             >
+                <Interruptor id="sector-activo" v-model="form.activo">
+                    <span class="font-medium">Sector activo</span>
+                    <span class="block text-xs text-tinta-suave">
+                        {{
+                            form.activo
+                                ? 'Se ofrece al registrar empresas nuevas.'
+                                : 'No se ofrece todavía: lo activas cuando tenga diagnóstico.'
+                        }}
+                    </span>
+                </Interruptor>
+            </div>
+
+            <Recuadro v-if="!editando" tono="neutro">
                 Al crearlo queda sin diagnósticos. Después puedes crear su
                 primer diagnóstico o duplicar uno de otro sector.
-            </p>
+            </Recuadro>
 
             <template v-if="editando && sector && resumen">
-                <p
-                    class="flex flex-wrap justify-between gap-2 rounded-md bg-lienzo px-3 py-2 text-xs"
-                >
-                    <span>
-                        <strong>{{ resumen.empresas }}</strong> empresas ·
-                        <strong>{{ sector.diagnosticos }}</strong> diagnósticos
-                        · <strong>{{ resumen.mediciones }}</strong> mediciones
-                    </span>
-                    <span class="text-tinta-suave">
-                        {{ resumen.publicados }} publicados ·
-                        {{ resumen.borradores }} borrador
-                    </span>
-                </p>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div
+                        v-for="cifra in [
+                            { n: resumen.empresas, t: 'empresas' },
+                            { n: sector.diagnosticos, t: 'diagnósticos' },
+                            { n: resumen.mediciones, t: 'mediciones' },
+                        ]"
+                        :key="cifra.t"
+                        class="rounded-xl bg-lienzo/70 px-2 py-2.5"
+                    >
+                        <p class="font-mono text-lg leading-none font-semibold">
+                            {{ cifra.n }}
+                        </p>
+                        <p class="mt-1 text-[11px] text-tinta-suave">
+                            {{ cifra.t }}
+                        </p>
+                    </div>
+                </div>
 
                 <div class="flex flex-col gap-2">
                     <p class="text-xs">
@@ -332,7 +360,11 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
                     </p>
                     <TarjetaOpcion
                         v-if="resumen.empresas > 0"
-                        :titulo="`Reasignar las ${resumen.empresas} empresas a otro sector`"
+                        :titulo="
+                            resumen.empresas === 1
+                                ? 'Reasignar la empresa a otro sector'
+                                : `Reasignar las ${resumen.empresas} empresas a otro sector`
+                        "
                         @elegir="otraOpcion('reasignar')"
                     >
                         Al reasignar, las empresas se llevan sus mediciones. Si
@@ -357,9 +389,11 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
                         @elegir="otraOpcion('eliminar')"
                     >
                         <template v-if="tieneDatos">
-                            Tiene {{ resumen.empresas }} empresas. Reasígnalas o
-                            desactiva el sector. Si queda sin empresas ni
-                            mediciones, podrás eliminarlo.
+                            Tiene
+                            {{
+                                plural(resumen.empresas, 'empresa', 'empresas')
+                            }}. Reasígnalas o desactiva el sector. Si queda sin
+                            empresas ni mediciones, podrás eliminarlo.
                         </template>
                         <template v-else>
                             No tiene empresas ni mediciones. No se puede
@@ -374,7 +408,17 @@ function otraOpcion(opcion: 'reasignar' | 'desactivar' | 'eliminar'): void {
             <Boton variante="secundario" @click="abierto = false">
                 Cancelar
             </Boton>
-            <Boton type="submit" form="form-sector" :cargando="form.processing">
+            <Boton
+                type="submit"
+                form="form-sector"
+                class="gap-1.5"
+                :cargando="form.processing"
+            >
+                <FolderPlus
+                    v-if="!editando"
+                    class="size-4"
+                    aria-hidden="true"
+                />
                 {{ editando ? 'Guardar cambios' : 'Crear sector' }}
             </Boton>
         </template>

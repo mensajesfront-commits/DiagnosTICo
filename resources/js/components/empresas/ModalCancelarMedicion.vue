@@ -5,10 +5,12 @@
  *
  * Envía: POST /mediciones/{id}/cancelar.
  */
+import { CalendarX2 } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
 
 const props = defineProps<{
@@ -38,15 +40,14 @@ function cancelar(): void {
         v-model:abierto="abierto"
         ancho="sm"
         :titulo="`¿Cancelar la medición ${medicion.numero}?`"
+        :icono="CalendarX2"
+        tono="peligro"
     >
         <div class="flex flex-col gap-2 text-sm text-tinta-suave">
             <p>{{ empresa }} dejará de verla en su inicio.</p>
-            <p
-                v-if="medicion.tiene_respuestas"
-                class="rounded-md bg-aviso-suave px-3 py-2 text-aviso"
-            >
+            <Recuadro tono="peligro" v-if="medicion.tiene_respuestas">
                 Ya tiene respuestas guardadas. Al cancelar, no se analizan.
-            </p>
+            </Recuadro>
             <p v-if="errorMedicion" class="text-aviso" role="alert">
                 {{ errorMedicion }}
             </p>

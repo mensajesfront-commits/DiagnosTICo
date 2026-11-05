@@ -2,6 +2,7 @@
 
 namespace App\Services\Resultados;
 
+use App\Support\AnalisisSinIa;
 use App\Support\MetodosAnalisis;
 use App\Support\Niveles;
 
@@ -68,15 +69,13 @@ class ResultadoEjemplo
             $promedio = CalculadoraPuntajes::categoria($puntajes) ?? 0;
             $nombre = (string) $c['nombre'];
 
+            $metodo = MetodosAnalisis::porCategoria($nombre, $promedio);
             $analisis[$c['ref']] = [
                 'preguntas' => $iaPreguntas,
-                'metodo' => MetodosAnalisis::porCategoria($nombre, $promedio),
-                'metodo_motivo' => 'Ejemplo: con la IA real, el método se elige según lo que responda la empresa.',
-                'observacion_categoria' => "Ejemplo: con estas respuestas, {$nombre} queda en nivel ".Niveles::nombre(Niveles::de($promedio)).'. Con la IA real, aquí va lo que muestran las respuestas de la empresa.',
-                'recomendacion' => [
-                    'titulo' => "Recomendación de ejemplo para {$nombre}",
-                    'detalle' => 'Con la IA real, aquí va una acción concreta para los próximos 1 a 3 meses, según las respuestas de la empresa.',
-                ],
+                'metodo' => $metodo,
+                'metodo_motivo' => 'Ejemplo: el método que mejor encaja con lo que respondió la empresa.',
+                'observacion_categoria' => "Ejemplo: con estas respuestas, {$nombre} queda en nivel ".Niveles::nombre(Niveles::de($promedio)).'. Aquí la IA explica qué está pasando, por qué pasa y qué le cuesta a la empresa.',
+                ...AnalisisSinIa::partes($nombre, $metodo, 'de ejemplo'),
             ];
         }
 

@@ -151,6 +151,18 @@ class PublicarResultado
                     'nombre' => MetodosAnalisis::nombre((string) $ia['metodo']),
                     'motivo' => (string) ($ia['metodo_motivo'] ?? ''),
                 ] : null,
+                // Lo que encontró el método, lo que hace bien y 2 o 3
+                // recomendaciones con pasos, plazo e indicador. Vacíos en
+                // resultados anteriores a estos campos.
+                'impacto' => (string) ($ia['impacto'] ?? ''),
+                'hallazgos' => array_values((array) ($ia['hallazgos'] ?? [])),
+                'fortalezas' => array_values((array) ($ia['fortalezas'] ?? [])),
+                'debilidades' => array_values((array) ($ia['debilidades'] ?? [])),
+                'oportunidades' => array_values((array) ($ia['oportunidades'] ?? [])),
+                'amenazas' => array_values((array) ($ia['amenazas'] ?? [])),
+                'faltante' => array_values((array) ($ia['faltante'] ?? [])),
+                'recomendaciones' => array_values((array) ($ia['recomendaciones'] ?? [])),
+                // La principal, con la forma de siempre (inicio de la empresa y PDF).
                 'recomendacion' => [
                     'titulo' => (string) ($ia['recomendacion']['titulo'] ?? ''),
                     'detalle' => (string) ($ia['recomendacion']['detalle'] ?? ''),

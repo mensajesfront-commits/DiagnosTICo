@@ -651,8 +651,16 @@ Lo que devuelve la IA para una categoría (etapa única, RN-021), ya validado (`
   ],
   "metodo": "VRIO",
   "metodo_motivo": "Las respuestas hablan de lo que la empresa tiene: contenido y equipo.",
-  "observacion_categoria": "Tienen presencia constante, pero sin un plan de contenidos.",
-  "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "Tres publicaciones por semana; revisa cada mes cuáles funcionan." }
+  "observacion_categoria": "Tienen presencia constante, pero sin un plan de contenidos. Deciden qué publicar el mismo día y pasan semanas sin aparecer.",
+  "hallazgos": [
+    { "grupo": "Valioso", "puntos": ["Fotos propias del producto."] },
+    { "grupo": "Organizado para aprovecharlo", "puntos": ["Nadie tiene a cargo las publicaciones."] }
+  ],
+  "fortalezas": ["Publican cada semana."],
+  "recomendaciones": [
+    { "titulo": "Arma un calendario mensual", "detalle": "Publicar sin plan te deja semanas sin aparecer.", "pasos": ["…", "…", "…"], "plazo": "4 semanas", "indicador": "12 publicaciones en el mes" }
+  ],
+  "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "Publicar sin plan te deja semanas sin aparecer." }
 }
 ```
 
@@ -660,7 +668,7 @@ Lo que devuelve la IA para una categoría (etapa única, RN-021), ya validado (`
 
 ### `resultados.por_categoria`
 
-Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 / A3.3, E9 / A3.5 y el PDF. Copia los textos de las preguntas y las respuestas para que el resultado no cambie aunque cambie el diagnóstico (RN-023). `anterior` y `variacion` son `null` en la primera medición (RN-020); el radar usa `anterior` para la línea punteada.
+Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 / A3.3, E9 / A3.5 y el PDF. Copia los textos de las preguntas y las respuestas para que el resultado no cambie aunque cambie el diagnóstico (RN-023). `anterior` y `variacion` son `null` en la primera medición (RN-020); el radar usa `anterior` para la línea punteada. `hallazgos`, `fortalezas` y `recomendaciones` llegan vacíos en los resultados publicados antes del 2 de noviembre de 2026; esos se muestran solo con la observación y `recomendacion` (RN-023).
 
 ```json
 [
@@ -669,6 +677,9 @@ Una entrada por categoría, en el orden del diagnóstico. Es lo que muestran E6 
     "puntaje": 38, "nivel": "mejorar", "anterior": 33, "variacion": 5,
     "observacion": "Publicas sin un plan…",
     "metodo": { "clave": "VRIO", "nombre": "VRIO", "motivo": "…" },
+    "hallazgos": [{ "grupo": "Valioso", "puntos": ["…"] }],
+    "fortalezas": ["…"],
+    "recomendaciones": [{ "titulo": "Arma un calendario mensual", "detalle": "…", "pasos": ["…"], "plazo": "4 semanas", "indicador": "…" }],
     "recomendacion": { "titulo": "Arma un calendario mensual", "detalle": "…" },
     "preguntas": [
       { "ref": "p41", "texto": "¿Con qué frecuencia publicas?", "tipo": "opcion_unica", "respuesta": "Varias veces por semana", "puntaje": 60, "observacion": "…" },
@@ -697,6 +708,19 @@ Avisos por correo que la cuenta elige en Mi perfil (A6).
 | `role_has_permissions` | Qué permisos tiene cada rol | — |
 | `model_has_roles` | Qué rol tiene cada cuenta (uno solo, RN-027) | — |
 | `model_has_permissions` | Permisos sueltos por cuenta (no se usan) | — |
+
+### `consultor_empresa` (RN-030, 3 de noviembre)
+
+Qué empresas acompaña cada consultor. Un consultor puede tener una o varias; una empresa, varios consultores. La llena el Administrador (pestaña "Consultores" de A3.1 o al invitar). Solo vale mientras la cuenta tenga el rol Consultor: al cambiarle el rol se borran sus filas.
+
+| Campo | Tipo | Nota |
+|---|---|---|
+| `id` | bigint | — |
+| `user_id` | FK `users`, borrado en cascada | La cuenta con el rol Consultor |
+| `empresa_id` | FK `empresas`, borrado en cascada | — |
+| `created_at`, `updated_at` | timestamps | "Desde el…" en A3.1 |
+
+Único: (`user_id`, `empresa_id`). Migración `2026_11_03_000001_consultores_con_empresas_vinculadas`, que además deja el rol Consultor activo, del sistema y con sus 5 permisos.
 
 ### Del kit de Laravel
 
@@ -747,7 +771,6 @@ Se revisó que cada dato que muestran los wireframes tenga dónde guardarse o de
 
 Pendiente de decidir:
 
-- **[FUNCIONALIDAD POR DEFINIR]** A3.1 tiene la pestaña "Consultores · Próximamente" y A5.2 el rol "Consultor" inactivo. Si se activa, hace falta una tabla `consultor_empresa` (qué empresas ve cada consultor).
 - **[INCONSISTENCIA DETECTADA]** A6 (Mi perfil) muestra 3 requisitos de contraseña; L2 y L4 muestran 4 y RN-001 pide 4 más la confirmación.
 - **[INFORMACIÓN PENDIENTE]** "Unos 25 minutos" (A3.1b, E1): ¿se calcula por número de preguntas o se escribe en el diagnóstico?
 - Ya tienen migración los campos de Mi perfil (`users`: ciudad, país, zona horaria, idioma, avisos, foto, último acceso, fecha de la contraseña; `empresas`: teléfono, sitio web, número de empleados, logo). Los demás campos nuevos de esta revisión se agregan en T-045.

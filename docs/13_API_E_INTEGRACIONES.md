@@ -41,17 +41,46 @@ Las rutas completas, con su controlador y permiso, están en `15_BACKEND.md`. La
   ],
   "metodo": "DOFA",
   "metodo_motivo": "Mezcla fortalezas internas con amenazas del mercado.",
-  "observacion_categoria": "Conoce a su cliente, pero no mide sus canales.",
-  "recomendacion": { "titulo": "Mide tus canales", "detalle": "Pon un enlace con UTM en cada red durante un mes." }
+  "observacion_categoria": "Conoce a su cliente, pero no mide qué canal le trae ventas. Reparte el tiempo entre redes sin saber cuál funciona, y eso le cuesta horas cada semana.",
+  "hallazgos": [
+    { "grupo": "Fortalezas", "puntos": ["Tiene su cliente ideal por escrito."] },
+    { "grupo": "Debilidades", "puntos": ["Publica sin un plan.", "No mide de dónde llegan los clientes."] }
+  ],
+  "impacto": "Sin saber qué canal funciona, el tiempo se reparte a ciegas y se pierden clientes.",
+  "fortalezas": ["Sabe a quién le vende."],
+  "debilidades": ["No mide de dónde llegan los clientes."],
+  "oportunidades": [],
+  "amenazas": [],
+  "faltante": ["Cuántas visitas recibe cada red: se obtiene en las estadísticas de cada una."],
+  "recomendaciones": [
+    {
+      "titulo": "Mide tus canales",
+      "detalle": "Sin medir, no sabes dónde poner tu tiempo.",
+      "problema": "No sabe qué canal le trae clientes.",
+      "objetivo": "Saber qué red trae más visitas.",
+      "pasos": ["Crea un enlace con UTM por red", "Ponlo en la biografía de cada una", "Revisa las visitas cada viernes"],
+      "responsable": "Quien maneja las redes",
+      "recursos": "Google Analytics (gratis)",
+      "plazo": "4 semanas",
+      "semanas": 4,
+      "indicador": "Visitas por red al mes",
+      "kpi": { "formula": "Visitas con UTM de cada red", "linea_base": "", "meta": "", "frecuencia": "Semanal", "fuente": "Google Analytics" },
+      "evidencia": "Captura del informe de visitas"
+    }
+  ]
 }
 ```
 
 - `puntaje` solo va en las abiertas; en las cerradas llega `null`, porque el sistema ya lo calculó.
 - `metodo` es uno de `PESTEL`, `PORTER`, `VRIO`, `DOFA` o `CAME` (DEC-019).
+- `hallazgos` usa los grupos del método elegido (`MetodosAnalisis::GRUPOS`; por ejemplo Corregir, Afrontar, Mantener y Explotar en CAME). La validación descarta los grupos de otro método y deja hasta 3 puntos por grupo.
+- `fortalezas`, `debilidades`, `oportunidades` y `amenazas`: 0 a 2 cada una (arman el DOFA consolidado del PDF). `faltante`: lo que las respuestas no permiten saber y cómo obtenerlo.
+- `recomendaciones`: 2 o 3, de la más a la menos importante. Cada una es una ficha de acción (problema, objetivo, 3 pasos, rol responsable, recursos, plazo y `semanas` de 1 a 12, indicador con `kpi` y evidencia). `linea_base` y `meta` van vacías si la empresa no dio el dato: la IA no las inventa. La validación rechaza la respuesta (y la cola reintenta) si no hay ninguna recomendación con pasos o ningún hallazgo del método.
+- Al guardar, el sistema agrega `recomendacion` (título y detalle de la primera) para el inicio de la empresa y los resultados viejos.
 
 ### Sin clave
 
-- Con `IA_DE_PRUEBA=true`, `AnalizadorDePrueba` devuelve textos y puntajes de prueba sin conexión. Sirve para programar; nunca en producción.
+- La aplicación no tiene modo sin IA: sin clave, el análisis falla y la categoría queda «fallido» tras 3 intentos. Solo las pruebas automáticas usan `Tests\Support\AnalizadorFalso`.
 - Las pruebas automáticas no llaman a OpenAI (`OpenAI::fake()` o el analizador de prueba).
 - `php artisan prueba:ia` hace una llamada real para comprobar la clave y el modelo.
 

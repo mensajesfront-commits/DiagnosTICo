@@ -16,7 +16,7 @@ Requisitos funcionales (RF), historias de usuario, criterios de aceptación y ba
 
 Sistema web para que NuevasTIC mida el nivel de marketing digital de empresas. Las empresas responden un diagnóstico propio de su sector, la IA analiza cada categoría y el sistema entrega un resultado con puntaje, nivel, observaciones, recomendaciones y un PDF. El Administrador de NuevasTIC configura sectores, categorías, diagnósticos, empresas, mediciones, la IA y las cuentas.
 
-Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa y Colaborador (Consultor y Usuario quedan para un posible futuro); sin análisis FODA ni comparación con promedios; contraseña fuerte (8 caracteres, mayúscula, número y carácter especial); análisis de IA en una sola etapa por categoría; estados de medición Enviada y Terminada; medición vencida → la empresa pide otra por correo; el bot de WhatsApp es totalmente separado y queda **aplazado**; el simulador de inversión no existe.
+Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa, Colaborador y Consultor (este último agregado el 3 de noviembre, solo de lectura; Usuario queda para un posible futuro); sin análisis FODA ni comparación con promedios; contraseña fuerte (8 caracteres, mayúscula, número y carácter especial); análisis de IA en una sola etapa por categoría; estados de medición Enviada y Terminada; medición vencida → la empresa pide otra por correo; el bot de WhatsApp es totalmente separado y lo terminó otra persona del equipo fuera de este repositorio (4 de noviembre de 2026); el simulador de inversión no existe.
 
 # 2. Actores identificados
 
@@ -26,8 +26,9 @@ Decisiones confirmadas que rigen estas historias: roles Administrador, Empresa y
 | Empresa (usuario principal) | Cuenta de la empresa cliente; se registra sola o la crea el Administrador. | Responder el diagnóstico, ver resultados, historial y PDF; gestionar sus colaboradores y sus datos. |
 | Colaborador | Cuenta creada por la empresa, con casi los mismos permisos. | Responder y enviar el diagnóstico y ver resultados, historial y PDF; no crea colaboradores ni cambia datos de la empresa. |
 | Sistema | Procesos automáticos (cálculo, análisis de IA, publicación, vencimientos). | Producir resultados justos y consistentes sin intervención. |
-| Empresa por WhatsApp | Quien conversa con el bot (aplazado). | Hacer un diagnóstico rápido sin cuenta. |
-| Consultor, Usuario | Roles posibles a futuro. **[FUNCIONALIDAD POR DEFINIR]** No tienen historias. | — |
+| Empresa por WhatsApp | Quien conversa con el bot (hecho fuera de este repositorio). | Hacer un diagnóstico rápido sin cuenta. |
+| Consultor | Persona externa a NuevasTIC que acompaña a una o varias empresas; la invita el Administrador (agregado el 3 de noviembre). | Ver la ficha, el historial, los resultados y el PDF de las empresas que tiene vinculadas. Solo mira: no responde ni toca diagnósticos. |
+| Usuario | Rol posible a futuro. **[FUNCIONALIDAD POR DEFINIR]** No tiene historias. | — |
 
 # 3. Módulos identificados
 
@@ -46,7 +47,7 @@ Sistema de Diagnóstico de Marketing Digital
 ├── EP-010 Experiencia de la empresa
 ├── EP-011 Colaboradores
 ├── EP-012 Cálculo, IA y tareas automáticas
-└── EP-013 Diagnóstico por WhatsApp (aplazado)
+└── EP-013 Diagnóstico por WhatsApp (hecho fuera de este repositorio)
 ```
 
 # 4. Épicas
@@ -201,7 +202,7 @@ Sistema de Diagnóstico de Marketing Digital
 |---|---|
 | ID | EP-013 |
 | Nombre | Diagnóstico por WhatsApp |
-| Descripción | Diagnóstico rápido conversando con un bot, separado de la web (APLAZADO). |
+| Descripción | Diagnóstico rápido conversando con un bot, separado de la web. Lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026). |
 | Actor principal | Empresa (por WhatsApp) |
 | Objetivo | Hacer un diagnóstico rápido sin cuenta. |
 | Valor de negocio | Canal de entrada ligero; aplazado por decisión de Cristian. |
@@ -561,7 +562,7 @@ Permite recuperar el acceso a quien olvidó su contraseña sin exponer qué corr
 
 - RN-004 — Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar.
 - RN-005 — Los avisos de inicio de sesión y recuperación no revelan si un correo está registrado.
-- RN-006 — El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas.
+- RN-006 — El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026, auditoría QA ERR-09).
 
 ### Validaciones
 
@@ -678,7 +679,7 @@ Permite fijar una contraseña nueva y segura para recuperar el acceso a la cuent
 ### Reglas de negocio
 
 - RN-001 — Contraseña fuerte: mínimo 8 caracteres, una mayúscula, un número y un carácter especial.
-- RN-006 — El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas.
+- RN-006 — El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026, auditoría QA ERR-09).
 
 ### Validaciones
 
@@ -2243,7 +2244,7 @@ Permite medir un tema nuevo agregando una categoría al catálogo y sumándola a
 - RN-009 — El nombre de una categoría es obligatorio, de máximo 40 caracteres y único; una categoría con respuestas se archiva en lugar de borrarse.
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
 - RN-011 — La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -2471,7 +2472,7 @@ Da el cuestionario que responderán las empresas de un sector, en blanco o a par
 
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
 - RN-011 — La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -2922,7 +2923,7 @@ Permite medir algo nuevo con preguntas abiertas, de opción única o de selecci�
 ### Reglas de negocio
 
 - RN-013 — Pregunta: abierta, opción única o selección múltiple; opciones con puntaje 0–100; la indicación para responder es obligatoria; “Ten en cuenta” por respuesta es opcional (máx. 200 caracteres), no lo ve la empresa y solo se usa si esa respuesta fue elegida; la abierta tiene un único criterio de calificación; texto abierto de máximo 1000 caracteres.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -3154,7 +3155,7 @@ Permite ampliar lo que mide un diagnóstico tomando categorías del catálogo.
 
 - RN-009 — El nombre de una categoría es obligatorio, de máximo 40 caracteres y único; una categoría con respuestas se archiva en lugar de borrarse.
 - RN-011 — La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -3372,7 +3373,7 @@ Permite revisar el diagnóstico como lo verá la empresa y saber qué falta para
 
 ### Reglas de negocio
 
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -3380,7 +3381,7 @@ Permite revisar el diagnóstico como lo verá la empresa y saber qué falta para
 - Cada opción tiene puntaje.
 - La importancia suma 100%.
 - Todas las preguntas tienen indicación.
-- Las selecciones múltiples pueden llegar a 100 puntos.
+- Las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás).
 
 ### Casos alternativos
 
@@ -3498,7 +3499,7 @@ Permite que las empresas respondan una versión corregida del diagnóstico sin a
 ### Reglas de negocio
 
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
-- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos.
+- RN-012 — Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»).
 
 ### Validaciones
 
@@ -3850,7 +3851,7 @@ Permite dar de alta a una empresa que no se registra sola y dejarla lista para r
 
 - RN-002 — Un correo no puede pertenecer a más de una cuenta.
 - RN-003 — Solo se ofrecen sectores activos al registrar empresas; no existe la opción “Otro”.
-- RN-006 — El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas.
+- RN-006 — El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026, auditoría QA ERR-09).
 - RN-014 — Solo hay una medición pendiente por empresa y solo se asignan diagnósticos publicados del sector de la empresa.
 
 ### Validaciones
@@ -4081,7 +4082,7 @@ Mantiene al día los datos de la empresa y de su usuario principal.
 ### Reglas de negocio
 
 - RN-002 — Un correo no puede pertenecer a más de una cuenta.
-- RN-006 — El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas.
+- RN-006 — El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026, auditoría QA ERR-09).
 - RN-008 — Un sector con empresas o mediciones no se elimina: se reasigna o se desactiva; las mediciones hechas se conservan.
 
 ### Validaciones
@@ -7824,6 +7825,8 @@ Permite recordar en qué se basó el resultado al leer las propias respuestas.
 
 El PDF se genera al terminar el análisis y se guarda; descargarlo no vuelve a llamar a la IA.
 
+**Cambio del 4 de noviembre de 2026:** un empresario no va a leer un informe de 36 páginas. La empresa recibe un **resumen corto** con lo que la IA escribió de cada categoría, en orden y con buen formato. El **informe completo** queda para el Administrador y el Consultor, que en A3.3 pueden descargar los dos (el resumen, para entregárselo a la empresa).
+
 ### Valor de negocio
 
 Permite compartir el resultado con el equipo mediante un informe descargable.
@@ -7841,15 +7844,27 @@ Permite compartir el resultado con el equipo mediante un informe descargable.
 
 **Cuando** descargo el PDF,
 
-**Entonces** tiene 3 páginas: portada y puntaje, puntaje por categoría y recomendaciones.
+**Entonces** recibo el resumen: mi calificación, mi nivel y cómo leerlo; mis categorías en barras; «Por dónde empezar» (las acciones de mis 3 categorías más débiles); por cada categoría, de la más urgente a la más fuerte, qué encontró el análisis, por qué importa, lo que hago bien, lo que debo mejorar y qué hacer, con pasos y plazo; y los próximos pasos. Tiene encabezado y número de página en cada hoja.
 
-#### CA-002 — Radar y fecha
+**Y** aunque pida el informe completo en la dirección, recibo el resumen.
+
+#### CA-002 — Gráfica y fecha
 
 **Dado** que descargo el PDF,
 
 **Cuando** lo abro,
 
-**Entonces** incluye el radar y la fecha de la medición.
+**Entonces** incluye mis categorías en barras y la fecha de la medición. El radar va en el informe completo.
+
+#### CA-005 — Informe completo para el Administrador y el Consultor
+
+**Dado** que soy Administrador o Consultor y veo el resultado de una empresa (A3.3),
+
+**Cuando** pulso «Informe completo PDF»,
+
+**Entonces** descargo el informe con portada, ficha técnica y alcance, resumen ejecutivo, metodología y criterios, resultados generales, priorización, una página por categoría, DOFA consolidado, conclusiones, fichas de acción, cronograma, KPI y anexos.
+
+**Y** con «Resumen para la empresa» descargo el mismo resumen que recibe la empresa.
 
 #### CA-003 — Archivo guardado
 
@@ -7869,7 +7884,7 @@ Permite compartir el resultado con el equipo mediante un informe descargable.
 
 ### Reglas de negocio
 
-- RN-024 — PDF de 3 páginas (portada y puntaje, puntaje por categoría, recomendaciones), generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA.
+- RN-024 — Dos PDF por resultado, generados una vez al terminar el análisis y guardados; no vuelven a llamar a la IA. (1) El Informe de Diagnóstico y Estrategia de Marketing Digital completo, según la propuesta de reestructuración del 2 de noviembre de 2026 (portada, ficha técnica, resumen ejecutivo, metodología, resultados, priorización, diagnóstico por categoría, DOFA, conclusiones, plan estratégico, cronograma, KPI y anexos), para el Administrador y el Consultor. (2) El resumen para la empresa (decisión del 4 de noviembre de 2026): lo que la IA escribió de cada categoría, copiado en orden y sin detalle técnico. La empresa y su colaborador solo reciben el resumen.
 - RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
 
 ### Validaciones
@@ -8728,7 +8743,7 @@ Obtiene de la IA las observaciones, calificaciones y recomendaciones de cada cat
 
 1. Armo el prompt de la categoría (HU-081).
 2. Envío la categoría a la IA.
-3. Recibo una observación por pregunta, el puntaje 0–100 de cada abierta, una observación de la categoría y una recomendación.
+3. Recibo una observación por pregunta, el puntaje 0–100 de cada abierta, el diagnóstico de la categoría, lo que encontró el método por grupos, lo que la empresa hace bien y 2 o 3 recomendaciones con pasos, plazo e indicador.
 4. Repito para cada categoría.
 
 ### Criterios de aceptación
@@ -9050,7 +9065,7 @@ Entrega a la empresa un resultado final que no cambia y le avisa cuando está li
 1. Consolido promedios por categoría y total.
 2. Cambio la medición a “Terminada”.
 3. Guardo la versión del resultado.
-4. Genero y guardo el PDF de 3 páginas sin volver a llamar a la IA.
+4. Genero y guardo el informe PDF sin volver a llamar a la IA.
 5. Aviso a la empresa por correo.
 
 ### Criterios de aceptación
@@ -9075,7 +9090,7 @@ Entrega a la empresa un resultado final que no cambia y le avisa cuando está li
 
 **Dado** que se publicó el resultado,
 
-**Cuando** se genera el PDF de 3 páginas,
+**Cuando** se genera el informe PDF,
 
 **Entonces** queda guardado sin volver a llamar a la IA.
 
@@ -9098,7 +9113,7 @@ Entrega a la empresa un resultado final que no cambia y le avisa cuando está li
 ### Reglas de negocio
 
 - RN-023 — El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable.
-- RN-024 — PDF de 3 páginas (portada y puntaje, puntaje por categoría, recomendaciones), generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA.
+- RN-024 — Dos PDF por resultado, generados una vez al terminar el análisis y guardados; no vuelven a llamar a la IA. (1) El Informe de Diagnóstico y Estrategia de Marketing Digital completo, según la propuesta de reestructuración del 2 de noviembre de 2026 (portada, ficha técnica, resumen ejecutivo, metodología, resultados, priorización, diagnóstico por categoría, DOFA, conclusiones, plan estratégico, cronograma, KPI y anexos), para el Administrador y el Consultor. (2) El resumen para la empresa (decisión del 4 de noviembre de 2026): lo que la IA escribió de cada categoría, copiado en orden y sin detalle técnico. La empresa y su colaborador solo reciben el resumen.
 - RN-015 — Estados de la medición: No iniciada, En curso, Enviada (mientras la IA analiza), Terminada (resultado publicado) y Vencida.
 - RN-018 — Puntaje: opción única = puntaje de la opción; selección múltiple = suma con tope 100; abiertas = 0–100 calificadas por la IA; categoría = promedio de sus preguntas; total = promedio ponderado por la importancia.
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
@@ -9148,7 +9163,7 @@ Entrega a la empresa un resultado final que no cambia y le avisa cuando está li
 
 **MoSCoW:** Should
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir y diseñar la sección del bot en el panel (sin vista en el prototipo).
 
@@ -9249,7 +9264,7 @@ Permite al Administrador cambiar las preguntas del bot sin depender de un desarr
 ### Riesgos
 
 - SIN VISTA EN EL PROTOTIPO: falta diseñar la sección del bot en el panel.
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -9265,7 +9280,7 @@ Permite al Administrador cambiar las preguntas del bot sin depender de un desarr
 
 **MoSCoW:** Should
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el texto exacto del saludo del bot.
 
@@ -9349,7 +9364,7 @@ Permite a una empresa iniciar un diagnóstico rápido por chat sin crear una cue
 
 - REQUIERE VALIDACIÓN: texto exacto del saludo.
 - Depende de HU-071 (preguntas configuradas).
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -9365,7 +9380,7 @@ Permite a una empresa iniciar un diagnóstico rápido por chat sin crear una cue
 
 **MoSCoW:** Should
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071).
 
@@ -9472,7 +9487,7 @@ Permite completar el diagnóstico desde el chat respondiendo una pregunta a la v
 ### Riesgos
 
 - Depende de HU-072.
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -9488,7 +9503,7 @@ Permite completar el diagnóstico desde el chat respondiendo una pregunta a la v
 
 **MoSCoW:** Could
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071), de los que depende la conversación.
 
@@ -9578,7 +9593,7 @@ Evita que la empresa tenga que empezar de nuevo si deja la conversación a media
 ### Riesgos
 
 - Depende de HU-073.
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
 
@@ -9594,7 +9609,7 @@ Evita que la empresa tenga que empezar de nuevo si deja la conversación a media
 
 **MoSCoW:** Should
 
-**Estado:** Aplazada
+**Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
 **Definition of Ready:** NO LISTA: aplazada; falta definir el saludo y las preguntas del bot (HU-071 y HU-072), de los que depende el resultado.
 
@@ -9684,9 +9699,172 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 
 - Depende de HU-073.
 - Depende de la integración con Meta (verificación de mensajes).
-- Historia aplazada por decisión del cliente.
+- Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
 ---
+
+## EP-014 — Consultor
+
+Agregada el 3 de noviembre de 2026: en la presentación se decidió incluir el rol Consultor, que hasta entonces existía inactivo (PA-006). Decisiones del equipo: es una persona externa a la que se le crea una cuenta (se le invita); solo mira; no responde ni toca diagnósticos; lo vincula el Administrador; puede acompañar una o varias empresas.
+
+## HU-085 — Vincular consultores a una empresa
+
+**Épica:** EP-014 — Consultor
+
+**Actor:** Administrador
+
+**Prioridad:** Alta — Sin el vínculo, el consultor no ve ninguna empresa.
+
+**Story Points:** 5 — Tabla nueva, pestaña en la ficha y elección de empresas al invitar.
+
+**MoSCoW:** Must
+
+**Estado:** Hecha
+
+**Definition of Ready:** LISTA
+
+**Vistas del prototipo:** A3.1 (pestaña "Consultores", antes "Próximamente"), A5 (Invitar usuario)
+
+### Historia de Usuario
+
+> Como Administrador, quiero vincular consultores a las empresas, para que cada consultor vea solo las empresas que acompaña.
+
+### Caso de éxito
+
+1. Invito a la persona desde Usuarios y roles con el rol Consultor y, si quiero, elijo sus empresas.
+2. En la ficha de una empresa, pestaña "Consultores", elijo un consultor y lo vinculo.
+3. Si ya no la acompaña, lo quito con una confirmación.
+
+### Criterios de aceptación
+
+#### CA-001 — Vincular desde la ficha
+
+**Dado** que existe una cuenta con el rol Consultor,
+
+**Cuando** la elijo en la pestaña "Consultores" de la empresa y pulso "Vincular",
+
+**Entonces** queda vinculada y la ve en su inicio.
+
+#### CA-002 — Varias empresas
+
+**Dado** que un consultor ya acompaña una empresa,
+
+**Cuando** lo vinculo a otra,
+
+**Entonces** ve las dos.
+
+#### CA-003 — Elegir empresas al invitar
+
+**Dado** que invito a alguien con el rol Consultor,
+
+**Cuando** marco empresas en la invitación,
+
+**Entonces** quedan vinculadas desde que crea su contraseña. Con otro rol no se vincula ninguna.
+
+#### CA-004 — Quitar
+
+**Dado** que un consultor está vinculado,
+
+**Cuando** lo quito y confirmo,
+
+**Entonces** deja de ver esa empresa; su cuenta sigue activa.
+
+#### CA-005 — Solo consultores
+
+**Dado** que elijo una cuenta que no tiene el rol Consultor,
+
+**Cuando** intento vincularla,
+
+**Entonces** el sistema lo rechaza. Si la cuenta deja de ser Consultor, pierde sus vínculos.
+
+### Reglas de negocio
+
+- RN-030 — El Consultor es externo e invitado; solo mira las empresas que el Administrador le vincula (una o varias): su ficha, su historial, sus resultados, sus respuestas y el PDF. No responde, no asigna mediciones, no cambia datos y no toca diagnósticos. Es un rol del sistema: sus permisos no se editan.
+
+### Validaciones
+
+- Solo quien tiene "Gestionar usuarios y roles" vincula o quita consultores.
+- Solo se vinculan cuentas con el rol Consultor.
+
+## HU-086 — Ver mis empresas como consultor
+
+**Épica:** EP-014 — Consultor
+
+**Actor:** Consultor
+
+**Prioridad:** Alta — Es la razón de ser del rol.
+
+**Story Points:** 5 — Inicio propio y filtro en todas las pantallas de empresas y resultados.
+
+**MoSCoW:** Must
+
+**Estado:** Hecha
+
+**Definition of Ready:** LISTA
+
+**Vistas del prototipo:** C1 (inicio del Consultor, nueva), C2 (Mis empresas, nueva), A3, A3.1, A3.3, A3.4, A3.5
+
+### Historia de Usuario
+
+> Como consultor, quiero ver los resultados de las empresas que acompaño, para orientarlas sin poder cambiar nada.
+
+### Caso de éxito
+
+1. Inicio sesión y llego a mi inicio con mis empresas, su último puntaje, su nivel y su medición pendiente.
+2. Abro una empresa y veo su historial, sus resultados, sus respuestas y el PDF.
+
+### Criterios de aceptación
+
+#### CA-001 — Solo sus empresas
+
+**Dado** que tengo empresas vinculadas,
+
+**Cuando** abro mi inicio,
+
+**Entonces** solo aparecen esas. El Consultor no tiene "Empresas" (A3) en el menú sino "Mis empresas" (C2, en `/empresas`): una tarjeta por empresa con el último puntaje, el nivel, la variación y la medición pendiente. Con 7 empresas o más, un buscador filtra por nombre o sector. Su inicio (C1) muestra el resumen y "Qué atender".
+
+#### CA-002 — Otra empresa no
+
+**Dado** que una empresa no está vinculada,
+
+**Cuando** intento abrir su ficha, su historial, un resultado o su PDF,
+
+**Entonces** el sistema responde "No encontramos esta página" (404).
+
+#### CA-003 — Solo lectura
+
+**Dado** que soy consultor,
+
+**Cuando** abro la ficha de una empresa,
+
+**Entonces** no veo acciones (asignar medición, editar, desactivar) y el servidor las rechaza si las intento.
+
+#### CA-004 — Sin empresas
+
+**Dado** que todavía no tengo empresas vinculadas,
+
+**Cuando** entro,
+
+**Entonces** veo un aviso de que el equipo de NuevasTIC me las vincula.
+
+#### CA-005 — Qué atender
+
+**Dado** que tengo empresas vinculadas,
+
+**Cuando** abro mi inicio,
+
+**Entonces** arriba de "Mis empresas" veo "Qué atender", de lo más urgente a lo menos:
+
+1. una medición vencida sin enviar;
+2. un último resultado por debajo del anterior (RN-020), con los puntos que bajó;
+3. una medición sin empezar asignada hace 7 días o más;
+4. un resultado publicado en los últimos 7 días.
+
+Cada aviso abre el resultado ("bajó" y "nuevo") o la ficha (lo pendiente). Se ven 4 y "Ver los N avisos" muestra el resto. Si no hay avisos, la franja no aparece. No se usa "desde tu último acceso" porque el último acceso se actualiza al entrar.
+
+### Reglas de negocio
+
+- RN-030.
 
 # 6. Reglas de negocio
 
@@ -9697,13 +9875,13 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 | RN-003 | Solo se ofrecen sectores activos al registrar empresas; no existe la opción “Otro”. | HU-002, HU-012, HU-013, HU-014, HU-015, HU-032 |
 | RN-004 | Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar. Además, el Administrador puede **eliminar** una cuenta escribiendo su correo exacto para confirmar; se puede recuperar durante 90 días y después se borra para siempre (decisión del equipo, 8 de octubre de 2026, DEC-017). | HU-001, HU-003, HU-035, HU-047, HU-079 |
 | RN-005 | Los avisos de inicio de sesión y recuperación no revelan si un correo está registrado. | HU-001, HU-003 |
-| RN-006 | El enlace de contraseña nueva no vence por tiempo y sirve hasta guardar la contraseña; el Administrador no restablece contraseñas de otras cuentas. | HU-003, HU-004, HU-032, HU-034 |
+| RN-006 | El enlace de "¿Olvidaste tu contraseña?" vence a los 10 minutos; el de una invitación (crear la primera contraseña) sirve hasta usarlo. Pedir otro invalida el anterior. El Administrador no restablece contraseñas de otras cuentas (cambio del 4 de noviembre de 2026). | HU-003, HU-004, HU-032, HU-034 |
 | RN-007 | Cada rol ve solo las secciones que le corresponden; empresa y colaborador ven solo la información de su propia empresa. | HU-001, HU-046, HU-048, HU-053, HU-056, HU-057, HU-065, HU-076 |
 | RN-008 | Un sector con empresas o mediciones no se elimina: se reasigna o se desactiva; las mediciones hechas se conservan. | HU-013, HU-014, HU-015, HU-016, HU-034 |
 | RN-009 | El nombre de una categoría es obligatorio, de máximo 40 caracteres y único; una categoría con respuestas se archiva en lugar de borrarse. | HU-017, HU-018, HU-019, HU-026 |
 | RN-010 | Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron. Dentro de un mismo sector, dos diagnósticos no pueden tener el mismo nombre (decisión del equipo, 8 de octubre de 2026). | HU-010, HU-018, HU-020, HU-021, HU-022, HU-023, HU-025, HU-029, HU-084 |
 | RN-011 | La importancia de las categorías de un diagnóstico es un porcentaje propio de ese diagnóstico y debe sumar exactamente 100%. | HU-018, HU-019, HU-020, HU-026, HU-027, HU-068 |
-| RN-012 | Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples pueden llegar a 100 puntos. | HU-018, HU-020, HU-024, HU-026, HU-028, HU-029 |
+| RN-012 | Para publicar: cada categoría tiene al menos 1 pregunta, cada opción tiene puntaje, la importancia suma 100%, toda pregunta tiene indicación y las selecciones múltiples suman exactamente 100 puntos con todas marcadas (sin contar la opción que excluye a las demás, como «Ninguna»). | HU-018, HU-020, HU-024, HU-026, HU-028, HU-029 |
 | RN-013 | Pregunta: abierta, opción única o selección múltiple; opciones con puntaje 0–100; la indicación para responder es obligatoria; “Ten en cuenta” por respuesta es opcional (máx. 200 caracteres), no lo ve la empresa y solo se usa si esa respuesta fue elegida; la abierta tiene un único criterio de calificación; texto abierto de máximo 1000 caracteres. | HU-024, HU-025, HU-081 |
 | RN-014 | Solo hay una medición pendiente por empresa y solo se asignan diagnósticos publicados del sector de la empresa. | HU-009, HU-010, HU-032, HU-036, HU-058, HU-083 |
 | RN-015 | Estados de la medición: No iniciada, En curso, Enviada (mientras la IA analiza), Terminada (resultado publicado) y Vencida. | HU-007, HU-036, HU-058, HU-060, HU-062, HU-070, HU-082, HU-084 |
@@ -9715,12 +9893,13 @@ Entrega a la empresa su puntaje, nivel y recomendaciones al terminar, dentro del
 | RN-021 | El análisis de IA es una sola etapa por categoría; si falla, se reintenta solo esa categoría hasta 3 veces y luego se avisa por correo al Administrador. | HU-041, HU-062, HU-063, HU-069 |
 | RN-022 | El prompt se arma con capas: instrucciones generales, ajuste del sector, ajuste de la empresa, preguntas con respuestas y formato fijo; se usa siempre lo más específico y los ajustes aplican a mediciones posteriores. | HU-041, HU-042, HU-043, HU-044, HU-045, HU-069, HU-080, HU-081 |
 | RN-023 | El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable. | HU-038, HU-063, HU-064, HU-084 |
-| RN-024 | PDF de 3 páginas (portada y puntaje, puntaje por categoría, recomendaciones), generado una vez al terminar el análisis y guardado; no vuelve a llamar a la IA. | HU-066, HU-084 |
+| RN-024 | Dos PDF por resultado, generados una vez al terminar el análisis y guardados, sin volver a llamar a la IA: el informe completo (propuesta del 2 de noviembre de 2026) para el Administrador y el Consultor, y el resumen corto para la empresa (decisión del 4 de noviembre de 2026). | HU-066, HU-084 |
 | RN-025 | Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa. | HU-035, HU-048, HU-056, HU-076, HU-077, HU-078, HU-079 |
 | RN-026 | “Ver como” es solo de lectura y queda registrado quién lo usó y cuándo. | HU-053, HU-054 |
-| RN-027 | Los roles del sistema (Administrador, Empresa, Colaborador) son fijos; cada cuenta tiene un solo rol; solo se elimina un rol sin cuentas. | HU-048, HU-049, HU-050, HU-051, HU-052 |
+| RN-027 | Los roles del sistema (Administrador, Empresa, Colaborador y, desde el 3 de noviembre, Consultor) son fijos; cada cuenta tiene un solo rol; solo se elimina un rol sin cuentas. | HU-048, HU-049, HU-050, HU-051, HU-052 |
 | RN-028 | El resultado no incluye análisis FODA ni comparación con promedios. | HU-038, HU-064, HU-066 |
 | RN-029 | El diagnóstico por WhatsApp es totalmente separado de la web: sin cuentas, mediciones ni PDF; máximo 10 preguntas configurables; solo texto; retoma desde la última pregunta y solo se reinicia si la empresa lo pide. | HU-071, HU-072, HU-073, HU-074, HU-075 |
+| RN-030 | El Consultor es externo e invitado; solo mira las empresas que el Administrador le vincula (una o varias): ficha, historial, resultados, respuestas y PDF. No responde, no asigna, no cambia datos ni toca diagnósticos. Es rol del sistema (decisión del 3 de noviembre de 2026). | HU-085, HU-086 |
 
 # 7. Requisitos no funcionales relacionados
 
@@ -9781,6 +9960,7 @@ Requisito → Épica → Historia → Criterio de aceptación.
 | RF-038 — Publicar el resultado | EP-012 | HU-084 | HU-084: CA-001–CA-005 | Completa |
 | RF-039 — Configurar el bot de WhatsApp | EP-013 | HU-071 | HU-071: CA-001–CA-005 | Completa (aplazada) |
 | RF-040 — Diagnóstico por WhatsApp | EP-013 | HU-072, HU-073, HU-074, HU-075 | HU-072: CA-001–CA-003; HU-073: CA-001–CA-006; HU-074: CA-001–CA-004; HU-075: CA-001–CA-004 | Completa (aplazada) |
+| RF-041 — Consultor con empresas vinculadas | EP-014 | HU-085, HU-086 | HU-085: CA-001–CA-005; HU-086: CA-001–CA-004 | Completa |
 
 ## Historia → requisito (T-061)
 
@@ -9858,11 +10038,11 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-068 — Calcular los puntajes | RF-036 | Hecha |
 | HU-069 — Analizar cada categoría con la IA | RF-037 | Hecha |
 | HU-070 — Marcar mediciones vencidas | RF-007 | Hecha (CA-003: una vencida no se responde en E2) |
-| HU-071 — Configurar las preguntas del bot | RF-039 | Aplazada |
-| HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Aplazada |
-| HU-073 — Responder las preguntas del bot | RF-040 | Aplazada |
-| HU-074 — Retomar la conversación | RF-040 | Aplazada |
-| HU-075 — Recibir el resultado por WhatsApp | RF-040 | Aplazada |
+| HU-071 — Configurar las preguntas del bot | RF-039 | Hecha fuera de este repositorio |
+| HU-072 — Empezar el diagnóstico por WhatsApp | RF-040 | Hecha fuera de este repositorio |
+| HU-073 — Responder las preguntas del bot | RF-040 | Hecha fuera de este repositorio |
+| HU-074 — Retomar la conversación | RF-040 | Hecha fuera de este repositorio |
+| HU-075 — Recibir el resultado por WhatsApp | RF-040 | Hecha fuera de este repositorio |
 | HU-076 — Ver los colaboradores de mi empresa | RF-035 | Hecha |
 | HU-077 — Crear un colaborador | RF-035 | Hecha |
 | HU-078 — Cambiar la contraseña de un colaborador | RF-035 | Hecha |
@@ -9872,6 +10052,8 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-082 — Pedir una nueva medición cuando la mía venció | RF-034 | Hecha (botón "Pedir una nueva fecha" en E1) |
 | HU-083 — Atender las solicitudes de nueva medición | RF-034 | Hecha (aviso en A1, en la lista y la ficha de la empresa y en Asignar medición; se atiende asignando otra, con nueva fecha o cancelando la vencida) |
 | HU-084 — Publicar el resultado | RF-038 | Hecha |
+| HU-085 — Vincular consultores a una empresa | RF-041 | Hecha (pestaña "Consultores" de A3.1 y elección de empresas al invitar) |
+| HU-086 — Ver mis empresas como consultor | RF-041 | Hecha (inicio C1 y filtro en A3, A3.1, A3.3, A3.4, A3.5 y PDF) |
 
 HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la semana 4; mientras tanto vuelven a A2 con un aviso. HU-078 también permite editar el nombre, el cargo y el correo del colaborador, y E12 permite eliminarlo (DEC-017).
 
@@ -10223,7 +10405,7 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 - **[INFORMACIÓN PENDIENTE]** Capacidad del equipo para organizar Sprints (PA-007).
 - **[INFORMACIÓN PENDIENTE]** Diseño y textos del bot de WhatsApp (PA-001, PA-002).
 - **[FUNCIONALIDAD POR DEFINIR]** Rol Usuario; historial de solicitudes de nueva medición.
-- **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. ~~El Colaborador puede editar su propio perfil.~~
+- **Cambiado (3 de noviembre):** el rol Consultor se incluye y queda activo como rol del sistema, solo de lectura, con empresas vinculadas por el Administrador (EP-014, RN-030). Antes: **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. ~~El Colaborador puede editar su propio perfil.~~
 - **Definido (28 de octubre):** los colaboradores no cambian de rol; solo los desactivan o eliminan el Administrador o la cuenta principal de su empresa. A una empresa sin cuenta principal se le da una cuenta nueva.
 - **Definido (28 de octubre):** la cuenta del Administrador principal (la creada al instalar) no pierde el rol ni se desactiva o elimina. Una cuenta de empresa que pasa a un rol interno deja la empresa y crea una contraseña nueva con la invitación; si era la principal, la empresa queda desactivada. El teléfono nuevo de Mi perfil se confirma con un código al correo.
 - **Cambiado (26 de octubre):** el Colaborador **no** edita su perfil ni su contraseña: lo hace la cuenta principal (E12.3), que además elige qué páginas ve cada colaborador. Desactivar un rol bloquea a sus cuentas hasta que tengan otro rol.

@@ -81,10 +81,10 @@ Ruta (routes/web.php, con su permiso)
 | `Jobs\AnalizarMedicion` | Calcula las preguntas cerradas y manda una tarea por categoría a la cola. |
 | `Jobs\AnalizarCategoria` | Arma el prompt, llama al analizador y guarda la respuesta. Tres intentos (15 s y 60 s de espera); después queda fallida y avisa (`AnalisisFallido`). |
 | `Services\Ia\ArmadorPrompt` | Arma el prompt por capas (RN-022) con las variables `{sector}`, `{contexto_sector}`, `{categoria}` y `{respuestas_categoria}`. |
-| `Services\Ia\Analizador` | Interfaz con dos versiones: `AnalizadorDeCategoria` (OpenAI, salida JSON estricta) y `AnalizadorDePrueba` (sin conexión, `IA_DE_PRUEBA=true`). |
+| `Services\Ia\Analizador` | Interfaz. La aplicación usa `AnalizadorDeCategoria` (OpenAI, salida JSON estricta); las pruebas automáticas, `Tests\Support\AnalizadorFalso`. |
 | `Services\Resultados\CalculadoraPuntajes` | Funciones puras del cálculo (RN-018) y el texto de cada respuesta. |
 | `Services\Resultados\PublicarResultado` | Consolida y publica el resultado una sola vez, avisa a la empresa y manda a generar el PDF. |
-| `Jobs\GenerarInformePdf` e `InformePdf` | PDF de 3 páginas con Chromium (RN-024). |
+| `Jobs\GenerarInformePdf` e `InformePdf` | Informe PDF con Chromium, con encabezado y número de página en cada hoja (RN-024). |
 | `Support\Niveles` y `Support\MetodosAnalisis` | Niveles con su frase (RN-019) y los cinco métodos de análisis (DEC-019). |
 
 ### Ver como
@@ -158,7 +158,7 @@ Están completos, con ejemplo, en `12_BASE_DE_DATOS.md`. Resumen:
 |---|---|
 | `versiones_diagnostico.contenido` | `{ categorias: [{ ref, nombre, importancia, preguntas: [{ ref, texto, tipo, indicacion, criterio_ia, obligatoria, opciones: [{ ref, texto, puntaje, ten_en_cuenta, exclusiva, con_texto }] }] }] }` |
 | `respuestas.opciones_elegidas` | Lista de referencias de opción (`["o12"]`). El texto de la abierta o del "¿Cuál?" va en `respuestas.texto`. |
-| `analisis_categoria.respuesta_ia` | `{ preguntas: [{ id, puntaje, observacion }], metodo, metodo_motivo, observacion_categoria, recomendacion: { titulo, detalle } }` |
+| `analisis_categoria.respuesta_ia` | `{ preguntas: [{ id, puntaje, observacion }], metodo, metodo_motivo, observacion_categoria, hallazgos: [{ grupo, puntos }], fortalezas, recomendaciones: [{ titulo, detalle, pasos, plazo, indicador }], recomendacion: { titulo, detalle } }` |
 | `resultados.por_categoria` | Lista con `ref`, `nombre`, `importancia`, `puntaje`, `nivel`, `anterior`, `variacion`, `observacion`, `metodo`, `recomendacion` y `preguntas`. |
 
 ## 5. Concurrencia y fallas

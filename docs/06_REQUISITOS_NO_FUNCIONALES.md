@@ -91,7 +91,7 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 
 ### RNF-011 · Datos personales
 
-- Al registrarse, la empresa acepta los términos y la política de tratamiento de datos, y se guarda cuándo (`users.terminos_aceptados_en`).
+- Al registrarse, la empresa acepta los Términos y Condiciones y la Política de Privacidad oficiales de Captter, y se guarda cuándo (`users.terminos_aceptados_en`).
 - La foto y el logo se guardan en una carpeta privada y solo los ve la misma cuenta, su empresa o el Administrador.
 - Las cuentas se desactivan (RN-004) y, si hace falta, el Administrador las elimina confirmando con el correo exacto: quedan 90 días recuperables y luego se borran para siempre con sus datos (DEC-017). Sirve para atender una solicitud de borrado (Ley 1581 de 2012, de protección de datos personales).
 - **[INFORMACIÓN PENDIENTE]**:

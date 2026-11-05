@@ -24,7 +24,7 @@ class SectorReasignado extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new Correo)
             ->subject('Tu empresa cambió de sector en '.config('app.name'))
             ->line("NuevasTIC movió tu empresa del sector «{$this->anterior}» al sector «{$this->nuevo}».")
             ->line('Tus mediciones y resultados se conservan. Los próximos diagnósticos serán los de tu nuevo sector.')

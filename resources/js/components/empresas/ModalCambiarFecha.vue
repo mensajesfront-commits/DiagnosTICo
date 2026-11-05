@@ -6,6 +6,7 @@
  *
  * Envía: PUT /mediciones/{id}/fecha con fecha_limite.
  */
+import { CalendarClock } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
@@ -65,6 +66,7 @@ function guardar(): void {
         ancho="sm"
         :titulo="`Nueva fecha para la medición ${medicion.numero}`"
         :descripcion="`${empresa} conserva lo que ya respondió.`"
+        :icono="CalendarClock"
     >
         <form id="form-cambiar-fecha" @submit.prevent="guardar">
             <Campo

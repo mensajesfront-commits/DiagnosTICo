@@ -8,13 +8,16 @@
  * Editar se hace en otro modal (ModalEditarCategoria).
  */
 import { useForm } from '@inertiajs/vue3';
+import { Check, Shapes } from '@lucide/vue';
 import { watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
+import { cn } from '@/lib/utils';
 import type { DiagnosticoBorrador } from '@/types/diagnosticos';
 
 const MAXIMO_NOMBRE = 40;
@@ -53,8 +56,8 @@ function crear(): void {
     });
 }
 
-const textoBorrador = (b: DiagnosticoBorrador) =>
-    `${b.nombre} · ${b.sector_nombre} (borrador${b.version > 1 ? ` v${b.version}` : ''})`;
+const textoVersion = (b: DiagnosticoBorrador) =>
+    `Borrador${b.version > 1 ? ` v${b.version}` : ''}`;
 </script>
 
 <template>
@@ -63,6 +66,7 @@ const textoBorrador = (b: DiagnosticoBorrador) =>
         titulo="Crear categoría"
         descripcion="Se agrega al catálogo común. Después cada diagnóstico decide si la usa."
         ancho="lg"
+        :icono="Shapes"
     >
         <form
             id="form-categoria"
@@ -106,36 +110,67 @@ const textoBorrador = (b: DiagnosticoBorrador) =>
                 </legend>
                 <p
                     v-if="borradores.length === 0"
-                    class="text-xs text-tinta-suave"
+                    class="rounded-xl border border-dashed border-linea-fuerte px-3 py-3 text-center text-xs text-tinta-suave"
                 >
                     No hay diagnósticos en borrador.
                 </p>
-                <label
-                    v-for="borrador in borradores"
-                    :key="borrador.id"
-                    class="flex items-center gap-2 text-sm"
-                >
-                    <input
-                        v-model="form.diagnosticos"
-                        type="checkbox"
-                        :value="borrador.id"
-                        class="size-4 accent-marca"
-                    />
-                    {{ textoBorrador(borrador) }}
-                </label>
+                <div v-else class="grid gap-2 sm:grid-cols-2">
+                    <label
+                        v-for="borrador in borradores"
+                        :key="borrador.id"
+                        :class="
+                            cn(
+                                'flex cursor-pointer items-start gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition has-focus-visible:ring-2 has-focus-visible:ring-marca/30',
+                                form.diagnosticos.includes(borrador.id)
+                                    ? 'border-marca bg-marca-suave/40'
+                                    : 'border-linea hover:border-marca/40',
+                            )
+                        "
+                    >
+                        <input
+                            v-model="form.diagnosticos"
+                            type="checkbox"
+                            :value="borrador.id"
+                            class="sr-only"
+                        />
+                        <span
+                            :class="
+                                cn(
+                                    'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded border',
+                                    form.diagnosticos.includes(borrador.id)
+                                        ? 'border-marca bg-marca text-white'
+                                        : 'border-linea-fuerte bg-white',
+                                )
+                            "
+                            aria-hidden="true"
+                        >
+                            <Check
+                                v-if="form.diagnosticos.includes(borrador.id)"
+                                class="size-3"
+                            />
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block font-medium">
+                                {{ borrador.nombre }}
+                            </span>
+                            <span class="block text-xs text-tinta-suave">
+                                {{ borrador.sector_nombre }} ·
+                                {{ textoVersion(borrador) }}
+                            </span>
+                        </span>
+                    </label>
+                </div>
                 <p class="text-xs text-tinta-suave">
                     Solo se ofrecen borradores: una versión publicada no cambia.
                     Puedes agregarla más tarde desde el editor.
                 </p>
             </fieldset>
 
-            <p
-                class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
-            >
+            <Recuadro tono="neutro">
                 La categoría nueva empieza sin preguntas. Los borradores donde
                 se agregue quedan incompletos hasta escribirle al menos 1
                 pregunta y ajustar la importancia.
-            </p>
+            </Recuadro>
         </form>
 
         <template #pie>

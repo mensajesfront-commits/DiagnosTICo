@@ -35,13 +35,13 @@ En total son 13 épicas y 84 historias, con 330 puntos estimados.
 |---|---|
 | Publicar el sistema en un servidor | Se entrega el repositorio funcionando en local (Sail) con un README para instalarlo. `20_DESPLIEGUE.md` lo marcará NO APLICA. |
 | Análisis FODA y comparación con promedios | Decisión confirmada (RN-028). La propuesta técnica todavía los menciona (ver INC-001 en `05_REQUISITOS_FUNCIONALES.md`). |
-| Roles Consultor y Usuario | Quedan para un posible futuro. |
+| Rol Usuario | Queda para un posible futuro. El rol Consultor **sí entra** desde el 3 de noviembre, solo de lectura (EP-014, RN-030). |
 | Simulador de inversión | No existe en el diseño. |
-| Bot de WhatsApp (HU-071 a HU-075) | **Fuera de este repositorio:** lo hace otra persona del equipo 23 de octubre de 2026. Ver la sección siguiente. |
+| Bot de WhatsApp (HU-071 a HU-075) | **Terminado fuera de este repositorio** por otra persona del equipo (confirmado el 4 de noviembre de 2026). Ver la sección siguiente. |
 
-## Bot de WhatsApp: REQUIERE VALIDACIÓN
+## Bot de WhatsApp: terminado fuera de este repositorio
 
-La propuesta técnica y el cronograma (T-020, T-125, T-135, T-150) incluyen el bot, pero `05_REQUISITOS_FUNCIONALES.md` lo deja **aplazado**. Si se retoma, el bot:
+Otra persona del equipo lo terminó (confirmado el 4 de noviembre de 2026). No está en este repositorio. **[INFORMACIÓN PENDIENTE]** Si se conecta con este sistema y cómo. Según `05_REQUISITOS_FUNCIONALES.md`, el bot:
 
 - es totalmente separado de la web: no tiene cuentas, mediciones ni PDF (RN-029);
 - hace como máximo 10 preguntas configurables, solo de texto;

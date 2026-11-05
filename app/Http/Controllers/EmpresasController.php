@@ -11,6 +11,7 @@ use App\Notifications\EmpresaDesactivada;
 use App\Rules\CargoDelDueno;
 use App\Rules\TelefonoValido;
 use App\Services\Mediciones\AsignarMedicion;
+use App\Support\DatosConsultores;
 use App\Support\DatosEmpresas;
 use App\Support\Invitaciones;
 use App\Support\Plazos;
@@ -35,8 +36,18 @@ class EmpresasController extends Controller
     /** A3 · Lista con búsqueda, filtros y paginado (en la pantalla). */
     public function index(Request $request): Response
     {
+        /** @var User $yo */
+        $yo = $request->user();
+
+        // C2 · El consultor ve sus empresas vinculadas en tarjetas (RN-030).
+        if ($yo->esConsultor()) {
+            return Inertia::render('empresas/MisEmpresas', [
+                'empresas' => DatosEmpresas::lista($yo),
+            ]);
+        }
+
         return Inertia::render('empresas/Index', [
-            'empresas' => DatosEmpresas::lista(),
+            'empresas' => DatosEmpresas::lista($request->user()),
             'sectores' => Sector::orderBy('nombre')->get(['id', 'nombre']),
             // "Ver las N empresas en Empresas" desde A2 llega con ?sector=.
             'sectorInicial' => $request->integer('sector') ?: null,
@@ -83,11 +94,17 @@ class EmpresasController extends Controller
     }
 
     /** A3.1 · Ficha de la empresa (pestañas Historial y Datos de la cuenta). */
-    public function ver(Empresa $empresa): Response
+    public function ver(Request $request, Empresa $empresa): Response
     {
+        /** @var User $yo */
+        $yo = $request->user();
+        abort_unless($yo->puedeVerEmpresa($empresa->id), 404);
+
         return Inertia::render('empresas/Ver', [
             ...DatosEmpresas::ficha($empresa),
             'opciones' => DatosEmpresas::opciones(),
+            // Pestaña "Consultores" (HU-085): solo quien gestiona usuarios.
+            'consultores' => $yo->can('usuarios.gestionar') ? DatosConsultores::deEmpresa($empresa) : null,
         ]);
     }
 

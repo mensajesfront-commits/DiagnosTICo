@@ -8,12 +8,14 @@
  * anteriores, porque el nombre vive en el catálogo.
  */
 import { useForm } from '@inertiajs/vue3';
+import { Archive, Pencil, Trash2 } from '@lucide/vue';
 import { watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import { rutas } from '@/lib/rutas';
 import type { Categoria } from '@/types/diagnosticos';
 
@@ -64,6 +66,7 @@ function retirar(accion: 'archivar' | 'eliminar'): void {
         v-model:abierto="abierto"
         :titulo="`Editar categoría · ${categoria.nombre}`"
         ancho="lg"
+        :icono="Pencil"
     >
         <form
             id="form-editar-categoria"
@@ -100,23 +103,45 @@ function retirar(accion: 'archivar' | 'eliminar'): void {
                 />
             </Campo>
 
-            <p class="rounded-md bg-marca-suave px-3 py-2.5 text-sm">
-                <strong>
-                    Usada en {{ categoria.diagnosticos }} de
-                    {{ totalDiagnosticos }} diagnósticos.
-                </strong>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="rounded-xl bg-lienzo/70 px-2 py-2.5">
+                    <p class="font-mono text-lg leading-none font-semibold">
+                        {{ categoria.diagnosticos }}
+                        <span class="text-xs font-normal text-tinta-suave">
+                            / {{ totalDiagnosticos }}
+                        </span>
+                    </p>
+                    <p class="mt-1 text-[11px] text-tinta-suave">
+                        diagnósticos la usan
+                    </p>
+                </div>
+                <div class="rounded-xl bg-lienzo/70 px-2 py-2.5">
+                    <p class="font-mono text-lg leading-none font-semibold">
+                        {{ categoria.preguntas }}
+                    </p>
+                    <p class="mt-1 text-[11px] text-tinta-suave">preguntas</p>
+                </div>
+                <div class="rounded-xl bg-lienzo/70 px-2 py-2.5">
+                    <p class="font-mono text-lg leading-none font-semibold">
+                        {{ categoria.versiones_publicadas }}
+                    </p>
+                    <p class="mt-1 text-[11px] text-tinta-suave">
+                        versiones publicadas
+                    </p>
+                </div>
+            </div>
+
+            <Recuadro tono="info">
                 Para agregarla o quitarla de un diagnóstico, abre ese
                 diagnóstico en el editor.
-            </p>
+            </Recuadro>
 
-            <p
+            <Recuadro
                 v-if="categoria.diagnosticos > 0"
-                class="rounded-md bg-alerta-suave px-3 py-2.5 text-xs"
+                tono="alerta"
+                titulo="El cambio de nombre o descripción se verá en todas partes"
             >
-                <strong class="text-alerta">
-                    ⚠ El cambio de nombre o descripción se verá en todas partes:
-                </strong>
-                en los {{ categoria.diagnosticos }} diagnósticos<template
+                En los {{ categoria.diagnosticos }} diagnósticos<template
                     v-if="categoria.versiones_publicadas > 0"
                 >
                     (también en las
@@ -124,32 +149,37 @@ function retirar(accion: 'archivar' | 'eliminar'): void {
                     publicadas)</template
                 >
                 y en los resultados e informes PDF anteriores.
-            </p>
+            </Recuadro>
 
-            <p
-                class="rounded-md bg-lienzo px-3 py-2.5 text-xs text-tinta-suave"
-            >
-                <strong class="text-tinta">Al archivar:</strong> deja de poder
-                agregarse a diagnósticos y se conserva en los resultados
-                anteriores. Puedes restaurarla desde el filtro «Archivadas».
+            <Recuadro tono="neutro">
+                <strong>Al archivar:</strong> deja de poder agregarse a
+                diagnósticos y se conserva en los resultados anteriores. Puedes
+                restaurarla desde el filtro «Archivadas».
                 <template v-if="!categoria.tiene_respuestas">
                     <br />
-                    <strong class="text-tinta">Al eliminar:</strong> ninguna
-                    empresa la ha respondido, así que se borra del catálogo.
+                    <strong>Al eliminar:</strong> ninguna empresa la ha
+                    respondido, así que se borra del catálogo.
                 </template>
-            </p>
+            </Recuadro>
         </form>
 
         <template #pie>
             <span class="mr-auto flex gap-2">
-                <Boton variante="secundario" @click="retirar('archivar')">
+                <Boton
+                    variante="secundario"
+                    class="gap-1.5"
+                    @click="retirar('archivar')"
+                >
+                    <Archive class="size-4" aria-hidden="true" />
                     Archivar…
                 </Boton>
                 <Boton
                     v-if="!categoria.tiene_respuestas"
                     variante="secundario"
+                    class="gap-1.5 text-aviso"
                     @click="retirar('eliminar')"
                 >
+                    <Trash2 class="size-4" aria-hidden="true" />
                     Eliminar…
                 </Boton>
             </span>

@@ -4,9 +4,11 @@ use App\Models\Empresa;
 use App\Models\Sector;
 use App\Models\User;
 use App\Support\HistorialContrasenas;
+use App\Support\Invitaciones;
 use Database\Seeders\RolesYPermisosSeeder;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Testing\TestResponse;
@@ -211,18 +213,56 @@ it('envía el correo de recuperación en español', function () {
     });
 });
 
-it('acepta el enlace de recuperación aunque hayan pasado días (RN-006)', function () {
-    $usuario = User::factory()->create();
-    $token = Password::createToken($usuario);
+// RN-006 (cambio del 4 de noviembre, ERR-09): recuperación 10 minutos; invitación, hasta usarla.
 
-    $this->travel(3)->days();
-
-    $this->post(route('password.update'), [
+function guardarConEnlace($test, User $usuario, string $token)
+{
+    return $test->post(route('password.update'), [
         'token' => $token,
         'email' => $usuario->email,
         'password' => 'NuevaClave1!',
         'password_confirmation' => 'NuevaClave1!',
-    ])->assertSessionHasNoErrors()->assertRedirect(route('login'));
+    ]);
+}
+
+it('acepta el enlace de recuperación dentro de los 10 minutos', function () {
+    $usuario = User::factory()->create();
+    $token = Password::createToken($usuario);
+
+    $this->travel(9)->minutes();
+
+    guardarConEnlace($this, $usuario, $token)->assertSessionHasNoErrors()->assertRedirect(route('login'));
+});
+
+it('rechaza el enlace de recuperación después de 10 minutos', function () {
+    $usuario = User::factory()->create(['password' => 'Vieja-Clave-1']);
+    $token = Password::createToken($usuario);
+
+    $this->travel(11)->minutes();
+
+    guardarConEnlace($this, $usuario, $token)->assertSessionHasErrors(['email' => 'Este enlace ya no es válido.']);
+    expect(Hash::check('Vieja-Clave-1', $usuario->fresh()->password))->toBeTrue();
+});
+
+it('la invitación sigue sirviendo aunque pasen días, y al usarla no queda ningún enlace', function () {
+    $invitada = User::factory()->create(['password' => null]);
+    $token = Invitaciones::broker()->createToken($invitada);
+    Password::createToken($invitada);
+
+    $this->travel(5)->days();
+
+    guardarConEnlace($this, $invitada, $token)->assertSessionHasNoErrors()->assertRedirect(route('login'));
+
+    expect($invitada->fresh()->password)->not->toBeNull()
+        ->and(DB::table('invitaciones_tokens')->where('email', $invitada->email)->exists())->toBeFalse()
+        ->and(DB::table('password_reset_tokens')->where('email', $invitada->email)->exists())->toBeFalse();
+});
+
+it('un enlace de recuperación no se puede usar como si fuera una invitación', function () {
+    $usuario = User::factory()->create();
+    $token = Password::createToken($usuario);
+
+    expect(Invitaciones::broker()->tokenExists($usuario, $token))->toBeFalse();
 });
 
 // --- Contraseña nueva: distinta y sin partes del correo (17 oct.) ----------

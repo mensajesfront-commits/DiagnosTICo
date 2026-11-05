@@ -10,6 +10,9 @@ void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
+            // Las páginas de error traen su propia estructura (sin menú).
+            case name.startsWith('errores/'):
+                return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('responder/'):

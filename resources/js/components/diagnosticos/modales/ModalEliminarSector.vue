@@ -4,12 +4,15 @@
  * (HU-016). Un sector con empresas o mediciones no se elimina: se reasigna o
  * se desactiva (RN-008).
  */
+import { Lock, Trash2 } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import TarjetaOpcion from '@/components/base/TarjetaOpcion.vue';
 import { rutas } from '@/lib/rutas';
+import { plural } from '@/lib/texto';
 import type { ResumenDiagnosticos, Sector } from '@/types/diagnosticos';
 
 const props = defineProps<{
@@ -52,20 +55,35 @@ function ir(opcion: 'reasignar' | 'desactivar'): void {
                 ? `No se puede eliminar “${sector.nombre}” todavía`
                 : `¿Eliminar el sector “${sector.nombre}”?`
         "
+        :icono="bloqueado ? Lock : Trash2"
+        :tono="bloqueado ? 'alerta' : 'peligro'"
     >
         <div v-if="bloqueado" class="flex flex-col gap-3 text-sm">
-            <p class="rounded-md bg-aviso-suave px-3 py-2 text-aviso">
-                ⚠ Tiene
+            <Recuadro tono="peligro">
+                Tiene
                 <strong>
-                    {{ resumen.empresas }} empresas,
-                    {{ sector.diagnosticos }} diagnósticos y
-                    {{ resumen.mediciones }} mediciones</strong
+                    {{ plural(resumen.empresas, 'empresa', 'empresas') }},
+                    {{
+                        plural(
+                            sector.diagnosticos,
+                            'diagnóstico',
+                            'diagnósticos',
+                        )
+                    }}
+                    y
+                    {{
+                        plural(resumen.mediciones, 'medición', 'mediciones')
+                    }}</strong
                 >. Solo se puede eliminar un sector sin empresas ni mediciones.
-            </p>
+            </Recuadro>
             <p class="text-xs text-tinta-suave">Qué puedes hacer</p>
             <TarjetaOpcion
                 v-if="resumen.empresas > 0"
-                :titulo="`Reasignar las ${resumen.empresas} empresas a otro sector`"
+                :titulo="
+                    resumen.empresas === 1
+                        ? 'Reasignar la empresa a otro sector'
+                        : `Reasignar las ${resumen.empresas} empresas a otro sector`
+                "
                 @elegir="ir('reasignar')"
             >
                 Al reasignar, las empresas se llevan sus mediciones. Si
@@ -87,10 +105,7 @@ function ir(opcion: 'reasignar' | 'desactivar'): void {
                 Este sector no tiene empresas ni mediciones, así que se puede
                 eliminar. <strong>No se puede deshacer.</strong>
             </p>
-            <p
-                v-if="sector.activo"
-                class="rounded-md bg-lienzo px-3 py-2 text-xs text-tinta-suave"
-            >
+            <Recuadro tono="neutro" v-if="sector.activo">
                 Si solo quieres dejar de ofrecerlo al registrar empresas, mejor
                 <button
                     type="button"
@@ -99,7 +114,7 @@ function ir(opcion: 'reasignar' | 'desactivar'): void {
                 >
                     desactívalo</button
                 >: se conserva y puedes reactivarlo cuando quieras.
-            </p>
+            </Recuadro>
         </div>
 
         <template #pie>

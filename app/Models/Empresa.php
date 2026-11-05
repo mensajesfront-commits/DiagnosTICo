@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -59,6 +60,16 @@ class Empresa extends Model
     public function mediciones(): HasMany
     {
         return $this->hasMany(Medicion::class);
+    }
+
+    /**
+     * Consultores que la acompañan (RN-030).
+     *
+     * @return BelongsToMany<User, $this>
+     */
+    public function consultores(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'consultor_empresa')->withTimestamps();
     }
 
     /** @return HasMany<User, $this> */

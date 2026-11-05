@@ -14,6 +14,17 @@
  * tildes ni mayúsculas.
  */
 import { Head } from '@inertiajs/vue3';
+import {
+    Archive,
+    ArrowUpDown,
+    FilePlus2,
+    FolderOpen,
+    Layers,
+    Pencil,
+    Search,
+    SearchX,
+    Trash2,
+} from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
@@ -34,6 +45,7 @@ import TablaDiagnosticos from '@/components/diagnosticos/TablaDiagnosticos.vue';
 import { usePermisos } from '@/composables/usePermisos';
 import { rutas } from '@/lib/rutas';
 import { normalizar } from '@/lib/texto';
+import { cn } from '@/lib/utils';
 import type {
     DiagnosticoArchivado,
     DivisionCiiu,
@@ -75,6 +87,37 @@ const filtro = ref<FiltroEstado>('todos');
 const busqueda = ref('');
 const buscando = computed(() => normalizar(busqueda.value) !== '');
 
+const esBorrador = (d: FilaDiagnostico) =>
+    d.version_publicada === null || d.borrador_pendiente !== null;
+
+const filtros = computed(() => [
+    {
+        valor: 'todos' as const,
+        texto: 'Todos',
+        n: props.diagnosticos.length,
+        tono: null,
+    },
+    {
+        valor: 'publicado' as const,
+        texto: 'Publicados',
+        n: props.diagnosticos.filter((d) => d.version_publicada !== null)
+            .length,
+        tono: 'bg-exito',
+    },
+    {
+        valor: 'borrador' as const,
+        texto: 'Borradores',
+        n: props.diagnosticos.filter(esBorrador).length,
+        tono: 'bg-alerta',
+    },
+]);
+
+const plural = (n: number, uno: string, varios: string) =>
+    `${n} ${n === 1 ? uno : varios}`;
+
+const claseAccion =
+    'inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs text-tinta-suave transition hover:bg-lienzo hover:text-tinta';
+
 const filas = computed(() => {
     let lista = [...props.diagnosticos];
     const buscado = normalizar(busqueda.value);
@@ -86,10 +129,7 @@ const filas = computed(() => {
     if (filtro.value === 'publicado') {
         lista = lista.filter((d) => d.version_publicada !== null);
     } else if (filtro.value === 'borrador') {
-        lista = lista.filter(
-            (d) =>
-                d.version_publicada === null || d.borrador_pendiente !== null,
-        );
+        lista = lista.filter(esBorrador);
     }
 
     const porNombre = (a: FilaDiagnostico, b: FilaDiagnostico) =>
@@ -213,120 +253,212 @@ function elegir(
 
             <div class="flex min-w-0 flex-col gap-5 lg:min-h-0">
                 <section
-                    class="flex flex-col rounded-xl border border-linea bg-white lg:min-h-0 lg:flex-1"
+                    class="flex flex-col rounded-2xl border border-linea bg-white lg:min-h-0 lg:flex-1"
                 >
                     <header
-                        class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3"
+                        class="flex flex-wrap items-start justify-between gap-3 px-5 pt-5 pb-3"
                     >
-                        <h2 class="text-base font-semibold">
-                            {{
-                                sector
-                                    ? `Diagnósticos de ${sector.nombre}`
-                                    : 'Todos los diagnósticos'
-                            }}
+                        <div class="flex min-w-0 items-center gap-3">
                             <span
-                                class="ml-2 text-xs font-normal text-tinta-suave"
+                                class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-marca-suave text-marca"
+                                aria-hidden="true"
                             >
-                                <template v-if="sector">
-                                    {{ sector.diagnosticos }} diagnósticos ·
-                                    {{ resumen.empresas }} empresas
-                                </template>
-                                <template v-else>
-                                    {{ totalDiagnosticos }} diagnósticos ·
-                                    {{ sectores.length }} sectores
-                                </template>
+                                <FolderOpen v-if="sector" class="size-5" />
+                                <Layers v-else class="size-5" />
                             </span>
-                        </h2>
+                            <div class="min-w-0">
+                                <h2
+                                    class="text-base leading-tight font-semibold"
+                                >
+                                    {{
+                                        sector
+                                            ? `Diagnósticos de ${sector.nombre}`
+                                            : 'Todos los diagnósticos'
+                                    }}
+                                </h2>
+                                <p class="mt-0.5 text-xs text-tinta-suave">
+                                    <template v-if="sector">
+                                        {{
+                                            plural(
+                                                sector.diagnosticos,
+                                                'diagnóstico',
+                                                'diagnósticos',
+                                            )
+                                        }}
+                                        ·
+                                        {{
+                                            plural(
+                                                resumen.empresas,
+                                                'empresa',
+                                                'empresas',
+                                            )
+                                        }}
+                                        <template v-if="!sector.activo">
+                                            · ○ Inactivo
+                                        </template>
+                                    </template>
+                                    <template v-else>
+                                        {{
+                                            plural(
+                                                totalDiagnosticos,
+                                                'diagnóstico',
+                                                'diagnósticos',
+                                            )
+                                        }}
+                                        ·
+                                        {{
+                                            plural(
+                                                sectores.length,
+                                                'sector',
+                                                'sectores',
+                                            )
+                                        }}
+                                    </template>
+                                </p>
+                            </div>
+                        </div>
 
-                        <div v-if="sector" class="flex gap-4 text-xs">
+                        <div class="flex flex-wrap items-center gap-1">
                             <button
                                 type="button"
-                                class="text-marca underline"
+                                :class="claseAccion"
                                 @click="modalArchivados = true"
                             >
-                                Archivados ({{ archivados.length }})
+                                <Archive class="size-3.5" aria-hidden="true" />
+                                Archivados
+                                <span
+                                    class="rounded-full bg-lienzo-oscuro px-1.5 font-mono text-[11px]"
+                                >
+                                    {{ archivados.length }}
+                                </span>
                             </button>
-                            <template v-if="puede('diagnosticos.editar')">
+                            <template
+                                v-if="sector && puede('diagnosticos.editar')"
+                            >
                                 <button
                                     type="button"
-                                    class="text-marca underline"
+                                    :class="claseAccion"
                                     @click="editarSector"
                                 >
+                                    <Pencil
+                                        class="size-3.5"
+                                        aria-hidden="true"
+                                    />
                                     Editar sector
                                 </button>
                                 <button
                                     type="button"
-                                    class="text-marca underline"
+                                    :class="
+                                        cn(
+                                            claseAccion,
+                                            'hover:bg-aviso-suave hover:text-aviso',
+                                        )
+                                    "
                                     @click="modalEliminarSector = true"
                                 >
+                                    <Trash2
+                                        class="size-3.5"
+                                        aria-hidden="true"
+                                    />
                                     Eliminar sector
                                 </button>
                             </template>
-                        </div>
-                        <div
-                            v-else
-                            class="flex flex-wrap items-center gap-3 text-xs"
-                        >
-                            <label class="flex items-center gap-2">
-                                Ordenar por
-                                <Seleccion
-                                    v-model="orden"
-                                    class="h-8 w-auto text-xs"
-                                >
-                                    <option value="sector">
-                                        Sector (A–Z), luego estado
-                                    </option>
-                                    <option value="edicion">
-                                        Última edición
-                                    </option>
-                                    <option value="nombre">Nombre (A–Z)</option>
-                                </Seleccion>
-                            </label>
-                            <button
-                                type="button"
-                                class="text-marca underline"
-                                @click="modalArchivados = true"
-                            >
-                                Archivados ({{ archivados.length }})
-                            </button>
-                            <label class="flex items-center gap-2">
-                                Estado
-                                <Seleccion
-                                    v-model="filtro"
-                                    class="h-8 w-auto text-xs"
-                                >
-                                    <option value="todos">Todos</option>
-                                    <option value="publicado">
-                                        Publicados
-                                    </option>
-                                    <option value="borrador">Borradores</option>
-                                </Seleccion>
-                            </label>
                         </div>
                     </header>
 
                     <div
                         v-if="diagnosticos.length > 0"
-                        class="shrink-0 px-5 pb-3"
+                        class="flex shrink-0 flex-wrap items-center gap-2 px-5 pb-4"
                     >
-                        <label for="buscar-diagnostico" class="sr-only">
-                            Buscar diagnóstico
+                        <div class="relative min-w-52 flex-1">
+                            <label for="buscar-diagnostico" class="sr-only">
+                                Buscar diagnóstico
+                            </label>
+                            <Search
+                                class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-tinta-suave"
+                                aria-hidden="true"
+                            />
+                            <Entrada
+                                id="buscar-diagnostico"
+                                v-model="busqueda"
+                                type="search"
+                                placeholder="Buscar diagnóstico por nombre"
+                                autocomplete="off"
+                                class="h-9 pl-9"
+                            />
+                        </div>
+
+                        <div
+                            class="flex flex-wrap items-center gap-1.5"
+                            role="group"
+                            aria-label="Filtrar por estado"
+                        >
+                            <button
+                                v-for="f in filtros"
+                                :key="f.valor"
+                                type="button"
+                                :aria-pressed="filtro === f.valor"
+                                :class="
+                                    cn(
+                                        'inline-flex h-9 items-center gap-2 rounded-full border px-3 text-xs transition',
+                                        filtro === f.valor
+                                            ? 'border-marca bg-marca text-white'
+                                            : 'border-linea bg-white hover:border-marca/40',
+                                    )
+                                "
+                                @click="filtro = f.valor"
+                            >
+                                <span
+                                    v-if="f.tono"
+                                    :class="cn('size-2 rounded-full', f.tono)"
+                                    aria-hidden="true"
+                                />
+                                {{ f.texto }}
+                                <span
+                                    :class="
+                                        cn(
+                                            'rounded-full px-1.5 font-mono text-[11px] font-semibold',
+                                            filtro === f.valor
+                                                ? 'bg-white/20'
+                                                : 'bg-lienzo-oscuro',
+                                        )
+                                    "
+                                >
+                                    {{ f.n }}
+                                </span>
+                            </button>
+                        </div>
+
+                        <label
+                            v-if="!sector"
+                            class="flex items-center gap-2 text-xs text-tinta-suave"
+                        >
+                            <ArrowUpDown class="size-3.5" aria-hidden="true" />
+                            <span class="sr-only">Ordenar por</span>
+                            <Seleccion
+                                v-model="orden"
+                                class="h-9 w-auto text-xs"
+                            >
+                                <option value="sector">
+                                    Sector (A–Z), luego estado
+                                </option>
+                                <option value="edicion">Última edición</option>
+                                <option value="nombre">Nombre (A–Z)</option>
+                            </Seleccion>
                         </label>
-                        <Entrada
-                            id="buscar-diagnostico"
-                            v-model="busqueda"
-                            type="search"
-                            placeholder="Buscar diagnóstico por nombre"
-                            autocomplete="off"
-                            class="h-9"
-                        />
                     </div>
 
                     <!-- A2b · sector sin diagnósticos -->
                     <div
                         v-if="sector && diagnosticos.length === 0"
-                        class="flex flex-1 flex-col items-center justify-center border-t border-linea px-5 py-8 text-center"
+                        class="flex flex-1 flex-col items-center justify-center border-t border-linea px-5 py-10 text-center"
                     >
+                        <span
+                            class="mb-3 flex size-12 items-center justify-center rounded-2xl bg-marca-suave text-marca"
+                            aria-hidden="true"
+                        >
+                            <FilePlus2 class="size-6" />
+                        </span>
                         <p class="font-semibold">
                             Este sector todavía no tiene diagnósticos
                         </p>
@@ -355,8 +487,9 @@ function elegir(
 
                     <p
                         v-else-if="filas.length === 0"
-                        class="flex flex-1 items-center justify-center border-t border-linea px-5 py-8 text-center text-sm text-tinta-suave"
+                        class="flex flex-1 flex-col items-center justify-center gap-2 border-t border-linea px-5 py-10 text-center text-sm text-tinta-suave"
                     >
+                        <SearchX class="size-6" aria-hidden="true" />
                         <template v-if="diagnosticos.length === 0">
                             Todavía no hay diagnósticos.
                         </template>

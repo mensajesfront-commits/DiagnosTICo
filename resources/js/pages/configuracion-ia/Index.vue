@@ -13,12 +13,34 @@
  * instrucciones se usan, "Probar con un ejemplo" (A4.7), "Ver instrucciones
  * completas" (A4.4), cuándo aplica, la última edición y "Quitar ajuste".
  * Cambiar de alcance con cambios sin guardar pide confirmación.
+ *
+ * Diseño: encabezado con ícono y el estado de los cambios en una píldora; el
+ * alcance se elige en tres tarjetas con ícono; los datos automáticos en
+ * chips; el formato fijo con candado y, a la derecha, tarjetas con ícono.
  */
+import {
+    Braces,
+    Building2,
+    CalendarClock,
+    CircleCheck,
+    FlaskConical,
+    Globe,
+    History,
+    Layers,
+    Lock,
+    RotateCcw,
+    Save,
+    ScrollText,
+    Sparkles,
+    Store,
+    Undo2,
+} from '@lucide/vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Combobox from '@/components/base/Combobox.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import ElementoPrompt from '@/components/ia/ElementoPrompt.vue';
 import ModalProbarPrompt from '@/components/ia/ModalProbarPrompt.vue';
@@ -106,10 +128,25 @@ function guardar(): void {
 }
 
 // --- Alcance, sector y empresa ---------------------------------------------------
-const alcances: { valor: Alcance; etiqueta: string }[] = [
-    { valor: 'general', etiqueta: 'Todas las empresas' },
-    { valor: 'sector', etiqueta: 'Solo un sector' },
-    { valor: 'empresa', etiqueta: 'Solo una empresa' },
+const alcances = [
+    {
+        valor: 'general' as Alcance,
+        etiqueta: 'Todas las empresas',
+        detalle: 'Instrucciones generales',
+        icono: Globe,
+    },
+    {
+        valor: 'sector' as Alcance,
+        etiqueta: 'Solo un sector',
+        detalle: 'Ajusta lo general',
+        icono: Store,
+    },
+    {
+        valor: 'empresa' as Alcance,
+        etiqueta: 'Solo una empresa',
+        detalle: 'Lo más específico',
+        icono: Building2,
+    },
 ];
 
 /** Destino pendiente de confirmar si hay cambios sin guardar. */
@@ -239,17 +276,46 @@ const listoParaEditar = computed(
         <header
             class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-linea bg-white px-6 py-3"
         >
-            <div>
-                <p class="text-xs text-tinta-suave">
-                    Configuración IA · Analizar categoría
-                </p>
-                <h1 class="text-xl font-semibold">{{ titulo }}</h1>
+            <div class="flex items-center gap-3">
+                <span
+                    class="flex size-10 items-center justify-center rounded-xl bg-marca-suave text-marca"
+                    aria-hidden="true"
+                >
+                    <Sparkles class="size-5" />
+                </span>
+                <div>
+                    <p class="text-xs text-tinta-suave">
+                        Configuración IA · Analizar categoría
+                    </p>
+                    <h1 class="text-xl leading-tight font-semibold">
+                        {{ titulo }}
+                    </h1>
+                </div>
             </div>
             <div
                 v-if="puedeEditar && listoParaEditar"
-                class="flex items-center gap-2"
+                class="flex flex-wrap items-center gap-2"
             >
-                <span class="text-xs text-tinta-suave" aria-live="polite">
+                <span
+                    :class="
+                        cn(
+                            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
+                            form.isDirty
+                                ? 'bg-alerta-suave text-alerta'
+                                : 'bg-exito-suave text-exito',
+                        )
+                    "
+                    aria-live="polite"
+                >
+                    <span
+                        :class="
+                            cn(
+                                'size-1.5 rounded-full',
+                                form.isDirty ? 'bg-alerta' : 'bg-exito',
+                            )
+                        "
+                        aria-hidden="true"
+                    />
                     {{
                         form.isDirty
                             ? 'Cambios sin guardar'
@@ -258,16 +324,20 @@ const listoParaEditar = computed(
                 </span>
                 <Boton
                     variante="secundario"
+                    class="gap-1.5"
                     :disabled="!form.isDirty || form.processing"
                     @click="form.reset()"
                 >
+                    <Undo2 class="size-4" aria-hidden="true" />
                     Descartar
                 </Boton>
                 <Boton
+                    class="gap-1.5"
                     :disabled="!form.isDirty"
                     :cargando="form.processing"
                     @click="guardar"
                 >
+                    <Save class="size-4" aria-hidden="true" />
                     {{
                         alcance === 'general'
                             ? 'Guardar instrucciones'
@@ -284,20 +354,32 @@ const listoParaEditar = computed(
             <div
                 class="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-2"
             >
-                <p class="text-sm text-tinta-suave">
-                    Se ejecuta una vez por categoría, con todas sus respuestas,
-                    y hace todo en un solo análisis: una observación por
-                    pregunta, la calificación de las abiertas, la observación de
-                    la categoría y su recomendación. No necesitas cambiar nada
-                    para que funcione: ya viene listo.
-                </p>
+                <div
+                    class="flex gap-3 rounded-2xl bg-linear-to-br from-marca-suave/70 to-white p-4 text-sm"
+                >
+                    <Sparkles
+                        class="mt-0.5 size-5 shrink-0 text-marca"
+                        aria-hidden="true"
+                    />
+                    <p class="text-tinta">
+                        Se ejecuta <strong>una vez por categoría</strong>, con
+                        todas sus respuestas, y hace todo en un solo análisis:
+                        una observación por pregunta, la calificación de las
+                        abiertas, la observación de la categoría y su
+                        recomendación.
+                        <span class="text-tinta-suave">
+                            No necesitas cambiar nada para que funcione: ya
+                            viene listo.
+                        </span>
+                    </p>
+                </div>
 
                 <section>
                     <h2 class="text-sm font-semibold">
                         ¿A quién se aplica lo que escribas aquí?
                     </h2>
                     <div
-                        class="mt-2 grid grid-cols-3 overflow-hidden rounded-lg border border-linea-fuerte bg-white text-sm"
+                        class="mt-2 grid gap-2 sm:grid-cols-3"
                         role="radiogroup"
                         aria-label="Alcance"
                     >
@@ -309,10 +391,10 @@ const listoParaEditar = computed(
                             :aria-checked="alcance === a.valor"
                             :class="
                                 cn(
-                                    'px-3 py-2.5 transition-colors',
+                                    'flex items-center gap-3 rounded-xl border px-3 py-2.5 text-left text-sm transition',
                                     alcance === a.valor
-                                        ? 'bg-marca font-medium text-white'
-                                        : 'hover:bg-lienzo',
+                                        ? 'border-marca bg-marca text-white'
+                                        : 'border-linea bg-white hover:border-marca/40',
                                 )
                             "
                             @click="
@@ -320,7 +402,36 @@ const listoParaEditar = computed(
                                 ir(rutas.ia.index(a.valor))
                             "
                         >
-                            {{ a.etiqueta }}
+                            <span
+                                :class="
+                                    cn(
+                                        'flex size-9 shrink-0 items-center justify-center rounded-lg',
+                                        alcance === a.valor
+                                            ? 'bg-white/15'
+                                            : 'bg-marca-suave text-marca',
+                                    )
+                                "
+                                aria-hidden="true"
+                            >
+                                <component :is="a.icono" class="size-4" />
+                            </span>
+                            <span>
+                                <span class="block font-medium">
+                                    {{ a.etiqueta }}
+                                </span>
+                                <span
+                                    :class="
+                                        cn(
+                                            'block text-xs',
+                                            alcance === a.valor
+                                                ? 'text-white/75'
+                                                : 'text-tinta-suave',
+                                        )
+                                    "
+                                >
+                                    {{ a.detalle }}
+                                </span>
+                            </span>
                         </button>
                     </div>
                     <p class="mt-2 text-xs text-tinta-suave">
@@ -346,10 +457,15 @@ const listoParaEditar = computed(
                 <!-- Sector o empresa -->
                 <section
                     v-if="alcance === 'sector'"
-                    class="rounded-xl border border-linea bg-white p-5"
+                    class="rounded-2xl border border-linea bg-white p-5"
                 >
-                    <label for="ia-sector" class="text-sm font-semibold"
-                        >¿Para qué sector?</label
+                    <label
+                        for="ia-sector"
+                        class="flex items-center gap-2 text-sm font-semibold"
+                        ><Store
+                            class="size-4 text-marca"
+                            aria-hidden="true"
+                        />¿Para qué sector?</label
                     >
                     <Seleccion
                         id="ia-sector"
@@ -390,10 +506,15 @@ const listoParaEditar = computed(
 
                 <section
                     v-if="alcance === 'empresa'"
-                    class="rounded-xl border border-linea bg-white p-5"
+                    class="rounded-2xl border border-linea bg-white p-5"
                 >
-                    <label for="ia-empresa" class="text-sm font-semibold"
-                        >¿Para qué empresa?</label
+                    <label
+                        for="ia-empresa"
+                        class="flex items-center gap-2 text-sm font-semibold"
+                        ><Building2
+                            class="size-4 text-marca"
+                            aria-hidden="true"
+                        />¿Para qué empresa?</label
                     >
                     <Combobox
                         id="ia-empresa"
@@ -408,8 +529,9 @@ const listoParaEditar = computed(
                     >
                         <span
                             v-if="empresa.ajuste"
-                            class="rounded bg-exito-suave px-1.5 py-0.5 text-xs text-exito"
-                            >✓ Ajuste activo</span
+                            class="inline-flex items-center gap-1 rounded-full bg-exito-suave px-2 py-0.5 text-xs font-medium text-exito"
+                            ><CircleCheck class="size-3" aria-hidden="true" />
+                            Ajuste activo</span
                         >
                         <span>
                             Hereda del sector
@@ -429,12 +551,13 @@ const listoParaEditar = computed(
                 <!-- Datos que se insertan solos -->
                 <section
                     v-if="alcance === 'general'"
-                    class="rounded-xl border border-linea bg-white p-5"
+                    class="rounded-2xl border border-linea bg-white p-5"
                 >
-                    <h2 class="text-sm font-semibold">
+                    <h2 class="flex items-center gap-2 text-sm font-semibold">
+                        <Braces class="size-4 text-marca" aria-hidden="true" />
                         Datos que se insertan solos en esta etapa
                     </h2>
-                    <p class="text-xs text-tinta-suave">
+                    <p class="mt-1 text-xs text-tinta-suave">
                         El sistema reemplaza cada código por el dato real de la
                         empresa. Escríbelos tal cual, con sus llaves: si borras
                         uno, la IA no recibe ese dato en el texto.
@@ -443,30 +566,40 @@ const listoParaEditar = computed(
                         <li
                             v-for="v in variablesEnUso"
                             :key="v.codigo"
-                            class="flex items-center gap-3 rounded-md bg-lienzo px-3 py-2"
+                            class="flex items-center justify-between gap-3 rounded-xl border border-linea px-3 py-2"
                         >
-                            <span
-                                :class="
-                                    cn(
-                                        'rounded px-1.5 py-0.5 text-[11px] whitespace-nowrap',
-                                        v.enUso
-                                            ? 'bg-exito-suave text-exito'
-                                            : 'bg-lienzo-oscuro text-tinta-suave',
-                                    )
-                                "
-                                >{{ v.enUso ? '✓ en uso' : 'sin usar' }}</span
-                            >
-                            <span class="text-sm">
+                            <span class="min-w-0 text-sm">
                                 {{ v.nombre }}
                                 <span
-                                    class="block font-mono text-[11px] text-tinta-suave"
-                                    >{{ marca(v.codigo) }} · en
+                                    class="mt-0.5 block text-[11px] text-tinta-suave"
+                                    ><span
+                                        class="rounded bg-marca-suave/70 px-1 font-mono text-marca"
+                                        >{{ marca(v.codigo) }}</span
+                                    >
+                                    · en
                                     {{
                                         elementos.find(
                                             (e) => e.clave === v.elemento,
                                         )?.titulo
                                     }}</span
                                 >
+                            </span>
+                            <span
+                                :class="
+                                    cn(
+                                        'inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium whitespace-nowrap',
+                                        v.enUso
+                                            ? 'bg-exito-suave text-exito'
+                                            : 'bg-lienzo-oscuro text-tinta-suave',
+                                    )
+                                "
+                            >
+                                <CircleCheck
+                                    v-if="v.enUso"
+                                    class="size-3"
+                                    aria-hidden="true"
+                                />
+                                {{ v.enUso ? 'En uso' : 'Sin usar' }}
                             </span>
                         </li>
                     </ul>
@@ -477,18 +610,19 @@ const listoParaEditar = computed(
                         <!-- 4 · Formato fijo, antes de los ejemplos -->
                         <section
                             v-if="e.clave === 'ejemplos'"
-                            class="rounded-xl border border-dashed border-linea-fuerte bg-lienzo p-5"
+                            class="rounded-2xl border border-dashed border-linea-fuerte bg-lienzo/70 p-5"
                         >
-                            <h2 class="flex items-center gap-2 font-semibold">
+                            <h2 class="flex items-center gap-3 font-semibold">
                                 <span
-                                    class="flex size-7 items-center justify-center rounded-full bg-lienzo-oscuro text-xs"
+                                    class="flex size-8 items-center justify-center rounded-full bg-lienzo-oscuro font-mono text-xs"
                                     aria-hidden="true"
                                     >4</span
                                 >
                                 Formato de la respuesta
                                 <span
-                                    class="rounded bg-white px-1.5 py-0.5 text-[11px] font-normal text-tinta-suave"
-                                    >🔒 Fijo</span
+                                    class="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[11px] font-normal text-tinta-suave"
+                                    ><Lock class="size-3" aria-hidden="true" />
+                                    Fijo</span
                                 >
                             </h2>
                             <p class="mt-2 text-sm">
@@ -542,18 +676,21 @@ const listoParaEditar = computed(
                     </template>
                 </template>
 
-                <p class="pb-2 text-xs text-tinta-suave">
+                <Recuadro tono="neutro" class="mb-2">
                     Si la IA falla, la categoría se reintenta hasta 3 veces;
                     después la empresa puede reintentarla y te llega un correo.
-                </p>
+                </Recuadro>
             </div>
 
             <!-- Panel derecho -->
             <aside class="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto">
                 <section
-                    class="rounded-xl border border-linea bg-white p-4 text-sm"
+                    class="rounded-2xl border border-linea bg-white p-4 text-sm"
                 >
-                    <h2 class="font-semibold">¿Qué instrucciones se usan?</h2>
+                    <h2 class="flex items-center gap-2 font-semibold">
+                        <Layers class="size-4 text-marca" aria-hidden="true" />
+                        ¿Qué instrucciones se usan?
+                    </h2>
                     <template v-if="alcance === 'general'">
                         <p class="mt-1 text-tinta-suave">
                             Estas son las
@@ -638,9 +775,15 @@ const listoParaEditar = computed(
                 </section>
 
                 <section
-                    class="rounded-xl border border-linea bg-white p-4 text-sm"
+                    class="rounded-2xl border border-linea bg-linear-to-br from-marca-suave/70 to-white p-4 text-sm"
                 >
-                    <h2 class="font-semibold">¿Quieres ver cómo queda?</h2>
+                    <h2 class="flex items-center gap-2 font-semibold">
+                        <FlaskConical
+                            class="size-4 text-marca"
+                            aria-hidden="true"
+                        />
+                        ¿Quieres ver cómo queda?
+                    </h2>
                     <p class="mt-1 text-tinta-suave">
                         Prueba lo que escribiste con un ejemplo real. Probar no
                         afecta resultados reales.
@@ -648,20 +791,24 @@ const listoParaEditar = computed(
                     <div class="mt-3 flex flex-col gap-2">
                         <Boton
                             v-if="puedeEditar"
+                            class="gap-1.5"
                             :disabled="
                                 !listoParaEditar || ejemplos.length === 0
                             "
                             @click="modalProbar = true"
                         >
+                            <FlaskConical class="size-4" aria-hidden="true" />
                             Probar con un ejemplo
                         </Boton>
                         <Boton
                             variante="secundario"
+                            class="gap-1.5 bg-white"
                             :disabled="
                                 !listoParaEditar || ejemplos.length === 0
                             "
                             @click="modalCompleto = true"
                         >
+                            <ScrollText class="size-4" aria-hidden="true" />
                             Ver instrucciones completas
                         </Boton>
                     </div>
@@ -686,26 +833,41 @@ const listoParaEditar = computed(
                 </section>
 
                 <section
-                    class="rounded-xl border border-linea bg-white p-4 text-sm"
+                    class="rounded-2xl border border-linea bg-white p-4 text-sm"
                 >
-                    <h2 class="font-semibold">¿Cuándo aplica?</h2>
+                    <h2 class="flex items-center gap-2 font-semibold">
+                        <CalendarClock
+                            class="size-4 text-marca"
+                            aria-hidden="true"
+                        />
+                        ¿Cuándo aplica?
+                    </h2>
                     <p class="mt-1 text-tinta-suave">
                         {{ cuandoAplica }}
                     </p>
                 </section>
 
                 <section
-                    class="rounded-xl border border-linea bg-white p-4 text-sm"
+                    class="rounded-2xl border border-linea bg-white p-4 text-sm"
                 >
-                    <h2 class="font-semibold">Última edición</h2>
+                    <h2 class="flex items-center gap-2 font-semibold">
+                        <History class="size-4 text-marca" aria-hidden="true" />
+                        Última edición
+                    </h2>
                     <p class="mt-1 text-tinta-suave">{{ ultimaEdicion }}</p>
                 </section>
 
                 <section
                     v-if="puedeEditar && capa?.ajuste"
-                    class="rounded-xl border border-linea bg-white p-4 text-sm"
+                    class="rounded-2xl border border-alerta/30 bg-white p-4 text-sm"
                 >
-                    <h2 class="font-semibold">Quitar el ajuste</h2>
+                    <h2 class="flex items-center gap-2 font-semibold">
+                        <RotateCcw
+                            class="size-4 text-alerta"
+                            aria-hidden="true"
+                        />
+                        Quitar el ajuste
+                    </h2>
                     <p class="mt-1 text-tinta-suave">
                         {{
                             alcance === 'sector'
@@ -715,9 +877,10 @@ const listoParaEditar = computed(
                     </p>
                     <Boton
                         variante="secundario"
-                        class="mt-3 w-full"
+                        class="mt-3 w-full gap-1.5"
                         @click="modalQuitar = true"
                     >
+                        <RotateCcw class="size-4" aria-hidden="true" />
                         {{
                             alcance === 'sector'
                                 ? 'Quitar ajuste del sector'
@@ -760,6 +923,8 @@ const listoParaEditar = computed(
         ancho="sm"
         titulo="¿Descartar los cambios?"
         @update:abierto="(a: boolean) => !a && (destino = null)"
+        :icono="Undo2"
+        tono="alerta"
     >
         <p class="text-sm text-tinta-suave">
             Tienes cambios sin guardar en

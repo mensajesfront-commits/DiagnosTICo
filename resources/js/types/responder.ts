@@ -45,6 +45,8 @@ export type AvanceCategoria = {
     respondidas: number;
     total: number;
     faltan_obligatorias: number;
+    /** Ref de la primera obligatoria sin responder; null si no falta ninguna. */
+    primera_faltante: string | null;
 };
 
 export type Avance = {

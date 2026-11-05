@@ -1,0 +1,379 @@
+<?php
+
+use App\Models\Diagnostico;
+use App\Models\Empresa;
+use App\Models\Medicion;
+use App\Models\Resultado;
+use App\Models\Sector;
+use App\Models\User;
+use App\Services\Resultados\ResultadoEjemplo;
+use App\Support\DatosHistorial;
+use App\Support\DatosInicioConsultor;
+use App\Support\Niveles;
+use Database\Seeders\RolesYPermisosSeeder;
+use Illuminate\Support\Facades\Notification;
+use Inertia\Testing\AssertableInertia as Assert;
+use Spatie\Permission\Models\Role;
+
+/*
+ * Rol Consultor (HU-085, HU-086, RN-030): externo e invitado, solo mira las
+ * empresas que el Administrador le vincula. No responde ni toca
+ * diagnósticos.
+ */
+
+beforeEach(function () {
+    $this->seed(RolesYPermisosSeeder::class);
+    Notification::fake();
+
+    $sector = Sector::factory()->create(['nombre' => 'Comidas']);
+    $diagnostico = Diagnostico::factory()->publicado()->create(['sector_id' => $sector->id]);
+    $this->version = $diagnostico->versiones()->firstOrFail();
+
+    $this->suya = Empresa::factory()->create(['nombre' => 'La Esquina', 'sector_id' => $sector->id]);
+    $this->otra = Empresa::factory()->create(['nombre' => 'El Trigal', 'sector_id' => $sector->id]);
+
+    $this->admin = User::factory()->create()->assignRole('Administrador');
+    $this->consultor = User::factory()->create(['name' => 'Valeria Consultora'])->assignRole('Consultor');
+    $this->consultor->empresasAsesoradas()->attach($this->suya->id);
+
+    $this->medicionSuya = medicionTerminada($this, $this->suya);
+    $this->medicionOtra = medicionTerminada($this, $this->otra);
+});
+
+function medicionTerminada($test, Empresa $empresa, int $numero = 1): Medicion
+{
+    $medicion = Medicion::factory()->create([
+        'empresa_id' => $empresa->id,
+        'version_diagnostico_id' => $test->version->id,
+        'numero' => $numero,
+        'estado' => 'terminada',
+    ]);
+    $medicion->forceFill(['enviada_en' => now(), 'terminada_en' => now()])->save();
+
+    $datos = ResultadoEjemplo::calcular($test->version->contenido, 'medio');
+    Resultado::create([
+        'medicion_id' => $medicion->id,
+        'puntaje_total' => $datos['puntaje_total'],
+        'nivel' => Niveles::de($datos['puntaje_total']),
+        'variacion' => null,
+        'por_categoria' => $datos['por_categoria'],
+        'publicado_en' => now(),
+    ]);
+
+    return $medicion;
+}
+
+// --- Qué ve el consultor --------------------------------------------------------
+
+it('entra a su propio inicio con solo sus empresas, no al del Administrador', function () {
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $p) => $p
+            ->component('inicio/Consultor')
+            ->where('resumen.empresas', 1)
+            ->where('resumen.con_resultado', 1)
+            ->where('resumen.promedio', $this->medicionSuya->resultado->puntaje_total)
+            ->has('resumen.recientes', 1)
+            ->where('resumen.recientes.0.empresa.nombre', 'La Esquina'));
+});
+
+it('el inicio trae las próximas fechas límite, sin las vencidas', function () {
+    $otra = Empresa::factory()->create(['nombre' => 'Zapatería Sol', 'sector_id' => $this->suya->sector_id]);
+    $this->consultor->empresasAsesoradas()->attach($otra->id);
+    medicionDelConsultor($this, $this->suya, 2, ['estado' => 'en_curso', 'fecha_limite' => now()->addDays(5)->toDateString()]);
+    medicionDelConsultor($this, $otra, 1, ['estado' => 'en_curso', 'fecha_limite' => now()->subDays(2)->toDateString()]);
+
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->where('resumen.pendientes', 2)
+            ->where('resumen.vencidas', 1)
+            ->has('resumen.proximas', 1)
+            ->where('resumen.proximas.0.empresa.nombre', 'La Esquina')
+            ->where('resumen.proximas.0.dias', 5));
+});
+
+it('en /empresas ve "Mis empresas" (C2) solo con las suyas', function () {
+    $this->actingAs($this->consultor)
+        ->get(route('empresas.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $p) => $p
+            ->component('empresas/MisEmpresas')
+            ->has('empresas', 1)
+            ->where('empresas.0.id', $this->suya->id)
+            ->missing('sectores'));
+});
+
+it('cada tarjeta de Mis empresas trae la evolución, la última medición y la fecha límite', function () {
+    medicionDelConsultor($this, $this->suya, 2, ['estado' => 'en_curso', 'fecha_limite' => now()->subDay()->toDateString()]);
+
+    $this->actingAs($this->consultor)
+        ->get(route('empresas.index'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->where('empresas.0.evolucion', [$this->medicionSuya->resultado->puntaje_total])
+            ->where('empresas.0.ultima.id', $this->medicionSuya->id)
+            ->where('empresas.0.vence', now()->subDay()->toDateString())
+            ->where('empresas.0.vencida', true));
+
+    // El Administrador no recibe esos datos en A3.
+    $this->actingAs($this->admin)
+        ->get(route('empresas.index'))
+        ->assertInertia(fn (Assert $p) => $p->missing('empresas.0.evolucion'));
+});
+
+it('ve la ficha, el historial y los resultados de su empresa', function () {
+    $this->actingAs($this->consultor);
+
+    $this->get(route('empresas.ver', $this->suya))
+        ->assertOk()
+        ->assertInertia(fn (Assert $p) => $p->component('empresas/Ver')->where('consultores', null));
+    $this->get(route('empresas.historial', $this->suya))->assertOk();
+    $this->get(route('resultados.ver', $this->medicionSuya))->assertOk();
+    $this->get(route('resultados.respuestas', $this->medicionSuya))->assertOk();
+});
+
+it('descarga el PDF del resultado de su empresa', function () {
+    $this->actingAs($this->consultor);
+
+    expect($this->consultor->can('resultados.pdf'))->toBeTrue()
+        ->and($this->consultor->can('empresas.registrar'))->toBeFalse();
+});
+
+it('en el resultado recibe las mediciones de la empresa para pasar de una a otra', function () {
+    $segunda = medicionTerminada($this, $this->suya, 2);
+
+    $this->actingAs($this->consultor)
+        ->get(route('resultados.ver', $segunda))
+        ->assertInertia(fn (Assert $p) => $p
+            ->where('interno', true)
+            ->has('mediciones', 2)
+            ->where('mediciones.0.id', $this->medicionSuya->id)
+            ->where('mediciones.1.id', $segunda->id));
+});
+
+it('en las respuestas cada pregunta trae su nivel según el puntaje', function () {
+    $this->actingAs($this->consultor)
+        ->get(route('resultados.respuestas', $this->medicionSuya))
+        ->assertInertia(function (Assert $p) {
+            $p->component('resultados/Respuestas')->where('interno', true);
+            $pregunta = $p->toArray()['props']['categorias'][0]['preguntas'][0];
+
+            expect($pregunta)->toHaveKey('nivel');
+
+            if (is_numeric($pregunta['puntaje']) && empty($pregunta['extra'])) {
+                expect($pregunta['nivel'])->toBe(Niveles::de($pregunta['puntaje']));
+            }
+        });
+
+    // Lo guardado no cambia (RN-023).
+    expect($this->medicionSuya->resultado->fresh()->por_categoria[0]['preguntas'][0])->not->toHaveKey('nivel');
+});
+
+it('en Mi perfil ve las empresas que acompaña y no tiene avisos por correo', function () {
+    $this->actingAs($this->consultor)
+        ->get(route('profile.edit'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $p) => $p
+            ->component('perfil/MiPerfil')
+            ->has('acompanadas', 1)
+            ->where('acompanadas.0.nombre', 'La Esquina')
+            ->where('opciones.avisos', []));
+
+    // Otros roles no reciben la lista.
+    $this->actingAs($this->admin)
+        ->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $p) => $p->where('acompanadas', null));
+});
+
+it('en el historial recibe el cambio de cada categoría, de la que más bajó a la que más subió', function () {
+    $series = [
+        ['nombre' => 'Contenido', 'puntos' => [['numero' => 1, 'fecha' => null, 'puntaje' => 40], ['numero' => 2, 'fecha' => null, 'puntaje' => 70]]],
+        ['nombre' => 'Clientes', 'puntos' => [['numero' => 1, 'fecha' => null, 'puntaje' => 80], ['numero' => 2, 'fecha' => null, 'puntaje' => 50]]],
+        ['nombre' => 'Nueva', 'puntos' => [['numero' => 2, 'fecha' => null, 'puntaje' => 20]]],
+    ];
+
+    $filas = DatosHistorial::cambiosPorCategoria($series);
+
+    expect(array_column($filas, 'nombre'))->toBe(['Clientes', 'Contenido', 'Nueva'])
+        ->and($filas[0]['cambio'])->toBe(-30)
+        ->and($filas[1]['nivel'])->toBe(Niveles::de(70))
+        ->and($filas[2]['cambio'])->toBeNull();
+
+    $this->actingAs($this->consultor)
+        ->get(route('empresas.historial', $this->suya))
+        ->assertInertia(fn (Assert $p) => $p->where('interno', true)->has('cambios_categoria'));
+});
+
+it('no ve la ficha, el historial ni los resultados de otra empresa', function () {
+    $this->actingAs($this->consultor);
+
+    $this->get(route('empresas.ver', $this->otra))->assertNotFound();
+    $this->get(route('empresas.historial', $this->otra))->assertNotFound();
+    $this->get(route('resultados.ver', $this->medicionOtra))->assertNotFound();
+    $this->get(route('resultados.respuestas', $this->medicionOtra))->assertNotFound();
+    $this->get(route('resultados.pdf', $this->medicionOtra))->assertNotFound();
+});
+
+it('no responde, no asigna, no edita empresas ni toca diagnósticos', function () {
+    $this->actingAs($this->consultor);
+
+    $this->get(route('diagnosticos.index'))->assertForbidden();
+    $this->get(route('mediciones.crear'))->assertForbidden();
+    $this->get(route('empresas.crear'))->assertForbidden();
+    $this->put(route('empresas.actualizar', $this->suya), [])->assertForbidden();
+    $this->get(route('usuarios.index'))->assertForbidden();
+    $this->get(route('ia.index'))->assertForbidden();
+    $this->post(route('empresas.consultores.vincular', $this->otra), ['consultor_id' => $this->consultor->id])->assertForbidden();
+
+    expect($this->consultor->can('diagnostico.responder'))->toBeFalse();
+});
+
+it('sin empresas vinculadas no ve ninguna', function () {
+    $this->consultor->empresasAsesoradas()->detach();
+
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p->where('resumen.empresas', 0)->has('avisos', 0));
+    $this->get(route('empresas.ver', $this->suya))->assertNotFound();
+});
+
+it('el Administrador sigue viendo todas las empresas', function () {
+    $this->actingAs($this->admin)
+        ->get(route('empresas.index'))
+        ->assertInertia(fn (Assert $p) => $p->has('empresas', 2));
+    $this->get(route('empresas.ver', $this->otra))->assertOk();
+});
+
+// --- Qué atender (HU-086 CA-005) ---------------------------------------------------
+
+function medicionDelConsultor($test, Empresa $empresa, int $numero, array $datos): Medicion
+{
+    return Medicion::factory()->create([
+        'empresa_id' => $empresa->id,
+        'version_diagnostico_id' => $test->version->id,
+        'numero' => $numero,
+        ...$datos,
+    ]);
+}
+
+it('avisa del resultado nuevo de sus empresas y no de las ajenas', function () {
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->has('avisos', 1)
+            ->where('avisos.0.tipo', 'nuevo')
+            ->where('avisos.0.empresa.id', $this->suya->id)
+            ->where('avisos.0.medicion', $this->medicionSuya->id));
+});
+
+it('ordena: vencida, bajó, sin empezar y nuevo', function () {
+    // La Esquina bajó 8 puntos en su último resultado.
+    $this->medicionSuya->resultado->update(['variacion' => -8]);
+
+    // Una vencida y una sin empezar hace 10 días, en otras dos empresas suyas.
+    $vencida = Empresa::factory()->create(['nombre' => 'Zapatería Sol', 'sector_id' => $this->suya->sector_id]);
+    $quieta = Empresa::factory()->create(['nombre' => 'Arepas Ya', 'sector_id' => $this->suya->sector_id]);
+    $this->consultor->empresasAsesoradas()->attach([$vencida->id, $quieta->id]);
+
+    medicionDelConsultor($this, $vencida, 1, ['estado' => 'en_curso', 'fecha_limite' => now()->subDays(3)->toDateString()]);
+    $sinEmpezar = medicionDelConsultor($this, $quieta, 1, ['estado' => 'no_iniciada', 'fecha_limite' => now()->addDays(20)->toDateString()]);
+    $sinEmpezar->forceFill(['created_at' => now()->subDays(10)])->save();
+
+    // Recién asignada: todavía no avisa.
+    medicionDelConsultor($this, $this->suya, 2, ['estado' => 'no_iniciada', 'fecha_limite' => now()->addDays(20)->toDateString()]);
+
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->has('avisos', 3)
+            ->where('avisos.0.tipo', 'vencida')
+            ->where('avisos.0.empresa.nombre', 'Zapatería Sol')
+            ->where('avisos.1.tipo', 'bajo')
+            ->where('avisos.1.puntos', 8)
+            ->where('avisos.2.tipo', 'sin_empezar')
+            ->where('avisos.2.dias', 10));
+});
+
+it('un resultado de hace más de una semana ya no es nuevo', function () {
+    $this->medicionSuya->resultado->update(['publicado_en' => now()->subDays(DatosInicioConsultor::DIAS_NUEVO + 1)]);
+
+    $this->actingAs($this->consultor)
+        ->get(route('inicio.administrador'))
+        ->assertInertia(fn (Assert $p) => $p->has('avisos', 0));
+});
+
+// --- Vincular (HU-085) --------------------------------------------------------------
+
+it('el Administrador ve la pestaña Consultores con los vinculados y los disponibles', function () {
+    $otroConsultor = User::factory()->create(['name' => 'Bruno'])->assignRole('Consultor');
+
+    $this->actingAs($this->admin)
+        ->get(route('empresas.ver', $this->suya))
+        ->assertInertia(fn (Assert $p) => $p
+            ->has('consultores.vinculados', 1)
+            ->where('consultores.vinculados.0.nombre', 'Valeria Consultora')
+            ->where('consultores.vinculados.0.empresas', 1)
+            ->has('consultores.disponibles', 1)
+            ->where('consultores.disponibles.0.id', $otroConsultor->id));
+});
+
+it('vincula un consultor a varias empresas y lo quita', function () {
+    $this->actingAs($this->admin)
+        ->post(route('empresas.consultores.vincular', $this->otra), ['consultor_id' => $this->consultor->id])
+        ->assertSessionHasNoErrors();
+
+    expect($this->consultor->empresasAsesoradas()->pluck('empresas.id')->sort()->values()->all())
+        ->toBe([$this->suya->id, $this->otra->id]);
+
+    $this->delete(route('empresas.consultores.quitar', [$this->otra, $this->consultor]))->assertRedirect();
+
+    expect($this->consultor->empresasAsesoradas()->pluck('empresas.id')->all())->toBe([$this->suya->id]);
+});
+
+it('solo vincula cuentas con el rol Consultor', function () {
+    $empresa = User::factory()->create()->assignRole('Administrador');
+
+    $this->actingAs($this->admin)
+        ->post(route('empresas.consultores.vincular', $this->otra), ['consultor_id' => $empresa->id])
+        ->assertSessionHasErrors('consultor_id');
+
+    expect($this->otra->consultores()->count())->toBe(0);
+});
+
+it('invita un consultor con sus empresas', function () {
+    $this->actingAs($this->admin)
+        ->post(route('usuarios.invitar'), [
+            'name' => 'Camilo',
+            'email' => 'camilo@asesores.co',
+            'rol_id' => Role::findByName('Consultor')->id,
+            'empresas' => [$this->suya->id, $this->otra->id],
+        ])
+        ->assertSessionHasNoErrors();
+
+    $camilo = User::where('email', 'camilo@asesores.co')->firstOrFail();
+
+    expect($camilo->esConsultor())->toBeTrue()
+        ->and($camilo->empresasAsesoradas()->count())->toBe(2);
+});
+
+it('al invitar con otro rol no vincula empresas', function () {
+    $this->actingAs($this->admin)
+        ->post(route('usuarios.invitar'), [
+            'name' => 'Ana',
+            'email' => 'ana@nuevastic.co',
+            'rol_id' => Role::findByName('Administrador')->id,
+            'empresas' => [$this->suya->id],
+        ])
+        ->assertSessionHasNoErrors();
+
+    expect(User::where('email', 'ana@nuevastic.co')->firstOrFail()->empresasAsesoradas()->count())->toBe(0);
+});
+
+it('al dejar de ser Consultor pierde sus empresas', function () {
+    $this->actingAs($this->admin)
+        ->put(route('usuarios.cambiar-rol', $this->consultor), ['rol_id' => Role::findByName('Administrador')->id])
+        ->assertSessionHasNoErrors();
+
+    expect($this->consultor->fresh()->empresasAsesoradas()->count())->toBe(0);
+});

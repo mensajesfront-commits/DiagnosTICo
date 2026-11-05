@@ -9,6 +9,7 @@
  *
  * Envía: POST /empresas/{id}/desactivar con motivo y avisar.
  */
+import { Ban } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
@@ -54,6 +55,8 @@ const plural = (n: number, uno: string, varios: string) =>
     <Modal
         v-model:abierto="abierto"
         :titulo="`¿Desactivar la cuenta de ${empresa.nombre}?`"
+        :icono="Ban"
+        tono="alerta"
     >
         <div class="flex flex-col gap-4 text-sm">
             <p>

@@ -9,6 +9,7 @@ use App\Models\Empresa;
 use App\Models\User;
 use App\Services\Acceso\CodigoVerificacion;
 use App\Support\HistorialContrasenas;
+use App\Support\Invitaciones;
 use App\Support\OpcionesPerfil;
 use App\Support\Ubicaciones;
 use Illuminate\Database\Eloquent\Collection;
@@ -61,6 +62,11 @@ class PerfilController extends Controller
                 'telefono_pendiente' => $usuario->telefono_pendiente,
             ],
             'rol' => $rol,
+            // A6 · El Consultor ve las empresas que acompaña (RN-030).
+            'acompanadas' => $usuario->esConsultor()
+                ? $usuario->empresasAsesoradas()->orderBy('nombre')->get(['empresas.id', 'empresas.nombre'])
+                    ->map(fn ($e) => ['id' => $e->id, 'nombre' => $e->nombre])->values()->all()
+                : null,
             // Solo la cuenta principal del Administrador se elimina a sí misma.
             'principal' => $usuario->administrador_principal ? [
                 'sucesores' => self::sucesores($usuario)->map(fn (User $u) => ['id' => $u->id, 'nombre' => $u->name, 'correo' => $u->email])->values()->all(),
@@ -263,7 +269,7 @@ class PerfilController extends Controller
         DB::transaction(function () use ($yo, $sucesor): void {
             $yo->forceFill(['administrador_principal' => false])->save();
             $sucesor->forceFill(['administrador_principal' => true])->save();
-            DB::table('password_reset_tokens')->where('email', $yo->email)->delete();
+            Invitaciones::borrarEnlaces($yo->email);
             $yo->delete();
         });
 
@@ -355,13 +361,15 @@ class PerfilController extends Controller
 
         if ($tipo === 'empresa') {
             $ruta = Empresa::findOrFail($id)->logo_ruta;
-            $propia = $usuario->empresa_id === $id;
+            $puede = $usuario->puedeVerEmpresa($id) || $usuario->can('usuarios.ver');
         } else {
             $ruta = User::findOrFail($id)->foto_ruta;
-            $propia = $usuario->id === $id;
+            // El consultor no ve fotos de otras cuentas (RN-030).
+            $puede = $usuario->id === $id || $usuario->can('usuarios.ver')
+                || ($usuario->can('empresas.ver') && ! $usuario->esConsultor());
         }
 
-        abort_unless($propia || $usuario->can('empresas.ver') || $usuario->can('usuarios.ver'), 403);
+        abort_unless($puede, 403);
         abort_unless($ruta && Storage::exists($ruta), 404);
 
         return Storage::response($ruta);

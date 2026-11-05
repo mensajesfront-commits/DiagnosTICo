@@ -20,6 +20,7 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             verComo: VerComo | null;
+            soporte: string;
             [key: string]: unknown;
         };
     }

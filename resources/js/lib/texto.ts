@@ -49,3 +49,8 @@ export function opcionExacta(
         ? undefined
         : opciones.find((o) => normalizar(o) === buscado);
 }
+
+/** "1 empresa", "3 empresas". */
+export function plural(n: number, uno: string, varios: string): string {
+    return `${n} ${n === 1 ? uno : varios}`;
+}

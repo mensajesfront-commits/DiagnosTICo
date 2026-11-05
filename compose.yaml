@@ -24,6 +24,39 @@ services:
         depends_on:
             - pgsql
             - mailpit
+    # Trabajador de la cola: procesa el análisis de la IA, los PDF y los
+    # correos. Arranca solo con `sail up`, sin dejar una terminal abierta.
+    queue:
+        image: 'sail-8.4/app'
+        command: ['php', 'artisan', 'queue:work', '--sleep=1']
+        restart: unless-stopped
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
+            - pgsql
+            - mailpit
+    # Tareas programadas: mediciones vencidas, cuentas por borrar y el
+    # resumen semanal (routes/console.php).
+    scheduler:
+        image: 'sail-8.4/app'
+        command: ['php', 'artisan', 'schedule:work']
+        restart: unless-stopped
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
+            - pgsql
     pgsql:
         image: 'postgres:18-alpine'
         ports:

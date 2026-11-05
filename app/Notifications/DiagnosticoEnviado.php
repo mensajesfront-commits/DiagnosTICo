@@ -32,7 +32,7 @@ class DiagnosticoEnviado extends Notification implements ShouldQueue
     {
         $empresa = $this->medicion->empresa->nombre ?? '';
 
-        return (new MailMessage)
+        return (new Correo)
             ->subject("{$empresa} envió su diagnóstico")
             ->line("{$empresa} envió la medición {$this->medicion->numero}. La IA ya la está analizando.")
             ->line('Cuando termine, el resultado queda publicado y la empresa recibe su aviso.')

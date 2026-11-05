@@ -5,6 +5,7 @@
  *
  * Envía: DELETE /diagnosticos/{id}/preguntas/{pregunta}.
  */
+import { Trash2 } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
@@ -51,6 +52,8 @@ const quedan = () => props.parte.preguntas.length - 1;
     <Modal
         v-model:abierto="abierto"
         :titulo="`¿Eliminar la pregunta ${numero}?`"
+        :icono="Trash2"
+        tono="peligro"
     >
         <div class="flex flex-col gap-3 text-sm">
             <div class="rounded-md bg-lienzo px-4 py-3">

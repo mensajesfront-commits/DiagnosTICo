@@ -211,3 +211,25 @@ it('con la opción "Otro" guarda lo que escribió y sin ella lo descarta', funct
     $this->actingAs($this->laura)->get(route('responder.mostrar', $this->medicion))
         ->assertInertia(fn (Assert $p) => $p->where('categorias.0.preguntas.0.opciones.1.con_texto', true));
 });
+
+it('"Ir a la pregunta" de E3 lleva a la primera obligatoria que falta, no solo a su categoría', function () {
+    $categorias = $this->version->contenido['categorias'];
+    $primera = collect($categorias[0]['preguntas'])->firstWhere('obligatoria', true);
+
+    $this->actingAs($this->laura)->get(route('responder.revisar', $this->medicion))
+        ->assertInertia(fn (Assert $p) => $p->where('avance.categorias.0.primera_faltante', $primera['ref']));
+
+    $this->get(route('responder.mostrar', ['medicion' => $this->medicion, 'categoria' => 0, 'pregunta' => $primera['ref']]))
+        ->assertInertia(fn (Assert $p) => $p->where('categoriaInicial', 0)->where('preguntaInicial', $primera['ref']));
+
+    // Una pregunta que no es de esa categoría (o no existe) se ignora.
+    $this->get(route('responder.mostrar', ['medicion' => $this->medicion, 'categoria' => 0, 'pregunta' => 'p-inventada']))
+        ->assertInertia(fn (Assert $p) => $p->where('preguntaInicial', null));
+});
+
+it('sin obligatorias pendientes, la categoría no tiene pregunta a la que ir', function () {
+    responderTodo($this);
+
+    $this->actingAs($this->laura)->get(route('responder.revisar', $this->medicion))
+        ->assertInertia(fn (Assert $p) => $p->where('avance.categorias.0.primera_faltante', null));
+});

@@ -23,7 +23,7 @@ class DatosUsuarios
         'Administrador' => 'Acceso total',
         'Empresa' => 'Responde y ve sus resultados',
         'Colaborador' => 'Sin gestionar equipo',
-        'Consultor' => 'Próxima fase',
+        'Consultor' => 'Solo mira sus empresas',
     ];
 
     /** Aclaraciones junto a los permisos (A5.1b, A5.1e, A5.1c). */
@@ -35,9 +35,11 @@ class DatosUsuarios
             'resultados.ver' => 'si su empresa se lo da',
             'resultados.pdf' => 'si su empresa se lo da',
         ],
+        // RN-030: externo; solo mira las empresas que le vincula el Administrador.
         'Consultor' => [
             'empresas.ver' => 'solo las vinculadas',
-            'diagnostico.responder' => 'en nombre de la empresa',
+            'resultados.ver' => 'de sus empresas',
+            'resultados.pdf' => 'de sus empresas',
         ],
     ];
 
@@ -49,9 +51,6 @@ class DatosUsuarios
 
     /** Aviso de un rol creado e inactivo (A5.1c). */
     private const string AVISO_INACTIVO = 'Este rol está inactivo: sus cuentas no pueden entrar hasta que les asignes otro rol, y no se puede asignar a ninguna cuenta hasta que lo actives.';
-
-    /** Aviso del rol Consultor (A5.1c, PA-006). */
-    private const string AVISO_CONSULTOR = 'Disponible en la próxima fase: vincular empresas. Hasta entonces este rol queda inactivo y no se puede asignar a ninguna cuenta.';
 
     /**
      * Todas las cuentas, de la más reciente a la más antigua, con su rol y su
@@ -195,7 +194,7 @@ class DatosUsuarios
                 'es_tuya' => $u->id === auth()->id(),
                 'es_admin_principal' => $u->administrador_principal,
             ])->values()->all(),
-            'aviso' => $activo ? null : ($r->name === 'Consultor' ? self::AVISO_CONSULTOR : self::AVISO_INACTIVO),
+            'aviso' => $activo ? null : self::AVISO_INACTIVO,
         ];
     }
 

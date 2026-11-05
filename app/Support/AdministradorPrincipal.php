@@ -4,9 +4,7 @@ namespace App\Support;
 
 use App\Models\User;
 use App\Notifications\InvitacionCuenta;
-use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Password;
 use Throwable;
 
 /**
@@ -30,9 +28,8 @@ final class AdministradorPrincipal
      */
     public static function invitar(User $admin): ?string
     {
-        /** @var PasswordBroker $broker */
-        $broker = Password::broker();
-        $token = $broker->createToken($admin);
+        // El enlace de invitación sirve hasta usarlo (ERR-09).
+        $token = Invitaciones::broker()->createToken($admin);
 
         try {
             $admin->notifyNow(new InvitacionCuenta($token, 'Administrador'));

@@ -10,6 +10,7 @@
  *   IA" y el "Ten en cuenta".
  * - Texto exacto: lo que recibe la IA, con "Copiar texto exacto".
  */
+import { ScrollText } from '@lucide/vue';
 import { ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
@@ -89,6 +90,7 @@ const tipos = {
         ancho="xl"
         titulo="Instrucciones completas · Analizar categoría"
         descripcion="Así lee la IA las instrucciones en un caso real: las partes ya unidas y los datos reemplazados, con los cambios que aún no guardas."
+        :icono="ScrollText"
     >
         <div class="flex flex-col gap-4">
             <div class="flex flex-wrap items-end gap-3">

@@ -9,6 +9,7 @@
  * se pudo poner en marcha, se avisa y se puede reintentar (CA-005).
  */
 import { router, useForm } from '@inertiajs/vue3';
+import { Mail } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
@@ -111,8 +112,10 @@ function probar(): void {
 <template>
     <Modal
         v-model:abierto="abierto"
-        ancho="xl"
+        ancho="2xl"
         :titulo="`${accion} · medición ${medicion.numero} de ${empresa}`"
+        descripcion="Se envía al usuario principal de la empresa. Las variables se llenan solas."
+        :icono="Mail"
     >
         <p v-if="cargando" class="py-10 text-center text-sm text-tinta-suave">
             Cargando el correo…

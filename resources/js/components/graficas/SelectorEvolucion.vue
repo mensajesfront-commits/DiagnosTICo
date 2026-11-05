@@ -18,7 +18,7 @@ const elegida = defineModel<string>({ default: '' });
         Ver:
         <select
             v-model="elegida"
-            class="h-7 max-w-52 rounded-md border border-linea-fuerte bg-white px-2 text-xs text-tinta"
+            class="h-7 w-52 truncate rounded-md border border-linea-fuerte bg-white px-2 text-xs text-tinta"
         >
             <option value="">Puntaje total</option>
             <option v-for="c in categorias" :key="c.nombre" :value="c.nombre">

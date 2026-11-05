@@ -14,6 +14,7 @@
  * resto de formularios (pedido del equipo, 8 oct). `sectorActual` indica que
  * se está editando (A3.1d).
  */
+import { Building2, UserRound } from '@lucide/vue';
 import { computed, watch } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Campo from '@/components/base/Campo.vue';
@@ -93,7 +94,15 @@ const id = (campo: string) => `${props.prefijo}-${campo}`;
         <legend
             class="mb-1 text-xs font-semibold tracking-wide text-tinta-suave uppercase"
         >
-            {{ sectorActual ? 'Empresa' : 'La empresa' }}
+            <span class="inline-flex items-center gap-2">
+                <span
+                    class="flex size-6 items-center justify-center rounded-md bg-marca-suave text-marca"
+                    aria-hidden="true"
+                >
+                    <Building2 class="size-3.5" />
+                </span>
+                {{ sectorActual ? 'Empresa' : 'La empresa' }}
+            </span>
         </legend>
         <div class="grid gap-x-4 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
             <Campo
@@ -250,7 +259,15 @@ const id = (campo: string) => `${props.prefijo}-${campo}`;
         <legend
             class="mb-1 text-xs font-semibold tracking-wide text-tinta-suave uppercase"
         >
-            Usuario principal
+            <span class="inline-flex items-center gap-2">
+                <span
+                    class="flex size-6 items-center justify-center rounded-md bg-marca-suave text-marca"
+                    aria-hidden="true"
+                >
+                    <UserRound class="size-3.5" />
+                </span>
+                Usuario principal
+            </span>
         </legend>
         <div class="grid gap-x-4 gap-y-3 sm:grid-cols-2 xl:grid-cols-4">
             <Campo

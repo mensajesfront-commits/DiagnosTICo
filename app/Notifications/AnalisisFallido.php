@@ -36,7 +36,7 @@ class AnalisisFallido extends Notification implements ShouldQueue
         $categorias = $medicion->version->contenido['categorias'] ?? [];
         $nombre = collect($categorias)->firstWhere('ref', $this->analisis->categoria_ref)['nombre'] ?? $this->analisis->categoria_ref;
 
-        $correo = (new MailMessage)
+        $correo = (new Correo)
             ->subject("No se pudo analizar una categoría de {$medicion->empresa->nombre}")
             ->line("La IA no pudo analizar «{$nombre}» de la medición {$medicion->numero} de {$medicion->empresa->nombre} después de {$this->analisis->intentos} intentos.")
             ->line('Las demás categorías conservan su análisis. La empresa ve el aviso y puede reintentar; revisa la clave y el modelo de OpenAI en el .env si el error se repite.');

@@ -4,21 +4,20 @@
 
 ## 1. Dónde queda el proyecto en la entrega
 
-- **Historias:** 79 de 84 hechas (`05_REQUISITOS_FUNCIONALES.md`). Las 5 que faltan (HU-071 a HU-075, bot de WhatsApp) están aplazadas.
+- **Historias:** 79 de 84 hechas en este repositorio (`05_REQUISITOS_FUNCIONALES.md`). Las 5 del bot de WhatsApp (HU-071 a HU-075) las terminó otra persona del equipo, fuera de este repositorio.
 - **Flujo completo:** registrar la empresa → asignar la medición → responder → análisis de la IA por categoría → resultado, historial y PDF.
 - **Configuración:** el Administrador maneja sectores, categorías, diagnósticos con versiones, la IA por capas, las cuentas, los roles y "Ver como".
-- **Entrega:** se entrega el repositorio, sin despliegue (DEC-006).
+- **Entrega:** se entrega el repositorio y **el sistema se va a desplegar** (DEC-006 cambió el 4 de noviembre; pasos en `20_DESPLIEGUE.md`).
 
 ## 2. Antes de usarlo con empresas reales
 
 | Prioridad | Qué | Por qué |
 |---|---|---|
-| Alta | Cargar los diagnósticos reales de cada sector | NuevasTIC los genera con IA y los carga a mano en la aplicación cuando se lance (T-072). |
+| Alta | Cargar los diagnósticos reales de cada sector | NuevasTIC los genera con IA y los carga a mano en la aplicación cuando se lance (T-072). Confirmado el 4 de noviembre. |
 | Alta | Revisar con NuevasTIC las instrucciones de la IA | Las escribió el equipo. Las frases de los niveles ya están aprobadas. |
-| Alta | Definir el servidor, el dominio, el correo SMTP y las llaves de Turnstile | Sin esto no se puede poner en línea (`20_DESPLIEGUE.md`). OpenAI lo paga NuevasTIC, con gpt-4.1-mini. |
-| Media | Correo de soporte real (`SOPORTE_EMAIL`) | Lo ve la empresa con una medición vencida. |
+| Alta | Definir el servidor, el dominio y el correo SMTP | Sin esto no se puede poner en línea (`20_DESPLIEGUE.md`). Las llaves reales de Turnstile ya existen (4 de noviembre). OpenAI lo paga NuevasTIC, con gpt-4.1-mini. |
 
-## 3. Mejoras propuestas
+## 3. Mejoras propuestas (después de desplegar)
 
 | Prioridad | Qué | Notas |
 |---|---|---|
@@ -32,10 +31,10 @@
 
 ## 4. Funcionalidades aplazadas
 
+El bot de WhatsApp (EP-013, HU-071 a HU-075) ya no está aplazado: lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
+
 | Qué | Estado | Qué falta para retomarlo |
 |---|---|---|
-| Bot de WhatsApp (EP-013, HU-071 a HU-075) | Lo hace otra persona del equipo, aparte de este repositorio | El texto del saludo (PA-001), cómo se configuran las preguntas (PA-002), un número de Meta y un servidor con HTTPS para el webhook (RN-029). |
-| Rol Consultor | Existe inactivo (PA-006) | Definir qué empresas ve cada consultor. Necesita una tabla `consultor_empresa` (`12_BASE_DE_DATOS.md`). |
 | Rol Usuario | Sin historias | Definir para qué sirve. |
 | Comparación con promedios | Fuera del alcance (RN-028) | Lo decide NuevasTIC. |
 

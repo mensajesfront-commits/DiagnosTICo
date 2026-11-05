@@ -12,13 +12,23 @@
  * nuevo o los dos: pasa sus propias `rutas`, `cambio` y, si cambia el
  * teléfono, `telefono` (cerrar descarta el cambio). El código llega al
  * correo nuevo o, si solo cambia el teléfono, al actual.
+ *
+ * Diseño: el código se ve en 6 casillas, pero es un solo campo (invisible
+ * encima de ellas), así pegar o autocompletar el código sigue funcionando.
+ * "Reenviar código" es un botón con la cuenta regresiva en un anillo.
  */
 import { router, useForm } from '@inertiajs/vue3';
-import { MailCheck } from '@lucide/vue';
+import {
+    CircleCheck,
+    Clock,
+    MailCheck,
+    RotateCcw,
+    ShieldCheck,
+} from '@lucide/vue';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import Aviso from '@/components/base/Aviso.vue';
 import Boton from '@/components/base/Boton.vue';
 import Modal from '@/components/base/Modal.vue';
+import { cn } from '@/lib/utils';
 import { rutas } from '@/lib/rutas';
 
 type Rutas = { verificar: string; reenviar: string; cancelar: string };
@@ -80,6 +90,14 @@ function escribir(evento: Event): void {
     }
 }
 
+// --- Casillas ---------------------------------------------------------------
+const enfocado = ref(false);
+const casillas = computed(() =>
+    Array.from({ length: 6 }, (_, i) => form.codigo[i] ?? ''),
+);
+/** Casilla donde va el siguiente dígito (la última si ya están los 6). */
+const actual = computed(() => Math.min(form.codigo.length, 5));
+
 // --- Reenviar, con espera de 60 segundos ------------------------------------
 const espera = ref(60);
 let reloj: ReturnType<typeof setInterval> | undefined;
@@ -97,6 +115,10 @@ function contar(): void {
 }
 
 onMounted(contar);
+
+/** Anillo de la cuenta regresiva (radio 9). */
+const CIRCUNFERENCIA = 2 * Math.PI * 9;
+const desfase = computed(() => CIRCUNFERENCIA * (1 - espera.value / 60));
 onBeforeUnmount(() => clearInterval(reloj));
 
 const reenviando = ref(false);
@@ -123,10 +145,17 @@ watch(abierto, (valor) => {
 </script>
 
 <template>
-    <Modal v-model:abierto="abierto" :titulo="titulo" ancho="sm">
+    <Modal
+        v-model:abierto="abierto"
+        :titulo="titulo"
+        ancho="sm"
+        :icono="MailCheck"
+    >
         <template #descripcion>
             Enviamos un código de 6 dígitos a
-            <strong class="text-tinta">{{ correo }}</strong
+            <strong class="[overflow-wrap:anywhere] text-tinta">{{
+                correo
+            }}</strong
             ><template v-if="!(cambio && telefono)">.</template>
             <template v-if="cambio && telefono && !cambiaCorreo">
                 para confirmar tu nuevo teléfono
@@ -148,47 +177,88 @@ watch(abierto, (valor) => {
             novalidate
             @submit.prevent="verificar"
         >
-            <div
-                class="flex items-start gap-3 rounded-lg bg-lienzo px-3 py-3 text-xs text-tinta-suave"
-            >
-                <MailCheck
-                    class="mt-0.5 size-5 shrink-0 text-marca"
-                    aria-hidden="true"
-                />
-                <p>
-                    Revisa tu bandeja de entrada y la carpeta de spam. El código
-                    vence en 15 minutos.
-                </p>
-            </div>
-
             <div>
                 <label for="codigo" class="text-xs font-medium text-tinta">
                     Código de verificación
                     <span class="text-aviso" aria-hidden="true">*</span>
                 </label>
-                <input
-                    id="codigo"
-                    :value="form.codigo"
-                    type="text"
-                    inputmode="numeric"
-                    autocomplete="one-time-code"
-                    maxlength="6"
-                    placeholder="000000"
-                    :aria-invalid="!!form.errors.codigo || undefined"
-                    class="mt-1.5 h-14 w-full rounded-md border border-linea-fuerte bg-white text-center font-mono text-3xl tracking-[0.5em] text-tinta placeholder:text-tinta-suave/40 focus-visible:border-marca focus-visible:ring-2 focus-visible:ring-marca/25 focus-visible:outline-none"
-                    :class="form.errors.codigo && 'border-aviso'"
-                    @input="escribir"
-                />
+                <div class="relative mt-2">
+                    <!-- Lo que se ve: 6 casillas -->
+                    <div
+                        class="grid grid-cols-6 gap-1.5 sm:gap-2"
+                        aria-hidden="true"
+                    >
+                        <span
+                            v-for="(digito, i) in casillas"
+                            :key="i"
+                            :class="
+                                cn(
+                                    'flex h-14 items-center justify-center rounded-xl border bg-white font-mono text-2xl font-semibold text-tinta transition-colors',
+                                    form.errors.codigo
+                                        ? 'border-aviso bg-aviso-suave/40'
+                                        : enfocado && i === actual
+                                          ? 'border-marca ring-2 ring-marca/25'
+                                          : digito
+                                            ? 'border-marca/40 bg-marca-suave/40'
+                                            : 'border-linea-fuerte',
+                                )
+                            "
+                        >
+                            <template v-if="digito">{{ digito }}</template>
+                            <span
+                                v-else-if="enfocado && i === actual"
+                                class="h-6 w-0.5 animate-pulse rounded-full bg-marca"
+                            />
+                            <span v-else class="text-tinta-suave/30">·</span>
+                        </span>
+                    </div>
+                    <!-- El campo real, invisible encima -->
+                    <input
+                        id="codigo"
+                        :value="form.codigo"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        maxlength="6"
+                        :aria-invalid="!!form.errors.codigo || undefined"
+                        :aria-describedby="
+                            form.errors.codigo ? 'codigo-error' : 'codigo-ayuda'
+                        "
+                        class="absolute inset-0 h-full w-full cursor-text opacity-0"
+                        @input="escribir"
+                        @focus="enfocado = true"
+                        @blur="enfocado = false"
+                    />
+                </div>
                 <p
                     v-if="form.errors.codigo"
-                    class="mt-1 text-xs text-aviso"
+                    id="codigo-error"
+                    class="mt-1.5 text-xs text-aviso"
                     role="alert"
                 >
                     {{ form.errors.codigo }}
                 </p>
+                <p
+                    v-else
+                    id="codigo-ayuda"
+                    class="mt-1.5 flex items-center gap-1.5 text-xs text-tinta-suave"
+                >
+                    <Clock class="size-3.5 shrink-0" aria-hidden="true" />
+                    Vence en 15 minutos. Revisa también la carpeta de spam.
+                </p>
             </div>
 
-            <Aviso v-if="status" tono="exito">{{ status }}</Aviso>
+            <p
+                v-if="status"
+                class="flex items-start gap-2 rounded-xl bg-exito-suave px-3 py-2.5 text-sm text-exito"
+                role="status"
+            >
+                <CircleCheck
+                    class="mt-0.5 size-4 shrink-0"
+                    aria-hidden="true"
+                />
+                {{ status }}
+            </p>
 
             <Boton
                 type="submit"
@@ -196,24 +266,54 @@ watch(abierto, (valor) => {
                 :cargando="form.processing"
                 :disabled="form.codigo.length !== 6"
             >
+                <ShieldCheck class="size-4" aria-hidden="true" />
                 Verificar
             </Boton>
 
-            <p class="text-center text-sm text-tinta-suave">
-                ¿No te llegó?
+            <div
+                class="flex items-center justify-between gap-3 rounded-xl bg-lienzo px-3 py-2.5"
+            >
+                <p class="text-sm text-tinta-suave">¿No te llegó?</p>
                 <button
                     type="button"
-                    class="text-marca underline underline-offset-2 hover:text-marca-hover disabled:text-tinta-suave disabled:no-underline"
+                    class="inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-marca hover:bg-white focus-visible:ring-2 focus-visible:ring-marca/40 focus-visible:outline-none disabled:text-tinta-suave disabled:hover:bg-transparent"
                     :disabled="espera > 0 || reenviando"
                     @click="reenviar"
                 >
+                    <svg
+                        v-if="espera > 0"
+                        viewBox="0 0 22 22"
+                        class="size-5 -rotate-90"
+                        aria-hidden="true"
+                    >
+                        <circle
+                            cx="11"
+                            cy="11"
+                            r="9"
+                            fill="none"
+                            stroke-width="2.5"
+                            class="stroke-lienzo-oscuro"
+                        />
+                        <circle
+                            cx="11"
+                            cy="11"
+                            r="9"
+                            fill="none"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            class="stroke-marca transition-[stroke-dashoffset] duration-1000 ease-linear"
+                            :stroke-dasharray="CIRCUNFERENCIA"
+                            :stroke-dashoffset="desfase"
+                        />
+                    </svg>
+                    <RotateCcw v-else class="size-4" aria-hidden="true" />
                     {{
                         espera > 0
-                            ? `Reenviar código en ${espera} s`
+                            ? `Reenviar en ${espera} s`
                             : 'Reenviar código'
                     }}
                 </button>
-            </p>
+            </div>
         </form>
     </Modal>
 </template>

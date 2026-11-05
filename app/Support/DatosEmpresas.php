@@ -23,13 +23,28 @@ class DatosEmpresas
     public const array PENDIENTES = ['no_iniciada', 'en_curso', 'enviada', 'vencida'];
 
     /**
-     * A3 · Todas las empresas (no eliminadas), por nombre.
+     * Empresas para elegir al invitar un Consultor (HU-085).
+     *
+     * @return array<int, array{id: int, nombre: string}>
+     */
+    public static function paraElegir(): array
+    {
+        return Empresa::orderBy('nombre')->get(['id', 'nombre'])
+            ->map(fn (Empresa $e) => ['id' => $e->id, 'nombre' => $e->nombre])
+            ->values()->all();
+    }
+
+    /**
+     * A3 · Todas las empresas (no eliminadas), por nombre. Para un
+     * consultor, solo las que tiene vinculadas (RN-030).
      *
      * @return list<array<string, mixed>>
      */
-    public static function lista(): array
+    public static function lista(?User $para = null): array
     {
         $empresas = Empresa::query()
+            // El consultor solo ve las empresas que tiene vinculadas (RN-030).
+            ->when($para?->esConsultor(), fn ($q) => $q->whereIn('id', $para->empresasAsesoradas()->select('empresas.id')))
             ->with(['sector:id,nombre', 'mediciones' => fn ($q) => $q->where('estado', '!=', 'cancelada')->with(['resultado', 'version:id,contenido'])])
             ->orderBy('nombre')
             ->get();
@@ -38,6 +53,7 @@ class DatosEmpresas
         $solicitudes = SolicitudMedicion::abiertasDe($empresas->modelKeys());
         Plazos::precargar($empresas->modelKeys());
         $lista = [];
+        $consultor = $para?->esConsultor() ?? false;
 
         foreach ($empresas as $empresa) {
             [$ultimo, $variacion] = self::ultimoResultado($empresa->mediciones);
@@ -57,6 +73,9 @@ class DatosEmpresas
                     'solicitud' => $solicitudes[$empresa->id] ?? null,
                 ] : null,
                 'activa' => $empresa->activa,
+                // C2 · Mis empresas del Consultor: la línea de evolución, el
+                // último resultado y la fecha límite de la pendiente.
+                ...($consultor ? self::extrasConsultor($empresa, $ultimo, $pendiente) : []),
             ];
         }
 
@@ -220,14 +239,26 @@ class DatosEmpresas
      */
     public static function diagnosticosPublicados(int $sectorId): array
     {
-        return array_values(Diagnostico::query()
-            ->where('sector_id', $sectorId)
+        return array_values(self::diagnosticosPorSector([$sectorId])[$sectorId] ?? []);
+    }
+
+    /**
+     * Lo mismo para varios sectores en una sola consulta (ERR-10).
+     *
+     * @param  array<int, int|string>  $sectorIds
+     * @return array<int|string, array<int, array<string, mixed>>>
+     */
+    private static function diagnosticosPorSector(array $sectorIds): array
+    {
+        return Diagnostico::query()
+            ->whereIn('sector_id', $sectorIds)
             ->where('estado', Diagnostico::PUBLICADO)
             ->with('ultimaVersion')
             ->orderBy('nombre')
             ->get()
             ->filter(fn (Diagnostico $d) => $d->ultimaVersion !== null)
-            ->map(function (Diagnostico $d): array {
+            ->groupBy('sector_id')
+            ->map(fn (Collection $grupo) => $grupo->map(function (Diagnostico $d): array {
                 /** @var list<array{preguntas?: list<mixed>}> $categorias */
                 $categorias = $d->ultimaVersion->contenido['categorias'] ?? [];
 
@@ -238,9 +269,8 @@ class DatosEmpresas
                     'categorias' => count($categorias),
                     'preguntas' => array_sum(array_map(fn (array $c) => count($c['preguntas'] ?? []), $categorias)),
                 ];
-            })
-            ->values()
-            ->all());
+            })->values()->all())
+            ->all();
     }
 
     /**
@@ -250,15 +280,21 @@ class DatosEmpresas
      */
     public static function opciones(): array
     {
+        $sectores = Sector::query()->orderBy('nombre')->get(['id', 'nombre', 'activo']);
+        // Actividades y diagnósticos de todos los sectores en dos consultas (ERR-10).
+        $actividades = ActividadEconomica::query()->where('activo', true)->orderBy('codigo')
+            ->get(['id', 'sector_id', 'codigo', 'nombre'])->groupBy('sector_id');
+        $diagnosticos = self::diagnosticosPorSector($sectores->modelKeys());
+
         return [
-            'sectores' => Sector::query()->orderBy('nombre')->get(['id', 'nombre', 'activo'])
+            'sectores' => $sectores
                 ->map(fn (Sector $s) => [
                     'id' => $s->id,
                     'nombre' => $s->nombre,
                     'activo' => $s->activo,
-                    'actividades' => ActividadEconomica::where('sector_id', $s->id)->where('activo', true)->orderBy('codigo')
-                        ->get(['id', 'codigo', 'nombre'])->toArray(),
-                    'diagnosticos' => self::diagnosticosPublicados($s->id),
+                    'actividades' => ($actividades->get($s->id) ?? collect())
+                        ->map(fn (ActividadEconomica $a) => ['id' => $a->id, 'codigo' => $a->codigo, 'nombre' => $a->nombre])->values()->all(),
+                    'diagnosticos' => $diagnosticos[$s->id] ?? [],
                 ])->all(),
             'paises' => Ubicaciones::paises(),
             'empleados' => OpcionesPerfil::RANGOS_EMPLEADOS,
@@ -294,6 +330,31 @@ class DatosEmpresas
             'numero' => $m->numero,
             'estado' => $estado,
             'avance' => $estado !== 'no_iniciada' && $m->version ? DatosInicio::avance($m->version->contenido, $refs) : null,
+        ];
+    }
+
+    /**
+     * C2 · Lo que la tarjeta del consultor muestra además de la fila de A3.
+     *
+     * @return array{evolucion: list<int>, ultima: array{id: int, numero: int, fecha: string}|null, vence: string|null, vencida: bool}
+     */
+    private static function extrasConsultor(Empresa $empresa, ?Medicion $ultimo, ?Medicion $pendiente): array
+    {
+        $evolucion = array_values($empresa->mediciones
+            ->filter(fn (Medicion $m) => $m->estado === 'terminada' && $m->resultado !== null)
+            ->sortBy('numero')
+            ->map(fn (Medicion $m) => (int) $m->resultado?->puntaje_total)
+            ->all());
+
+        return [
+            'evolucion' => $evolucion,
+            'ultima' => $ultimo?->resultado ? [
+                'id' => $ultimo->id,
+                'numero' => $ultimo->numero,
+                'fecha' => $ultimo->resultado->publicado_en->toDateString(),
+            ] : null,
+            'vence' => $pendiente?->fecha_limite?->toDateString(),
+            'vencida' => $pendiente !== null && Plazos::vencio($pendiente),
         ];
     }
 

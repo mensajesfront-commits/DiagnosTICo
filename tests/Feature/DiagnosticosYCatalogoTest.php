@@ -1,15 +1,22 @@
 <?php
 
+use App\Models\ActividadEconomica;
 use App\Models\Categoria;
 use App\Models\Diagnostico;
 use App\Models\Empresa;
 use App\Models\Medicion;
+use App\Models\Opcion;
 use App\Models\Sector;
 use App\Models\User;
 use App\Notifications\SectorReasignado;
+use App\Services\Resultados\ResultadoEjemplo;
 use App\Support\DatosDiagnosticos;
+use App\Support\DatosResultado;
+use App\Support\EstadoDiagnostico;
 use Database\Seeders\CategoriasSeeder;
+use Database\Seeders\CiiuSeeder;
 use Database\Seeders\DiagnosticoEjemploSeeder;
+use Database\Seeders\DiagnosticoProgramacionSeeder;
 use Database\Seeders\RolesYPermisosSeeder;
 use Database\Seeders\SectoresSeeder;
 use Illuminate\Support\Facades\Notification;
@@ -317,5 +324,69 @@ it('el diagnóstico de ejemplo se publica en Comidas con 7 preguntas en Presenci
         ->and($contenido['categorias'][0]['nombre'])->toBe('Presencia en línea')
         ->and($contenido['categorias'][0]['preguntas'])->toHaveCount(7)
         ->and(collect($contenido['categorias'][0]['preguntas'])->pluck('tipo')->unique()->sort()->values()->all())
-        ->toBe(['abierta', 'opcion_unica', 'seleccion_multiple']);
+        ->toBe(['abierta', 'opcion_unica', 'seleccion_multiple'])
+        ->and(EstadoDiagnostico::calcular($contenido)['publicable'])->toBeTrue();
+});
+
+it('el diagnóstico de prueba de software crea su sector, suma 100 % y su informe de ejemplo se arma', function () {
+    $this->seed([CategoriasSeeder::class, CiiuSeeder::class]);
+
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+
+    $diagnostico = Diagnostico::where('nombre', DiagnosticoProgramacionSeeder::NOMBRE)->sole();
+    $contenido = $diagnostico->versiones()->firstOrFail()->contenido;
+    $preguntas = collect($contenido['categorias'])->flatMap(fn ($c) => $c['preguntas']);
+
+    expect($diagnostico->sector->nombre)->toBe('Programación y consultoría informática')
+        ->and($diagnostico->estado)->toBe(Diagnostico::PUBLICADO)
+        ->and(ActividadEconomica::where('sector_id', $diagnostico->sector_id)->pluck('codigo')->all())->toContain('6211')
+        ->and($contenido['categorias'])->toHaveCount(6)
+        ->and(collect($contenido['categorias'])->sum('importancia'))->toEqual(100)
+        ->and($preguntas)->toHaveCount(30)
+        ->and($preguntas->where('tipo', 'abierta')->every(fn ($p) => filled($p['criterio_ia'])))->toBeTrue()
+        ->and(EstadoDiagnostico::calcular($contenido)['publicable'])->toBeTrue();
+
+    // El informe PDF de ejemplo se arma con este diagnóstico.
+    $datos = DatosResultado::pagina(ResultadoEjemplo::calcular($contenido, 'medio'), null, now(), false);
+    $informe = DatosResultado::informeDe(['id' => null, 'numero' => 1, 'empresa' => ['id' => null, 'nombre' => 'Empresa de ejemplo'], 'sector' => 'Programación y consultoría informática', 'diagnostico' => $diagnostico->nombre, 'version' => 1], $datos, null, now(), null, true);
+
+    expect(view('pdf.informe', ['informe' => $informe])->render())->toContain('Medición de KPIs')->toContain('Plan estratégico de marketing');
+});
+
+it('si el diagnóstico de prueba ya existe sin las notas, publica la versión siguiente con ellas', function () {
+    $this->seed([CategoriasSeeder::class, DiagnosticoProgramacionSeeder::class]);
+    $diagnostico = Diagnostico::where('nombre', DiagnosticoProgramacionSeeder::NOMBRE)->sole();
+
+    // Como estaba la versión 1 que ya se cargó: sin la nota en "Nunca".
+    Opcion::where('texto', 'Nunca')->update(['ten_en_cuenta' => null]);
+
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+
+    $versiones = $diagnostico->versiones()->get();
+    $nunca = collect($versiones->last()->contenido['categorias'])->flatMap(fn ($c) => $c['preguntas'])
+        ->flatMap(fn ($p) => $p['opciones'])->firstWhere('texto', 'Nunca');
+
+    expect($versiones)->toHaveCount(2)
+        ->and($versiones->last()->numero)->toBe(2)
+        ->and($nunca['ten_en_cuenta'])->toContain('revisión corta y fija');
+});
+
+it('si el diagnóstico de prueba ya existe con puntajes viejos, publica la versión siguiente con los nuevos', function () {
+    $this->seed([CategoriasSeeder::class, DiagnosticoProgramacionSeeder::class]);
+    $diagnostico = Diagnostico::where('nombre', DiagnosticoProgramacionSeeder::NOMBRE)->sole();
+
+    // Como estaba antes: Google Play valía 30 y la pregunta sumaba 105.
+    Opcion::where('texto', 'Google Play')->update(['puntaje' => 30]);
+
+    $this->seed(DiagnosticoProgramacionSeeder::class);
+
+    $versiones = $diagnostico->versiones()->get();
+    $ultima = $versiones->last();
+
+    expect($versiones)->toHaveCount(2)
+        ->and($ultima->nota_cambios)->toContain('sumar exactamente 100')
+        ->and(EstadoDiagnostico::calcular($ultima->contenido)['publicable'])->toBeTrue()
+        ->and(Opcion::where('texto', 'Google Play')->value('puntaje'))->toBe(25);
 });

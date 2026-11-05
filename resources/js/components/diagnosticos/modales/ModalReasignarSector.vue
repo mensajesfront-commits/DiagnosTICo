@@ -5,13 +5,16 @@
  * Envía: sector_destino_id y avisar (correo a las empresas). Las empresas se
  * llevan sus mediciones (RN-008).
  */
+import { ArrowRightLeft } from '@lucide/vue';
 import { useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
 import Modal from '@/components/base/Modal.vue';
+import Recuadro from '@/components/base/Recuadro.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
 import { rutas } from '@/lib/rutas';
+import { plural } from '@/lib/texto';
 import type {
     MedicionesPorEstado,
     ResumenDiagnosticos,
@@ -55,8 +58,13 @@ function reasignar(): void {
 <template>
     <Modal
         v-model:abierto="abierto"
-        :titulo="`Reasignar las ${resumen.empresas} empresas de ${sector.nombre}`"
+        :titulo="
+            resumen.empresas === 1
+                ? `Reasignar la empresa de ${sector.nombre}`
+                : `Reasignar las ${resumen.empresas} empresas de ${sector.nombre}`
+        "
         :descripcion="`Al reasignar, las empresas se llevan sus mediciones. Si ${sector.nombre} queda sin empresas ni mediciones, podrás eliminarlo.`"
+        :icono="ArrowRightLeft"
     >
         <form
             id="form-reasignar"
@@ -87,9 +95,10 @@ function reasignar(): void {
                 </Seleccion>
             </Campo>
 
-            <div class="rounded-md bg-lienzo px-3 py-2.5 text-xs">
+            <Recuadro tono="neutro">
                 <p class="mb-1.5 font-semibold">
-                    Qué pasa con sus {{ resumen.mediciones }} mediciones
+                    Qué pasa con sus
+                    {{ plural(resumen.mediciones, 'medición', 'mediciones') }}
                 </p>
                 <ul class="flex flex-col gap-1">
                     <li>
@@ -114,7 +123,7 @@ function reasignar(): void {
                         Puedes volver a reasignarlas cuando quieras.
                     </li>
                 </ul>
-            </div>
+            </Recuadro>
 
             <label class="flex items-center gap-2 text-sm">
                 <input
@@ -122,7 +131,12 @@ function reasignar(): void {
                     type="checkbox"
                     class="size-4 accent-marca"
                 />
-                Avisar por correo a las {{ resumen.empresas }} empresas
+                Avisar por correo a
+                {{
+                    resumen.empresas === 1
+                        ? 'la empresa'
+                        : `las ${resumen.empresas} empresas`
+                }}
             </label>
         </form>
 
@@ -139,7 +153,7 @@ function reasignar(): void {
                 :disabled="!form.sector_destino_id"
                 :cargando="form.processing"
             >
-                Reasignar {{ resumen.empresas }} empresas
+                Reasignar {{ plural(resumen.empresas, 'empresa', 'empresas') }}
             </Boton>
         </template>
     </Modal>

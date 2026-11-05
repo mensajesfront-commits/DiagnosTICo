@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ColaboradoresController;
 use App\Http\Controllers\ConfiguracionIaController;
+use App\Http\Controllers\ConsultoresController;
 use App\Http\Controllers\DiagnosticosController;
 use App\Http\Controllers\EditorDiagnosticoController;
 use App\Http\Controllers\EmpresasController;
@@ -168,6 +169,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('roles/{rol}', [RolesController::class, 'update'])->name('roles.update');
         Route::delete('roles/{rol}', [RolesController::class, 'destroy'])->name('roles.destroy');
         Route::post('roles/{rol}/asignar', [RolesController::class, 'asignar'])->name('roles.asignar');
+
+        // HU-085 · Consultores de una empresa (A3.1, RN-030).
+        Route::post('empresas/{empresa}/consultores', [ConsultoresController::class, 'vincular'])->name('empresas.consultores.vincular');
+        Route::delete('empresas/{empresa}/consultores/{consultor}', [ConsultoresController::class, 'quitar'])->name('empresas.consultores.quitar');
     });
 
     // E12 · Colaboradores: solo la cuenta principal de la empresa (RN-025).

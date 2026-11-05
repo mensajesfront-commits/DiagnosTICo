@@ -35,6 +35,16 @@ describe('filtrarMenu', () => {
         expect(titulos(items)).toEqual(['Inicio', 'Diagnósticos', 'Empresas']);
     });
 
+    it('al Consultor le muestra Mis empresas en vez de Empresas (RN-030)', () => {
+        const items = filtrarMenu(
+            menuAdministrador,
+            ['empresas.ver', 'resultados.ver'],
+            'Consultor',
+        );
+
+        expect(titulos(items)).toEqual(['Inicio', 'Mis empresas']);
+    });
+
     it('quita un submenú que se queda sin subsecciones visibles', () => {
         const menu: ItemMenu[] = [
             {

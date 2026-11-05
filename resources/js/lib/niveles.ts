@@ -14,6 +14,8 @@ export type InfoNivel = {
     etiqueta: string;
     /** Clase de Tailwind para barras y puntos (color fuerte). */
     barra: string;
+    /** Clase de Tailwind para un borde lateral del color del nivel. */
+    borde: string;
     /** Color fuerte en hexadecimal, para Chart.js. */
     color: string;
 };
@@ -24,6 +26,7 @@ export const niveles: Record<Nivel, InfoNivel> = {
         rango: '0–29',
         etiqueta: 'bg-nivel-critico-suave text-nivel-critico-texto',
         barra: 'bg-nivel-critico',
+        borde: 'border-l-nivel-critico',
         color: '#d85249',
     },
     mejorar: {
@@ -31,6 +34,7 @@ export const niveles: Record<Nivel, InfoNivel> = {
         rango: '30–59',
         etiqueta: 'bg-nivel-mejorar-suave text-nivel-mejorar-texto',
         barra: 'bg-nivel-mejorar',
+        borde: 'border-l-nivel-mejorar',
         color: '#e39938',
     },
     camino: {
@@ -38,6 +42,7 @@ export const niveles: Record<Nivel, InfoNivel> = {
         rango: '60–79',
         etiqueta: 'bg-nivel-camino-suave text-nivel-camino-texto',
         barra: 'bg-nivel-camino',
+        borde: 'border-l-nivel-camino',
         color: '#4a85c7',
     },
     sigue: {
@@ -45,6 +50,7 @@ export const niveles: Record<Nivel, InfoNivel> = {
         rango: '80–100',
         etiqueta: 'bg-nivel-sigue-suave text-nivel-sigue-texto',
         barra: 'bg-nivel-sigue',
+        borde: 'border-l-nivel-sigue',
         color: '#4e9954',
     },
     sin: {
@@ -52,6 +58,7 @@ export const niveles: Record<Nivel, InfoNivel> = {
         rango: '—',
         etiqueta: 'bg-lienzo-oscuro text-tinta-suave',
         barra: 'bg-nivel-sin',
+        borde: 'border-l-nivel-sin',
         color: '#c9c8c3',
     },
 };

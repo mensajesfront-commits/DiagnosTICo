@@ -36,7 +36,34 @@ function analisisValido(int|float|string|null $puntajeAbierta = 45): array
         'metodo' => 'CAME',
         'metodo_motivo' => 'El problema ya está claro: falta convertirlo en acciones.',
         'observacion_categoria' => 'Hoy tomas pedidos y reservas a mano por WhatsApp.',
-        'recomendacion' => ['titulo' => 'Activa pedidos y respuestas automáticas', 'detalle' => 'Un menú digital con pedidos en WhatsApp Business.'],
+        'hallazgos' => [
+            ['grupo' => 'Corregir', 'puntos' => ['Los pedidos llegan al WhatsApp personal.', 'Las respuestas tardan hasta un día.']],
+            ['grupo' => 'Fortalezas', 'puntos' => ['Este grupo no es de CAME y se descarta.']],
+            ['grupo' => 'Explotar', 'puntos' => ['  ', 'Los clientes ya te escriben por WhatsApp.']],
+        ],
+        'impacto' => 'Los pedidos que llegan tarde se pierden.',
+        'fortalezas' => ['Respondes a todos los clientes, aunque tarde.'],
+        'debilidades' => ['Todo depende de un celular personal.', 'Sin horario de atención.', 'La tercera sobra.'],
+        'oportunidades' => [],
+        'amenazas' => [],
+        'faltante' => ['Cuántos pedidos llegan por semana: se obtiene contándolos un mes.'],
+        'recomendaciones' => [
+            [
+                'titulo' => 'Activa pedidos y respuestas automáticas',
+                'detalle' => 'Un menú digital con pedidos en WhatsApp Business.',
+                'pasos' => ['Crea la cuenta de WhatsApp Business', 'Sube el menú al catálogo', 'Activa el mensaje de bienvenida', 'Este cuarto paso sobra'],
+                'plazo' => '2 semanas',
+                'semanas' => 30,
+                'indicador' => 'Pedidos respondidos el mismo día',
+                'problema' => 'Respuestas de hasta un día.',
+                'objetivo' => 'Responder el mismo día.',
+                'responsable' => 'Quien atiende WhatsApp',
+                'recursos' => 'WhatsApp Business (gratis)',
+                'kpi' => ['formula' => 'Respondidos el mismo día ÷ recibidos × 100', 'linea_base' => '', 'meta' => '', 'frecuencia' => 'Semanal', 'fuente' => 'WhatsApp Business'],
+                'evidencia' => 'Captura de las estadísticas',
+            ],
+            ['titulo' => 'Sin pasos se descarta', 'detalle' => '', 'pasos' => [], 'plazo' => '', 'indicador' => ''],
+        ],
     ];
 }
 
@@ -132,3 +159,55 @@ it('rechaza una respuesta sin un método válido', function () {
 
     app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
 })->throws(RespuestaIaInvalida::class, 'La IA no dijo qué método usó');
+
+it('guarda solo los grupos del método elegido, en su orden', function () {
+    OpenAI::fake([respuestaIa(analisisValido())]);
+
+    $resultado = app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+
+    expect(array_column($resultado['hallazgos'], 'grupo'))->toBe(['Corregir', 'Explotar'])
+        ->and($resultado['hallazgos'][1]['puntos'])->toBe(['Los clientes ya te escriben por WhatsApp.'])
+        ->and($resultado['fortalezas'])->toBe(['Respondes a todos los clientes, aunque tarde.']);
+});
+
+it('guarda las recomendaciones con hasta 3 pasos, plazo e indicador', function () {
+    OpenAI::fake([respuestaIa(analisisValido())]);
+
+    $resultado = app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+
+    expect($resultado['recomendaciones'])->toHaveCount(1)
+        ->and($resultado['recomendaciones'][0]['pasos'])->toHaveCount(3)
+        ->and($resultado['recomendaciones'][0]['plazo'])->toBe('2 semanas')
+        ->and($resultado['recomendaciones'][0]['indicador'])->toBe('Pedidos respondidos el mismo día');
+});
+
+it('rechaza una respuesta sin recomendaciones con pasos', function () {
+    $analisis = analisisValido();
+    $analisis['recomendaciones'] = [['titulo' => 'Mejora', 'detalle' => '', 'pasos' => [], 'plazo' => '', 'indicador' => '']];
+    OpenAI::fake([respuestaIa($analisis)]);
+
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+})->throws(RespuestaIaInvalida::class, 'La IA no dio ninguna recomendación con sus pasos.');
+
+it('rechaza una respuesta sin hallazgos del método elegido', function () {
+    $analisis = analisisValido();
+    $analisis['hallazgos'] = [['grupo' => 'Fortalezas', 'puntos' => ['Es de DOFA, no de CAME.']]];
+    OpenAI::fake([respuestaIa($analisis)]);
+
+    app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+})->throws(RespuestaIaInvalida::class, 'La IA no dijo qué encontró con CAME.');
+
+it('guarda el impacto, el DOFA, lo que faltó y la ficha de acción con su KPI', function () {
+    OpenAI::fake([respuestaIa(analisisValido())]);
+
+    $resultado = app(AnalizadorDeCategoria::class)->analizar(ArmadorPrompt::instrucciones(), PruebaIa::categoriaDeEjemplo());
+    $ficha = $resultado['recomendaciones'][0];
+
+    expect($resultado['impacto'])->toBe('Los pedidos que llegan tarde se pierden.')
+        ->and($resultado['debilidades'])->toHaveCount(2)
+        ->and($resultado['faltante'])->toHaveCount(1)
+        ->and($ficha['semanas'])->toBe(12)
+        ->and($ficha['responsable'])->toBe('Quien atiende WhatsApp')
+        ->and($ficha['kpi']['linea_base'])->toBe('')
+        ->and($ficha['kpi']['fuente'])->toBe('WhatsApp Business');
+});

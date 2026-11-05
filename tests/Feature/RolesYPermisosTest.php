@@ -29,23 +29,31 @@ it('da 5 permisos a la Empresa y ninguno al rol Colaborador', function () {
         ->and(Role::findByName('Colaborador')->permissions)->toBeEmpty();
 });
 
-it('marca los roles del sistema y deja al Consultor inactivo', function () {
+it('marca los roles del sistema, el Consultor incluido (RN-030)', function () {
     expect(Role::where('del_sistema', true)->pluck('name')->sort()->values()->all())
-        ->toBe(['Administrador', 'Colaborador', 'Empresa']);
+        ->toBe(['Administrador', 'Colaborador', 'Consultor', 'Empresa']);
 
     $consultor = Role::findByName('Consultor');
 
-    expect((bool) $consultor->activo)->toBeFalse()
-        ->and((bool) $consultor->del_sistema)->toBeFalse()
-        ->and($consultor->permissions)->toHaveCount(6);
+    expect((bool) $consultor->activo)->toBeTrue()
+        ->and($consultor->permissions->pluck('name')->sort()->values()->all())
+        ->toBe(['contrasena.cambiar', 'empresas.ver', 'perfil.editar', 'resultados.pdf', 'resultados.ver']);
 });
 
-it('no pisa los cambios que el Administrador le haga al Consultor', function () {
-    Role::findByName('Consultor')->syncPermissions(['empresas.ver']);
+it('el Consultor solo mira: no responde ni toca diagnósticos', function () {
+    $consultor = Role::findByName('Consultor');
+
+    foreach (['diagnostico.responder', 'diagnosticos.ver', 'diagnosticos.editar', 'diagnosticos.publicar', 'mediciones.asignar', 'empresas.registrar'] as $permiso) {
+        expect($consultor->hasPermissionTo($permiso))->toBeFalse();
+    }
+});
+
+it('el seeder le devuelve al Consultor sus permisos fijos', function () {
+    Role::findByName('Consultor')->syncPermissions(['empresas.ver', 'diagnostico.responder']);
 
     $this->seed(RolesYPermisosSeeder::class);
 
-    expect(Role::findByName('Consultor')->permissions)->toHaveCount(1);
+    expect(Role::findByName('Consultor')->permissions)->toHaveCount(5);
 });
 
 it('se puede correr otra vez sin duplicar y borra permisos viejos', function () {
