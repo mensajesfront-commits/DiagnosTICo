@@ -1,6 +1,6 @@
 # Convenciones de desarrollo
 
-**Estado:** EN CURSO (T-005, T-033)
+**Estado:** COMPLETO (T-005, T-033).
 
 ## Definición de terminado
 

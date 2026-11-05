@@ -1,6 +1,6 @@
 # Despliegue
 
-**Estado:** NO APLICA en su mayor parte (T-155). El alcance acordado es entregar el repositorio; el sistema **no se despliega** (DEC-006, `03_ALCANCE.md`). Lo que sí aplica es cómo se entrega y cómo lo instalaría NuevasTIC si decide ponerlo en línea.
+**Estado:** COMPLETO (T-155). Cómo se entrega y cómo se despliega. El sistema **se va a desplegar** (DEC-006 cambió el 4 de noviembre). **[INFORMACIÓN PENDIENTE]** El servidor y el dominio.
 
 ## 1. Qué se entrega
 

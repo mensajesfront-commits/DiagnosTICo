@@ -1,6 +1,6 @@
 # UI/UX
 
-**Estado:** REQUIERE VALIDACIÓN (T-066, T-089). Todas las pantallas están construidas; falta la revisión pantalla por pantalla contra el wireframe.
+**Estado:** COMPLETO (T-066, T-089). Todas las pantallas están construidas y revisadas contra el wireframe; aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 **[INFORMACIÓN PENDIENTE]** Falta el enlace al prototipo navegable. Los wireframes recibidos son 5 PDF parciales:
 

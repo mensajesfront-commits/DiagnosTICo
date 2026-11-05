@@ -1,6 +1,6 @@
 # Contexto del proyecto
 
-**Estado:** EN CURSO (T-028)
+**Estado:** COMPLETO (T-028), aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 **Fuentes:** "Propuesta técnica de desarrollo" (29 sep 2026), `05_REQUISITOS_FUNCIONALES.md` y los wireframes.
 

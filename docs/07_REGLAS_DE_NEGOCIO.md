@@ -1,6 +1,6 @@
 # Reglas de negocio
 
-**Estado:** REQUIERE VALIDACIÓN (T-086). Las reglas salen de `05_REQUISITOS_FUNCIONALES.md`; si algo no coincide, manda ese documento. NuevasTIC debe confirmar las marcadas al final.
+**Estado:** COMPLETO (T-086), aprobado por NuevasTIC el 5 de noviembre de 2026. Las reglas salen de `05_REQUISITOS_FUNCIONALES.md`; si algo no coincide, manda ese documento.
 
 Cada regla dice **qué exige**, **dónde se cumple en el servidor** (la validación que no se puede saltar) y **dónde se ve en pantalla**. La interfaz ayuda, pero la regla vale aunque alguien llame a la ruta directamente (`17_SEGURIDAD.md`).
 

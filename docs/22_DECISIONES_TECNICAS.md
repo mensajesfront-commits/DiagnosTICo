@@ -1,6 +1,6 @@
 # Decisiones técnicas
 
-**Estado:** EN CURSO (T-034)
+**Estado:** COMPLETO (T-034). Decisiones vigentes en la entrega `v1.0.0`.
 
 Cada decisión registra qué se decidió, por qué y qué se descartó. Si una decisión se cambia, no se borra: se marca **REEMPLAZADA** y se agrega una nueva.
 

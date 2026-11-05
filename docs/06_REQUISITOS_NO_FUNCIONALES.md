@@ -1,6 +1,6 @@
 # Requisitos no funcionales
 
-**Estado:** REQUIERE VALIDACIÓN (T-062). Las metas numéricas de rendimiento son una **propuesta** del equipo; NuevasTIC debe confirmarlas (PA-008).
+**Estado:** COMPLETO (T-062), aprobado por NuevasTIC el 5 de noviembre de 2026, incluidas las metas numéricas de rendimiento (PA-008).
 
 Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vienen de `05_REQUISITOS_FUNCIONALES.md`, sección 7; desde RNF-007 se agregan aquí. Cada requisito dice cómo se comprueba.
 

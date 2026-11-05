@@ -1,6 +1,6 @@
 # Requisitos funcionales
 
-**Estado:** REQUIERE VALIDACIÓN
+**Estado:** COMPLETO, aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 Requisitos funcionales (RF), historias de usuario, criterios de aceptación y backlog del Sistema de Diagnóstico de Marketing Digital (NuevasTIC). Se construyeron a partir de las 79 vistas del prototipo y de lo confirmado por Cristian, siguiendo las normas de `Normas.txt`. Nada se inventó: lo que falta se marca **[INFORMACIÓN PENDIENTE]**, **[FUNCIONALIDAD POR DEFINIR]** o **[INCONSISTENCIA DETECTADA]**.
 
@@ -1152,7 +1152,7 @@ Permite empujar a las empresas a terminar su medición a tiempo con un recordato
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: si el registro del envío se muestra en la ficha de la empresa.
+- Aprobado por NuevasTIC el 5 de noviembre de 2026 tal como está construido: el registro del envío.
 - Depende de HU-037 (edición del correo).
 
 ---
@@ -2638,7 +2638,7 @@ Permite reutilizar un diagnóstico en otro sector o modificarlo sin tocar el pub
 
 Un diagnóstico publicado se archiva; un borrador nunca publicado se elimina.
 
-> REQUIERE VALIDACIÓN: el modal de confirmación no está diseñado en el prototipo.
+> El modal de confirmación no está en el prototipo; NuevasTIC lo aprobó tal como está construido (5 de noviembre de 2026).
 
 ### Valor de negocio
 
@@ -2723,7 +2723,7 @@ Permite sacar un diagnóstico de uso sin perder los resultados ya obtenidos.
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: el modal de confirmación no está diseñado en el prototipo.
+- El modal de confirmación no está en el prototipo; NuevasTIC lo aprobó tal como está construido (5 de noviembre de 2026).
 - Depende de HU-010 y HU-029.
 
 ---
@@ -5399,7 +5399,7 @@ Permite al Administrador revisar que el prompt final se entienda tal como lo rec
 
 Una sola prueba, por categoría, que muestra lo que devolvería la IA.
 
-> REQUIERE VALIDACIÓN: límite de pruebas por día.
+> Límite de pruebas por día: 100 entre todos los administradores (PA-003, decisión del 23 de octubre).
 
 ### Valor de negocio
 
@@ -5483,7 +5483,7 @@ Permite ver el resultado que daría la IA con un caso real antes de cambiar el p
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: límite de pruebas por día.
+- Límite de pruebas por día: 100 entre todos los administradores (PA-003, decisión del 23 de octubre).
 - Depende de HU-041 y de la IA.
 
 ---
@@ -5953,7 +5953,7 @@ Permite saber qué puede hacer cada rol del sistema y quién lo tiene.
 
 Modal para crear un rol con permisos agrupados.
 
-> REQUIERE VALIDACIÓN: el prototipo muestra un ejemplo de rol “Consultor”; confirmar si se mantiene como rol creable o solo a futuro.
+> Resuelto el 3 de noviembre: el rol Consultor existe, es del sistema y de solo lectura (EP-014, RN-030).
 
 ### Valor de negocio
 
@@ -6032,7 +6032,7 @@ Permite dar acceso a otras personas con permisos a la medida sin depender de cam
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: confirmar si el rol “Consultor” del prototipo se mantiene como rol creable o solo a futuro.
+- Resuelto el 3 de noviembre: el rol Consultor existe, es del sistema y de solo lectura (EP-014, RN-030).
 - Depende de HU-048.
 
 ---
@@ -9294,7 +9294,7 @@ Permite al Administrador cambiar las preguntas del bot sin depender de un desarr
 
 El bot saluda, explica qué va a hacer y pide el nombre de la empresa.
 
-> REQUIERE VALIDACIÓN: texto exacto del saludo.
+> Texto exacto del saludo: lo definió el bot, que se hizo fuera de este repositorio.
 
 ### Valor de negocio
 
@@ -9362,7 +9362,7 @@ Permite a una empresa iniciar un diagnóstico rápido por chat sin crear una cue
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: texto exacto del saludo.
+- Texto exacto del saludo: lo definió el bot, que se hizo fuera de este repositorio.
 - Depende de HU-071 (preguntas configuradas).
 - Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
@@ -9903,7 +9903,7 @@ Cada aviso abre el resultado ("bajó" y "nuevo") o la ficha (lo pendiente). Se v
 
 # 7. Requisitos no funcionales relacionados
 
-Estos RNF se desprenden de las historias. El detalle, con los RNF que se agregaron desde RNF-007 y las metas propuestas, está en `06_REQUISITOS_NO_FUNCIONALES.md` (REQUIERE VALIDACIÓN, PA-008).
+Estos RNF se desprenden de las historias. El detalle, con los RNF que se agregaron desde RNF-007 y las metas propuestas, está en `06_REQUISITOS_NO_FUNCIONALES.md` (aprobado por NuevasTIC el 5 de noviembre de 2026, PA-008).
 
 | ID | Categoría | Requisito | Historias |
 |---|---|---|---|
@@ -10012,7 +10012,7 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-042 — Ajustar el prompt para un sector | RF-021 | Hecha |
 | HU-043 — Ajustar el prompt para una empresa | RF-021 | Hecha |
 | HU-044 — Ver el prompt completo | RF-022 | Hecha |
-| HU-045 — Probar el prompt con un ejemplo | RF-022 | Hecha (límite: 10 pruebas por minuto; el límite por día sigue **REQUIERE VALIDACIÓN**) |
+| HU-045 — Probar el prompt con un ejemplo | RF-022 | Hecha (límite: 10 pruebas por minuto y 100 al día, PA-003) |
 | HU-046 — Ver las cuentas del sistema | RF-023 | Hecha |
 | HU-047 — Desactivar o reactivar una cuenta | RF-023 | Hecha |
 | HU-048 — Ver los roles del sistema | RF-024 | Hecha |

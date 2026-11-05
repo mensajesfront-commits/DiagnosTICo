@@ -1,6 +1,6 @@
 # Visión y objetivos
 
-**Estado:** REQUIERE VALIDACIÓN (T-059). Las metas de éxito son una propuesta del equipo y deben confirmarse con NuevasTIC.
+**Estado:** COMPLETO (T-059), aprobado por NuevasTIC el 5 de noviembre de 2026, incluidas las metas de éxito.
 
 **Fuentes:** `01_CONTEXTO_PROYECTO.md`, `03_ALCANCE.md`, `05_REQUISITOS_FUNCIONALES.md` y la propuesta técnica (29 sep 2026).
 
@@ -61,7 +61,7 @@ Cada objetivo se cumple con una o más épicas de `05_REQUISITOS_FUNCIONALES.md`
 | Instalación desde cero | Otra persona instala con el README sin ayuda | T-021, T-154 |
 | Fidelidad con el diseño | Cada pantalla comparada con su wireframe; diferencias anotadas | `18_UI_UX.md` |
 
-### Del uso del sistema (propuesta, REQUIERE VALIDACIÓN)
+### Del uso del sistema (aprobado por NuevasTIC el 5 de noviembre de 2026)
 
 Se pueden medir con los datos que el sistema ya guarda:
 

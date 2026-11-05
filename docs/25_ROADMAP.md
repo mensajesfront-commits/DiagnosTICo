@@ -1,6 +1,6 @@
 # Roadmap
 
-**Estado:** REQUIERE VALIDACIÓN (T-157). Lo que viene después de la entrega del 6 de noviembre de 2026. Las prioridades las propone el equipo y NuevasTIC debe confirmarlas.
+**Estado:** COMPLETO (T-157), aprobado por NuevasTIC el 5 de noviembre de 2026. Lo que viene después de la entrega del 6 de noviembre de 2026.
 
 ## 1. Dónde queda el proyecto en la entrega
 

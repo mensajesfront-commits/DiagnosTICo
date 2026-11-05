@@ -1,6 +1,6 @@
 # Base de datos
 
-**Estado:** EN CURSO · el MER está migrado completo (T-045, 8 de octubre). Falta la aprobación formal del equipo (hito T-044).
+**Estado:** COMPLETO. El MER está migrado completo (T-045) y quedó aprobado por NuevasTIC el 5 de noviembre de 2026 (hito T-044).
 
 **Motor:** PostgreSQL 18.
 

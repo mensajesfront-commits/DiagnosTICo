@@ -1,6 +1,6 @@
 # Estado actual
 
-**Estado:** EN CURSO (T-037). Se actualiza al cerrar cada semana. El detalle de cada cambio está en `24_CAMBIOS_Y_VERSIONES.md`.
+**Estado:** COMPLETO (T-037). Estado del proyecto en la entrega `v1.0.0` (5 de noviembre de 2026). El detalle de cada cambio está en `24_CAMBIOS_Y_VERSIONES.md`.
 
 **Última actualización:** 5 de noviembre de 2026, antes de la entrega.
 
@@ -47,7 +47,7 @@ Lo construido, de punta a punta:
 
 Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 
-**Documentación:** todos los documentos del índice tienen archivo. Los que dicen REQUIERE VALIDACIÓN esperan la revisión de NuevasTIC o del equipo (`00_INDICE.md`).
+**Documentación:** los 32 documentos del índice están en COMPLETO. NuevasTIC aprobó los de negocio el 5 de noviembre de 2026 (`00_INDICE.md`).
 
 ## Reparto del trabajo
 
@@ -65,8 +65,8 @@ Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 | Desplegar en el servidor | Equipo | `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio |
 | Revisión pantalla por pantalla (diseño, textos y funciones) | Cristian | Los ajustes se anotan en `18_UI_UX.md` |
 | Instalar desde cero con el README en un equipo limpio (T-021) | Equipo | Con Sail |
-| PR de `develop` a `main` y etiqueta `v1.0.0` (T-152) | Equipo | `main` va 75 commits detrás de `develop` (5 de noviembre). `20_DESPLIEGUE.md` |
-| Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160) | Equipo y NuevasTIC | `00_INDICE.md` |
+| ~~PR de `develop` a `main` y etiqueta `v1.0.0` (T-152)~~ | Equipo | **Hecho** el 5 de noviembre: PR #13 y etiqueta `v1.0.0` sobre `main` |
+| ~~Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160)~~ | Equipo y NuevasTIC | **Hecho** el 5 de noviembre |
 
 ## Decisiones de NuevasTIC (23 de octubre de 2026)
 

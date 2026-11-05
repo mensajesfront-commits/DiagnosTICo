@@ -1,6 +1,6 @@
 # Stakeholders
 
-**Estado:** REQUIERE VALIDACIÓN (T-060). Falta confirmar los nombres y los canales de contacto de NuevasTIC.
+**Estado:** COMPLETO (T-060), aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 Quién tiene interés en el sistema, qué espera de él y cómo se le informa.
 

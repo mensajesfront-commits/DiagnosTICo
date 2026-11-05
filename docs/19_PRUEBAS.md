@@ -1,6 +1,6 @@
 # Pruebas
 
-**Estado:** COMPLETO (T-119). Cifras del 14 de octubre de 2026: **245 pruebas de Pest** (1680 comprobaciones) y **35 de Vitest**. Todas pasan.
+**Estado:** COMPLETO (T-119). Cifras de la entrega `v1.0.0` (5 de noviembre de 2026): **385 pruebas de Pest** y **47 de Vitest**. Todas pasan.
 
 ## 1. Cómo se corren
 

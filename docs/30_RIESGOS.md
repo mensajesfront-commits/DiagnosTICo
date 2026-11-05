@@ -1,6 +1,6 @@
 # Riesgos
 
-**Estado:** EN CURSO (T-067). Se revisa cada semana junto con `01_ESTADO_ACTUAL.md`.
+**Estado:** COMPLETO (T-067). Riesgos en la entrega `v1.0.0`.
 
 Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta y qué se hace para evitarlo. Formato: R-XXX.
 
@@ -130,7 +130,7 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
 
 ### R-011 — Instalación en otro equipo
 
-- **Qué puede pasar:** el sistema no se despliega; se entrega el repositorio, así que quien lo reciba debe poder instalarlo.
+- **Qué puede pasar:** quien reciba el repositorio, o el servidor donde se despliegue (DEC-006 cambió el 4 de noviembre), debe poder instalarlo sin ayuda.
 - **Medidas:**
   - README paso a paso;
   - Sail con PHP 8.4 y Chromium;

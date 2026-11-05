@@ -1,6 +1,6 @@
 # Backend
 
-**Estado:** REQUIERE VALIDACIÓN (T-043). Todas las rutas existen y tienen pruebas (14 de octubre de 2026). Falta la revisión de Luis.
+**Estado:** COMPLETO (T-043). Todas las rutas existen y tienen pruebas; Luis lo revisó en los PR #11 a #14 (5 de noviembre de 2026).
 
 Todas las rutas con sesión van con `auth` y con el rol o permiso indicado (matriz en `17_SEGURIDAD.md`). El frontend usa las funciones de Wayfinder (`@/routes/...`); si cambia una URL, se regenera con `php artisan wayfinder:generate --with-form`.
 
@@ -278,7 +278,7 @@ Tarea (HU-070): `mediciones:vencer` corre cada hora (a los :05) y marca `vencida
 - **Datos que se insertan solos:** `{sector}`, `{contexto_sector}` (la descripción del sector), `{categoria}` y `{respuestas_categoria}` (en el texto queda "las preguntas con sus respuestas, que van en el mensaje siguiente"; las respuestas siempre se envían aparte, en JSON).
 - El sector que se usa es el del diagnóstico de la medición.
 - Los cambios aplican a los análisis que se hagan después de guardar; cada análisis guarda su prompt exacto en `analisis_categoria.prompt`.
-- **[INFORMACIÓN PENDIENTE]** El límite de pruebas por día (HU-045 "REQUIERE VALIDACIÓN"). Por ahora solo hay 10 por minuto.
+- Límite de "Probar con un ejemplo": 10 por minuto y 100 al día entre todos los administradores (`ConfiguracionIaController::PRUEBAS_POR_DIA`, PA-003).
 
 ## Análisis de la IA y resultado (HU-068, HU-069, HU-081, HU-084, hecho)
 

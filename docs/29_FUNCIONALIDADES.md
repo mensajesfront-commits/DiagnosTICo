@@ -121,4 +121,4 @@
 
 - **Bot de WhatsApp (HU-071 a HU-075):** terminado por otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 - **FODA y comparación con promedios:** fuera del alcance (RN-028). Ver la inconsistencia con DEC-019 en `07_REGLAS_DE_NEGOCIO.md`.
-- **Despliegue:** no se despliega (DEC-006).
+- **Despliegue:** se va a desplegar (DEC-006 cambió el 4 de noviembre; `20_DESPLIEGUE.md`).
