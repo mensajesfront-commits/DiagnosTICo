@@ -4,17 +4,16 @@
 
 La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan por semana del cronograma.
 
-## Después de v1.0.0 · archivos de producción (5 y 6 de noviembre de 2026)
+## Después de v1.0.0 · despliegue con Docker (6 de noviembre de 2026)
 
-- **Despliegue con Docker Compose (DEC-024)** en https://diagnostico.captter.com. Apache del servidor tiene el SSL y reenvía a `127.0.0.1:8200`.
-  - `docker-compose.prod.yml`: `nginx`, `app` (PHP 8.4-FPM), `queue`, `scheduler`, `postgres` 18 y `redis`. Solo Nginx publica un puerto (`127.0.0.1:${NGINX_PORT:-8200}:80`).
-  - `docker/php/Dockerfile.prod`: PHP 8.4-FPM con `pdo_pgsql`, `redis`, `intl`, `gd`, `bcmath`, `zip`, `opcache` y `pcntl`; Node 24 y Chromium para los PDF; `composer install --no-dev` y `npm run build`. Con `php.ini`, `www.conf` y `entrypoint.sh`.
-  - `docker/nginx/Dockerfile.prod` y `default.conf`: sirven `public/` y pasan lo demás a php-fpm.
-  - `.env.production.example`: plantilla del `.env` del servidor, solo con marcadores. Caché y cola en Redis; sesiones en PostgreSQL.
-  - `.dockerignore`: el `.env` nunca entra a la imagen.
-- **Detrás de un proxy:** `bootstrap/app.php` confía en el proxy inmediato (`trustProxies`). `AppServiceProvider` fuerza `https` en los enlaces cuando `APP_URL` empieza por `https://`, también en los correos de la cola.
-- docs/16, docs/20, docs/22 (DEC-024) y docs/27 explican la instalación, Apache y las variables.
-- **[INFORMACIÓN PENDIENTE]** Los archivos de Kiasmer no estaban disponibles al escribir estos; si Kiasmer usa otros nombres o pasos, se ajustan.
+- **PR #17 a `main`** (Luis Carlos): estructura de producción igual a la de Kiasmer (DEC-024).
+  - `docker-compose.prod.yml`: `app`, `web` (solo en `127.0.0.1:${WEB_PORT}`), `queue`, `scheduler`, `pgsql` y los comandos `migrate` y `artisan`.
+  - `docker/php/Dockerfile.prod` con las imágenes `app` (PHP-FPM 8.4, Chromium y Puppeteer) y `web` (Nginx), más `entrypoint.prod.sh`, `php.ini`, `opcache.prod.ini`, `www.conf` y `docker/nginx/default.prod.conf`.
+  - `deploy-production.sh`, `.env.production.example` y `.dockerignore`.
+  - `trustProxies` en `bootstrap/app.php`; docs/20 con la instalación, la actualización y los VirtualHost de Apache y Nginx.
+- **En el PR #16:** `URL::forceScheme('https')` cuando `APP_URL` empieza por `https://`, y docs/16, docs/22 (DEC-024), docs/27 y README alineados con el PR #17.
+- **Servidor:** https://diagnostico.captter.com. Apache tiene el SSL y reenvía a `127.0.0.1:8200`, así que el `.env` del servidor lleva `WEB_PORT=8200`.
+- Una primera versión de estos archivos, escrita en el PR #16, se quitó a favor de la del PR #17, que sí se construyó y probó.
 
 ## v1.0.0 · versión de entrega (5 de noviembre de 2026)
 

@@ -279,12 +279,12 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 
 ### DEC-024 — Producción con Docker Compose detrás de Apache
 
-- **Decisión (5 de noviembre de 2026):**
-  - El servidor corre el sistema con `docker-compose.prod.yml`: `nginx`, `app` (PHP 8.4-FPM), `queue`, `scheduler`, `postgres` (18) y `redis`.
-  - `app`, `queue` y `scheduler` usan la misma imagen (`docker/php/Dockerfile.prod`), con Node 24 y Chromium para los PDF. Nginx (`docker/nginx/Dockerfile.prod`) copia `public/` de esa imagen.
-  - Solo Nginx publica un puerto, en `127.0.0.1:${NGINX_PORT:-8200}`. Apache del servidor tiene el SSL de `diagnostico.captter.com` y reenvía a ese puerto.
-  - Redis guarda la caché y la cola. Las sesiones siguen en PostgreSQL porque el sistema borra filas de `sessions` al desactivar una cuenta o cambiarle el rol.
-  - Laravel confía en el proxy inmediato (`trustProxies`) para saber que la petición llegó por HTTPS, y fuerza `https` en los enlaces cuando `APP_URL` empieza por `https://`.
-- **Por qué:** es la misma forma en que el equipo despliega sus otros proyectos (pedido del 5 de noviembre, "igual que en Kiasmer"); deja todo el entorno en el repositorio y no instala PHP ni Chromium en el servidor.
-- **Descartado:** instalar PHP, Supervisor y cron directo en el servidor (la sección "Sin Docker" de `20_DESPLIEGUE.md` lo deja como alternativa); sesiones en Redis.
-- **[INFORMACIÓN PENDIENTE]** Los archivos de Kiasmer no estaban disponibles en la sesión en que se escribieron estos: se armaron con lo pedido. Si Kiasmer usa nombres o pasos distintos, se ajustan.
+- **Decisión (6 de noviembre de 2026, PR #17):**
+  - El servidor corre el sistema con `docker-compose.prod.yml`, con la misma estructura de producción de Kiasmer: `app` (PHP 8.4-FPM), `web` (Nginx), `queue`, `scheduler`, `pgsql` (PostgreSQL 18) y los comandos puntuales `migrate` y `artisan`.
+  - Un solo `docker/php/Dockerfile.prod` arma las dos imágenes (`target: app` y `target: web`). `app` lleva Chromium (Playwright) y Puppeteer para los PDF.
+  - Solo `web` publica un puerto, en `127.0.0.1:${WEB_PORT}`. En el servidor, `WEB_PORT=8200`: Apache tiene el SSL de `diagnostico.captter.com` y reenvía a ese puerto.
+  - Cola, caché y sesiones siguen en PostgreSQL, como en local. Redis queda como opción documentada en `20_DESPLIEGUE.md`.
+  - Laravel confía en el proxy (`trustProxies` en `bootstrap/app.php`) para saber que la petición llegó por HTTPS, y fuerza `https` en los enlaces cuando `APP_URL` empieza por `https://` (`AppServiceProvider`), también en los correos de la cola.
+  - `deploy-production.sh` actualiza el sistema: mantenimiento, `git pull`, build, migraciones con `--migrate`, contenedores nuevos y comprobación de `/up`.
+- **Por qué:** es la forma en que el equipo despliega sus otros proyectos; deja todo el entorno en el repositorio y no instala PHP ni Chromium en el servidor. Se probó completa en local con la imagen de producción (PDF desde `app` y desde `queue`).
+- **Descartado:** instalar PHP, Supervisor y cron directo en el servidor; una primera versión con Redis y una imagen de Nginx aparte, que no se pudo construir en la sesión donde se escribió (reemplazada por la del PR #17).

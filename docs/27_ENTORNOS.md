@@ -40,11 +40,11 @@ Todas están explicadas en `.env.example`.
 
 | Variable | Local con Sail | Pruebas automáticas (`phpunit.xml`) | Producción (`.env.production.example`) |
 |---|---|---|---|
-| `DB_CONNECTION` / `DB_HOST` | `pgsql` / `pgsql` | La misma conexión, con la base `testing` | `pgsql` / `postgres` |
+| `DB_CONNECTION` / `DB_HOST` | `pgsql` / `pgsql` | La misma conexión, con la base `testing` | `pgsql` / `pgsql` |
 | `MAIL_MAILER` | `smtp` hacia `mailpit:1025` | `array` (no envía) | `smtp` real |
-| `QUEUE_CONNECTION` / `CACHE_STORE` | `database` / `database` | `sync` / `array` | `redis` / `redis` |
+| `QUEUE_CONNECTION` / `CACHE_STORE` | `database` / `database` | `sync` / `array` | `database` / `database` |
 | `OPENAI_API_KEY` | La de cada desarrollador | No se usa: las pruebas simulan OpenAI (`OpenAI::fake()`) | La de NuevasTIC |
-| `LARAVEL_PDF_CHROME_PATH` | `/usr/local/bin/chromium` | No se usa: las pruebas simulan el PDF (`Pdf::fake()`) | `/usr/bin/chromium` |
+| `LARAVEL_PDF_CHROME_PATH` | `/usr/local/bin/chromium` | No se usa: las pruebas simulan el PDF (`Pdf::fake()`) | `/usr/local/bin/chromium` |
 
 ## Correo
 
@@ -66,11 +66,11 @@ Todas están explicadas en `.env.example`.
 
 ## Producción
 
-Se despliega con Docker Compose (DEC-024) en **https://diagnostico.captter.com**. Apache del servidor tiene el SSL y reenvía a `127.0.0.1:8200`.
+Se despliega con Docker Compose (DEC-024, PR #17) en **https://diagnostico.captter.com**. Apache del servidor tiene el SSL y reenvía a `127.0.0.1:8200`.
 
-- Archivos: `docker-compose.prod.yml`, `docker/php/Dockerfile.prod`, `docker/nginx/Dockerfile.prod` y `.env.production.example`.
-- Servicios: `nginx`, `app`, `queue`, `scheduler`, `postgres` y `redis` (`16_INFRAESTRUCTURA.md`).
-- El `.env` del servidor se arma con `.env.production.example`; las claves reales solo viven ahí.
+- Archivos: `docker-compose.prod.yml`, `docker/php/Dockerfile.prod` (imágenes `app` y `web`), `deploy-production.sh` y `.env.production.example`.
+- Servicios: `app`, `web`, `queue`, `scheduler` y `pgsql`, más `migrate` y `artisan` para comandos puntuales (`16_INFRAESTRUCTURA.md`).
+- El `.env` del servidor se arma con `.env.production.example`, con `WEB_PORT=8200`; las claves reales solo viven ahí.
 - Pasos de instalación y actualización: `20_DESPLIEGUE.md`.
 
 ## WhatsApp
