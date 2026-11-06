@@ -18,7 +18,7 @@ rama de trabajo (claude/…, feature/…) ──PR + revisión──▶ develop 
 
 1. Cada cambio entra a `develop` por *pull request*, con la revisión del otro desarrollador y CI en verde (`28_CONVENCIONES_DESARROLLO.md`).
 2. Al cerrar el proyecto, un *pull request* de `develop` a `main` deja la versión de entrega.
-3. Se marca la versión con una etiqueta (`v1.0.0`) y se anota en `24_CAMBIOS_Y_VERSIONES.md`.
+3. Se marca la versión con una etiqueta y se anota en `24_CAMBIOS_Y_VERSIONES.md`: `v1.0.0` es la de entrega (5 de noviembre) y `v1.1.0` la que se despliega (6 de noviembre). Las etiquetas no se mueven; cada cambio nuevo lleva una versión nueva.
 
 ## 3. Despliegue con Docker (recomendado)
 

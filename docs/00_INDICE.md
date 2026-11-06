@@ -55,7 +55,7 @@ Lista de los documentos del proyecto con su estado. Cada documento se escribió 
 | 30 | [Riesgos](30_RIESGOS.md) | COMPLETO | 3 | T-067 |
 | 31 | [Manual de usuario](31_MANUAL_DE_USUARIO.md) | COMPLETO | 6–7 | T-142, T-163 |
 
-Todos los documentos tienen archivo y quedaron en COMPLETO para la entrega `v1.0.0` (5 de noviembre de 2026). Los de negocio los aprobó NuevasTIC ese día. Las marcas **[INFORMACIÓN PENDIENTE]** que quedan dentro de algunos documentos (por ejemplo, el servidor y el dominio) son datos que faltan, no revisiones pendientes.
+Todos los documentos tienen archivo y quedaron en COMPLETO para la entrega `v1.0.0` (5 de noviembre de 2026). Los de negocio los aprobó NuevasTIC ese día. Las marcas **[INFORMACIÓN PENDIENTE]** que quedan dentro de algunos documentos (por ejemplo, quién mantiene el sistema) son datos que faltan, no revisiones pendientes.
 
 ## Otros archivos de la raíz
 

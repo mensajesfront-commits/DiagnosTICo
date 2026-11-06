@@ -1,10 +1,21 @@
 # Cambios y versiones
 
-**Estado:** COMPLETO (T-037) hasta la versión `v1.0.0`. Lo más nuevo va arriba; los cambios siguientes se anotan como una versión nueva.
+**Estado:** COMPLETO (T-037) hasta la versión `v1.1.0`. Lo más nuevo va arriba; los cambios siguientes se anotan como una versión nueva.
 
-La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan por semana del cronograma.
+La versión de entrega es `v1.0.0` (T-152); hasta ella, los cambios se agrupan por semana del cronograma. La versión que corre en el servidor es `v1.1.0`.
 
-## Después de v1.0.0 · despliegue con Docker (6 de noviembre de 2026)
+| Versión | Fecha | Commit en `main` | Qué es |
+|---|---|---|---|
+| `v1.1.0` | 6 de noviembre de 2026 | `c419a43` | Lo que se despliega en https://diagnostico.captter.com: `v1.0.0` más el despliegue con Docker |
+| `v1.0.0` | 5 de noviembre de 2026 | `2838f4a` | La versión de entrega del proyecto |
+
+Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` para una corrección, `v1.2.0` para algo nuevo).
+
+## v1.1.0 · despliegue en el servidor (6 de noviembre de 2026)
+
+- **Etiqueta `v1.1.0` sobre `main`** (commit `c419a43`, después de los PR #16 a #19). La crea el equipo en GitHub (Releases → *Draft a new release*). `v1.0.0` no se mueve: sigue marcando lo entregado el 5 de noviembre.
+- **Al actualizar el servidor:** no hay migraciones nuevas desde `v1.0.0`. La primera instalación sigue `20_DESPLIEGUE.md`; las siguientes, `./deploy-production.sh`.
+- **PR #18:** el puerto por defecto de `web` pasa a 8200 y `APP_URL` a `https://diagnostico.captter.com` en `.env.production.example`. **PR #19:** `develop` a `main`.
 
 - **PR #17 a `main`** (Luis Carlos): estructura de producción igual a la de Kiasmer (DEC-024).
   - `docker-compose.prod.yml`: `app`, `web` (solo en `127.0.0.1:${WEB_PORT}`), `queue`, `scheduler`, `pgsql` y los comandos `migrate` y `artisan`.
@@ -12,7 +23,7 @@ La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan p
   - `deploy-production.sh`, `.env.production.example` y `.dockerignore`.
   - `trustProxies` en `bootstrap/app.php`; docs/20 con la instalación, la actualización y los VirtualHost de Apache y Nginx.
 - **En el PR #16:** `URL::forceScheme('https')` cuando `APP_URL` empieza por `https://`, y docs/16, docs/22 (DEC-024), docs/27 y README alineados con el PR #17.
-- **Servidor:** https://diagnostico.captter.com. Apache tiene el SSL y reenvía a `127.0.0.1:8200`, así que el `.env` del servidor lleva `WEB_PORT=8200`.
+- **Servidor:** https://diagnostico.captter.com. Apache tiene el SSL y reenvía a `127.0.0.1:8200`, así que el `.env` del servidor lleva `WEB_PORT=8200` (el valor de `.env.production.example` desde el PR #18).
 - Una primera versión de estos archivos, escrita en el PR #16, se quitó a favor de la del PR #17, que sí se construyó y probó.
 
 ## v1.0.0 · versión de entrega (5 de noviembre de 2026)
