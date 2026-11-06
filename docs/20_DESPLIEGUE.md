@@ -1,12 +1,12 @@
 # Despliegue
 
-**Estado:** COMPLETO (T-155). Cómo se entrega y cómo se despliega. El sistema **se va a desplegar** (DEC-006 cambió el 4 de noviembre). Se publica en **https://diagnostico.captter.com** con Docker Compose (DEC-024).
+**Estado:** el sistema **se despliega** (DEC-006 cambió el 4 de noviembre de 2026; antes solo se entregaba el repositorio). La forma recomendada es con Docker (sección 3), con la misma estructura de producción de Kiasmer: imágenes inmutables, Nginx en un contenedor y un proxy con HTTPS en el servidor.
 
 ## 1. Qué se entrega
 
 - El repositorio de GitHub con la rama `main` al día y las pruebas en verde.
 - La documentación de `docs/` y el `README.md` con la instalación paso a paso.
-- El archivo `.env.example` con todas las variables y solo marcadores en lugar de claves.
+- `.env.example` (local) y `.env.production.example` (servidor), con todas las variables y solo marcadores en lugar de claves.
 
 No se entregan claves, cuentas de prueba ni una base de datos con datos reales.
 
@@ -20,147 +20,178 @@ rama de trabajo (claude/…, feature/…) ──PR + revisión──▶ develop 
 2. Al cerrar el proyecto, un *pull request* de `develop` a `main` deja la versión de entrega.
 3. Se marca la versión con una etiqueta (`v1.0.0`) y se anota en `24_CAMBIOS_Y_VERSIONES.md`.
 
-**Hecho para la entrega:** PR #11 a #15 a `develop`, PR #13 a `main` y la etiqueta `v1.0.0` sobre `main` (commit `2838f4a`, 5 de noviembre de 2026).
+## 3. Despliegue con Docker (recomendado)
 
-## 3. Desplegar en el servidor (Docker)
+### 3.1 Piezas
 
-Requisitos del servidor: `16_INFRAESTRUCTURA.md`. Decisión: DEC-024.
-
-```
-Internet ──https──▶ Apache del servidor (SSL de diagnostico.captter.com)
-                      │ ProxyPass a http://127.0.0.1:8200
-                      ▼
-┌──────────────── docker-compose.prod.yml (red "interna") ────────────────┐
-│ nginx :80 ──fastcgi──▶ app (PHP 8.4-FPM :9000)                          │
-│ queue (queue:work) · scheduler (schedule:work)   ← misma imagen que app │
-│ postgres (18) · redis (caché y cola)            ← sin puertos al exterior│
-└──────────────────────────────────────────────────────────────────────────┘
-```
-
-| Archivo | Para qué |
+| Archivo | Qué es |
 |---|---|
-| `docker-compose.prod.yml` | Los seis servicios, los volúmenes (`storage`, `postgres`, `redis`) y el puerto `127.0.0.1:${NGINX_PORT:-8200}:80` |
-| `docker/php/Dockerfile.prod` | Imagen de `app`, `queue` y `scheduler`: PHP 8.4-FPM, extensiones, Node 24, Chromium, `composer install --no-dev` y `npm run build` |
-| `docker/php/php.ini`, `docker/php/www.conf` | OPcache, límites de subida y el pool de php-fpm (`clear_env = no` para que PHP vea las variables) |
-| `docker/php/entrypoint.sh` | Al arrancar corre `php artisan optimize` con las variables del servidor. No corre migraciones |
-| `docker/nginx/Dockerfile.prod`, `docker/nginx/default.conf` | Nginx con `public/` copiado de la imagen de la aplicación |
-| `.env.production.example` | Plantilla del `.env` del servidor, solo con marcadores |
-| `.dockerignore` | Deja fuera de la imagen el `.env`, `vendor`, `node_modules`, `tests` y `docs` |
+| `docker-compose.prod.yml` | Los servicios de producción. El local sigue siendo Sail (`compose.yaml`). |
+| `docker/php/Dockerfile.prod` | Dos imágenes: `app` (PHP-FPM 8.4 + Chromium para los PDF) y `web` (Nginx con `public/` y los assets de Vite). |
+| `docker/php/entrypoint.prod.sh` | Al arrancar: `storage:link` y `php artisan optimize` (cachea config, rutas, vistas y eventos). |
+| `docker/php/php.ini`, `opcache.prod.ini`, `www.conf` | PHP, OPcache (sin revisar archivos) y el pool de PHP-FPM. |
+| `docker/nginx/default.prod.conf` | Nginx del contenedor: archivos de `public/` y todo lo demás a `index.php`. |
+| `.env.production.example` | Plantilla del `.env` del servidor. |
+| `deploy-production.sh` | Actualiza el sistema (sección 3.4). |
 
-Necesita Docker con Compose 2.17 o más reciente (Nginx toma los archivos de la imagen `app` con `additional_contexts`).
+| Servicio | Imagen | Para qué |
+|---|---|---|
+| `app` | `diagnostico-app` | PHP-FPM (Laravel + Inertia). |
+| `web` | `diagnostico-web` | Nginx. El único con puerto: `127.0.0.1:${WEB_PORT}` (8200 por defecto). |
+| `queue` | `diagnostico-app` | `php artisan queue:work --tries=3`: análisis de la IA, PDF y correos. |
+| `scheduler` | `diagnostico-app` | `php artisan schedule:work` (`routes/console.php`). |
+| `pgsql` | `postgres:18-alpine` | Base de datos, sin puertos publicados. |
+| `migrate`, `artisan` | `diagnostico-app` | Comandos puntuales (perfil `tools`). |
 
-### Primer despliegue
+Volúmenes: `pgsql_data` (base de datos) y `storage_data` (`storage/` de Laravel: PDF, logs, sesiones de archivo). Red: `diagnostico`. PHP corre como `www-data`.
+
+Los PDF se generan en `app` y en `queue`: las dos llevan Chromium (`/usr/local/bin/chromium`, instalado con Playwright como en Sail) y Puppeteer en `/opt/browsershot`. Tienen `shm_size: 1gb` porque Chromium falla con los 64 MB por defecto.
+
+### 3.2 Requisitos del servidor
+
+- Docker Engine con el plugin `docker compose`, y `git`.
+- Un proxy con HTTPS delante (sección 3.5). Requisitos de memoria y disco: `16_INFRAESTRUCTURA.md`.
+
+### 3.3 Primera instalación
 
 ```bash
 git clone https://github.com/mensajesfront-commits/DiagnosTICo.git
 cd DiagnosTICo
-git checkout v1.0.0                          # o main
+cp .env.production.example .env        # completa lo que está entre < >
 
-cp .env.production.example .env
-chmod 600 .env
-nano .env                                    # llena todo lo que está entre < >
-
-# Contraseñas de PostgreSQL y Redis (una para cada una):
-openssl rand -hex 24
-
-# APP_KEY: se genera una vez y se copia en el .env (APP_KEY=base64:...)
+# Clave de la aplicación: copia el valor que muestra a APP_KEY en .env
 docker compose -f docker-compose.prod.yml build
-docker compose -f docker-compose.prod.yml run --rm --no-deps app php artisan key:generate --show
+docker compose -f docker-compose.prod.yml run --rm --no-deps artisan key:generate --show
+
+# Base de datos y cuenta principal del Administrador (MAIL_* ya configurado:
+# al ADMIN_EMAIL le llega "Crear mi contraseña")
+docker compose -f docker-compose.prod.yml up -d pgsql
+docker compose -f docker-compose.prod.yml run --rm artisan migrate --seed --force
 
 docker compose -f docker-compose.prod.yml up -d
-docker compose -f docker-compose.prod.yml exec app php artisan migrate --seed --force
-docker compose -f docker-compose.prod.yml ps   # todo en running / healthy
+curl -fsS http://127.0.0.1:8200/up      # debe responder 200
 ```
 
-`db:seed` crea los roles, los catálogos y la cuenta principal del Administrador (`ADMIN_EMAIL`); a ese correo le llega "Crear mi contraseña". Si no llega: `docker compose -f docker-compose.prod.yml exec app php artisan admin:invitar`.
+Si el correo de "Crear mi contraseña" no llega: `docker compose -f docker-compose.prod.yml run --rm artisan admin:invitar`.
 
-### Apache delante
+### 3.4 Actualizar a una versión nueva
 
-Apache ya tiene el SSL de `diagnostico.captter.com` y apunta al puerto 8200. El VirtualHost `:443` debe tener, como mínimo:
+```bash
+./deploy-production.sh              # sin migraciones
+./deploy-production.sh --migrate    # con migraciones nuevas
+```
+
+El script deja el sitio en mantenimiento, hace `git pull` de `main`, construye las imágenes, verifica que arranquen, corre las migraciones (solo con `--migrate`), recrea los contenedores, espera a que `app` y `web` estén sanos, quita el mantenimiento, borra imágenes viejas y comprueba `/up`. Si algo falla a mitad de camino, quita el mantenimiento. Registro en `deploy.log`.
+
+La cola y el scheduler se recrean con cada despliegue, así que siempre corren el código nuevo (no hace falta `queue:restart`).
+
+Comandos útiles:
+
+```bash
+docker compose -f docker-compose.prod.yml ps                       # estado
+docker compose -f docker-compose.prod.yml logs -f queue            # logs de la cola
+docker compose -f docker-compose.prod.yml run --rm artisan <cmd>   # cualquier comando artisan
+docker compose -f docker-compose.prod.yml exec app php artisan prueba:pdf   # prueba que Chromium genera PDF
+```
+
+### 3.5 Proxy con HTTPS delante
+
+El servidor usa **Apache** con el SSL (el ejemplo de Nginx queda por si cambia). Los dos apuntan a `127.0.0.1:8200` y le pasan `X-Forwarded-Proto` para que Laravel arme los enlaces con `https://`. Laravel acepta esas cabeceras (`trustProxies` en `bootstrap/app.php`); es seguro porque el contenedor solo escucha en `127.0.0.1`.
+
+**Apache** (módulos `proxy`, `proxy_http`, `headers`, `ssl`):
 
 ```apache
-ProxyPreserveHost On
-RequestHeader set X-Forwarded-Proto "https"
-RequestHeader set X-Forwarded-Port "443"
-ProxyPass        / http://127.0.0.1:8200/
-ProxyPassReverse / http://127.0.0.1:8200/
+<VirtualHost *:443>
+    ServerName diagnostico.captter.com
+
+    SSLEngine on
+    SSLCertificateFile    /etc/letsencrypt/live/diagnostico.captter.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/diagnostico.captter.com/privkey.pem
+
+    ProxyPreserveHost On
+    RequestHeader set X-Forwarded-Proto "https"
+    RequestHeader set X-Forwarded-Port "443"
+    ProxyPass        / http://127.0.0.1:8200/
+    ProxyPassReverse / http://127.0.0.1:8200/
+    LimitRequestBody 20971520
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName diagnostico.captter.com
+    Redirect permanent / https://diagnostico.captter.com/
+</VirtualHost>
 ```
 
-Sin `X-Forwarded-Proto`, Laravel cree que la petición llegó por http: las cookies seguras y la cabecera HSTS dependen de eso. Requiere `mod_proxy`, `mod_proxy_http` y `mod_headers`. Laravel confía en ese proxy (`trustProxies` en `bootstrap/app.php`) y, como `APP_URL` empieza por `https://`, arma todos los enlaces en https.
+**Nginx:**
 
-### Variables del `.env` del servidor
+```nginx
+server {
+    listen 443 ssl;
+    server_name diagnostico.captter.com;
 
-La plantilla es `.env.production.example`. Las claves reales se escriben **solo** en el `.env` del servidor: nunca en el repositorio, en un chat ni en un correo.
+    ssl_certificate     /etc/letsencrypt/live/diagnostico.captter.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/diagnostico.captter.com/privkey.pem;
 
-| Variable | Valor |
-|---|---|
-| `APP_ENV` / `APP_DEBUG` / `INERTIA_DEVTOOLS_ENABLED` | `production` / `false` / `false` (ERR-06/07) |
-| `APP_URL` | `https://diagnostico.captter.com` |
-| `APP_KEY` | La que da `key:generate --show`. No se cambia después: cifra las sesiones |
-| `NGINX_PORT` | `8200` |
-| `DB_HOST` / `DB_PASSWORD` | `postgres` / una clave aleatoria. PostgreSQL crea la base con ella la primera vez |
-| `REDIS_HOST` / `REDIS_PASSWORD` | `redis` / una clave aleatoria |
-| `CACHE_STORE` / `QUEUE_CONNECTION` | `redis` / `redis` |
-| `SESSION_DRIVER` | `database` (el sistema borra sesiones de la tabla `sessions`) |
-| `SESSION_SECURE_COOKIE` / `SESSION_ENCRYPT` | `true` / `true` |
-| `OPENAI_API_KEY` / `OPENAI_MODEL` | La clave de NuevasTIC / `gpt-4.1-mini` |
-| `CAPTCHA_ACTIVO`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | `true` y las llaves reales; sin ellas nadie se registra |
-| `MAIL_*` | El SMTP real |
-| `ADMIN_EMAIL` | La cuenta principal del Administrador (la elige NuevasTIC) |
-| `SOPORTE_EMAIL` | `contacto@captter.com` |
-| `AUTH_PASSWORD_RESET_EXPIRE` | `10` |
-| `LARAVEL_PDF_CHROME_PATH` / `LARAVEL_PDF_NO_SANDBOX` | `/usr/bin/chromium` / `true` |
+    client_max_body_size 20M;
 
-Otras reglas:
+    location / {
+        proxy_pass http://127.0.0.1:8200;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-Port  443;
+        proxy_read_timeout 120s;
+    }
+}
 
+server {
+    listen 80;
+    server_name diagnostico.captter.com;
+    return 301 https://$host$request_uri;
+}
+```
+
+El certificado se puede sacar con Certbot (`certbot --apache` o `certbot --nginx`).
+
+### 3.6 Cola y caché: base de datos o Redis
+
+Hoy la cola, la caché y las sesiones usan PostgreSQL (`QUEUE_CONNECTION=database`, `CACHE_STORE=database`, `SESSION_DRIVER=database`): menos piezas y suficiente para el volumen esperado. **[INFORMACIÓN PENDIENTE]** Si NuevasTIC prefiere Redis:
+
+1. Agregar a `docker-compose.prod.yml` un servicio `redis` (`redis:7-alpine`, volumen propio, sin puertos), como en Kiasmer.
+2. En `.env`: `REDIS_HOST=redis`, `QUEUE_CONNECTION=redis`, `CACHE_STORE=redis` y, si se quiere, `SESSION_DRIVER=redis`.
+3. La imagen no trae la extensión de Redis: agregar `pecl install redis && docker-php-ext-enable redis` en la etapa `base` de `docker/php/Dockerfile.prod` (o usar `REDIS_CLIENT=predis` con `composer require predis/predis`).
+
+## 4. Variables y seguridad en producción
+
+- **Obligatorias:** `APP_KEY`, `APP_URL` con `https://`, `DB_PASSWORD`, `OPENAI_API_KEY` y `OPENAI_MODEL`, `MAIL_*` con el SMTP real, `ADMIN_EMAIL`, `TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`. Plantilla: `.env.production.example`.
 - **Rutas de prueba técnica:** `/prueba-tecnica/*` solo existen con `APP_ENV=local`; en producción no se cargan.
-- **Antes de publicar:** `composer audit` y `npm audit` sin alertas altas (en `v1.0.0`, los dos en 0).
-- Si se cambia el `.env`: `docker compose -f docker-compose.prod.yml up -d` (recrea los contenedores y vuelve a cachear la configuración).
+- **Seguridad del entorno (auditoría QA del 4 de noviembre, ERR-06/07):**
+  - `APP_ENV=production` y `APP_DEBUG=false`: con `local`, `/_inertia/devtools` deja leer a cualquiera las peticiones recientes con sus datos, y un error muestra el código y el SQL.
+  - `INERTIA_DEVTOOLS_ENABLED=false`.
+  - Con HTTPS: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`. El sistema ya manda `X-Frame-Options`, `nosniff`, `Referrer-Policy` y, con HTTPS, `Strict-Transport-Security` (`CabecerasSeguridad`).
+  - Antes de publicar: `composer audit` y `npm audit --omit=dev` sin alertas altas.
+- OpenAI lo paga NuevasTIC, con gpt-4.1-mini.
+- Las llaves reales de Cloudflare Turnstile ya existen (4 de noviembre). Van solo en el `.env` del servidor, nunca en el repositorio.
+- Dominio: `https://diagnostico.captter.com`, con Apache y el SSL en el servidor. **[INFORMACIÓN PENDIENTE]** Quién mantiene el sistema (`21_MANTENIMIENTO.md`).
+- Despliegue automático desde GitHub Actions: **NO APLICA** por ahora. CI solo corre las pruebas.
 
-### Actualizar a una versión nueva
+## 5. Sin Docker (alternativa)
 
-```bash
-git pull                                      # o git checkout <etiqueta nueva>
-docker compose -f docker-compose.prod.yml build
-docker compose -f docker-compose.prod.yml exec app php artisan down
-docker compose -f docker-compose.prod.yml up -d
-docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
-docker compose -f docker-compose.prod.yml exec app php artisan up
-```
-
-`up -d` cambia los contenedores por los de la imagen nueva; la cola termina el trabajo en curso antes de apagarse (`stop_grace_period`). Los PDF, logos, fotos y logs quedan en el volumen `storage`.
-
-### Comandos útiles
+Si el servidor no tiene Docker: PHP 8.4 con `pdo_pgsql`, `intl`, `zip`, `gd`, `bcmath`, `pcntl`; Node 24; PostgreSQL 18; Chromium.
 
 ```bash
-docker compose -f docker-compose.prod.yml logs -f queue        # análisis de la IA, PDF y correos
-docker compose -f docker-compose.prod.yml exec app php artisan prueba:ia   # una llamada real a OpenAI
-docker compose -f docker-compose.prod.yml exec app php artisan queue:failed
-docker compose -f docker-compose.prod.yml exec postgres pg_dump -U diagnostico diagnostico > respaldo.sql
-```
-
-### Sin Docker (alternativa)
-
-Si algún día se instala directo en un servidor con PHP 8.4, Node 24 y Chromium:
-
-```bash
-cp .env.production.example .env   # con DB_HOST, REDIS_HOST y LARAVEL_PDF_CHROME_PATH del servidor
+git clone https://github.com/mensajesfront-commits/DiagnosTICo.git
+cd DiagnosTICo
+cp .env.production.example .env        # DB_HOST y LARAVEL_PDF_CHROME_PATH según el servidor
 composer install --no-dev --optimize-autoloader
 php artisan key:generate
 php artisan migrate --seed --force
-npm ci && npm run build
+npm ci
+npm run build
 php artisan optimize
 ```
 
-Con Supervisor para `php artisan queue:work --tries=3 --timeout=120` y el cron `* * * * * php artisan schedule:run`.
-
-## 4. Despliegue (decisión del 4 de noviembre de 2026)
-
-El sistema **se va a desplegar** (DEC-006 cambió). La sección 3 tiene los pasos.
-
-- Dominio: **diagnostico.captter.com**. Apache del servidor tiene el certificado SSL y reenvía a `127.0.0.1:8200` (5 de noviembre).
-- Archivos de producción: `docker-compose.prod.yml`, `docker/php/Dockerfile.prod` y `docker/nginx/Dockerfile.prod` (DEC-024).
-- **[INFORMACIÓN PENDIENTE]** Quién mantiene el sistema (`21_MANTENIMIENTO.md`).
-- OpenAI lo paga NuevasTIC, con gpt-4.1-mini.
-- Las llaves reales de Cloudflare Turnstile ya existen (4 de noviembre). Van solo en el `.env` del servidor (`TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`), nunca en el repositorio.
-- Despliegue automático desde GitHub Actions: **NO APLICA** por ahora. CI solo corre las pruebas.
+- **Cola:** un servicio de Supervisor con `php artisan queue:work --tries=3`.
+- **Tareas programadas:** el cron `* * * * * php artisan schedule:run`.
+- **Actualizar:** `php artisan down`, `git pull`, `composer install --no-dev --optimize-autoloader`, `php artisan migrate --force`, `npm ci && npm run build`, `php artisan optimize`, `php artisan queue:restart`, `php artisan up`.

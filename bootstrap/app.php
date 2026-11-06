@@ -31,13 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
 
-        // En producción Apache (con el SSL) y Nginx van delante de PHP
-        // (docker-compose.prod.yml). Se confía en el proxy inmediato para leer
-        // X-Forwarded-Proto/For: así Laravel sabe que la petición llegó por
-        // HTTPS (cookies seguras, HSTS, enlaces https) y ve la IP real para
-        // el límite de intentos. Nginx solo escucha en 127.0.0.1.
-        $middleware->trustProxies(at: '*');
-
         // ERR-06: cabeceras de seguridad en todas las respuestas.
         $middleware->append(CabecerasSeguridad::class);
 
