@@ -37,7 +37,7 @@ rama de trabajo (claude/…, feature/…) ──PR + revisión──▶ develop 
 | Servicio | Imagen | Para qué |
 |---|---|---|
 | `app` | `diagnostico-app` | PHP-FPM (Laravel + Inertia). |
-| `web` | `diagnostico-web` | Nginx. El único con puerto: `127.0.0.1:${WEB_PORT}` (8080 por defecto). |
+| `web` | `diagnostico-web` | Nginx. El único con puerto: `127.0.0.1:${WEB_PORT}` (8200 por defecto). |
 | `queue` | `diagnostico-app` | `php artisan queue:work --tries=3`: análisis de la IA, PDF y correos. |
 | `scheduler` | `diagnostico-app` | `php artisan schedule:work` (`routes/console.php`). |
 | `pgsql` | `postgres:18-alpine` | Base de datos, sin puertos publicados. |
@@ -69,7 +69,7 @@ docker compose -f docker-compose.prod.yml up -d pgsql
 docker compose -f docker-compose.prod.yml run --rm artisan migrate --seed --force
 
 docker compose -f docker-compose.prod.yml up -d
-curl -fsS http://127.0.0.1:8080/up      # debe responder 200
+curl -fsS http://127.0.0.1:8200/up      # debe responder 200
 ```
 
 Si el correo de "Crear mi contraseña" no llega: `docker compose -f docker-compose.prod.yml run --rm artisan admin:invitar`.
@@ -96,29 +96,29 @@ docker compose -f docker-compose.prod.yml exec app php artisan prueba:pdf   # pr
 
 ### 3.5 Proxy con HTTPS delante
 
-**[INFORMACIÓN PENDIENTE]** Qué servidor web tiene la máquina de NuevasTIC. Cualquiera de los dos sirve: apuntan a `127.0.0.1:8080` y le pasan `X-Forwarded-Proto` para que Laravel arme los enlaces con `https://`. Laravel acepta esas cabeceras (`trustProxies` en `bootstrap/app.php`); es seguro porque el contenedor solo escucha en `127.0.0.1`.
+El servidor usa **Apache** con el SSL (el ejemplo de Nginx queda por si cambia). Los dos apuntan a `127.0.0.1:8200` y le pasan `X-Forwarded-Proto` para que Laravel arme los enlaces con `https://`. Laravel acepta esas cabeceras (`trustProxies` en `bootstrap/app.php`); es seguro porque el contenedor solo escucha en `127.0.0.1`.
 
 **Apache** (módulos `proxy`, `proxy_http`, `headers`, `ssl`):
 
 ```apache
 <VirtualHost *:443>
-    ServerName <dominio>
+    ServerName diagnostico.captter.com
 
     SSLEngine on
-    SSLCertificateFile    /etc/letsencrypt/live/<dominio>/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/<dominio>/privkey.pem
+    SSLCertificateFile    /etc/letsencrypt/live/diagnostico.captter.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/diagnostico.captter.com/privkey.pem
 
     ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
-    ProxyPass        / http://127.0.0.1:8080/
-    ProxyPassReverse / http://127.0.0.1:8080/
+    ProxyPass        / http://127.0.0.1:8200/
+    ProxyPassReverse / http://127.0.0.1:8200/
     LimitRequestBody 20971520
 </VirtualHost>
 
 <VirtualHost *:80>
-    ServerName <dominio>
-    Redirect permanent / https://<dominio>/
+    ServerName diagnostico.captter.com
+    Redirect permanent / https://diagnostico.captter.com/
 </VirtualHost>
 ```
 
@@ -127,15 +127,15 @@ docker compose -f docker-compose.prod.yml exec app php artisan prueba:pdf   # pr
 ```nginx
 server {
     listen 443 ssl;
-    server_name <dominio>;
+    server_name diagnostico.captter.com;
 
-    ssl_certificate     /etc/letsencrypt/live/<dominio>/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/<dominio>/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/diagnostico.captter.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/diagnostico.captter.com/privkey.pem;
 
     client_max_body_size 20M;
 
     location / {
-        proxy_pass http://127.0.0.1:8080;
+        proxy_pass http://127.0.0.1:8200;
         proxy_set_header Host              $host;
         proxy_set_header X-Real-IP         $remote_addr;
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -147,7 +147,7 @@ server {
 
 server {
     listen 80;
-    server_name <dominio>;
+    server_name diagnostico.captter.com;
     return 301 https://$host$request_uri;
 }
 ```
@@ -173,7 +173,7 @@ Hoy la cola, la caché y las sesiones usan PostgreSQL (`QUEUE_CONNECTION=databas
   - Antes de publicar: `composer audit` y `npm audit --omit=dev` sin alertas altas.
 - OpenAI lo paga NuevasTIC, con gpt-4.1-mini.
 - Las llaves reales de Cloudflare Turnstile ya existen (4 de noviembre). Van solo en el `.env` del servidor, nunca en el repositorio.
-- **[INFORMACIÓN PENDIENTE]** El servidor, el dominio, el certificado HTTPS y quién mantiene el sistema (`21_MANTENIMIENTO.md`).
+- Dominio: `https://diagnostico.captter.com`, con Apache y el SSL en el servidor. **[INFORMACIÓN PENDIENTE]** Quién mantiene el sistema (`21_MANTENIMIENTO.md`).
 - Despliegue automático desde GitHub Actions: **NO APLICA** por ahora. CI solo corre las pruebas.
 
 ## 5. Sin Docker (alternativa)
