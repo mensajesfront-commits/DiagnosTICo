@@ -1,6 +1,6 @@
 # Decisiones técnicas
 
-**Estado:** EN CURSO (T-034)
+**Estado:** COMPLETO (T-034). Decisiones vigentes en la entrega `v1.0.0`.
 
 Cada decisión registra qué se decidió, por qué y qué se descartó. Si una decisión se cambia, no se borra: se marca **REEMPLAZADA** y se agrega una nueva.
 
@@ -18,13 +18,18 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-010 | Fuentes IBM Plex servidas desde el proyecto | Vigente |
 | DEC-011 | Chromium instalado con Playwright en la imagen de Sail | Vigente |
 | DEC-012 | Del kit solo se deja el registro; sin modo oscuro | Cambiada el 16 oct: el registro verifica el correo (DEC-020) |
-| DEC-013 | La llamada real a OpenAI se prueba cuando se use la IA | Vigente |
+| DEC-013 | La llamada real a OpenAI se prueba cuando se use la IA | Cumplida: flujo completo con la clave real verificado el 5 de noviembre |
 | DEC-014 | Reglas de acceso propias sobre Fortify | Vigente |
 | DEC-015 | Registro en dos pasos y actividad económica CIIU | Vigente |
 | DEC-016 | País, departamento y ciudad en cascada | Vigente |
 | DEC-017 | Eliminar cuentas con 90 días para recuperarlas | Vigente |
 | DEC-018 | Catálogo CIIU Rev. 5 A.C. y subsectores por división | Vigente |
+| DEC-019 | La IA elige el método de análisis según las respuestas | Vigente |
 | DEC-020 | Verificar el correo al registrarse | Vigente |
+| DEC-021 | Consultor: rol del sistema, de solo lectura, con empresas vinculadas | Vigente |
+| DEC-022 | Dos PDF por resultado: resumen para la empresa e informe completo | Vigente |
+| DEC-023 | Enlaces de invitación aparte de los de recuperación | Vigente |
+| DEC-024 | Producción con Docker Compose detrás de Apache | Vigente |
 
 ---
 
@@ -215,7 +220,8 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - La respuesta de la IA trae `metodo` (una de las cinco claves; la salida estructurada no acepta otra) y `metodo_motivo` (por qué encaja). El resultado lo guarda en `por_categoria[].metodo` y lo muestra en E6 ("Analizado con …"), en las recomendaciones y en el PDF.
   - La guía de cuándo usar cada uno está en las instrucciones generales por defecto (`ArmadorPrompt::GENERAL`, "Detalles y restricciones") y en el formato fijo, que se envía siempre aunque el Administrador cambie las instrucciones. Los métodos están en `App\Support\MetodosAnalisis`.
 - **Por qué:** lo pidió el equipo (14 de octubre de 2026): el análisis no puede ser siempre DOFA; depende de las respuestas.
-- **Confirmado (NuevasTIC, 23 de octubre de 2026):** la IA puede usar DOFA, PESTEL y los demás métodos. No se muestra una matriz FODA, solo el nombre del método que guió el análisis y por qué; RN-028 se ajustó.
+- **Confirmado (NuevasTIC, 23 de octubre de 2026):** la IA puede usar DOFA, PESTEL y los demás métodos. En pantalla no se muestra una matriz FODA, solo el nombre del método que guió el análisis y por qué; RN-028 se ajustó.
+- **Cambio del 2 de noviembre de 2026:** con la reestructuración del informe, el PDF completo agrupa en «Análisis estratégico DOFA» las fortalezas, debilidades, oportunidades y amenazas que escribió la IA en cada categoría.
 
 ### DEC-020 — Verificar el correo al registrarse (con código y captcha)
 
@@ -234,7 +240,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - Llaves en `TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`.
   - Sin llaves, en local y en pruebas se usan las de prueba de Cloudflare, que siempre aprueban.
   - `CAPTCHA_ACTIVO=false` lo apaga; las pruebas automáticas lo apagan.
-  - **[INFORMACIÓN PENDIENTE]** Las llaves reales las crea NuevasTIC con su cuenta de Cloudflare si pone el sistema en línea.
+  - Las llaves reales ya existen (4 de noviembre de 2026). Van solo en el `.env` del servidor.
 - **Por qué:** evitar cuentas con correos falsos o que no existen, y registros hechos por robots.
 - **Registros sin verificar:** la tarea diaria `cuentas:purgar` los borra a los 7 días, con su empresa si no tiene otra cuenta. Así el correo queda libre para registrarse otra vez. Se cambia con `DIAS_REGISTRO_SIN_VERIFICAR`. Las invitaciones sin contraseña no cuentan.
 - **Cambio de correo en Mi perfil (A6, E11):**
@@ -242,3 +248,43 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - Llega un código al correo nuevo y se abre la ventana "Confirma tu nuevo correo".
   - Hasta confirmarlo se sigue entrando con el anterior.
   - Cerrar la ventana descarta el cambio (`users.email_pendiente`).
+
+### DEC-021 — Consultor: rol del sistema, de solo lectura, con empresas vinculadas
+
+- **Decisión (3 de noviembre de 2026, en la presentación):**
+  - El rol Consultor, que existía inactivo (PA-006), pasa a ser un rol del sistema: activo, fijo y con sus 5 permisos (`empresas.ver`, `resultados.ver`, `resultados.pdf`, `perfil.editar` y `contrasena.cambiar`).
+  - Es una persona externa: la invita el Administrador y le vincula una o varias empresas (tabla `consultor_empresa`).
+  - Solo mira esas empresas: ficha, historial, resultados, respuestas y los dos PDF. No responde ni toca diagnósticos.
+  - Tiene su inicio (C1) y «Mis empresas» (C2) en lugar de la lista A3.
+- **Cómo se cumple:** `User::puedeVerEmpresa()` en cada controlador de empresas y resultados; una empresa no vinculada da 404 (RN-030).
+- **Por qué:** NuevasTIC quiere sumar consultores externos al acompañamiento sin darles acceso al resto del sistema.
+
+### DEC-022 — Dos PDF por resultado: resumen para la empresa e informe completo
+
+- **Decisión (4 de noviembre de 2026):**
+  - Cada resultado tiene dos PDF (RN-024): el **informe completo** (`pdf/informe.blade.php`, unas 36 páginas) y el **resumen** (`pdf/resumen.blade.php`).
+  - La empresa y su colaborador reciben siempre el resumen, aunque pidan el completo en la URL.
+  - El Administrador y el Consultor descargan el completo por defecto y el resumen con `?tipo=resumen`, para entregárselo a la empresa.
+  - El resumen copia lo que la IA ya guardó, en orden, sin metodología, DOFA, fichas, cronograma ni KPI. Usa los nombres de nivel de la pantalla.
+- **Cómo se guarda:** `resultados.pdf_ruta` (completo) y `resultados.pdf_resumen_ruta` (resumen). `GenerarInformePdf` genera los dos al publicar.
+- **Por qué:** un empresario no lee un informe de 36 páginas; el detalle técnico es para quien lo acompaña.
+
+### DEC-023 — Enlaces de invitación aparte de los de recuperación
+
+- **Decisión (4 de noviembre de 2026, auditoría QA, ERR-09):**
+  - El enlace de «¿Olvidaste tu contraseña?» vence a los **10 minutos** (`AUTH_PASSWORD_RESET_EXPIRE`, broker `users`, tabla `password_reset_tokens`).
+  - El de una invitación sirve hasta usarlo (broker `invitaciones`, tabla `invitaciones_tokens`).
+  - `ElegirEnlaceContrasena` hace que L4 acepte los dos. Al crear la contraseña se borran los dos enlaces de la cuenta.
+- **Por qué:** un enlace de recuperación que vale un año es un riesgo; uno de invitación que vence a los 10 minutos dejaría sin entrar a quien no abrió el correo a tiempo.
+
+### DEC-024 — Producción con Docker Compose detrás de Apache
+
+- **Decisión (6 de noviembre de 2026, PR #17):**
+  - El servidor corre el sistema con `docker-compose.prod.yml`, con la misma estructura de producción de Kiasmer: `app` (PHP 8.4-FPM), `web` (Nginx), `queue`, `scheduler`, `pgsql` (PostgreSQL 18) y los comandos puntuales `migrate` y `artisan`.
+  - Un solo `docker/php/Dockerfile.prod` arma las dos imágenes (`target: app` y `target: web`). `app` lleva Chromium (Playwright) y Puppeteer para los PDF.
+  - Solo `web` publica un puerto, en `127.0.0.1:${WEB_PORT}`. En el servidor, `WEB_PORT=8200`: Apache tiene el SSL de `diagnostico.captter.com` y reenvía a ese puerto.
+  - Cola, caché y sesiones siguen en PostgreSQL, como en local. Redis queda como opción documentada en `20_DESPLIEGUE.md`.
+  - Laravel confía en el proxy (`trustProxies` en `bootstrap/app.php`) para saber que la petición llegó por HTTPS, y fuerza `https` en los enlaces cuando `APP_URL` empieza por `https://` (`AppServiceProvider`), también en los correos de la cola.
+  - `deploy-production.sh` actualiza el sistema: mantenimiento, `git pull`, build, migraciones con `--migrate`, contenedores nuevos y comprobación de `/up`.
+- **Por qué:** es la forma en que el equipo despliega sus otros proyectos; deja todo el entorno en el repositorio y no instala PHP ni Chromium en el servidor. Se probó completa en local con la imagen de producción (PDF desde `app` y desde `queue`).
+- **Descartado:** instalar PHP, Supervisor y cron directo en el servidor; una primera versión con Redis y una imagen de Nginx aparte, que no se pudo construir en la sesión donde se escribió (reemplazada por la del PR #17).

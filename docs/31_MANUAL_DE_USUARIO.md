@@ -1,11 +1,12 @@
 # Manual de usuario
 
-**Estado:** REQUIERE VALIDACIÓN (T-142, T-163). Lo revisa NuevasTIC con el sistema funcionando. Los nombres de botones son los de la pantalla; entre paréntesis va el código del wireframe.
+**Estado:** COMPLETO (T-142, T-163), aprobado por NuevasTIC el 5 de noviembre de 2026. Los nombres de botones son los de la pantalla; entre paréntesis va el código del wireframe.
 
-Hay dos partes:
+Hay tres partes:
 
 - **Parte A:** para el equipo de NuevasTIC (Administrador).
 - **Parte B:** para las empresas y sus colaboradores.
+- **Parte C:** para los consultores.
 
 ---
 
@@ -14,10 +15,10 @@ Hay dos partes:
 ## A.1 Entrar
 
 1. Abre el sistema y escribe tu correo y tu contraseña (L1).
-2. Si la olvidaste, pulsa **¿Olvidaste tu contraseña?** (L3). Te llega un correo con un enlace para crear una nueva (L4).
+2. Si la olvidaste, pulsa **¿Olvidaste tu contraseña?** (L3). Te llega un correo con un enlace para crear una nueva (L4). El enlace vence a los **10 minutos**; si se te pasa el tiempo, pide otro.
 3. Entras al **Inicio** (A1).
 
-Las cuentas internas no se registran solas: otro Administrador las invita desde **Usuarios y roles** y llega un correo para crear la contraseña.
+Las cuentas internas no se registran solas: otro Administrador las invita desde **Usuarios y roles** y llega un correo para crear la contraseña. Ese enlace de invitación sirve hasta usarlo.
 
 ## A.2 Preparar un diagnóstico
 
@@ -113,8 +114,9 @@ Ve a **Configuración IA** (A4). Las instrucciones tienen cuatro partes: context
 2. **Sector:** para cada parte eliges usar la general, agregar texto al final o reemplazarla.
 3. **Empresa:** lo mismo, para una empresa puntual.
 4. **Ver instrucciones completas:** muestra el texto final.
-5. **Probar con un ejemplo:** analiza una categoría real con lo que escribiste, sin guardar. Gasta una llamada a OpenAI.
-6. Pulsa **Guardar**. Los cambios valen para las mediciones que se analicen desde ahora.
+5. **Probar con un ejemplo:** analiza una categoría real con lo que escribiste, sin guardar. Gasta una llamada a OpenAI; hay un máximo de 100 pruebas al día entre todos los administradores.
+6. Pulsa **Guardar**. Los cambios valen para las mediciones que se analicen desde ahora; los resultados ya publicados no cambian.
+7. Si algo sale mal, **Restaurar texto original** vuelve a las instrucciones de fábrica.
 
 **Cómo se arma el prompt final** (A4.9) explica las capas con un ejemplo.
 
@@ -122,11 +124,12 @@ Ve a **Configuración IA** (A4). Las instrucciones tienen cuatro partes: context
 
 En **Usuarios y roles** (A5):
 
-- **Invitar** cuentas internas.
+- **Invitar** cuentas internas. Si eliges el rol **Consultor**, la ventana pasa a «Invitar consultor» y puedes marcar en «Empresas que acompaña» las empresas que va a ver.
 - **Desactivar o reactivar** una cuenta.
 - **Eliminar** una cuenta: se escribe el correo exacto para confirmar y se puede recuperar durante 90 días.
 - **Cambiar el rol** de una cuenta. Si es la cuenta principal de una empresa, el sistema avisa qué pasa con sus colaboradores y su medición pendiente.
-- **Roles:** crear roles con los permisos que elijas. Los roles Administrador, Empresa y Colaborador no se borran.
+- **Roles:** crear roles con los permisos que elijas. Los roles Administrador, Empresa, Colaborador y Consultor no se borran.
+- **Consultores de una empresa:** también se vinculan después, en la ficha de la empresa (A3.1), pestaña **Consultores** → «Vincular un consultor» → **Vincular**. Ahí mismo, **Quitar** lo desvincula (pide confirmación). Un consultor puede acompañar varias empresas.
 - **Ver como:** mira el sistema como lo ve una empresa o un colaborador.
   - Es solo de lectura y queda registrado.
   - Arriba aparece una franja con **Salir de Ver como**.
@@ -142,9 +145,10 @@ En **Mi perfil** (A6) cambias tu nombre, tu foto, tu correo y tu contraseña.
 ## B.1 Registrarte
 
 1. En la pantalla de entrada pulsa **Registra tu empresa** (L2).
-2. **Paso 1:** tus datos y una contraseña con al menos 8 caracteres, una mayúscula, un número y un carácter especial.
-3. **Paso 2:** los datos de la empresa: sector, actividad económica, ubicación y número de empleados.
-4. Entras a tu inicio. Cuando NuevasTIC te asigne un diagnóstico, aparecerá ahí y, si así lo eligió, te llegará un correo.
+2. **Paso 1 · Mi empresa:** nombre, sector, actividad económica, descripción corta y ubicación.
+3. **Paso 2 · Tu usuario:** tus datos, tu correo y una contraseña con al menos 8 caracteres, una mayúscula, un número y un carácter especial. Marca la casilla «Acepto los **Términos y Condiciones** y la **Política de Privacidad**» (cada nombre abre su texto) y pasa el captcha.
+4. Te llega un correo con un **código de 6 dígitos**. Escríbelo en la ventana «Verifica tu correo» (L2b). Si no lo verificas en 7 días, el registro se borra.
+5. Entra con tu correo y tu contraseña. Cuando NuevasTIC te asigne un diagnóstico, aparecerá en tu inicio y, si así lo eligió, te llegará un correo.
 
 ## B.2 Responder el diagnóstico
 
@@ -209,15 +213,50 @@ Una medición vencida ya no se puede responder. En tu inicio pulsa **Pedir una n
 En **Colaboradores** (E12) agregas a las personas de tu empresa que también pueden responder y ver resultados.
 
 1. Pulsa **Agregar colaborador**.
-2. Escribe su nombre, cargo, correo y una contraseña.
+2. Escribe su nombre, cargo, correo y una contraseña, y elige qué páginas ve: **Responder el diagnóstico**, **Resultados y Mi historial** y **Descargar el informe PDF** (este último, solo junto con los resultados).
 3. El sistema te muestra los datos de acceso para que se los compartas (E12.2).
-4. Puedes editar, desactivar, reactivar o eliminar a cada colaborador.
+4. Puedes editar a cada colaborador (sus datos, su contraseña y sus páginas), desactivarlo, reactivarlo o eliminarlo.
 
 Los colaboradores no agregan a otros colaboradores ni cambian los datos de la empresa.
 
 ## B.8 Mi perfil
 
-En **Mi perfil** (E11) cambias tus datos, tu foto y tu contraseña. La cuenta principal también cambia los datos y el logo de la empresa.
+En **Mi perfil** (E11) cambias tus datos, tu foto y tu contraseña. La cuenta principal también cambia los datos y el logo de la empresa. Si cambias tu correo o tu teléfono, te llega un código para confirmarlo; hasta entonces sigues entrando con el anterior.
+
+Los colaboradores ven Mi perfil en solo lectura: sus datos y su contraseña los cambia la cuenta principal (E12.3).
+
+---
+
+# Parte C · Consultor
+
+El consultor es una persona externa a NuevasTIC que acompaña a una o varias empresas. **Solo mira:** no responde diagnósticos ni cambia datos.
+
+## C.1 Entrar
+
+1. NuevasTIC te invita y te llega un correo para crear tu contraseña (el enlace sirve hasta usarlo).
+2. Entra con tu correo y tu contraseña (L1). Llegas a tu **Inicio** (C1).
+3. Si todavía no tienes empresas, verás un aviso: el equipo de NuevasTIC te las vincula.
+
+## C.2 Tu inicio (C1)
+
+- Cifras de tus empresas: cuántas son, el puntaje promedio, cuántas mejoraron o bajaron y las mediciones pendientes.
+- **Qué atender**, de lo más urgente a lo menos: mediciones vencidas, puntajes que bajaron, mediciones sin empezar hace una semana y resultados nuevos.
+- Los resultados recientes y las próximas fechas límite.
+
+## C.3 Mis empresas (C2)
+
+- Una tarjeta por empresa con el último puntaje, el nivel, la variación y la medición pendiente.
+- **Ver empresa** abre su ficha; **Historial** y **Último resultado** van directo.
+- Puedes filtrar y ordenar; con 7 empresas o más aparece un buscador.
+
+## C.4 Resultados y PDF
+
+En el resultado de una empresa (A3.3) ves lo mismo que el equipo de NuevasTIC, y dos botones:
+
+- **Informe completo PDF:** el informe de diagnóstico con todo el detalle (metodología, DOFA, plan, cronograma y KPI).
+- **Resumen para la empresa:** el PDF corto que recibe la empresa, para entregárselo o revisarlo con ella.
+
+Si abres una empresa que no tienes vinculada, verás «No encontramos esta página».
 
 ---
 
@@ -225,4 +264,5 @@ En **Mi perfil** (E11) cambias tus datos, tu foto y tu contraseña. La cuenta pr
 
 - **No me llegó el correo.** Revisa la carpeta de spam. Si no está, escribe a **contacto@captter.com** para que te lo reenvíen.
 - **¿Puedo responder desde el celular?** Sí. Las pantallas se adaptan al ancho del celular.
-- **¿Quién ve mis respuestas?** Tu empresa, tus colaboradores y el equipo de NuevasTIC. Ninguna otra empresa (RN-007).
+- **¿Quién ve mis respuestas?** Tu empresa, tus colaboradores, el equipo de NuevasTIC y los consultores que NuevasTIC vincule a tu empresa. Ninguna otra empresa (RN-007, RN-030).
+- **El enlace para cambiar la contraseña ya no sirve.** Vence a los 10 minutos. Pide otro en «¿Olvidaste tu contraseña?»; solo sirve el último.

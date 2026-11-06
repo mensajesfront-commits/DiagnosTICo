@@ -16,7 +16,7 @@ No requiere programar. Se hace en Diagnósticos (A2):
 
 ### Cambiar cómo analiza la IA
 
-No requiere programar. Se hace en Configuración IA (A4) con las capas general, sector y empresa. "Probar con un ejemplo" muestra el resultado antes de guardar, pero gasta una llamada a OpenAI.
+No requiere programar. Se hace en Configuración IA (A4), con el permiso «Editar prompts», en las capas general, sector y empresa. "Probar con un ejemplo" muestra el resultado antes de guardar, pero gasta una llamada a OpenAI (máximo 100 al día). Los cambios solo aplican a los análisis nuevos; cada análisis guarda el texto que se usó. "Restaurar texto original" vuelve al de fábrica. El formato de la respuesta no se edita.
 
 ### Cambiar el modelo de OpenAI
 
@@ -49,7 +49,7 @@ php artisan mediciones:resumen
 
 ### Falla un PDF
 
-El resultado sigue publicado. El PDF se genera de nuevo al descargarlo. Si sigue fallando:
+Cada resultado tiene dos PDF: el informe completo y el resumen para la empresa (RN-024). El resultado sigue publicado aunque falle uno, y el que falte se genera de nuevo al descargarlo. Si sigue fallando:
 
 1. Revisar `storage/logs/laravel.log`.
 2. Comprobar Chromium con `php artisan prueba:pdf`.
@@ -57,8 +57,9 @@ El resultado sigue publicado. El PDF se genera de nuevo al descargarlo. Si sigue
 
 ### Olvidaron la contraseña del Administrador
 
-1. Pedir el enlace en "¿Olvidaste tu contraseña?" (L3).
-2. Si el correo no funciona, cambiarla desde la consola:
+1. Pedir el enlace en "¿Olvidaste tu contraseña?" (L3). Vence a los 10 minutos (RN-006).
+2. Si la cuenta principal del Administrador nunca creó su contraseña, `php artisan admin:invitar` reenvía la invitación o muestra el enlace.
+3. Si el correo no funciona, cambiarla desde la consola:
 
    ```bash
    php artisan tinker
@@ -70,10 +71,10 @@ El resultado sigue publicado. El PDF se genera de nuevo al descargarlo. Si sigue
 | Qué | Cómo | Cuidado |
 |---|---|---|
 | PHP (Composer) | `composer update` y luego `php artisan test` | PHP está fijado en 8.4 (`config.platform.php`) |
-| JavaScript (npm) | `npm update` y luego `npm test` y `npm run build` | Revisar Inertia, Vue y Chart.js entre versiones mayores |
+| JavaScript (npm) | `npm update` y luego `npm test`, `npm run types:check` y `npm run build` | Revisar Inertia, Vue y Chart.js entre versiones mayores. **Vite+:** al subir `vite-plus` se cambian juntos `vite-plus`, el alias `vite` (`npm:@voidzero-dev/vite-plus-core@…`) y los `overrides` de `vite` y `vitest` (DEC-008). **`vue-tsc`** queda fijo en 3.3.10 (ISSUE-010) |
 | Imagen de Sail | `./vendor/bin/sail build --no-cache` | Vuelve a instalar Chromium |
 
-Antes de subir, debe pasar `composer ci:check`.
+Antes de subir, debe pasar `composer ci:check`. Antes de publicar, `composer audit` y `npm audit` sin alertas altas (en la entrega `v1.0.0`, las dos dan 0).
 
 ## 3. Registros y monitoreo
 
@@ -98,7 +99,10 @@ Antes de subir, debe pasar `composer ci:check`.
 | Rangos o frases de los niveles | `app/Support/Niveles.php` y `resources/js/lib/niveles.ts` (mismas claves) |
 | Métodos de análisis de la IA | `app/Support/MetodosAnalisis.php` y el esquema de `AnalizadorDeCategoria` |
 | Instrucciones de la IA por defecto | `ArmadorPrompt::GENERAL` (lo que se edita en A4 queda en la tabla `prompts`) |
-| Plantilla del PDF | `resources/views/pdf/informe.blade.php` |
+| Plantillas de los PDF | `resources/views/pdf/informe.blade.php` (completo), `resumen.blade.php` (empresa), `encabezado`, `pie` y `logo` |
+| Textos legales del registro | `resources/js/lib/legales.ts` (copiar el texto oficial que entregue la empresa, con su fecha) |
+| Correo de soporte | `SOPORTE_EMAIL` en el `.env` |
+| Vencimiento del enlace de recuperación | `AUTH_PASSWORD_RESET_EXPIRE` en el `.env` (10 minutos por defecto) |
 | Correos | `app/Notifications/*` |
 | Colores del wireframe | `resources/css/app.css` |
 | Menú por rol | `resources/js/lib/menu.ts` (y el permiso en `routes/web.php`) |

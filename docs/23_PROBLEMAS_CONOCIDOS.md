@@ -1,6 +1,6 @@
 # Problemas conocidos
 
-**Estado:** EN CURSO (T-035)
+**Estado:** COMPLETO (T-035). Problemas conocidos en la entrega `v1.0.0`.
 
 Problemas que aparecieron al instalar o al programar, con su solución. Formato: ISSUE-XXX.
 
@@ -14,7 +14,10 @@ Problemas que aparecieron al instalar o al programar, con su solución. Formato:
 | ISSUE-006 | Conflicto de Guzzle al instalar `openai-php/laravel` | Resuelto |
 | ISSUE-007 | Chromium se cierra dentro de Docker ("Target closed") | Resuelto |
 | ISSUE-008 | Las etiquetas del radar salen con otra letra | Resuelto |
-| ISSUE-009 | La imagen de Sail no se pudo construir en el entorno de Claude | Abierto |
+| ISSUE-009 | La imagen de Sail no se pudo construir en el entorno de Claude | Resuelto en los equipos del equipo |
+| ISSUE-010 | `vue-tsc` 3.3.13 y 3.3.14 dan errores falsos en `MiPerfil.vue` | Resuelto (fijado en 3.3.10) |
+| ISSUE-011 | Docker Desktop en Windows no abre un puerto ("ports are not available") | Resuelto |
+| ISSUE-012 | `git pull` se detiene por cambios locales en `package-lock.json` | Resuelto |
 
 ---
 
@@ -77,4 +80,23 @@ Problemas que aparecieron al instalar o al programar, con su solución. Formato:
 - **Cómo se verificó lo demás:**
   - Las pruebas, PHPStan y la generación real del PDF se corrieron con PHP 8.4 en contenedores de Docker y PostgreSQL 18 (`postgres:18-alpine`).
   - El PDF se generó con Chromium 141.
-- **Pendiente:** construir la imagen con `./vendor/bin/sail build` en el equipo de Luis o de Cristian y confirmar que `chromium --version` funciona dentro del contenedor (T-021).
+- **Resuelto:** la imagen se construye en el equipo de Cristian con Sail, y ahí se generaron y revisaron los dos PDF (4 de noviembre de 2026).
+
+### ISSUE-010 — `vue-tsc` 3.3.13 y 3.3.14 con errores falsos
+
+- **Síntoma:** `npm run types:check` dice "Property 'value' does not exist on type 'InertiaForm'" en `resources/js/pages/perfil/MiPerfil.vue`, aunque el código está bien.
+- **Causa:** un error de esas versiones de `vue-tsc`.
+- **Solución:** `vue-tsc` queda fijo en **3.3.10** en `package.json` (DEC-008). Se puede subir cuando una versión nueva pase `npm run types:check`.
+
+### ISSUE-011 — Docker Desktop en Windows no abre un puerto
+
+- **Síntoma:** `sail up` falla con "ports are not available: exposing port TCP 0.0.0.0:54329 … /forwards/expose returned unexpected status: 500".
+- **Causa:** Windows reserva rangos de puertos para Hyper-V y WSL. Si `FORWARD_DB_PORT` (u otro puerto del `.env`) cae en uno, Docker no puede usarlo.
+- **Cómo verlo:** en PowerShell, `netsh interface ipv4 show excludedportrange protocol=tcp`.
+- **Solución:** usar en el `.env` un puerto fuera de esos rangos (por ejemplo `FORWARD_DB_PORT=5433`) y correr `./vendor/bin/sail down` y `./vendor/bin/sail up -d`. Otra opción, en PowerShell como administrador: `net stop winnat` y `net start winnat`. Laravel sigue usando `DB_PORT=5432` dentro de Docker.
+
+### ISSUE-012 — `git pull` se detiene por `package-lock.json`
+
+- **Síntoma:** "Your local changes to the following files would be overwritten by merge: package-lock.json".
+- **Causa:** `npm install` reescribe `package-lock.json` en el equipo.
+- **Solución:** `git checkout -- package-lock.json` y después `git pull`. El archivo bueno viene en la rama.

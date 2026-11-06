@@ -1,6 +1,6 @@
 # Casos de uso
 
-**Estado:** REQUIERE VALIDACIÓN (T-041). Se aprueban junto con el MER en el hito T-044.
+**Estado:** COMPLETO (T-041), aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 Casos de uso de los flujos complejos. Los flujos simples (crear un sector, editar el perfil…) se describen bien en sus historias de usuario (`05_REQUISITOS_FUNCIONALES.md`) y no se repiten aquí.
 
@@ -13,7 +13,8 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
 | CU-003 | Responder y enviar la medición | Empresa o Colaborador | Hecho |
 | CU-004 | Analizar con la IA cuando algo falla | Sistema | Hecho |
 | CU-005 | Ver el sistema como otra cuenta | Administrador | Hecho |
-| CU-006 | Diagnóstico por WhatsApp | Empresa por WhatsApp | Aplazado |
+| CU-006 | Diagnóstico por WhatsApp | Empresa por WhatsApp | Hecho fuera de este repositorio |
+| CU-007 | Acompañar empresas como consultor | Administrador y Consultor | Hecho |
 
 ---
 
@@ -186,7 +187,7 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
 5. Cuando todas las categorías terminan, el sistema:
    - calcula el puntaje de cada categoría, el total ponderado, el nivel y la variación (RN-018 a RN-020);
    - crea el resultado y lo publica sin revisión (RN-023);
-   - genera el PDF una vez y lo guarda (RN-024);
+   - genera los dos PDF una vez y los guarda: el resumen para la empresa y el informe completo para el Administrador y el Consultor (RN-024);
    - pone la medición `terminada`.
 6. La empresa ve E6 y recibe el aviso.
 
@@ -204,8 +205,8 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
 
 **Excepciones**
 
-- **E1. Falta la clave de OpenAI o no es válida:** todas las categorías fallan y se sigue A3. **[INFORMACIÓN PENDIENTE]** La clave del proyecto (DEC-013).
-- **E2. Falla la generación del PDF (Chromium):** el resultado se publica igual; el PDF se reintenta en la cola. Si la empresa lo descarga antes, se genera en ese momento; si vuelve a fallar, ve "No pudimos generar el PDF. Inténtalo de nuevo en un momento."
+- **E1. Falta la clave de OpenAI o no es válida:** todas las categorías fallan y se sigue A3. La clave la aporta NuevasTIC (gpt-4.1-mini) y va solo en el `.env` del servidor (DEC-013).
+- **E2. Falla la generación del PDF (Chromium):** el resultado se publica igual; el PDF se reintenta en la cola. Si alguien descarga uno de los dos PDF antes, ese se genera en ese momento; si vuelve a fallar, ve "No pudimos generar el PDF. Inténtalo de nuevo en un momento."
 
 **Postcondiciones**
 
@@ -252,7 +253,7 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
 
 ---
 
-## CU-006 — Diagnóstico por WhatsApp (aplazado)
+## CU-006 — Diagnóstico por WhatsApp (hecho fuera de este repositorio)
 
 | Campo | Información |
 |---|---|
@@ -262,7 +263,7 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
 | Pantallas | Ninguna del panel, salvo la configuración de las preguntas del bot |
 | Tablas | **[FUNCIONALIDAD POR DEFINIR]** Separadas de `empresas` y `mediciones` |
 
-**[FUNCIONALIDAD POR DEFINIR]** Está aplazado. Se deja el caso para no perder lo que ya se sabe.
+Se aplazó y después lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026). Se deja el caso como estaba definido; el detalle real está en el proyecto del bot. **[INFORMACIÓN PENDIENTE]** Si el bot se conecta con este sistema y cómo.
 
 **Flujo principal**
 
@@ -275,3 +276,36 @@ Cada caso cita sus historias (HU), sus reglas de negocio (RN), las pantallas del
 **Excepciones**
 
 - **E1. Mensaje sin firma válida:** se descarta sin responder.
+
+---
+
+## CU-007 — Acompañar empresas como consultor
+
+| Campo | Información |
+|---|---|
+| Actores | Administrador (permiso `usuarios.gestionar`) y Consultor |
+| Historias | HU-085, HU-086 |
+| Reglas | RN-030, RN-027, RN-024 |
+| Pantallas | A5 (invitar), A3.1 (pestaña Consultores), C1 (inicio del Consultor), C2 (Mis empresas), A3.1, A3.3, A3.4 y A3.5 en solo lectura |
+| Tablas | `users`, `consultor_empresa`, `empresas`, `mediciones`, `resultados` |
+
+**Precondiciones**
+
+- La persona tiene una cuenta con el rol Consultor. El Administrador la invita en A5; puede elegir sus empresas ahí mismo.
+
+**Flujo principal**
+
+1. El Administrador abre la ficha de una empresa (A3.1), pestaña **Consultores**, elige el consultor y pulsa **Vincular**. Un consultor puede acompañar varias empresas.
+2. El consultor entra y llega a su inicio (C1): sus empresas, su último puntaje, su nivel y «Qué atender», de lo más urgente a lo menos.
+3. En **Mis empresas** (C2) abre una empresa y ve su ficha, su historial, sus resultados, sus respuestas y los dos PDF (el informe completo y el resumen para la empresa).
+
+**Excepciones**
+
+- **E1. Empresa no vinculada:** si intenta abrir su ficha, su historial, un resultado o su PDF, el sistema responde 404 («No encontramos esta página»).
+- **E2. Acción de cambio:** no ve botones para asignar, editar ni desactivar; si intenta la acción, el servidor la rechaza.
+- **E3. Sin empresas:** ve un aviso de que el equipo de NuevasTIC se las vincula.
+- **E4. Quitar el vínculo:** el Administrador lo quita en la pestaña Consultores, con una confirmación. Desde ese momento el consultor deja de ver esa empresa.
+
+**Postcondiciones**
+
+- El vínculo queda en `consultor_empresa`. El consultor no cambió ningún dato.

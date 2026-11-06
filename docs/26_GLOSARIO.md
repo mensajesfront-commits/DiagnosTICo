@@ -1,6 +1,6 @@
 # Glosario
 
-**Estado:** EN CURSO (T-036). Se completa cada semana con los términos nuevos.
+**Estado:** COMPLETO (T-036). Términos del sistema en la entrega `v1.0.0`.
 
 ## Términos del negocio
 
@@ -20,9 +20,14 @@
 | **Puntaje** | De 0 a 100. Por pregunta: el de la opción, la suma de las opciones con tope de 100, o la calificación de la IA. Por categoría: el promedio de sus preguntas. Total: el promedio ponderado por la importancia. |
 | **Nivel** | Lectura del puntaje: Crítico (0–29), Se puede mejorar (30–59), Vas en buen camino (60–79), Sigue así (80–100). |
 | **Variación** | Diferencia del puntaje frente a la medición anterior de la misma empresa. Existe desde la 2.ª medición. |
-| **Resultado** | Lo que recibe la empresa al terminar el análisis: puntaje, nivel, puntaje por categoría, observaciones, recomendaciones y PDF. Se publica sin revisión y no cambia. |
+| **Resultado** | Lo que recibe la empresa al terminar el análisis: puntaje, nivel, puntaje por categoría, observaciones, recomendaciones y sus PDF. Se publica sin revisión y no cambia (RN-023). |
+| **Informe completo** | PDF del resultado con portada, metodología, diagnóstico por categoría, DOFA, plan, cronograma, KPI y anexos (unas 36 páginas). Lo descargan el Administrador y el Consultor (RN-024). |
+| **Resumen para la empresa** | PDF corto del resultado con lo que dijo la IA de cada categoría, en orden y sin detalle técnico. Es el que recibe la empresa (RN-024). |
+| **Método de análisis** | Forma en que la IA analiza una categoría: PESTEL, 5 Fuerzas de Porter, VRIO, DOFA o CAME. La elige según las respuestas (DEC-019). |
 | **Prompt** | Instrucciones que el sistema le envía a la IA para analizar una categoría. Se arma por capas: general, ajuste del sector, ajuste de la empresa, preguntas con respuestas y formato fijo. |
 | **Colaborador** | Persona de la empresa con su propia cuenta, creada por el usuario principal. Puede responder y ver resultados, pero no gestiona colaboradores ni cambia los datos de la empresa. |
+| **Consultor** | Persona externa a NuevasTIC que acompaña a una o varias empresas. La invita el Administrador, que le vincula las empresas. Solo mira sus resultados, su historial y sus PDF (RN-030). |
+| **Cuenta principal** | La cuenta de quien registró la empresa. Crea y gestiona a los colaboradores y elige qué páginas ve cada uno (RN-025). |
 | **Ver como** | Función del Administrador para ver el sistema como otra cuenta, en solo lectura. Queda registrado quién lo usó y cuándo. |
 
 ## Términos técnicos
@@ -42,7 +47,7 @@
 | **Seeder** | Archivo que carga datos iniciales en la base (`database/seeders/`): roles y permisos, sectores, actividades CIIU, las 10 categorías y el Administrador inicial. Se corre con `php artisan db:seed`. |
 | **Factory** | Receta para crear datos falsos en las pruebas (`database/factories/`), por ejemplo una empresa o un diagnóstico publicado. |
 | **Modelo** | Clase de PHP que representa una tabla (`app/Models/`): `Empresa` para `empresas`, `Medicion` para `mediciones`. |
-| **Rol** | Tipo de cuenta: Administrador, Empresa o Colaborador (y los que se creen en A5.1). Cada cuenta tiene uno solo y define qué menú ve (RN-027). Se maneja con spatie/laravel-permission. |
+| **Rol** | Tipo de cuenta: Administrador, Empresa, Colaborador o Consultor (y los que se creen en A5.1). Cada cuenta tiene uno solo y define qué menú ve (RN-027). Se maneja con spatie/laravel-permission. |
 | **Permiso** | Acción concreta que un rol puede hacer, como `diagnosticos.ver` o `usuarios.gestionar`. Son 15 (A5.2). El servidor los revisa en cada ruta; ocultar un botón no basta. |
 | **Middleware** | Filtro que corre antes del controlador: revisa la sesión, el rol o el permiso (`role:Empresa`, `permission:diagnosticos.editar`) o el límite de intentos. |
 | **Ruta** | Dirección de la aplicación (`/diagnosticos`) unida al controlador que la atiende. Están en `routes/web.php`; la lista por módulo está en `15_BACKEND.md`. |
@@ -50,3 +55,8 @@
 | **Componente** | Pieza de pantalla de Vue reutilizable (`.vue`), como `Boton.vue` o `Modal.vue`. Los base están en `resources/js/components/base/`; una página es un componente completo en `resources/js/pages/`. |
 | **Soft delete** | Borrado "suave": la fila no se borra, se marca con `deleted_at` y deja de verse. Se usa al eliminar cuentas para poder recuperarlas en 90 días (DEC-017). |
 | **Cola** | Lista de trabajos que se hacen en segundo plano (correos, análisis de la IA) para no hacer esperar a la pantalla (RNF-004). |
+| **Invitación** | Correo con un enlace para crear la primera contraseña. Sirve hasta usarlo; el de "¿Olvidaste tu contraseña?" vence a los 10 minutos (RN-006). |
+| **Captcha (Cloudflare Turnstile)** | Comprobación del registro de que quien llena el formulario no es un robot. |
+| **Código de verificación** | Número de 6 dígitos que llega al correo al registrarse (L2b) o al cambiar el correo en Mi perfil, para confirmar que el correo es de esa persona. |
+| **`.env`** | Archivo de cada equipo o servidor con las claves y la configuración real. No se sube al repositorio; `.env.example` es la plantilla. |
+| **Etiqueta (tag)** | Marca de Git sobre un commit para nombrar una versión, como `v1.0.0`. |

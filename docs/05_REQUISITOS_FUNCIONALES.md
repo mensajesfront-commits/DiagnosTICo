@@ -1,6 +1,6 @@
 # Requisitos funcionales
 
-**Estado:** REQUIERE VALIDACIÓN
+**Estado:** COMPLETO, aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 Requisitos funcionales (RF), historias de usuario, criterios de aceptación y backlog del Sistema de Diagnóstico de Marketing Digital (NuevasTIC). Se construyeron a partir de las 79 vistas del prototipo y de lo confirmado por Cristian, siguiendo las normas de `Normas.txt`. Nada se inventó: lo que falta se marca **[INFORMACIÓN PENDIENTE]**, **[FUNCIONALIDAD POR DEFINIR]** o **[INCONSISTENCIA DETECTADA]**.
 
@@ -47,7 +47,8 @@ Sistema de Diagnóstico de Marketing Digital
 ├── EP-010 Experiencia de la empresa
 ├── EP-011 Colaboradores
 ├── EP-012 Cálculo, IA y tareas automáticas
-└── EP-013 Diagnóstico por WhatsApp (hecho fuera de este repositorio)
+├── EP-013 Diagnóstico por WhatsApp (hecho fuera de este repositorio)
+└── EP-014 Consultor (agregada el 3 de noviembre de 2026)
 ```
 
 # 4. Épicas
@@ -205,8 +206,20 @@ Sistema de Diagnóstico de Marketing Digital
 | Descripción | Diagnóstico rápido conversando con un bot, separado de la web. Lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026). |
 | Actor principal | Empresa (por WhatsApp) |
 | Objetivo | Hacer un diagnóstico rápido sin cuenta. |
-| Valor de negocio | Canal de entrada ligero; aplazado por decisión de Cristian. |
+| Valor de negocio | Canal de entrada ligero. Se aplazó por decisión de Cristian y después lo terminó otra persona del equipo. |
 | Historias | 5 |
+
+### EP-014 — Consultor
+
+| Campo | Información |
+|---|---|
+| ID | EP-014 |
+| Nombre | Consultor |
+| Descripción | Persona externa a NuevasTIC que acompaña a una o varias empresas. La invita el Administrador y solo mira las empresas que le vincula (agregada el 3 de noviembre de 2026). |
+| Actor principal | Administrador y Consultor |
+| Objetivo | Que el consultor vea la ficha, el historial, los resultados y los PDF de sus empresas, sin poder cambiar nada. |
+| Valor de negocio | NuevasTIC puede sumar consultores externos al acompañamiento sin darles acceso al resto del sistema. |
+| Historias | 2 |
 
 # 5. Historias de usuario
 
@@ -1152,7 +1165,7 @@ Permite empujar a las empresas a terminar su medición a tiempo con un recordato
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: si el registro del envío se muestra en la ficha de la empresa.
+- Aprobado por NuevasTIC el 5 de noviembre de 2026 tal como está construido: el registro del envío.
 - Depende de HU-037 (edición del correo).
 
 ---
@@ -2638,7 +2651,7 @@ Permite reutilizar un diagnóstico en otro sector o modificarlo sin tocar el pub
 
 Un diagnóstico publicado se archiva; un borrador nunca publicado se elimina.
 
-> REQUIERE VALIDACIÓN: el modal de confirmación no está diseñado en el prototipo.
+> El modal de confirmación no está en el prototipo; NuevasTIC lo aprobó tal como está construido (5 de noviembre de 2026).
 
 ### Valor de negocio
 
@@ -2723,7 +2736,7 @@ Permite sacar un diagnóstico de uso sin perder los resultados ya obtenidos.
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: el modal de confirmación no está diseñado en el prototipo.
+- El modal de confirmación no está en el prototipo; NuevasTIC lo aprobó tal como está construido (5 de noviembre de 2026).
 - Depende de HU-010 y HU-029.
 
 ---
@@ -4550,7 +4563,7 @@ Permite acompañar a la empresa y explicarle su diagnóstico viendo lo mismo que
 ### Reglas de negocio
 
 - RN-023 — El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable.
-- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026). El informe PDF completo (propuesta del 2 de noviembre) agrupa en una sección «Análisis estratégico DOFA» las fortalezas, debilidades, oportunidades y amenazas que escribió la IA en cada categoría; el resumen de la empresa no la trae.
 
 ### Validaciones
 
@@ -5399,7 +5412,7 @@ Permite al Administrador revisar que el prompt final se entienda tal como lo rec
 
 Una sola prueba, por categoría, que muestra lo que devolvería la IA.
 
-> REQUIERE VALIDACIÓN: límite de pruebas por día.
+> Límite de pruebas por día: 100 entre todos los administradores (PA-003, decisión del 23 de octubre).
 
 ### Valor de negocio
 
@@ -5483,7 +5496,7 @@ Permite ver el resultado que daría la IA con un caso real antes de cambiar el p
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: límite de pruebas por día.
+- Límite de pruebas por día: 100 entre todos los administradores (PA-003, decisión del 23 de octubre).
 - Depende de HU-041 y de la IA.
 
 ---
@@ -5953,7 +5966,7 @@ Permite saber qué puede hacer cada rol del sistema y quién lo tiene.
 
 Modal para crear un rol con permisos agrupados.
 
-> REQUIERE VALIDACIÓN: el prototipo muestra un ejemplo de rol “Consultor”; confirmar si se mantiene como rol creable o solo a futuro.
+> Resuelto el 3 de noviembre: el rol Consultor existe, es del sistema y de solo lectura (EP-014, RN-030).
 
 ### Valor de negocio
 
@@ -6032,7 +6045,7 @@ Permite dar acceso a otras personas con permisos a la medida sin depender de cam
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: confirmar si el rol “Consultor” del prototipo se mantiene como rol creable o solo a futuro.
+- Resuelto el 3 de noviembre: el rol Consultor existe, es del sistema y de solo lectura (EP-014, RN-030).
 - Depende de HU-048.
 
 ---
@@ -7661,7 +7674,7 @@ Muestra a la empresa su puntaje, nivel y recomendaciones para saber qué mejorar
 - RN-019 — Niveles fijos: Crítico 0–29, Se puede mejorar 30–59, Vas en buen camino 60–79, Sigue así 80–100.
 - RN-020 — La variación se calcula contra la medición anterior de la misma empresa y solo existe desde la 2.ª medición.
 - RN-023 — El resultado se publica directamente, sin revisión del Administrador, y queda guardado e inmutable.
-- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026). El informe PDF completo (propuesta del 2 de noviembre) agrupa en una sección «Análisis estratégico DOFA» las fortalezas, debilidades, oportunidades y amenazas que escribió la IA en cada categoría; el resumen de la empresa no la trae.
 
 ### Validaciones
 
@@ -7885,7 +7898,7 @@ Permite compartir el resultado con el equipo mediante un informe descargable.
 ### Reglas de negocio
 
 - RN-024 — Dos PDF por resultado, generados una vez al terminar el análisis y guardados; no vuelven a llamar a la IA. (1) El Informe de Diagnóstico y Estrategia de Marketing Digital completo, según la propuesta de reestructuración del 2 de noviembre de 2026 (portada, ficha técnica, resumen ejecutivo, metodología, resultados, priorización, diagnóstico por categoría, DOFA, conclusiones, plan estratégico, cronograma, KPI y anexos), para el Administrador y el Consultor. (2) El resumen para la empresa (decisión del 4 de noviembre de 2026): lo que la IA escribió de cada categoría, copiado en orden y sin detalle técnico. La empresa y su colaborador solo reciben el resumen.
-- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026).
+- RN-028 — El resultado no compara con promedios ni incluye una matriz FODA. La IA sí puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (NuevasTIC, 23 de octubre de 2026). El informe PDF completo (propuesta del 2 de noviembre) agrupa en una sección «Análisis estratégico DOFA» las fortalezas, debilidades, oportunidades y amenazas que escribió la IA en cada categoría; el resumen de la empresa no la trae.
 
 ### Validaciones
 
@@ -9165,7 +9178,7 @@ Entrega a la empresa un resultado final que no cambia y le avisa cuando está li
 
 **Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
-**Definition of Ready:** NO LISTA: aplazada; falta definir y diseñar la sección del bot en el panel (sin vista en el prototipo).
+**Definition of Ready (al planear):** NO LISTA: aplazada; falta definir y diseñar la sección del bot en el panel (sin vista en el prototipo).
 
 **Vistas del prototipo:** Sin vista en el prototipo
 
@@ -9282,7 +9295,7 @@ Permite al Administrador cambiar las preguntas del bot sin depender de un desarr
 
 **Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
-**Definition of Ready:** NO LISTA: aplazada; falta definir el texto exacto del saludo del bot.
+**Definition of Ready (al planear):** NO LISTA: aplazada; falta definir el texto exacto del saludo del bot.
 
 **Vistas del prototipo:** Sin vista en el prototipo
 
@@ -9294,7 +9307,7 @@ Permite al Administrador cambiar las preguntas del bot sin depender de un desarr
 
 El bot saluda, explica qué va a hacer y pide el nombre de la empresa.
 
-> REQUIERE VALIDACIÓN: texto exacto del saludo.
+> Texto exacto del saludo: lo definió el bot, que se hizo fuera de este repositorio.
 
 ### Valor de negocio
 
@@ -9362,7 +9375,7 @@ Permite a una empresa iniciar un diagnóstico rápido por chat sin crear una cue
 
 ### Riesgos
 
-- REQUIERE VALIDACIÓN: texto exacto del saludo.
+- Texto exacto del saludo: lo definió el bot, que se hizo fuera de este repositorio.
 - Depende de HU-071 (preguntas configuradas).
 - Historia aplazada por decisión del cliente; después la terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 
@@ -9382,7 +9395,7 @@ Permite a una empresa iniciar un diagnóstico rápido por chat sin crear una cue
 
 **Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
-**Definition of Ready:** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071).
+**Definition of Ready (al planear):** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071).
 
 **Vistas del prototipo:** Sin vista en el prototipo
 
@@ -9505,7 +9518,7 @@ Permite completar el diagnóstico desde el chat respondiendo una pregunta a la v
 
 **Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
-**Definition of Ready:** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071), de los que depende la conversación.
+**Definition of Ready (al planear):** NO LISTA: aplazada; falta definir el saludo del bot (HU-072) y la sección de preguntas del bot en el panel (HU-071), de los que depende la conversación.
 
 **Vistas del prototipo:** Sin vista en el prototipo
 
@@ -9611,7 +9624,7 @@ Evita que la empresa tenga que empezar de nuevo si deja la conversación a media
 
 **Estado:** Hecha fuera de este repositorio (bot terminado por otra persona del equipo; confirmado el 4 de noviembre de 2026)
 
-**Definition of Ready:** NO LISTA: aplazada; falta definir el saludo y las preguntas del bot (HU-071 y HU-072), de los que depende el resultado.
+**Definition of Ready (al planear):** NO LISTA: aplazada; falta definir el saludo y las preguntas del bot (HU-071 y HU-072), de los que depende el resultado.
 
 **Vistas del prototipo:** Sin vista en el prototipo
 
@@ -9897,13 +9910,13 @@ Cada aviso abre el resultado ("bajó" y "nuevo") o la ficha (lo pendiente). Se v
 | RN-025 | Colaboradores: sin límite; ven solo las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no crean ni desactivan colaboradores, no cambian datos de la empresa ni su propio perfil o contraseña; la empresa define su correo y contraseña, los comparte y es la única que los cambia; se desactivan junto con la empresa. | HU-035, HU-048, HU-056, HU-076, HU-077, HU-078, HU-079 |
 | RN-026 | “Ver como” es solo de lectura y queda registrado quién lo usó y cuándo. | HU-053, HU-054 |
 | RN-027 | Los roles del sistema (Administrador, Empresa, Colaborador y, desde el 3 de noviembre, Consultor) son fijos; cada cuenta tiene un solo rol; solo se elimina un rol sin cuentas. | HU-048, HU-049, HU-050, HU-051, HU-052 |
-| RN-028 | El resultado no incluye análisis FODA ni comparación con promedios. | HU-038, HU-064, HU-066 |
+| RN-028 | El resultado no compara con promedios. La IA puede analizar con DOFA, PESTEL, Porter, VRIO o CAME (23 de octubre), y el informe completo agrupa su DOFA (2 de noviembre). | HU-038, HU-064, HU-066 |
 | RN-029 | El diagnóstico por WhatsApp es totalmente separado de la web: sin cuentas, mediciones ni PDF; máximo 10 preguntas configurables; solo texto; retoma desde la última pregunta y solo se reinicia si la empresa lo pide. | HU-071, HU-072, HU-073, HU-074, HU-075 |
 | RN-030 | El Consultor es externo e invitado; solo mira las empresas que el Administrador le vincula (una o varias): ficha, historial, resultados, respuestas y PDF. No responde, no asigna, no cambia datos ni toca diagnósticos. Es rol del sistema (decisión del 3 de noviembre de 2026). | HU-085, HU-086 |
 
 # 7. Requisitos no funcionales relacionados
 
-Estos RNF se desprenden de las historias. El detalle, con los RNF que se agregaron desde RNF-007 y las metas propuestas, está en `06_REQUISITOS_NO_FUNCIONALES.md` (REQUIERE VALIDACIÓN, PA-008).
+Estos RNF se desprenden de las historias. El detalle, con los RNF que se agregaron desde RNF-007 y las metas propuestas, está en `06_REQUISITOS_NO_FUNCIONALES.md` (aprobado por NuevasTIC el 5 de noviembre de 2026, PA-008).
 
 | ID | Categoría | Requisito | Historias |
 |---|---|---|---|
@@ -9912,7 +9925,7 @@ Estos RNF se desprenden de las historias. El detalle, con los RNF que se agregar
 | RNF-003 | Usabilidad | Las respuestas del diagnóstico se guardan al momento y se puede retomar donde se quedó. | HU-060 |
 | RNF-004 | Rendimiento | El envío de correos y el análisis de la IA se hacen en segundo plano sin bloquear la pantalla. | HU-003, HU-008, HU-032, HU-036, HU-037, HU-045, HU-052, HU-062, HU-063, HU-069, HU-082, HU-083, HU-084 |
 | RNF-005 | Auditoría | Queda registrado quién usó “Ver como” y cuándo. | HU-053, HU-054 |
-| RNF-006 | Seguridad | Los mensajes del bot de WhatsApp solo se aceptan si vienen verificados de Meta (APLAZADO). | HU-075 |
+| RNF-006 | Seguridad | Los mensajes del bot de WhatsApp solo se aceptan si vienen verificados de Meta (el bot se hizo fuera de este repositorio). | HU-075 |
 
 # 8. Matriz de trazabilidad
 
@@ -9958,13 +9971,13 @@ Requisito → Épica → Historia → Criterio de aceptación.
 | RF-036 — Calcular puntajes y niveles | EP-012 | HU-068 | HU-068: CA-001–CA-006 | Completa |
 | RF-037 — Analizar cada categoría con la IA | EP-012 | HU-069, HU-081 | HU-069: CA-001–CA-004; HU-081: CA-001–CA-004 | Completa |
 | RF-038 — Publicar el resultado | EP-012 | HU-084 | HU-084: CA-001–CA-005 | Completa |
-| RF-039 — Configurar el bot de WhatsApp | EP-013 | HU-071 | HU-071: CA-001–CA-005 | Completa (aplazada) |
-| RF-040 — Diagnóstico por WhatsApp | EP-013 | HU-072, HU-073, HU-074, HU-075 | HU-072: CA-001–CA-003; HU-073: CA-001–CA-006; HU-074: CA-001–CA-004; HU-075: CA-001–CA-004 | Completa (aplazada) |
-| RF-041 — Consultor con empresas vinculadas | EP-014 | HU-085, HU-086 | HU-085: CA-001–CA-005; HU-086: CA-001–CA-004 | Completa |
+| RF-039 — Configurar el bot de WhatsApp | EP-013 | HU-071 | HU-071: CA-001–CA-005 | Completa (hecha fuera de este repositorio) |
+| RF-040 — Diagnóstico por WhatsApp | EP-013 | HU-072, HU-073, HU-074, HU-075 | HU-072: CA-001–CA-003; HU-073: CA-001–CA-006; HU-074: CA-001–CA-004; HU-075: CA-001–CA-004 | Completa (hecha fuera de este repositorio) |
+| RF-041 — Consultor con empresas vinculadas | EP-014 | HU-085, HU-086 | HU-085: CA-001–CA-005; HU-086: CA-001–CA-005 | Completa |
 
 ## Historia → requisito (T-061)
 
-Cada historia con su requisito y su estado en el código al 14 de octubre. "Hecha" quiere decir que tiene pantalla, backend y pruebas.
+Cada historia con su requisito y su estado en el código en la entrega `v1.0.0` (5 de noviembre de 2026). "Hecha" quiere decir que tiene pantalla, backend y pruebas.
 
 | Historia | Requisito | Estado |
 |---|---|---|
@@ -10012,7 +10025,7 @@ Cada historia con su requisito y su estado en el código al 14 de octubre. "Hech
 | HU-042 — Ajustar el prompt para un sector | RF-021 | Hecha |
 | HU-043 — Ajustar el prompt para una empresa | RF-021 | Hecha |
 | HU-044 — Ver el prompt completo | RF-022 | Hecha |
-| HU-045 — Probar el prompt con un ejemplo | RF-022 | Hecha (límite: 10 pruebas por minuto; el límite por día sigue **REQUIERE VALIDACIÓN**) |
+| HU-045 — Probar el prompt con un ejemplo | RF-022 | Hecha (límite: 10 pruebas por minuto y 100 al día, PA-003) |
 | HU-046 — Ver las cuentas del sistema | RF-023 | Hecha |
 | HU-047 — Desactivar o reactivar una cuenta | RF-023 | Hecha |
 | HU-048 — Ver los roles del sistema | RF-024 | Hecha |
@@ -10215,11 +10228,11 @@ HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la sem
 | HU-068 | EP-012 | Calcular los puntajes | Alta | 8 | Hecha |
 | HU-069 | EP-012 | Analizar cada categoría con la IA | Alta | 8 | Hecha |
 | HU-070 | EP-012 | Marcar mediciones vencidas | Media | 2 | Hecha |
-| HU-071 | EP-013 | Configurar las preguntas del bot | Alta | 5 | Aplazada |
-| HU-072 | EP-013 | Empezar el diagnóstico por WhatsApp | Alta | 2 | Aplazada |
-| HU-073 | EP-013 | Responder las preguntas del bot | Alta | 5 | Aplazada |
-| HU-074 | EP-013 | Retomar la conversación | Media | 3 | Aplazada |
-| HU-075 | EP-013 | Recibir el resultado por WhatsApp | Alta | 5 | Aplazada |
+| HU-071 | EP-013 | Configurar las preguntas del bot | Alta | 5 | Hecha fuera de este repositorio |
+| HU-072 | EP-013 | Empezar el diagnóstico por WhatsApp | Alta | 2 | Hecha fuera de este repositorio |
+| HU-073 | EP-013 | Responder las preguntas del bot | Alta | 5 | Hecha fuera de este repositorio |
+| HU-074 | EP-013 | Retomar la conversación | Media | 3 | Hecha fuera de este repositorio |
+| HU-075 | EP-013 | Recibir el resultado por WhatsApp | Alta | 5 | Hecha fuera de este repositorio |
 | HU-076 | EP-011 | Ver los colaboradores de mi empresa | Media | 2 | Hecha |
 | HU-077 | EP-011 | Crear un colaborador | Media | 3 | Hecha |
 | HU-078 | EP-011 | Cambiar la contraseña de un colaborador | Media | 2 | Hecha |
@@ -10229,6 +10242,8 @@ HU-020 y HU-021 crean el borrador, pero el editor (A2.1, HU-023) llega en la sem
 | HU-082 | EP-010 | Pedir una nueva medición cuando la mía venció | Media | 3 | Hecha |
 | HU-083 | EP-006 | Atender las solicitudes de nueva medición | Media | 3 | Hecha |
 | HU-084 | EP-012 | Publicar el resultado | Alta | 8 | Hecha |
+| HU-085 | EP-014 | Vincular consultores a una empresa | Alta | 5 | Hecha |
+| HU-086 | EP-014 | Ver mis empresas como consultor | Alta | 5 | Hecha |
 
 # 10. Priorización
 
@@ -10238,6 +10253,8 @@ Ordenadas por prioridad y luego por dependencias (primero las que no dependen de
 |---|---|---|---|---:|---|---|
 | HU-001 | Iniciar sesión | EP-001 | Alta | 5 | Must | HU-077, HU-046 |
 | HU-002 | Registrar mi empresa | EP-001 | Alta | 5 | Must | HU-012 |
+| HU-085 | Vincular consultores a una empresa | EP-014 | Alta | 5 | Must | HU-046, HU-033 |
+| HU-086 | Ver mis empresas como consultor | EP-014 | Alta | 5 | Must | HU-085, HU-038, HU-039 |
 | HU-003 | Recuperar mi contraseña | EP-001 | Alta | 3 | Must | HU-046 |
 | HU-010 | Ver los diagnósticos de un sector | EP-003 | Alta | 5 | Must | HU-012 |
 | HU-012 | Crear un sector | EP-003 | Alta | 3 | Must | Ninguna |
@@ -10333,6 +10350,7 @@ HU-062 ──► HU-069 Analizar con IA ──► HU-068 Calcular puntajes ─�
 HU-041 Prompt general ──► HU-042/043 Ajustes ──► HU-081 Armar el prompt ──► HU-069
 HU-077 Crear colaborador ──► HU-001 (el colaborador entra) ──► HU-056 Perfil
 HU-070 Marcar vencidas ──► HU-082 Pedir nueva medición ──► HU-083 Atender la solicitud ──► HU-036
+HU-046 Cuentas (invitar Consultor) ──► HU-085 Vincular a empresas ──► HU-086 Ver mis empresas
 ```
 
 Dependencia por historia: ver la sección “Dependencias” de cada una y la columna “Dependencia” de la priorización.
@@ -10361,11 +10379,16 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 - Historias: HU-030, HU-035, HU-038, HU-039, HU-040, HU-046, HU-047, HU-048, HU-049, HU-050, HU-051, HU-052, HU-053, HU-054, HU-055, HU-056, HU-059, HU-064, HU-065, HU-066, HU-067, HU-068, HU-076, HU-077, HU-078, HU-079, HU-084
 - Story Points totales: 98
 
-### Aplazadas — Diagnóstico por WhatsApp
+### Diagnóstico por WhatsApp (fuera de este repositorio)
 
 - Historias: HU-071, HU-072, HU-073, HU-074, HU-075
 - Story Points totales: 20
-- Se retoman más adelante por decisión de Cristian.
+- Se aplazaron por decisión de Cristian; después las terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
+
+### Fase 5 — Consultor (semana 7, agregada el 3 de noviembre)
+
+- Historias: HU-085, HU-086
+- Story Points totales: 10
 
 > Las historias nuevas HU-076 a HU-084 se ubicaron en la semana que ya tenían asignada según su pantalla o función; si el cronograma cambia, esta propuesta debe revisarse.
 
@@ -10373,37 +10396,36 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 
 | Riesgo | Historias afectadas | Impacto | Recomendación |
 |---|---|---|---|
-| El bot de WhatsApp no tiene pantalla ni saludo definidos y está aplazado | HU-071 a HU-075 | No se puede desarrollar ni probar | Retomarlo con diseño y texto del saludo antes de planificarlo |
-| La solicitud de nueva medición no tiene vista dibujada | HU-058, HU-070, HU-082, HU-083 | Dos historias no listas; flujo de vencidas incompleto | Dibujar el aviso en el inicio de la empresa y el correo al Administrador |
+| ~~El bot de WhatsApp no tiene pantalla ni saludo definidos y está aplazado~~ | HU-071 a HU-075 | — | **Resuelto:** lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026) |
+| ~~La solicitud de nueva medición no tiene vista dibujada~~ | HU-058, HU-070, HU-082, HU-083 | — | **Resuelto:** construida en E1, A1 y la ficha de la empresa (14 de octubre) |
 | El estado “Enviada” no aparece en el inicio del Administrador | HU-007, HU-062, HU-063 | El Administrador no distingue enviadas de terminadas | Agregar “Enviada” a las pestañas y a la columna de estado del prototipo |
 | La IA es una dependencia externa y puede fallar | HU-045, HU-063, HU-069, HU-081 | Resultados incompletos o demorados | Mantener los 3 reintentos por categoría y el aviso por correo al Administrador |
-| El rol “Consultor” aparece como ejemplo en el prototipo pero es un rol futuro | HU-048, HU-049, HU-050 | Confusión sobre qué roles existen | Cambiar el ejemplo del prototipo o confirmar que se mantiene como rol creable |
+| ~~El rol “Consultor” aparece como ejemplo en el prototipo pero es un rol futuro~~ | HU-048, HU-049, HU-050 | — | **Resuelto:** es un rol del sistema desde el 3 de noviembre (EP-014, RN-030) |
 | Los colaboradores no se ven en la ficha de la empresa del Administrador | HU-033, HU-035 | Criterio sin pantalla | Agregar la lista de colaboradores (nombre y usuario) a la ficha |
 | El modal de archivar o eliminar un diagnóstico no está diseñado | HU-022 | Historia no lista | Diseñar el modal de confirmación |
-| No está definido el límite de pruebas de IA por día | HU-045 | Costo de llamadas a la IA | Definir un límite con NuevasTIC |
+| ~~No está definido el límite de pruebas de IA por día~~ | HU-045 | — | **Resuelto:** 100 al día (PA-003, 23 de octubre) |
 | Documentos del proyecto desactualizados (plan de trabajo, Trello, cronograma) | Todas | Contradicciones entre documentos | Actualizarlos con las decisiones confirmadas |
-| Los RNF no están documentados | Todas | Sin metas medibles de rendimiento, seguridad y disponibilidad | Completar `docs/06_REQUISITOS_NO_FUNCIONALES.md` |
+| ~~Los RNF no están documentados~~ | Todas | — | **Resuelto:** `06_REQUISITOS_NO_FUNCIONALES.md`, aprobado por NuevasTIC el 5 de noviembre |
 
 # 14. Preguntas abiertas
 
-- **PA-001:** ¿Cuál es el texto exacto del saludo del bot de WhatsApp? (HU-072, aplazada)
-- **PA-002:** ¿Cuándo se retoma el bot y cómo será la sección del bot en el panel? (HU-071 a HU-075)
+- **PA-001:** ¿Cuál es el texto exacto del saludo del bot de WhatsApp? (HU-072) **Resuelta:** lo definió el bot, hecho fuera de este repositorio.
+- **PA-002:** ¿Cuándo se retoma el bot y cómo será la sección del bot en el panel? (HU-071 a HU-075) **Resuelta:** el bot lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
 - **PA-003:** ¿Cuántas pruebas de IA por día puede hacer el Administrador? (HU-045) **Respondida (NuevasTIC, 23 de octubre de 2026): 100 al día entre todos los administradores.**
 - **PA-004:** ¿El recordatorio enviado se registra y se muestra en la ficha de la empresa? (HU-008)
 - **PA-005:** ¿Cómo es el modal de confirmación al archivar o eliminar un diagnóstico? (HU-022)
 - **PA-006:** ¿El rol “Consultor” de ejemplo del prototipo (A5.1c) se mantiene o se cambia? (HU-049, HU-050)
   - **Respondida (6 de octubre):** se mantiene como rol **inactivo** hasta que se le asigne a alguien; se probará más adelante. Ver `17_SEGURIDAD.md`.
+  - **Cambiada (3 de noviembre):** el Consultor es un rol del sistema, activo y de solo lectura (EP-014, RN-030).
 - **PA-007:** ¿Cuál es la capacidad del equipo por Sprint? (propuesta de Sprints)
-- **PA-008:** ¿Cuáles son las metas medibles de rendimiento, disponibilidad y accesibilidad? (RNF)
+- **PA-008:** ¿Cuáles son las metas medibles de rendimiento, disponibilidad y accesibilidad? (RNF) **Respondida:** NuevasTIC aprobó las de `06_REQUISITOS_NO_FUNCIONALES.md` el 5 de noviembre de 2026.
 - **PA-009:** ¿Cómo se ve la solicitud de nueva medición en el inicio de la empresa y cómo es el correo al Administrador? (HU-082, HU-083)
 
 # 15. INFORMACIÓN FALTANTE Y SUPUESTOS
 
 **Información faltante**
 
-- **[INFORMACIÓN PENDIENTE]** Requisitos no funcionales con metas medibles (PA-008).
 - **[INFORMACIÓN PENDIENTE]** Capacidad del equipo para organizar Sprints (PA-007).
-- **[INFORMACIÓN PENDIENTE]** Diseño y textos del bot de WhatsApp (PA-001, PA-002).
 - **[FUNCIONALIDAD POR DEFINIR]** Rol Usuario; historial de solicitudes de nueva medición.
 - **Cambiado (3 de noviembre):** el rol Consultor se incluye y queda activo como rol del sistema, solo de lectura, con empresas vinculadas por el Administrador (EP-014, RN-030). Antes: **Definido (6 de octubre):** el rol Consultor existe inactivo (PA-006). “Ver como” sirve para revisar lo que ve cada rol y se usa sobre Empresa, Colaborador, Consultor y roles creados, no sobre Administradores. ~~El Colaborador puede editar su propio perfil.~~
 - **Definido (28 de octubre):** los colaboradores no cambian de rol; solo los desactivan o eliminan el Administrador o la cuenta principal de su empresa. A una empresa sin cuenta principal se le da una cuenta nueva.
@@ -10424,11 +10446,11 @@ Dependencia por historia: ver la sección “Dependencias” de cada una y la co
 |---|---|---|---|
 | INC-001 | **[INCONSISTENCIA DETECTADA]** El plan de trabajo, el Trello y el cronograma todavía mencionan Usuario, Consultor, FODA y el bot de WhatsApp con IA. | Contradicen las decisiones confirmadas. | Actualizarlos (no se modificaron). |
 | INC-002 | **[INCONSISTENCIA DETECTADA]** El prototipo muestra un rol de ejemplo “Consultor” (A5.1c) y no dibuja el estado “Enviada”. | El prototipo no refleja lo confirmado. | Ajustar el prototipo. |
-| INC-003 | Resueltas con Cristian: FODA fuera; estados Enviada y Terminada; contraseña con número; vencida → solicitud de nueva medición; WhatsApp separado y aplazado; Consultor y Usuario futuros. | — | Mantener este documento como fuente. |
+| INC-003 | Resueltas con Cristian: FODA fuera; estados Enviada y Terminada; contraseña con número; vencida → solicitud de nueva medición; WhatsApp separado (se aplazó y lo terminó otra persona, fuera de este repositorio); Usuario futuro. El Consultor se agregó el 3 de noviembre (EP-014). | — | Mantener este documento como fuente. |
 
 # 17. Revisión INVEST
 
-Todas las historias son independientes en lo posible, negociables y aportan valor. Las siguientes necesitan atención:
+Revisión hecha al planear (semana 2). Las observaciones de abajo se resolvieron al construir: las historias del bot se hicieron fuera de este repositorio y las demás están hechas aquí (sección 8). Las siguientes necesitaban atención:
 
 | Historia | Story Points | Observación |
 |---|---:|---|
@@ -10457,11 +10479,11 @@ Todas las historias son independientes en lo posible, negociables y aportan valo
 
 ### Requisitos cubiertos
 
-Los 40 requisitos funcionales (RF-001 a RF-040) tienen al menos una historia. Las 79 vistas del prototipo tienen al menos una historia, salvo el bot de WhatsApp y las solicitudes de nueva medición, que no tienen vista.
+Los 41 requisitos funcionales (RF-001 a RF-041) tienen al menos una historia. Las 79 vistas del prototipo tienen al menos una historia, salvo el bot de WhatsApp y las solicitudes de nueva medición, que no tienen vista.
 
 ### Requisitos parcialmente cubiertos
 
-Ninguno. Las historias HU-071 a HU-075 (bot) cubren sus requisitos pero están **aplazadas**.
+Ninguno. Las historias HU-071 a HU-075 (bot) se hicieron fuera de este repositorio.
 
 ### Requisitos sin historia
 
@@ -10473,12 +10495,12 @@ Ninguna historia sin requisito. Las historias del Administrador y de la empresa 
 
 ### Resumen final del backlog
 
-- **Total de Épicas:** 13
-- **Total de Historias:** 84
-- **Total de Story Points:** 330
-- **Historias de prioridad Alta:** 40
+- **Total de Épicas:** 14
+- **Total de Historias:** 86 (81 hechas en este repositorio y 5 del bot hechas fuera)
+- **Total de Story Points:** 340
+- **Historias de prioridad Alta:** 42
 - **Historias de prioridad Media:** 34
 - **Historias de prioridad Baja:** 10
 - **Historias bloqueadas:** 0
-- **Historias pendientes de información (NO LISTA):** 12 (HU-007, HU-008, HU-022, HU-045, HU-049, HU-071, HU-072, HU-073, HU-074, HU-075, HU-082, HU-083)
+- **Historias marcadas NO LISTA al planear:** 11 (HU-007, HU-008, HU-022, HU-045, HU-049, HU-071 a HU-075 y HU-082). Todas se construyeron después: las del bot fuera de este repositorio y las demás aquí.
 - **Requisitos sin cobertura:** 0

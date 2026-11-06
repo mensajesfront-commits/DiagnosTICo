@@ -1,6 +1,6 @@
 # Funcionalidades
 
-**Estado:** COMPLETO (T-087). Lo que hace el sistema el 14 de octubre de 2026, por rol. Cada función lleva el código de su pantalla y su historia. El detalle técnico está en `11_DISENO_TECNICO.md` y los componentes en `18_UI_UX.md`.
+**Estado:** COMPLETO (T-087). Lo que hace el sistema en la entrega `v1.0.0` (5 de noviembre de 2026), por rol. Cada función lleva el código de su pantalla y su historia. El detalle técnico está en `11_DISENO_TECNICO.md` y los componentes en `18_UI_UX.md`.
 
 ## Roles
 
@@ -8,16 +8,17 @@
 |---|---|---|
 | Administrador | Equipo de NuevasTIC | Todo el panel: Inicio, Diagnósticos, Empresas, Configuración IA y Usuarios y roles |
 | Empresa | Cuenta principal de cada empresa | Su inicio, su diagnóstico, sus resultados, su historial, su perfil y sus colaboradores |
-| Colaborador | Persona que la empresa agrega | Lo mismo que la empresa, menos los colaboradores y los datos de la empresa (RN-025) |
-| Consultor | Persona externa que acompaña empresas (invitada) | Su inicio con sus empresas vinculadas; su ficha, historial, resultados, respuestas y PDF. Solo mira (RN-030) |
+| Colaborador | Persona que la empresa agrega | Las páginas que la cuenta principal elige para cada uno (responder, resultados, PDF); no gestiona colaboradores ni cambia los datos de la empresa ni su propio perfil (RN-025) |
+| Consultor | Persona externa que acompaña empresas (invitada) | Su inicio (C1) y Mis empresas (C2) con sus empresas vinculadas; su ficha, historial, resultados, respuestas y los dos PDF. Solo mira (RN-030) |
 
 ## Acceso (todos)
 
 | Función | Pantalla | Historia |
 |---|---|---|
-| Iniciar sesión, con aviso de cuenta desactivada y límite de intentos | L1 | HU-001 |
-| Registrar la empresa en dos pasos (cuenta y empresa, con CIIU y ubicación) | L2 | HU-002 |
-| Recuperar la contraseña y crear una nueva | L3, L4 | HU-003, HU-004 |
+| Iniciar sesión, con aviso de cuenta desactivada, de rol inactivo y límite de intentos | L1 | HU-001 |
+| Registrar la empresa en dos pasos (cuenta y empresa, con CIIU y ubicación), con captcha, los Términos y Condiciones y la Política de Privacidad oficiales | L2 | HU-002 |
+| Verificar el correo con un código antes de entrar | L2b | DEC-020 |
+| Recuperar la contraseña (el enlace vence a los 10 minutos) y crear una nueva; crear la primera desde una invitación | L3, L4 | HU-003, HU-004 |
 | Cerrar sesión | Menú | HU-005 |
 | Editar el perfil, la foto y la contraseña | A6, E11 | HU-055, HU-056 |
 
@@ -56,7 +57,7 @@
 - **Importancia** de cada categoría, que suma 100 % (A2.1c, HU-027).
 - **Vista previa** con lo que falta para publicar (A2.4, HU-028).
 - **Publicar** una versión que ya no cambia (A2.1d, HU-029).
-- **Resultado de ejemplo** en el mejor, el medio y el peor caso, con el PDF (A2.6, HU-030).
+- **Resultado de ejemplo** en el mejor, el medio y el peor caso, con sus dos PDF: el completo y el resumen de la empresa (A2.6, HU-030).
 
 ### Empresas (A3)
 
@@ -72,6 +73,8 @@
   - reemplazar, cambiar de fecha o cancelar la pendiente (A3.1c).
 - Atender las solicitudes de nueva medición (HU-083).
 - Ver el resultado, el historial y las respuestas de cada empresa (A3.3, A3.4, A3.5, HU-038 a HU-040).
+- Descargar el informe PDF completo o el resumen que recibe la empresa (A3.3, RN-024).
+- Vincular y quitar consultores en la pestaña Consultores (A3.1, HU-085).
 
 ### Configuración de la IA (A4)
 
@@ -84,10 +87,19 @@
 ### Usuarios y roles (A5)
 
 - Lista de cuentas con búsqueda y filtros (HU-046).
-- Invitar cuentas internas; desactivar, reactivar, eliminar y recuperar cuentas (HU-047).
+- Invitar cuentas internas y consultores (con sus empresas); desactivar, reactivar, eliminar y recuperar cuentas (HU-047, HU-085).
 - Roles del sistema y roles creados: crear, editar permisos y eliminar (HU-048 a HU-051).
 - Cambiar o asignar el rol de una cuenta (HU-052).
 - "Ver como" una empresa, un colaborador u otra cuenta que no sea Administrador, solo de lectura y con registro (A5.4, HU-053, HU-054).
+
+## Consultor
+
+| Función | Pantalla | Historia |
+|---|---|---|
+| Inicio con sus empresas, cifras y «Qué atender» | C1 | HU-086 |
+| Mis empresas: una tarjeta por empresa, con filtros y buscador | C2 | HU-086 |
+| Ver la ficha, el historial, los resultados y las respuestas de sus empresas, solo de lectura | A3.1, A3.3–A3.5 | HU-086 |
+| Descargar el informe completo o el resumen de la empresa | A3.3 | HU-086, RN-024 |
 
 ## Empresa y colaborador
 
@@ -101,7 +113,7 @@
 | Ver el avance del análisis y reintentar una categoría fallida | E4 | HU-063 |
 | Resultado: puntaje, nivel, variación, radar, por categoría con el método de análisis, observaciones y recomendaciones | E6 | HU-064 |
 | Ver sus respuestas con la observación de la IA | E9 | HU-065 |
-| Descargar el informe PDF | E10 | HU-066 |
+| Descargar el informe PDF: el resumen con lo que dijo la IA, en orden | E10 | HU-066 |
 | Historial con la evolución total o por categoría | E8 | HU-067 |
 | Colaboradores: agregar, editar, desactivar, reactivar y eliminar (solo la empresa) | E12 | HU-076 a HU-079 |
 
@@ -111,14 +123,14 @@
 |---|---|---|
 | Calcular los puntajes de las preguntas cerradas | Al enviar | HU-068 |
 | Analizar cada categoría con la IA, con 3 intentos | En la cola, después de enviar | HU-069, HU-081 |
-| Publicar el resultado, avisar a la empresa y generar el PDF | Cuando terminan todas las categorías | HU-084 |
+| Publicar el resultado, avisar a la empresa y generar los dos PDF | Cuando terminan todas las categorías | HU-084 |
 | Marcar las mediciones vencidas | Cada hora, a la medianoche de cada empresa | HU-070 |
-| Borrar para siempre las cuentas eliminadas hace más de 90 días | Cada día a las 03:10 | DEC-017 |
+| Borrar para siempre las cuentas eliminadas hace más de 90 días y los registros sin verificar a los 7 días | Cada día a las 03:10 | DEC-017, DEC-020 |
 | Resumen semanal de mediciones pendientes a los administradores que lo encendieron | Cada lunes a las 07:50 | A6 |
 | Avisos por correo según lo que cada cuenta eligió en Mi perfil | Al enviar, al asignar, al publicar y si falla la IA | A6, E11 |
 
 ## Lo que no hace
 
 - **Bot de WhatsApp (HU-071 a HU-075):** terminado por otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026).
-- **FODA y comparación con promedios:** fuera del alcance (RN-028). Ver la inconsistencia con DEC-019 en `07_REGLAS_DE_NEGOCIO.md`.
-- **Despliegue:** no se despliega (DEC-006).
+- **Comparación con promedios:** fuera del alcance (RN-028). La IA sí analiza con DOFA y otros métodos, y el informe completo agrupa su DOFA (DEC-019).
+- **Despliegue:** se va a desplegar (DEC-006 cambió el 4 de noviembre; `20_DESPLIEGUE.md`).

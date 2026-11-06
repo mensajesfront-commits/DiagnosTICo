@@ -1,6 +1,6 @@
 # Alcance
 
-**Estado:** REQUIERE VALIDACIÓN (T-029)
+**Estado:** COMPLETO (T-029), aprobado por NuevasTIC el 5 de noviembre de 2026.
 
 **Fuentes:**
 
@@ -26,14 +26,15 @@
 | Experiencia de la empresa | E1–E10 | HU-057 a HU-067, HU-082 |
 | Colaboradores | E12–E12.3 | HU-076 a HU-079 |
 | Cálculo, IA y tareas automáticas | — | HU-068 a HU-070, HU-081, HU-084 |
+| Consultor (desde el 3 de noviembre) | C1, C2 y A3–A3.5 en solo lectura | HU-085, HU-086 |
 
-En total son 13 épicas y 84 historias, con 330 puntos estimados.
+En total son 14 épicas y 86 historias, con 340 puntos estimados. Las 81 de la web están hechas en este repositorio; las 5 del bot (EP-013) se hicieron fuera.
 
 ## Qué no entra
 
 | Qué | Por qué |
 |---|---|
-| Publicar el sistema en un servidor | Se entrega el repositorio funcionando en local (Sail) con un README para instalarlo. `20_DESPLIEGUE.md` lo marcará NO APLICA. |
+| Publicar el sistema en un servidor | **Cambió el 4 de noviembre de 2026: sí se despliega** (DEC-006). Pasos en `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio. |
 | Análisis FODA y comparación con promedios | Decisión confirmada (RN-028). La propuesta técnica todavía los menciona (ver INC-001 en `05_REQUISITOS_FUNCIONALES.md`). |
 | Rol Usuario | Queda para un posible futuro. El rol Consultor **sí entra** desde el 3 de noviembre, solo de lectura (EP-014, RN-030). |
 | Simulador de inversión | No existe en el diseño. |
@@ -48,11 +49,11 @@ Otra persona del equipo lo terminó (confirmado el 4 de noviembre de 2026). No e
 - retoma la conversación desde la última pregunta;
 - califica con los puntajes de las opciones, sin IA.
 
-Falta definir el texto del saludo y cómo se configuran las preguntas (PA-001 y PA-002).
+El texto del saludo y cómo se configuran las preguntas (PA-001 y PA-002) los definió el bot.
 
-**[INCONSISTENCIA DETECTADA]** El cronograma todavía tiene tareas del bot en las semanas 2, 6 y 7. Hay que decidir si se sacan o se mantienen como opcionales.
+**[INCONSISTENCIA DETECTADA]** El cronograma todavía tiene tareas del bot en las semanas 2, 6 y 7. Ya no aplican a este repositorio.
 
 ## Supuestos del alcance
 
-- La clave de la API de OpenAI y su saldo los aporta NuevasTIC. **[INFORMACIÓN PENDIENTE]** Falta acordarlo (propuesta técnica, sección 5).
-- El contenido real de los diagnósticos (preguntas, opciones y puntajes por sector) lo entrega NuevasTIC en la semana 4 (T-072).
+- La clave de la API de OpenAI y su saldo los aporta NuevasTIC, con el modelo gpt-4.1-mini (acordado el 23 de octubre de 2026).
+- El contenido real de los diagnósticos (preguntas, opciones y puntajes por sector) lo genera NuevasTIC con IA y lo carga a mano en la aplicación (confirmado el 4 de noviembre de 2026).

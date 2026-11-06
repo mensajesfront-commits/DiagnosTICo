@@ -1,6 +1,6 @@
 # Backend
 
-**Estado:** REQUIERE VALIDACIÓN (T-043). Todas las rutas existen y tienen pruebas (14 de octubre de 2026). Falta la revisión de Luis.
+**Estado:** COMPLETO (T-043). Todas las rutas existen y tienen pruebas; Luis lo revisó en los PR #11 a #14 (5 de noviembre de 2026).
 
 Todas las rutas con sesión van con `auth` y con el rol o permiso indicado (matriz en `17_SEGURIDAD.md`). El frontend usa las funciones de Wayfinder (`@/routes/...`); si cambia una URL, se regenera con `php artisan wayfinder:generate --with-form`.
 
@@ -10,9 +10,9 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 
 | Módulo | URL base | Controlador | Protección | Pantallas | Estado |
 |---|---|---|---|---|---|
-| Acceso | `/login`, `/register`, `/forgot-password`, `/reset-password` | Fortify (`FortifyServiceProvider`, `CreateNewUser`) | Invitado + límite de intentos | L1–L4 | Hecho |
+| Acceso | `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verificar-correo` | Fortify (`FortifyServiceProvider`, `CreateNewUser`), `VerificacionCorreoController`, `ElegirEnlaceContrasena` | Invitado + límite de intentos + captcha en el registro | L1–L4, L2b | Hecho |
 | Ubicaciones | `/ubicaciones/{pais}` | `UbicacionesController` | Pública, 60 por minuto | L2, A6, E11 | Hecho |
-| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio`, `DatosInicioEmpresa` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1 | Hecho |
+| Inicio | `/dashboard`, `/inicio`, `/mi-inicio` | `InicioController`, `DatosInicio`, `DatosInicioEmpresa`, `DatosInicioConsultor` | `auth`; cada cuenta a su inicio por rol (T-048) | A1, E1, C1 | Hecho |
 | Mi perfil | `/mi-perfil`, `/imagenes/{tipo}/{id}` | `PerfilController` | `auth` | A6, E11 | Hecho |
 | Diagnósticos y sectores | `/diagnosticos`, `/sectores` | `DiagnosticosController`, `EditorDiagnosticoController`, `SectoresController` | `diagnosticos.ver` / `diagnosticos.editar` | A2, A2·T, A2b, A2.1, A2.1b–f, A2.1c, A2.2, A2.4, A2.5, A2.7 | Hecho, con el resultado de ejemplo (A2.6) |
 | Categorías | `/categorias` | `CategoriasController` | `diagnosticos.ver` / `diagnosticos.editar` | A2.3 | Hecho |
@@ -24,9 +24,8 @@ Resumen: cada módulo con su controlador, su protección y sus pantallas. El det
 | Resultados | `/resultados/{id}`, `/resultados/{id}/respuestas`, `/resultados/{id}/pdf` (`?tipo=resumen` para el Administrador y el Consultor; la empresa siempre recibe el resumen) | `ResultadosController`, `DatosResultado`, `InformePdf` | `resultados.ver`, `resultados.pdf` + su empresa (interna: además `empresas.ver`) | E6, E9, E10, A3.3, A3.5 | Hecho |
 | Configuración de la IA | `/configuracion-ia` | `ConfiguracionIaController`, `DatosConfiguracionIa` | `ia.ver` / `ia.editar` | A4, A4.4–A4.7, A4.9 | Hecho |
 | Historial | `/historial`, `/empresas/{id}/historial` | `HistorialController`, `DatosHistorial` | E8: `resultados.ver` + su empresa (una cuenta interna recibe 404); A3.4: `empresas.ver` (el consultor, solo sus empresas) | E8, A3.4 | Hecho. Sale de `DatosEmpresas::ficha` para que coincida con A3.1; lista solo las terminadas con resultado |
-| Webhook del bot de WhatsApp | `/webhook/whatsapp` | — | Firma del proveedor, sin sesión | — | **Aplazado** (EP-013). **[FUNCIONALIDAD POR DEFINIR]** Si se retoma, va separado de empresas y mediciones (RN-029) |
 
-Los permisos son los 15 de `RolesYPermisosSeeder`. Todos los módulos están construidos; el bot de WhatsApp sigue aplazado.
+Los permisos son los 15 de `RolesYPermisosSeeder`. Todos los módulos están construidos. El bot de WhatsApp se hizo fuera de este repositorio: aquí no tiene rutas.
 
 ## Acceso (Fortify, ya existen)
 
@@ -49,8 +48,8 @@ Se hizo desde el frontend para poder probar el registro y el menú de la empresa
 | Tabla `sectores` | `database/migrations/2026_10_06_000001_create_sectores_table.php` | `nombre` (40, único), `descripcion`, `activo` |
 | Tabla `empresas` y columnas nuevas en `users` | `database/migrations/2026_10_06_000002_create_empresas_table.php` | `empresas`: `nombre`, `sector_id`, `ciudad`, `pais`, `activa`. `users`: `empresa_id`, `cargo`, `telefono`, `activo` |
 | Modelos | `app/Models/Sector.php`, `app/Models/Empresa.php`, `User::empresa()` | `Sector::activos()` para RN-003 |
-| Roles y permisos | `database/seeders/RolesYPermisosSeeder.php` | La matriz de `17_SEGURIDAD.md` (3 roles, 15 permisos) |
-| Sectores de ejemplo | `database/seeders/SectoresSeeder.php` | 6 sectores (se quitó Talleres, 9 de octubre). **[INFORMACIÓN PENDIENTE]** lista real |
+| Roles y permisos | `database/seeders/RolesYPermisosSeeder.php` | La matriz de `17_SEGURIDAD.md` (4 roles del sistema: Administrador, Empresa, Colaborador y Consultor; 15 permisos) |
+| Sectores de ejemplo | `database/seeders/SectoresSeeder.php` | Sectores, actividades y categorías reales (confirmados por NuevasTIC el 23 de octubre de 2026) |
 | Administrador inicial | `database/seeders/DatabaseSeeder.php`, `config/diagnostico.php` | `ADMIN_EMAIL` en `.env`; se crea sin contraseña y recibe la invitación (`App\Support\AdministradorPrincipal`, `php artisan admin:invitar`) |
 | Registro | `app/Actions/Fortify/CreateNewUser.php` | Valida los campos de L2 y crea empresa + usuario en una transacción |
 | Pruebas | `tests/Feature/Auth/RegistrationTest.php` | Solo sectores activos, registro completo, sector inactivo y términos |
@@ -278,7 +277,7 @@ Tarea (HU-070): `mediciones:vencer` corre cada hora (a los :05) y marca `vencida
 - **Datos que se insertan solos:** `{sector}`, `{contexto_sector}` (la descripción del sector), `{categoria}` y `{respuestas_categoria}` (en el texto queda "las preguntas con sus respuestas, que van en el mensaje siguiente"; las respuestas siempre se envían aparte, en JSON).
 - El sector que se usa es el del diagnóstico de la medición.
 - Los cambios aplican a los análisis que se hagan después de guardar; cada análisis guarda su prompt exacto en `analisis_categoria.prompt`.
-- **[INFORMACIÓN PENDIENTE]** El límite de pruebas por día (HU-045 "REQUIERE VALIDACIÓN"). Por ahora solo hay 10 por minuto.
+- Límite de "Probar con un ejemplo": 10 por minuto y 100 al día entre todos los administradores (`ConfiguracionIaController::PRUEBAS_POR_DIA`, PA-003).
 
 ## Análisis de la IA y resultado (HU-068, HU-069, HU-081, HU-084, hecho)
 
