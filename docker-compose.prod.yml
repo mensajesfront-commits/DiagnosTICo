@@ -38,7 +38,11 @@ services:
             args:
                 VITE_APP_NAME: '${APP_NAME:-Captter}'
         healthcheck:
-            test: ['CMD-SHELL', 'php -r "exit(@fsockopen(\"127.0.0.1\", 9000) ? 0 : 1);"']
+            test:
+                [
+                    'CMD-SHELL',
+                    'php -r "exit(@fsockopen(\"127.0.0.1\", 9000) ? 0 : 1);"',
+                ]
             interval: 10s
             timeout: 5s
             retries: 6
@@ -47,7 +51,16 @@ services:
     # Trabajador de la cola: análisis de la IA, PDF y correos.
     queue:
         <<: *aplicacion
-        command: ['php', 'artisan', 'queue:work', '--sleep=1', '--tries=3', '--timeout=120', '--max-time=3600']
+        command:
+            [
+                'php',
+                'artisan',
+                'queue:work',
+                '--sleep=1',
+                '--tries=3',
+                '--timeout=120',
+                '--max-time=3600',
+            ]
         stop_grace_period: 130s
         depends_on:
             app:
@@ -90,7 +103,11 @@ services:
         networks:
             - interna
         healthcheck:
-            test: ['CMD-SHELL', 'pg_isready -q -d "$${POSTGRES_DB}" -U "$${POSTGRES_USER}"']
+            test:
+                [
+                    'CMD-SHELL',
+                    'pg_isready -q -d "$${POSTGRES_DB}" -U "$${POSTGRES_USER}"',
+                ]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -100,7 +117,12 @@ services:
     redis:
         image: 'redis:8-alpine'
         restart: unless-stopped
-        command: ['sh', '-c', 'exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"']
+        command:
+            [
+                'sh',
+                '-c',
+                'exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"',
+            ]
         environment:
             REDIS_PASSWORD: '${REDIS_PASSWORD:?Falta REDIS_PASSWORD en el .env}'
         volumes:
@@ -108,7 +130,11 @@ services:
         networks:
             - interna
         healthcheck:
-            test: ['CMD-SHELL', 'redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG']
+            test:
+                [
+                    'CMD-SHELL',
+                    'redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG',
+                ]
             interval: 10s
             timeout: 5s
             retries: 5
