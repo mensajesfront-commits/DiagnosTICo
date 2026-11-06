@@ -1,6 +1,6 @@
 # Flujos del sistema
 
-**Estado:** COMPLETO (T-042). Todos los flujos están construidos y probados (14 de octubre de 2026).
+**Estado:** COMPLETO (T-042). Todos los flujos están construidos y probados. Actualizado para la entrega `v1.0.0` (5 de noviembre de 2026). El flujo del Consultor está en `08_CASOS_DE_USO.md` (CU-007).
 
 Los diagramas están en Mermaid; GitHub los dibuja solos. Los nombres de clases y trabajos (`AnalizarMedicion`, `AnalizarCategoria`, `PublicarResultado`…) son los del código (`11_DISENO_TECNICO.md`).
 
@@ -58,8 +58,8 @@ sequenceDiagram
     C->>L: PublicarResultado (cuando no queda ninguna pendiente)
     L->>L: Promedio por categoría, total ponderado, nivel y variación (RN-018 a RN-020)
     L->>BD: resultados (inmutable) · medición → Terminada
-    L->>L: Genera el informe PDF (Chromium)
-    L->>BD: Guarda la ruta del PDF
+    L->>L: Genera los dos PDF (Chromium): resumen para la empresa e informe completo
+    L->>BD: Guarda las rutas (pdf_resumen_ruta y pdf_ruta)
     L->>M: "Tu resultado está listo"
     V->>L: E5 consulta el avance
     L-->>V: Terminada
@@ -70,7 +70,7 @@ Puntos clave:
 
 - **Nada bloquea la pantalla (RNF-004).** El envío solo cambia el estado y encola trabajos; la empresa puede salir de E5.
 - **Cada categoría es independiente.** Si una falla, las demás conservan su análisis (HU-069 CA-004).
-- **El PDF se genera una sola vez** con lo guardado, sin volver a llamar a la IA (RN-024).
+- **Los dos PDF se generan una sola vez** con lo guardado, sin volver a llamar a la IA (RN-024). La empresa y su colaborador descargan el resumen; el Administrador y el Consultor, el informe completo o, con «Resumen para la empresa», el resumen.
 - **Categoría fallida tras 3 intentos:** el resultado espera. La empresa ve en E4 qué categoría falló y "Reintentar"; los administradores reciben el correo `AnalisisFallido`. Al reintentar, solo esa categoría vuelve a la cola y, cuando termina, se publica el resultado completo.
 
 ## 2. Estados de la medición
@@ -111,8 +111,12 @@ sequenceDiagram
         L->>BD: Busca la cuenta (correo en minúsculas)
         alt No existe o contraseña errónea
             L-->>U: "El correo o la contraseña no son correctos." (RN-005)
+        else Contraseña correcta, pero el correo no está verificado (L2b)
+            L-->>U: "Primero confirma tu correo: escribe el código que enviamos a…"
         else Contraseña correcta, pero cuenta o empresa desactivada
             L-->>U: Modal "Su cuenta ha sido desactivada…" (RN-004, RN-025)
+        else Cuenta activa con el rol inactivo (auditoría QA, ERR-12)
+            L-->>U: Modal "Rol inactivo"
         else Todo bien
             L->>BD: ultimo_acceso_en = ahora
             L-->>U: Inicio de su cuenta
@@ -128,15 +132,20 @@ sequenceDiagram
     participant L as Laravel
     participant BD as PostgreSQL
 
-    U->>L: Datos de la empresa y del usuario, contraseña, términos
-    L->>L: Valida: sector activo (RN-003), correo único (RN-002), contraseña fuerte (RN-001), términos aceptados
+    U->>L: Datos de la empresa y del usuario, contraseña, Términos y Política, captcha (Turnstile)
+    L->>L: Valida: captcha, sector activo (RN-003), correo único sin distinguir mayúsculas (RN-002), contraseña fuerte (RN-001), términos aceptados
     alt Hay errores
         L-->>U: Errores en español, bajo cada campo
     else
         L->>BD: Transacción: empresa + usuario + rol Empresa + terminos_aceptados_en
-        L-->>U: Sesión iniciada · entra a su inicio
+        L->>U: Correo con un código de verificación
+        L-->>U: Ventana "Verifica tu correo" (L2b), sin iniciar sesión
+        U->>L: Escribe el código
+        L-->>U: "Tu correo quedó verificado. Escribe tu contraseña para entrar." (L1)
     end
 ```
+
+Si no verifica el correo en 7 días, el registro se borra (`cuentas:purgar`).
 
 ### Recuperar la contraseña (L3 y L4)
 

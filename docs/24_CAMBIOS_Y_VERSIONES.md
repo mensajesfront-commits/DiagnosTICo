@@ -4,6 +4,17 @@
 
 La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan por semana del cronograma.
 
+## Después de v1.0.0 · despliegue con Docker (6 de noviembre de 2026)
+
+- **PR #17 a `main`** (Luis Carlos): estructura de producción igual a la de Kiasmer (DEC-024).
+  - `docker-compose.prod.yml`: `app`, `web` (solo en `127.0.0.1:${WEB_PORT}`), `queue`, `scheduler`, `pgsql` y los comandos `migrate` y `artisan`.
+  - `docker/php/Dockerfile.prod` con las imágenes `app` (PHP-FPM 8.4, Chromium y Puppeteer) y `web` (Nginx), más `entrypoint.prod.sh`, `php.ini`, `opcache.prod.ini`, `www.conf` y `docker/nginx/default.prod.conf`.
+  - `deploy-production.sh`, `.env.production.example` y `.dockerignore`.
+  - `trustProxies` en `bootstrap/app.php`; docs/20 con la instalación, la actualización y los VirtualHost de Apache y Nginx.
+- **En el PR #16:** `URL::forceScheme('https')` cuando `APP_URL` empieza por `https://`, y docs/16, docs/22 (DEC-024), docs/27 y README alineados con el PR #17.
+- **Servidor:** https://diagnostico.captter.com. Apache tiene el SSL y reenvía a `127.0.0.1:8200`, así que el `.env` del servidor lleva `WEB_PORT=8200`.
+- Una primera versión de estos archivos, escrita en el PR #16, se quitó a favor de la del PR #17, que sí se construyó y probó.
+
 ## v1.0.0 · versión de entrega (5 de noviembre de 2026)
 
 - `develop` se unió a `main` con el PR #13 (commit `2838f4a`), después de #11 y #12. CI en verde.
@@ -16,6 +27,15 @@ La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan p
 - Al actualizar un equipo o el servidor: `composer install`, `npm install`, `php artisan migrate` (3 migraciones del 4 de noviembre) y `npm run build`.
 - Etiqueta `v1.0.0` sobre `main` (commit `2838f4a`), creada por el equipo el 5 de noviembre.
 - **Documentación cerrada:** los 32 documentos quedaron en COMPLETO. NuevasTIC aprobó los de negocio el 5 de noviembre (02 a 08, 18, 25 y 31).
+- **Documentación revisada a fondo (5 de noviembre):** cada documento se puso al día con lo hecho después del 14 de octubre:
+  - el Consultor: EP-014, HU-085 y HU-086, RN-030, CU-007, C1 y C2, y una parte nueva del manual;
+  - los dos PDF y el logotipo;
+  - la auditoría QA: middlewares, cabeceras y enlaces de 10 minutos;
+  - las tablas y columnas nuevas en docs/12 (`consultor_empresa`, `invitaciones_tokens`, `pdf_resumen_ruta`, verificación del correo);
+  - las pruebas por archivo;
+  - las decisiones DEC-021 a DEC-023;
+  - los problemas ISSUE-010 a ISSUE-012;
+  - el despliegue, el bot terminado y los totales (14 épicas, 86 historias, 340 puntos).
 
 ## Semana 4 · del 12 al 18 de octubre de 2026 (en curso)
 

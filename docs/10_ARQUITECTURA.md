@@ -1,6 +1,6 @@
 # Arquitectura
 
-**Estado:** COMPLETO (T-063). Describe la arquitectura tal como quedó (14 de octubre de 2026). El detalle por clase está en `11_DISENO_TECNICO.md`.
+**Estado:** COMPLETO (T-063). Describe la arquitectura tal como quedó en la entrega `v1.0.0` (5 de noviembre de 2026). El detalle por clase está en `11_DISENO_TECNICO.md`.
 
 ## En una frase
 
@@ -11,7 +11,7 @@ Es un **monolito modular**: una sola aplicación Laravel con Vue adentro (Inerti
 ```mermaid
 flowchart LR
     subgraph Navegador
-        V["Vue 3 + Inertia<br/>(pantallas L, A, E)"]
+        V["Vue 3 + Inertia<br/>(pantallas L, A, C, E)"]
     end
 
     subgraph App["Aplicación Laravel 13 (PHP 8.4)"]
@@ -27,6 +27,7 @@ flowchart LR
     IA["OpenAI<br/>(análisis por categoría)"]
     MAIL["Servidor de correo<br/>(Mailpit en local)"]
     PDF["Chromium<br/>(Browsershot)"]
+    CAP["Cloudflare Turnstile<br/>(captcha del registro)"]
 
     V -- "Inertia (HTML + JSON)" --> R
     R --> C --> S --> M --> BD
@@ -34,18 +35,19 @@ flowchart LR
     J --> IA
     J --> MAIL
     J --> PDF
+    C --> CAP
     T --> M
     J --> M
 ```
 
-El bot de WhatsApp está aplazado. Si se retoma, vive en la misma aplicación pero en tablas y rutas separadas (RN-029).
+El bot de WhatsApp lo terminó otra persona del equipo, fuera de este repositorio (RN-029). Esta aplicación no tiene código del bot.
 
 ## Capas
 
 | Capa | Qué hace | Dónde |
 |---|---|---|
 | **Pantallas** | Muestran los datos y envían formularios. **No calculan reglas de negocio.** | `resources/js/pages`, `components`, `layouts` |
-| **Rutas y middleware** | Deciden quién entra: sesión, rol, permiso, cuenta activa, límite de intentos | `routes/`, `bootstrap/app.php`, `app/Http/Middleware` |
+| **Rutas y middleware** | Deciden quién entra: sesión, rol, permiso, cuenta activa, límite de intentos, "Ver como"; además ponen las cabeceras de seguridad y normalizan el correo | `routes/`, `bootstrap/app.php`, `app/Http/Middleware` |
 | **Controladores** | Reciben la petición, piden los datos y devuelven la página de Inertia o una redirección | `app/Http/Controllers` |
 | **Validación** | Reglas de cada formulario y mensajes en español | `app/Http/Requests`, `app/Rules`, `lang/es` |
 | **Servicios y acciones** | Las reglas de negocio: crear la empresa, calcular puntajes, armar el prompt, publicar el resultado | `app/Actions`, `app/Services` |
@@ -81,9 +83,10 @@ Cada épica de `05_REQUISITOS_FUNCIONALES.md` es un módulo. Un módulo tiene su
 | Inicio del Administrador | EP-002 | A1 | `pages/inicio/Administrador.vue`, `components/inicio` | `InicioController`, `DatosInicio` |
 | Empresas y mediciones | EP-006 | A3–A3.5 | `pages/empresas`, `pages/mediciones`, `pages/historial`, `components/empresas` | `EmpresasController`, `MedicionesController`, `HistorialController`, `app/Services/Mediciones`, `DatosEmpresas` |
 | Configuración de la IA | EP-007 | A4–A4.9 | `pages/configuracion-ia`, `components/ia` | `ConfiguracionIaController`, `app/Services/Ia`, `DatosConfiguracionIa` |
-| Usuarios y roles | EP-008 | A5 | `pages/usuarios` | `UsuariosController`, `RolesController`, `RolesYPermisosSeeder` |
+| Usuarios y roles | EP-008 | A5 | `pages/usuarios` | `UsuariosController`, `RolesController`, `VerComoController`, `RolesYPermisosSeeder` |
+| Consultor | EP-014 | C1, C2, A3.1 (pestaña Consultores) | `pages/inicio/Consultor.vue`, `pages/empresas/MisEmpresas.vue`, `components/empresas/PanelConsultores.vue` | `ConsultoresController`, `DatosConsultores`, `DatosInicioConsultor`, `User::puedeVerEmpresa()` |
 | Experiencia de la empresa | EP-010, EP-011 | E1–E12 | `pages/inicio/Empresa.vue`, `pages/responder`, `pages/resultados`, `pages/historial`, `pages/colaboradores` | `InicioController`, `ResponderController`, `ResultadosController`, `HistorialController`, `ColaboradoresController` |
-| Cálculo, IA y tareas | EP-012 | E4 | `pages/responder/Enviado.vue` | `app/Jobs`, `app/Services/Resultados`, tareas programadas (`routes/console.php`) |
+| Cálculo, IA y tareas | EP-012 | E4, E10 (los dos PDF) | `pages/responder/Enviado.vue`, `resources/views/pdf` | `app/Jobs`, `app/Services/Resultados` (`InformePdf`), tareas programadas (`routes/console.php`) |
 
 ## Mapa de carpetas
 
@@ -91,17 +94,17 @@ Cada épica de `05_REQUISITOS_FUNCIONALES.md` es un módulo. Un módulo tiene su
 app/
 ├── Actions/Fortify/      Registro (CreateNewUser) y contraseña nueva
 ├── Concerns/             Reglas de validación compartidas
-├── Console/Commands/     prueba:ia, prueba:pdf
+├── Console/Commands/     prueba:ia, prueba:pdf, mediciones:vencer, mediciones:resumen, cuentas:purgar, admin:invitar, ubicaciones
 ├── Http/
 │   ├── Controllers/      Un controlador por pantalla o grupo de pantallas
-│   ├── Middleware/       Cuenta activa, límite de intentos, Inertia
+│   ├── Middleware/       Cabeceras de seguridad, correo en minúsculas, cuenta activa, enlace de contraseña, "Ver como", límite de intentos, Inertia
 │   ├── Requests/         Validación de formularios
 │   └── Responses/        Respuestas propias de Fortify (RN-005)
 ├── Models/               User, Empresa, Sector…
 ├── Providers/            Configuración (contraseña, login, correo)
-├── Rules/                Reglas de validación propias (TieneMayuscula)
+├── Rules/                Reglas de validación propias (TieneMayuscula, NombreUnico, TelefonoValido…)
 ├── Services/Ia/          Análisis de la IA
-└── Support/              Listas de opciones (OpcionesPerfil)
+└── Support/              Datos de cada pantalla (Datos*), invitaciones, captcha, límites y opciones
 config/diagnostico.php    Configuración propia (Administrador inicial, demo)
 database/
 ├── migrations/           Tablas
@@ -117,7 +120,7 @@ resources/
 │   ├── lib/              Menú, niveles, contraseña, fechas, rutas
 │   ├── pages/<módulo>/   Una página por pantalla
 │   └── types/            Tipos de los datos que llegan del backend
-└── views/pdf/            Plantillas del PDF
+└── views/pdf/            Plantillas de los dos PDF (informe completo y resumen), encabezado, pie y logo
 routes/
 ├── web.php               Rutas del sistema
 ├── settings.php          Mi perfil
@@ -131,7 +134,7 @@ docs/                     Esta documentación
 ## Cómo viaja una petición
 
 1. El navegador pide una página, por ejemplo `/mi-perfil`.
-2. Laravel pasa los middleware `web`: sesión, CSRF, cuenta activa, límite de intentos e Inertia. Después pasa `auth`, y `role` o `permission` si la ruta lo pide.
+2. Laravel pasa los middleware `web`, en este orden: correo en minúsculas (`NormalizarCorreo`), sesión y CSRF, cuenta activa, enlace de contraseña (`ElegirEnlaceContrasena`), "Ver como", límite de intentos e Inertia. Después pasa `auth`, y `role` o `permission` si la ruta lo pide. A toda respuesta se le agregan las cabeceras de seguridad (`CabecerasSeguridad`).
 3. El controlador junta los datos ya calculados y llama a `Inertia::render('perfil/MiPerfil', [...props])`.
 4. La primera vez llega HTML con la página. Las siguientes, solo el JSON de las props, y Vue cambia la pantalla sin recargarla.
 5. Al enviar un formulario:
@@ -148,10 +151,10 @@ Los contratos entre pantallas y controladores (qué props espera cada pantalla) 
 | Monolito con Inertia en lugar de una API REST | Una sola aplicación, sin duplicar validaciones ni rutas | DEC-001, DEC-005 |
 | Versiones de diagnóstico y respuestas de la IA en JSONB | Una versión publicada no cambia aunque se edite el borrador (RN-010) | `12_BASE_DE_DATOS.md` |
 | Cola en la base de datos (`QUEUE_CONNECTION=database`) | No hace falta instalar Redis; alcanza para el volumen esperado | `.env.example` |
-| PDF con Chromium (Browsershot) | El PDF se ve igual que la pantalla, con las mismas gráficas | DEC-004, DEC-011 |
+| PDF con Chromium (Browsershot) | El PDF se ve igual que la pantalla, con las mismas gráficas. Son dos: el informe completo y el resumen para la empresa (RN-024) | DEC-004, DEC-011 |
 | Roles y permisos con spatie/laravel-permission | Roles creables con casillas (A5.1), sin código | `17_SEGURIDAD.md` |
 | Archivos privados (foto y logo) servidos por una ruta | Solo los ve quien tiene permiso; no hace falta `storage:link` | `15_BACKEND.md` |
 
 ## Entornos
 
-Solo hay entorno local (Sail) y de pruebas (CI). El sistema no se publica (`03_ALCANCE.md`). Detalle en `27_ENTORNOS.md`.
+Hay entorno local (Sail) y de pruebas (CI). El sistema se va a desplegar en un servidor (DEC-006 cambió el 4 de noviembre; `20_DESPLIEGUE.md`). Detalle en `27_ENTORNOS.md`.

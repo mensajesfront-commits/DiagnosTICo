@@ -13,12 +13,12 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 | RNF-003 | Usabilidad | Respuestas guardadas al momento; se retoma donde se quedó | Cumplido y probado |
 | RNF-004 | Rendimiento | Correos y análisis de la IA en segundo plano | Cumplido (análisis, PDF y correos de resultado, solicitudes y avisos en cola) |
 | RNF-005 | Auditoría | Registro de quién usó "Ver como" y cuándo | Cumplido y probado |
-| RNF-006 | Seguridad | Mensajes del bot verificados de Meta | APLAZADO con el bot |
+| RNF-006 | Seguridad | Mensajes del bot verificados de Meta | Fuera de este repositorio (lo cumple el bot) |
 | RNF-007 | Compatibilidad | Versiones fijas del stack | Cumplido |
-| RNF-008 | Compatibilidad | Navegadores y tamaños de pantalla | Propuesta |
-| RNF-009 | Rendimiento | Tiempos de respuesta | Propuesta |
+| RNF-008 | Compatibilidad | Navegadores y tamaños de pantalla | Aprobado (5 de noviembre) |
+| RNF-009 | Rendimiento | Tiempos de respuesta | Aprobado (5 de noviembre) |
 | RNF-010 | Seguridad | Sesión y secretos | Cumplido |
-| RNF-011 | Privacidad | Tratamiento de datos personales | Parcial |
+| RNF-011 | Privacidad | Tratamiento de datos personales | Cumplido con los textos oficiales; ver la inconsistencia anotada |
 | RNF-012 | Accesibilidad | Uso con teclado, lector de pantalla y sin depender del color | Cumplido en lo construido |
 | RNF-013 | Idioma | Todo en español | Cumplido |
 | RNF-014 | Mantenibilidad | Pruebas, formato y análisis estático en cada cambio | Cumplido |
@@ -65,15 +65,15 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 | PostgreSQL | 18 | `compose.yaml` |
 | Paquetes de PHP y JavaScript | Exactas | `composer.lock`, `package-lock.json` |
 
-### RNF-008 · Navegadores y pantallas (propuesta)
+### RNF-008 · Navegadores y pantallas (aprobado por NuevasTIC el 5 de noviembre de 2026)
 
 - Las dos últimas versiones de Chrome, Edge, Firefox y Safari.
 - Funciona desde 360 px de ancho, como un celular, sin desplazamiento horizontal. El menú lateral se vuelve un botón en pantallas pequeñas.
 - El diseño de referencia es de 1440 px, el de los wireframes.
 
-### RNF-009 · Tiempos de respuesta (propuesta)
+### RNF-009 · Tiempos de respuesta (aprobado por NuevasTIC el 5 de noviembre de 2026)
 
-| Qué | Meta propuesta | Condición |
+| Qué | Meta | Condición |
 |---|---|---|
 | Abrir una pantalla | Menos de 2 s | En el equipo local con Sail |
 | Guardar una respuesta (RNF-003) | Menos de 1 s | — |
@@ -87,16 +87,18 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 - Las claves (base de datos, correo, OpenAI) solo van en `.env`; `.env.example` lleva solo placeholders.
 - Las contraseñas se guardan cifradas con bcrypt.
 - La sesión dura 120 minutos sin actividad (`SESSION_LIFETIME`). Se cierra si desactivan la cuenta.
-- En una presentación o en producción: `APP_DEBUG=false`. Con HTTPS, además: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
+- En una presentación o en producción: `APP_ENV=production`, `APP_DEBUG=false` e `INERTIA_DEVTOOLS_ENABLED=false` (auditoría QA, ERR-07). Con HTTPS, además: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
+- Cabeceras de seguridad en todas las respuestas (`CabecerasSeguridad`, ERR-06): `X-Frame-Options`, `frame-ancestors`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y, con HTTPS, HSTS.
+- El enlace de recuperación de contraseña vence a los 10 minutos; el de invitación sirve hasta usarlo (RN-006).
 
 ### RNF-011 · Datos personales
 
 - Al registrarse, la empresa acepta los Términos y Condiciones y la Política de Privacidad oficiales de Captter, y se guarda cuándo (`users.terminos_aceptados_en`).
 - La foto y el logo se guardan en una carpeta privada y solo los ve la misma cuenta, su empresa o el Administrador.
 - Las cuentas se desactivan (RN-004) y, si hace falta, el Administrador las elimina confirmando con el correo exacto: quedan 90 días recuperables y luego se borran para siempre con sus datos (DEC-017). Sirve para atender una solicitud de borrado (Ley 1581 de 2012, de protección de datos personales).
-- **[INFORMACIÓN PENDIENTE]**:
-  - los datos de NuevasTIC que faltan en los términos y en la política (razón social, NIT, domicilio, teléfono, fecha de vigencia, costo, proveedores de correo y alojamiento) y su revisión legal. El borrador está en `resources/js/lib/legales.ts` y se ve en la ventana del registro (L2);
-  - el procedimiento formal de NuevasTIC para recibir y responder una solicitud de borrado (plazos, quién la aprueba, si hay datos que deban conservarse por ley).
+- **Por resolver:**
+  - **[INCONSISTENCIA DETECTADA]** Los Términos y la Política oficiales (`resources/js/lib/legales.ts`) no nombran a OpenAI ni a Cloudflare, aunque los datos salen del país (Ley 1581), y hablan de pagos y cookies que el sistema no tiene. Detalle en `17_SEGURIDAD.md`; la empresa decide si los ajusta.
+  - **[INFORMACIÓN PENDIENTE]** El procedimiento formal de NuevasTIC para recibir y responder una solicitud de borrado (plazos, quién la aprueba, si hay datos que deban conservarse por ley).
 
 ### RNF-012 · Accesibilidad
 

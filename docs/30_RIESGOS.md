@@ -10,17 +10,18 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
 | ID | Riesgo | Probabilidad | Impacto | Estado | Responsable |
 |---|---|---|---|---|---|
 | R-001 | El costo de OpenAI sube más de lo previsto | Media | Media | Abierto | Luis |
-| R-002 | No hay clave de OpenAI a tiempo para probar la IA | Alta | Alta | Ocurrido | Ambos |
+| R-002 | No hay clave de OpenAI a tiempo para probar la IA | Alta | Alta | Cerrado (flujo verificado con la clave real el 5 de noviembre) | Ambos |
 | R-003 | La IA responde fuera del formato o de forma poco útil | Media | Alta | Abierto | Luis |
-| R-004 | El bot de WhatsApp cambia o se retoma tarde | Media | Media | Mitigado | Ambos |
-| R-005 | No alcanza el tiempo para las 79 vistas en 7 semanas | Alta | Alta | Abierto | Ambos |
+| R-004 | El bot de WhatsApp cambia o se retoma tarde | Media | Media | Cerrado (terminado fuera de este repositorio) | Ambos |
+| R-005 | No alcanza el tiempo para las 79 vistas en 7 semanas | Alta | Alta | Cerrado (entrega `v1.0.0` el 5 de noviembre) | Ambos |
 | R-006 | El PDF depende de Chromium | Media | Media | Mitigado | Luis |
-| R-007 | NuevasTIC tarda en confirmar datos pendientes | Alta | Media | Abierto | Cristian |
+| R-007 | NuevasTIC tarda en confirmar datos pendientes | Alta | Media | Mitigado (aprobó la documentación el 5 de noviembre; faltan servidor y dominio) | Cristian |
 | R-008 | El alcance cambia durante el desarrollo | Alta | Media | Ocurrido | Ambos |
 | R-009 | Se borran datos de una empresa por error | Baja | Alta | Mitigado | Luis |
 | R-010 | Una sola persona conoce cada parte del código | Media | Media | Abierto | Ambos |
 | R-011 | La instalación falla en el equipo de quien recibe el repositorio | Media | Alta | Mitigado | Ambos |
 | R-012 | Una clave o dato privado llega al repositorio | Baja | Alta | Mitigado | Ambos |
+| R-013 | El despliegue se decidió al final (4 de noviembre) | Alta | Media | Abierto | Ambos |
 
 ---
 
@@ -35,7 +36,7 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
   - solo se reintenta la categoría que falló;
   - el PDF no vuelve a llamar a la IA (RN-024);
   - fijar un límite de gasto en la cuenta de OpenAI.
-- **[INFORMACIÓN PENDIENTE]** Presupuesto mensual que acepta NuevasTIC y quién paga la cuenta.
+- OpenAI lo paga NuevasTIC, con `gpt-4.1-mini` (23 de octubre de 2026). "Probar con un ejemplo" tiene un límite de 100 al día. **[INFORMACIÓN PENDIENTE]** El presupuesto mensual.
 
 ### R-002 — Clave de OpenAI
 
@@ -46,7 +47,7 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
 - **Medidas:**
   - el resto de la prueba técnica está hecho (permisos, gráficas y PDF);
   - el servicio de la IA se programa con una respuesta falsa en las pruebas, para no depender de la clave.
-- **Siguiente paso:** NuevasTIC o el equipo crean la clave y la ponen en el `.env` local. Nunca va en el chat ni en el repositorio.
+- **Cierre:** el flujo completo con la clave real se verificó el 5 de noviembre de 2026. La clave va solo en el `.env`; nunca en el chat ni en el repositorio.
 
 ### R-003 — Respuestas de la IA
 
@@ -64,9 +65,8 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
 
 - **Qué puede pasar:** que el bot vuelva al alcance tarde, o que cambien las reglas de la API de Meta.
 - **Medidas:**
-  - está aplazado (EP-013);
-  - va totalmente separado de la web (RN-029): sus tablas y rutas no tocan empresas ni mediciones, así que retomarlo no rompe lo hecho;
-  - el webhook queda anotado en `15_BACKEND.md`.
+  - se aplazó y después lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre de 2026);
+  - va totalmente separado de la web (RN-029), así que no toca empresas ni mediciones.
 
 ### R-005 — Tiempos
 
@@ -74,7 +74,7 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
 - **Medidas:**
   - cronograma por semanas con hitos;
   - componentes base reutilizables;
-  - lo aplazado se marca y no se programa (bot, rol Consultor);
+  - lo aplazado se marcó y no se programó (el bot, que después se hizo aparte); el rol Consultor entró el 3 de noviembre;
   - lo que se hizo antes de tiempo (acceso, A2, A5, E12) libera las semanas 4 a 6.
 - **Señal de alerta:** dos semanas seguidas con tareas "En curso" sin cerrar.
 
@@ -92,12 +92,11 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
 
 ### R-007 — Datos pendientes de NuevasTIC
 
+- **Ya confirmado:** la lista real de sectores, actividades y categorías (23 de octubre), quién paga la IA, los textos legales y el correo de soporte (4 de noviembre) y la documentación (5 de noviembre).
 - **Qué falta confirmar:**
-  - la lista real de sectores;
-  - los códigos CIIU de cada sector;
-  - los textos de los correos;
-  - el presupuesto de la IA;
-  - la eliminación de cuentas (DEC-017).
+  - el servidor y el dominio para desplegar;
+  - el presupuesto mensual de la IA;
+  - quién mantiene el sistema después de la entrega (`21_MANTENIMIENTO.md`).
 - **Medidas:**
   - nada se inventa: se marca **[INFORMACIÓN PENDIENTE]** y se usan datos de ejemplo cargados por seeders, fáciles de cambiar.
 
@@ -145,3 +144,12 @@ Riesgos del proyecto: qué puede salir mal, qué tan probable es, cuánto afecta
   - `.env.example` lleva solo marcadores;
   - el Administrador inicial sale de `ADMIN_EMAIL` y crea su contraseña con el correo de invitación;
   - ya no hay cuentas de demostración con contraseñas conocidas.
+
+### R-013 — Despliegue decidido al final
+
+- **Qué puede pasar:** el sistema se va a desplegar (DEC-006 cambió el 4 de noviembre), pero todavía no hay servidor ni dominio. Si se publica con la configuración local, quedan abiertos los huecos que encontró la auditoría QA.
+- **Medidas:**
+  - pasos y variables de producción en `20_DESPLIEGUE.md`: `APP_ENV=production`, `APP_DEBUG=false`, `INERTIA_DEVTOOLS_ENABLED=false`, HTTPS con cookies seguras, SMTP real, llaves de Turnstile y la cola con Supervisor;
+  - las cabeceras de seguridad ya están en el código (`CabecerasSeguridad`);
+  - `composer audit` y `npm audit` en 0 en la entrega.
+- **[INFORMACIÓN PENDIENTE]** Servidor, dominio y quién mantiene el sistema.

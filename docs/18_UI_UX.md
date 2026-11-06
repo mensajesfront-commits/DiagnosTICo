@@ -39,7 +39,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 
 - Aro azul oscuro (`#14154d`) con una «C» gris claro (`#e6e8ea`) y el punto y la señal en verde (`#6ae45b`).
 - Componente `resources/js/components/marca/Logo.vue`, en SVG; el tamaño se da con la clase (`size-10`).
-- Va en el menú lateral, en el panel de las pantallas de acceso y en la barra superior del celular.
+- Va en el menú lateral, en el panel de las pantallas de acceso, en la barra superior del celular y en la portada de los dos PDF (`resources/views/pdf/logo.blade.php`). Es el símbolo de NuevasTIC (confirmado el 4 de noviembre de 2026).
 - El ícono de la pestaña del navegador sale del mismo dibujo: `public/favicon.svg`, `favicon.ico` y `apple-touch-icon.png`.
 
 ## Tipografía
@@ -131,6 +131,10 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | E12.1 | Agregar colaborador | `components/colaboradores/ModalAgregarColaborador.vue` | Hecha |
 | E12.2 | Comparte estos datos | `components/colaboradores/ModalDatosDeAcceso.vue` | Hecha |
 | E12.3 | Editar un colaborador (datos y contraseña) | `components/colaboradores/ModalEditarColaborador.vue` | Hecha y conectada |
+| C1 | Inicio del Consultor (3 de noviembre) | `pages/inicio/Consultor.vue` | Hecha y conectada. Sin wireframe: pantalla nueva (HU-086) |
+| C2 | Mis empresas del Consultor | `pages/empresas/MisEmpresas.vue` | Hecha y conectada. Sin wireframe (HU-086) |
+| A3.1 | Pestaña Consultores de la ficha | `components/empresas/PanelConsultores.vue` | Hecha y conectada (antes «Próximamente», HU-085) |
+| — | Páginas de error 403, 404, 500 y 503 | `pages/errores/Error.vue` | Hecha, con el diseño de Captter |
 
 ## Diferencias con el wireframe
 
@@ -149,7 +153,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L1 | Cuenta desactivada y demasiados intentos se avisan en un modal, no bajo el campo. | Pedido por el equipo (7 de octubre). El wireframe no los dibuja. |
 | L2 | El registro va en dos pasos (Mi empresa → Tu usuario), con actividad económica CIIU, descripción corta (máx. 300) y cargo obligatorio. | Cambio pedido por el equipo (7 de octubre, DEC-015). El wireframe muestra un solo formulario. |
 | L2, A6, E11 | País → departamento → ciudad en listas con búsqueda; la etiqueta del departamento cambia según el país (Estado, Provincia, Región). | Pedido por el equipo (8 de octubre, DEC-016). El wireframe muestra solo ciudad y país. |
-| L2 | Los términos y la política solo están en el registro y se abren en una ventana sin salir del formulario. | Pedido por el equipo (16 de octubre). **[INFORMACIÓN PENDIENTE]** NuevasTIC completa sus datos y valida el texto. |
+| L2 | Los Términos y Condiciones y la Política de Privacidad solo están en el registro y se abren en una ventana sin salir del formulario. | Pedido por el equipo (16 de octubre). Desde el 4 de noviembre son los textos oficiales de Captter (`lib/legales.ts`). |
 | A2.5 | En blanco, se eligen las categorías con casillas y se muestra cuánto vale cada una al empezar. | HU-020 pide elegir las categorías; el wireframe solo muestra la opción de copiar. |
 | A2.3 | Si la categoría nunca se respondió, la acción es «Eliminar» en vez de «Archivar». | HU-019 y RN-009. El wireframe solo muestra «Archivar». |
 | A2.3 | Al abrir, el panel muestra la primera categoría; con «Cancelar» queda vacío con una indicación. | El wireframe solo muestra el panel con una categoría elegida. |
@@ -184,8 +188,8 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | E2 | La descripción de la categoría es un texto general ("No hay respuestas buenas o malas…"). | **[INFORMACIÓN PENDIENTE]** La versión congelada no guarda la descripción de cada categoría. |
 | E6 | El resultado va en tres pestañas (Resumen, Categorías, Recomendaciones) y el detalle se abre eligiendo una fila de la tabla, en vez de una página larga con acordeones. | Las páginas del panel no tienen scroll de página (pedido del equipo). |
 | E6 | Sin "Mi historial ›" en la ruta de navegación: flecha a Inicio (o a la ficha A3.1 para el Administrador). | Se usan flechas y no migas de pan; E8 aún no existe. |
-| E6, PDF | La frase de cada nivel: la de "Se puede mejorar" es la del wireframe; las otras tres son propuesta. | **[INFORMACIÓN PENDIENTE]** NuevasTIC aprueba las frases (`App\Support\Niveles::FRASES`). |
-| PDF | La página 2 tiene el radar sobre la tabla; el wireframe E10 no lo dibuja. | HU-066 CA-002 pide el radar. **[INCONSISTENCIA DETECTADA]** entre el wireframe y la historia; manda la historia. |
+| E6, PDF | La frase de cada nivel: la de "Se puede mejorar" es la del wireframe; las otras tres las propuso el equipo. | Aprobadas por NuevasTIC el 23 de octubre de 2026 (`App\Support\Niveles::FRASES`). |
+| PDF | Hay dos PDF (4 de noviembre): el informe completo, con el radar, y el resumen para la empresa, con barras por categoría. El wireframe E10 dibuja uno solo y sin radar. | HU-066 actualizada (CA-002 y CA-005). Manda la historia. |
 | A4 | Sin migas de pan: el título dice el alcance ("Personalizar por sector · Abogados"). | Se usan flechas y títulos, no migas de pan. |
 | A4.4 | Las marcas de origen son General, Sector y Empresa. No hay marca "[Pregunta]": el "Ten en cuenta" y el criterio se ven dentro de cada respuesta. | El sistema envía las indicaciones de pregunta con las respuestas (capa 4), no dentro de Detalles. |
 | A4.5 | "Reemplazar" sustituye el texto completo del elemento, no solo `{contexto_sector}`. | HU-042 CA-002: "Reemplazar lo sustituye". **[INCONSISTENCIA DETECTADA]** menor con el texto del wireframe ("ocupa el lugar del Contexto del sector"). |

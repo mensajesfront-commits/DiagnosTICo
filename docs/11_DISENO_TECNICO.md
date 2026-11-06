@@ -1,6 +1,6 @@
 # Diseño técnico
 
-**Estado:** COMPLETO (T-071). Describe el código tal como quedó el 14 de octubre de 2026.
+**Estado:** COMPLETO (T-071). Describe el código tal como quedó en la entrega `v1.0.0` (5 de noviembre de 2026).
 
 `10_ARQUITECTURA.md` explica las capas y el mapa de carpetas. Aquí se baja un nivel: qué clase hace qué, cómo se arman los datos de cada pantalla y cómo funcionan los procesos con más lógica (publicar, responder, analizar y calcular).
 
@@ -41,12 +41,19 @@ Ruta (routes/web.php, con su permiso)
 
 | Clase | Responsabilidad |
 |---|---|
-| `FortifyServiceProvider` | Inicio de sesión con el aviso que no revela si el correo existe (RN-005), cuenta desactivada (RN-004), límite de intentos y vistas L1–L4. |
+| `FortifyServiceProvider` | Inicio de sesión con el aviso que no revela si el correo existe (RN-005), correo sin verificar (L2b), cuenta desactivada (RN-004), rol inactivo, límite de intentos y vistas L1–L4. |
+| `Support\LimitadorLogin` | El limitador de intentos de Fortify con la llave hecha con un hash del correo, para que un correo muy largo no rompa la caché (auditoría QA, ERR-01). |
+| `Middleware\NormalizarCorreo` | Pasa el campo `email` a minúsculas y sin espacios antes de validar (RN-002, ERR-02). |
+| `Middleware\CabecerasSeguridad` | Cabeceras de seguridad en todas las respuestas (ERR-06). |
+| `VerificacionCorreoController` y `Services\Acceso\CodigoVerificacion` | Código para verificar el correo al registrarse (L2b). |
+| `Support\Captcha` | Verifica el token de Cloudflare Turnstile del registro. Sin llaves, en local usa las de prueba; en producción, sin llaves, nadie se registra. |
 | `Actions\Fortify\CreateNewUser` | Registro de la empresa (L2): crea la empresa y su cuenta principal en una transacción. |
-| `Support\Invitaciones` | Envía el enlace para crear la contraseña (RN-006). |
+| `Support\Invitaciones` | Envía el enlace para crear la contraseña (RN-006). Usa el broker `invitaciones` y la tabla `invitaciones_tokens`, que no vence hasta usarlo; la recuperación usa el broker `users` y vence a los 10 minutos (ERR-09). |
+| `Middleware\ElegirEnlaceContrasena` | En L4 decide si el enlace es una invitación o una recuperación, para validarlo con el broker que corresponde. |
 | `Middleware\CerrarSesionCuentaInactiva` | Cierra la sesión si desactivaron la cuenta o su empresa. |
 | `Middleware\LimitarIntentosAcceso` | 5 intentos por minuto en L2, L3 y L4. |
-| `Console\Commands\PurgarCuentas` | Borra para siempre las cuentas eliminadas hace más de 90 días (DEC-017). |
+| `Console\Commands\PurgarCuentas` | Borra para siempre las cuentas eliminadas hace más de 90 días (DEC-017) y los registros sin verificar a los 7 días. Las mediciones terminadas de una empresa borrada se conservan sin nombre (`Support\Anonimizar`). |
+| `Console\Commands\InvitarAdministrador` y `Support\AdministradorPrincipal` | Cuenta principal del Administrador (`ADMIN_EMAIL`): `admin:invitar` reenvía la invitación o muestra el enlace. |
 
 ### Diagnósticos
 
@@ -84,8 +91,23 @@ Ruta (routes/web.php, con su permiso)
 | `Services\Ia\Analizador` | Interfaz. La aplicación usa `AnalizadorDeCategoria` (OpenAI, salida JSON estricta); las pruebas automáticas, `Tests\Support\AnalizadorFalso`. |
 | `Services\Resultados\CalculadoraPuntajes` | Funciones puras del cálculo (RN-018) y el texto de cada respuesta. |
 | `Services\Resultados\PublicarResultado` | Consolida y publica el resultado una sola vez, avisa a la empresa y manda a generar el PDF. |
-| `Jobs\GenerarInformePdf` e `InformePdf` | Informe PDF con Chromium, con encabezado y número de página en cada hoja (RN-024). |
+| `Jobs\GenerarInformePdf` e `InformePdf` | Los dos PDF con Chromium (RN-024): `pdf.informe` (completo, para el Administrador y el Consultor) y `pdf.resumen` (corto, para la empresa), con encabezado, número de página y el logotipo de NuevasTIC. Rutas en `resultados.pdf_ruta` y `resultados.pdf_resumen_ruta`. `ResultadosController::pdf` elige el tipo según la cuenta: la empresa siempre recibe el resumen. |
+| `Support\DatosInforme` | Arma los datos de los dos PDF a partir de lo guardado: prioridades, DOFA consolidado, fichas de acción y cronograma. |
 | `Support\Niveles` y `Support\MetodosAnalisis` | Niveles con su frase (RN-019) y los cinco métodos de análisis (DEC-019). |
+
+### Consultor (EP-014)
+
+| Clase | Responsabilidad |
+|---|---|
+| `ConsultoresController` | Vincula y quita consultores de una empresa (A3.1, pestaña Consultores), con `usuarios.gestionar` (RN-030). |
+| `Models\User` (`esConsultor`, `empresasAsesoradas`, `puedeVerEmpresa`) | Tabla `consultor_empresa`. `puedeVerEmpresa()` decide en cada controlador si la cuenta puede ver una empresa: la suya, cualquiera con `empresas.ver` o, si es consultor, solo las vinculadas. |
+| `Support\DatosInicioConsultor` y `Support\DatosConsultores` | Inicio del Consultor (C1) con «Qué atender», Mis empresas (C2) y la pestaña Consultores. |
+
+### Correos
+
+| Clase | Responsabilidad |
+|---|---|
+| `Notifications\Correo` | Base de los correos con la identidad de Captter. Escapa el Markdown de los textos que vienen de los datos, para que un nombre no se vuelva un enlace (ERR-03). |
 
 ### Ver como
 
@@ -158,8 +180,8 @@ Están completos, con ejemplo, en `12_BASE_DE_DATOS.md`. Resumen:
 |---|---|
 | `versiones_diagnostico.contenido` | `{ categorias: [{ ref, nombre, importancia, preguntas: [{ ref, texto, tipo, indicacion, criterio_ia, obligatoria, opciones: [{ ref, texto, puntaje, ten_en_cuenta, exclusiva, con_texto }] }] }] }` |
 | `respuestas.opciones_elegidas` | Lista de referencias de opción (`["o12"]`). El texto de la abierta o del "¿Cuál?" va en `respuestas.texto`. |
-| `analisis_categoria.respuesta_ia` | `{ preguntas: [{ id, puntaje, observacion }], metodo, metodo_motivo, observacion_categoria, hallazgos: [{ grupo, puntos }], fortalezas, recomendaciones: [{ titulo, detalle, pasos, plazo, indicador }], recomendacion: { titulo, detalle } }` |
-| `resultados.por_categoria` | Lista con `ref`, `nombre`, `importancia`, `puntaje`, `nivel`, `anterior`, `variacion`, `observacion`, `metodo`, `recomendacion` y `preguntas`. |
+| `analisis_categoria.respuesta_ia` | `{ preguntas: [{ id, puntaje, observacion }], metodo, metodo_motivo, observacion_categoria, impacto, hallazgos: [{ grupo, puntos }], fortalezas, debilidades, oportunidades, amenazas, faltante, recomendaciones: [{ titulo, detalle, problema, objetivo, pasos, responsable, recursos, plazo, semanas, indicador, kpi: { formula, linea_base, meta, frecuencia, fuente }, evidencia }], recomendacion: { titulo, detalle } }` (esquema en `AnalizadorDeCategoria::esquema()`) |
+| `resultados.por_categoria` | Lista con `ref`, `nombre`, `importancia`, `puntaje`, `nivel`, `anterior`, `variacion`, `observacion`, `metodo`, `impacto`, `hallazgos`, `fortalezas`, `debilidades`, `oportunidades`, `amenazas`, `faltante`, `recomendaciones`, `recomendacion` y `preguntas`. Los resultados publicados antes de un campo no lo traen; los dos PDF muestran lo que haya. |
 
 ## 5. Concurrencia y fallas
 
@@ -167,7 +189,7 @@ Están completos, con ejemplo, en `12_BASE_DE_DATOS.md`. Resumen:
 |---|---|
 | Dos categorías terminan a la vez | `PublicarResultado` bloquea la fila de la medición (`lockForUpdate`) y comprueba que no exista resultado: se publica una vez. |
 | Dos personas de la empresa responden a la vez | Cada respuesta se guarda por pregunta; queda la última. |
-| Falla el PDF | El resultado queda publicado. `GenerarInformePdf` reintenta 3 veces y, si sigue faltando, se genera al descargarlo. |
+| Falla un PDF | El resultado queda publicado. `GenerarInformePdf` reintenta 3 veces los que falten (completo y resumen) y, si sigue faltando uno, se genera al descargarlo. |
 | Falla el correo de aviso al asignar | La medición queda asignada sin `ultimo_aviso_en` y la pantalla ofrece "Reenviar aviso". |
 | Dos administradores asignan a la vez | `AsignarMedicion` corre en una transacción, bloquea la pendiente (`lockForUpdate`) y pide `reemplazar` si ya existe una. |
 

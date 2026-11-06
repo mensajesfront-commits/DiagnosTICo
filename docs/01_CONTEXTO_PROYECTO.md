@@ -2,7 +2,9 @@
 
 **Estado:** COMPLETO (T-028), aprobado por NuevasTIC el 5 de noviembre de 2026.
 
-**Fuentes:** "Propuesta técnica de desarrollo" (29 sep 2026), `05_REQUISITOS_FUNCIONALES.md` y los wireframes.
+**Fuentes:** "Propuesta técnica de desarrollo" (29 sep 2026), `05_REQUISITOS_FUNCIONALES.md`, los wireframes y las decisiones de NuevasTIC hasta el 5 de noviembre de 2026.
+
+El sistema se llama **Captter**.
 
 ## Quién lo pide
 
@@ -25,12 +27,15 @@ Un sistema web con dos lados:
   - Arma un diagnóstico por sector con categorías (por ejemplo: análisis del mercado, presencia en línea, contenido) y les da a las categorías una importancia que suma 100%.
   - Publica versiones del diagnóstico y asigna mediciones a las empresas, con fecha límite.
   - Configura cómo analiza la IA.
-  - Administra las cuentas.
+  - Administra las cuentas e invita consultores externos, a los que les vincula empresas.
 - **La empresa (y sus colaboradores):**
   - Responde el diagnóstico a su ritmo; las respuestas se guardan solas.
   - Revisa y envía.
-  - Recibe su resultado: puntaje de 0 a 100, nivel, puntaje por categoría, observaciones y recomendaciones de la IA, y un informe PDF completo que explica cada resultado.
+  - Recibe su resultado: puntaje de 0 a 100, nivel, puntaje por categoría, observaciones y recomendaciones de la IA, y un resumen PDF corto con lo que dijo la IA.
   - Puede repetir la medición y ver su evolución.
+- **El Consultor (desde el 3 de noviembre):** persona externa que acompaña a una o varias empresas. Solo mira la ficha, el historial, los resultados y los dos PDF de las empresas que tiene vinculadas.
+
+Cada resultado tiene **dos PDF** (RN-024): el resumen corto para la empresa y el informe completo, de unas 36 páginas, para el Administrador y el Consultor.
 
 Los cuatro niveles del resultado son:
 
@@ -51,11 +56,13 @@ Tomadas de `05_REQUISITOS_FUNCIONALES.md`:
   - Usuario queda para un posible futuro.
 - **Análisis de la IA:**
   - Se hace en una sola etapa por cada categoría.
-  - No hay análisis FODA ni comparación con promedios.
+  - La IA elige un método de análisis por categoría: PESTEL, Porter, VRIO, DOFA o CAME (23 de octubre).
+  - No hay comparación con promedios (RN-028).
 - **Estados de la medición:**
   - Son cinco: No iniciada, En curso, Enviada, Terminada y Vencida.
   - Si una medición vence, la empresa pide otra por correo.
-- **Bot de WhatsApp:** es totalmente separado de la web y queda **aplazado**.
+- **Bot de WhatsApp:** es totalmente separado de la web. Se aplazó y después lo terminó otra persona del equipo, fuera de este repositorio (4 de noviembre).
+- **Textos legales y soporte:** el registro usa los Términos y Condiciones y la Política de Privacidad oficiales de Captter, y el correo de soporte es contacto@captter.com (4 de noviembre).
 - **Simulador de inversión:** no existe.
 
 ## Tecnologías exigidas
@@ -72,4 +79,4 @@ Un repositorio en GitHub con:
 - las pruebas automáticas;
 - esta documentación.
 
-No incluye publicar el sistema en un servidor (ver `03_ALCANCE.md`).
+La versión de entrega es `v1.0.0` (5 de noviembre de 2026). Además, el sistema **se va a desplegar** en un servidor (cambio del 4 de noviembre; `20_DESPLIEGUE.md`). **[INFORMACIÓN PENDIENTE]** Servidor y dominio.

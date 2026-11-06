@@ -6,7 +6,9 @@
 
 ## Resumen
 
-**El sistema está completo en funcionalidad.** De las 84 historias, 79 están hechas en este repositorio. Las 5 del bot de WhatsApp (HU-071 a HU-075) las terminó otra persona del equipo, fuera de este repositorio (`05_REQUISITOS_FUNCIONALES.md`).
+**El sistema está completo en funcionalidad.** De las 86 historias (14 épicas, 340 puntos), 81 están hechas en este repositorio. Las 5 del bot de WhatsApp (HU-071 a HU-075) las terminó otra persona del equipo, fuera de este repositorio (`05_REQUISITOS_FUNCIONALES.md`).
+
+**Versión de entrega:** `v1.0.0`, etiqueta sobre `main` (commit `2838f4a`, 5 de noviembre de 2026).
 
 **Se va a desplegar** (cambio del 4 de noviembre; antes solo se entregaba el repositorio). Pasos en `20_DESPLIEGUE.md`.
 
@@ -54,15 +56,15 @@ Detalle en `24_CAMBIOS_Y_VERSIONES.md`.
 - **Cristian:** frontend y documentación. Revisa cada pantalla contra el wireframe.
 - **Luis:** backend. Revisa en el *pull request* el backend que se hizo desde el frontend para conectar las pantallas.
 
-## Qué falta hasta la entrega (6 de noviembre)
+## Qué faltaba para la entrega (6 de noviembre)
 
 | Qué | Quién | Notas |
 |---|---|---|
-| ~~Unir a `develop` la rama `claude/zealous-babbage-7s6joa` (PR #11)~~ | Luis | **Hecho** el 5 de noviembre. El último commit (logotipo en los PDF, despliegue y bot) va en un PR nuevo. Después de actualizar: `php artisan migrate` (3 migraciones del 4 de noviembre) |
+| ~~Unir a `develop` la rama `claude/zealous-babbage-7s6joa` (PR #11 a #15)~~ | Luis | **Hecho** el 5 de noviembre. Después de actualizar cada equipo: `php artisan migrate` (3 migraciones del 4 de noviembre) |
 | ~~Recorrer el flujo completo con la clave real de OpenAI~~ | Cristian | **Hecho**: funciona (confirmado el 5 de noviembre) |
 | ~~Revisar a ojo los dos PDF~~ | Cristian | **Hecho** el 4 de noviembre |
 | Desplegar en el servidor | Equipo | `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio |
-| Revisión pantalla por pantalla (diseño, textos y funciones) | Cristian | Los ajustes se anotan en `18_UI_UX.md` |
+| ~~Revisión pantalla por pantalla (diseño, textos y funciones)~~ | Cristian | **Hecho:** `18_UI_UX.md` aprobado por NuevasTIC el 5 de noviembre |
 | Instalar desde cero con el README en un equipo limpio (T-021) | Equipo | Con Sail |
 | ~~PR de `develop` a `main` y etiqueta `v1.0.0` (T-152)~~ | Equipo | **Hecho** el 5 de noviembre: PR #13 y etiqueta `v1.0.0` sobre `main` |
 | ~~Cerrar los documentos EN CURSO y validar los REQUIERE VALIDACIÓN (T-160)~~ | Equipo y NuevasTIC | **Hecho** el 5 de noviembre |

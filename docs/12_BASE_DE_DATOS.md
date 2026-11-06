@@ -21,7 +21,7 @@ Todas las tablas del MER tienen migración en `database/migrations/` y modelo en
   - Así, editar el borrador no cambia las mediciones ya asignadas.
 - **Resultados inmutables:**
   - El resultado guarda los puntajes, el nivel, la variación, el análisis de la IA y el prompt exacto usado (RN-023).
-  - El PDF se genera una vez y se guarda (RN-024).
+  - Los dos PDF (el informe completo y el resumen para la empresa) se generan una vez y se guardan (RN-024).
 - **Nada se borra si tiene datos.**
   - Sectores, categorías, diagnósticos y cuentas con datos se desactivan o se archivan (RN-004, RN-008 y RN-009).
   - Se usan columnas `activo` o `archivado_en`.
@@ -55,6 +55,9 @@ erDiagram
     sectores ||--o{ prompts : "ajuste de sector"
     empresas ||--o{ prompts : "ajuste de empresa"
     users ||--o{ registros_ver_como : "usa Ver como"
+    users ||--o{ consultor_empresa : "acompaña (Consultor)"
+    empresas ||--o{ consultor_empresa : "tiene consultores"
+    users ||--o{ contrasenas_anteriores : "historial de contraseñas"
 
     sectores {
         bigint id PK
@@ -96,7 +99,7 @@ erDiagram
     users {
         bigint id PK
         string name
-        string email UK "un correo, una cuenta (RN-002)"
+        string email UK "un correo, una cuenta, sin distinguir mayúsculas (RN-002)"
         string password "null mientras la invitación esté pendiente (A5.3)"
         string telefono "opcional"
         string cargo "obligatorio en L2 y E12"
@@ -113,6 +116,11 @@ erDiagram
         timestamp invitacion_enviada_en "A5.3"
         timestamp contrasena_actualizada_en "A6"
         timestamp deleted_at "eliminada: 90 días para recuperarla (DEC-017)"
+        timestamp email_verified_at "correo verificado con el código (L2b)"
+        string codigo_verificacion "código cifrado (L2b)"
+        string email_pendiente "correo nuevo de A6/E11 sin confirmar"
+        string telefono_pendiente "teléfono nuevo de A6/E11 sin confirmar"
+        boolean administrador_principal "la cuenta creada al instalar"
         timestamps timestamps
     }
 
@@ -176,7 +184,7 @@ erDiagram
 
     mediciones {
         bigint id PK
-        bigint empresa_id FK
+        bigint empresa_id FK "null si la empresa se borró (se conserva sin nombre)"
         bigint version_diagnostico_id FK
         int numero "Medición 1, 2, 3... de la empresa"
         string estado "no_iniciada, en_curso, enviada, terminada, vencida, cancelada (RN-015)"
@@ -223,7 +231,8 @@ erDiagram
         string nivel "RN-019"
         int variacion "null en la primera medición (RN-020)"
         jsonb por_categoria "puntaje, nivel e importancia de cada categoría"
-        string pdf_ruta "PDF guardado (RN-024)"
+        string pdf_ruta "informe completo (RN-024)"
+        string pdf_resumen_ruta "resumen para la empresa (RN-024)"
         timestamp publicado_en
     }
 
@@ -271,6 +280,20 @@ erDiagram
         timestamp inicio
         timestamp fin
     }
+
+    consultor_empresa {
+        bigint id PK
+        bigint user_id FK "cuenta con el rol Consultor"
+        bigint empresa_id FK
+        timestamps timestamps
+    }
+
+    contrasenas_anteriores {
+        bigint id PK
+        bigint user_id FK
+        string hash_minusculas "las últimas 5, cifradas"
+        timestamp created_at
+    }
 ```
 
 Tablas que ya existen por el kit o por paquetes y que no se dibujan:
@@ -285,7 +308,7 @@ Tablas que ya existen por el kit o por paquetes y que no se dibujan:
 
 - **PA-004, en parte:** se guarda la fecha del último aviso (`mediciones.ultimo_aviso_en`) y se muestra en A1 y en la ficha. **[INFORMACIÓN PENDIENTE]** Si se quiere el historial de cada aviso, hace falta una tabla `avisos_medicion`.
 - **Resuelto con A3.1e:** el correo de aviso es una plantilla general (`plantillas_correo`) que se puede editar para una medición (`mediciones.correo_asunto` y `correo_cuerpo`); "Guardar como plantilla" reemplaza la general.
-- **[FUNCIONALIDAD POR DEFINIR]** El bot de WhatsApp está aplazado. Si se retoma, sus tablas van separadas (conversaciones y resultados del bot) y no se relacionan con `empresas` ni con `mediciones` (RN-029).
+- El bot de WhatsApp se hizo fuera de este repositorio (RN-029). Esta base no tiene tablas del bot.
 - Las respuestas y los análisis apuntan a preguntas y categorías por su identificador dentro del JSON de la versión (`pregunta_ref`, `categoria_ref`), no por llave foránea. Así siguen siendo válidos aunque el borrador cambie. Así quedó en las migraciones (T-045).
 
 ## Diccionario de datos (T-040)
@@ -361,7 +384,7 @@ Las carga `CiiuSeeder` desde `resources/ciiu/ciiu-rev5-ac.json` (fuentes: el Exc
 | `id` | bigint | Sí | `7` | |
 | `empresa_id` | bigint → `empresas.id` | No | `1` | `null` para las cuentas internas (Administrador) |
 | `name` | varchar(255) | Sí | `Laura Gómez` | |
-| `email` | varchar(255) | Sí, único | `laura@laesquina.co` | En minúsculas; un correo, una cuenta (RN-002) |
+| `email` | varchar(255) | Sí, único sin distinguir mayúsculas | `laura@laesquina.co` | En minúsculas (`NormalizarCorreo`); índice único `users_email_lower_unique` sobre `lower(email)` (migración `2026_11_04_000001`, ERR-02). Un correo, una cuenta (RN-002) |
 | `cargo` | varchar(255) | Sí en L2 (cuenta principal); no en las demás | `Administradora` | Quién registró la empresa |
 | `telefono` | varchar(255) | No | `+57 311 555 0142` | |
 | `ciudad`, `departamento`, `pais` | varchar(255) | No | `Bogotá`, `Bogotá D.C.`, `Colombia` | Mi perfil (A6); mismas reglas que en la empresa |
@@ -376,7 +399,10 @@ Las carga `CiiuSeeder` desde `resources/ciiu/ciiu-rev5-ac.json` (fuentes: el Exc
 | `contrasena_actualizada_en` | timestamp | No | `2026-08-01 10:00:00` | "Última actualización" en Mi perfil |
 | `terminos_aceptados_en` | timestamp | No | `2026-10-06 15:20:11` | Constancia de la aceptación al registrarse |
 | `invitacion_enviada_en` | timestamp | No | `2026-10-07 09:30:00` | Invitación pendiente (A5.3); `password` vacío hasta crearla |
-| `email_verified_at` | timestamp | No | `null` | Del kit; la verificación de correo no se usa (DEC-012) |
+| `email_verified_at` | timestamp | No | `2026-10-16 10:05:00` | Se llena al escribir el código de verificación del registro (L2b). Sin verificar no se entra (DEC-020) |
+| `codigo_verificacion`, `codigo_vence_en`, `codigo_intentos` | varchar(255), timestamp, smallint | No | `null` | Código de L2b, cifrado; vence y tiene un límite de intentos (`CodigoVerificacion`) |
+| `email_pendiente`, `telefono_pendiente` | varchar(255) | No | `null` | Correo o teléfono nuevos de Mi perfil mientras se confirman con un código (DEC-020) |
+| `administrador_principal` | boolean | Sí (por defecto `false`) | `true` | La cuenta del Administrador creada al instalar (`ADMIN_EMAIL`): no pierde el rol ni se desactiva o elimina |
 | `remember_token` | varchar(100) | No | | "Mantener la sesión iniciada" |
 | `created_at`, `updated_at` | timestamp | No | | "Cuenta creada" en Mi perfil |
 
@@ -441,6 +467,7 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `puntaje` | smallint | Sí | `75` | De 0 a 100 |
 | `ten_en_cuenta` | varchar(200) | No | `Si publican sin plan, no pasa de 50.` | Nota para la IA; la empresa no la ve |
 | `exclusiva` | boolean | Sí (por defecto `false`) | `true` | Solo en selección múltiple: "Ninguna" o "Nada". Al marcarla se desmarcan las demás; no se guarda junto con otras |
+| `con_texto` | boolean | Sí (por defecto `false`) | `true` | Opción "Otro": pide que la empresa escriba cuál (E2). Lo escrito va a `respuestas.texto` |
 | `orden` | smallint | Sí (por defecto `0`) | `3` | |
 | `created_at`, `updated_at` | timestamp | No | | |
 
@@ -462,7 +489,7 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | Campo | Tipo | Obligatorio | Ejemplo | Nota |
 |---|---|---|---|---|
 | `id` | bigint | Sí | `9` | |
-| `empresa_id` | bigint → `empresas.id` | Sí | `1` | Se borra con la empresa (al borrarla para siempre, DEC-017) |
+| `empresa_id` | bigint → `empresas.id` | No | `1` | Al borrar para siempre la empresa (DEC-017), las mediciones terminadas se conservan sin nombre: `empresa_id` queda en `null` y `Anonimizar` limpia lo que la identifica (decisión del 23 de octubre) |
 | `version_diagnostico_id` | bigint → `versiones_diagnostico.id` | Sí | `5` | La versión congelada que se responde, nunca el borrador |
 | `numero` | smallint | Sí, único por empresa entre las no canceladas | `2` | "Medición 2". Índice parcial `mediciones_empresa_numero_activas` (`where estado <> 'cancelada'`): la que reemplaza a una pendiente toma su mismo número (A3.1c) |
 | `estado` | varchar(20) | Sí (por defecto `no_iniciada`) | `en_curso` | `no_iniciada`, `en_curso`, `enviada`, `terminada`, `vencida`, `cancelada` (RN-015) |
@@ -514,7 +541,8 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `nivel` | varchar(20) | Sí | `camino` | `critico`, `mejorar`, `camino`, `sigue` (RN-019, `App\Support\Niveles`) |
 | `variacion` | smallint | No | `8` | Frente a la medición anterior; `null` en la primera (RN-020) |
 | `por_categoria` | jsonb | Sí | Ver «Campos JSONB» | |
-| `pdf_ruta` | varchar(255) | No | `pdfs/medicion-9.pdf` | PDF guardado (RN-024) |
+| `pdf_ruta` | varchar(255) | No | `informes/1/informe_la_esquina_m2.pdf` | Informe completo, para el Administrador y el Consultor (RN-024) |
+| `pdf_resumen_ruta` | varchar(255) | No | `informes/1/resumen_la_esquina_m2.pdf` | Resumen para la empresa (migración `2026_11_04_000003`) |
 | `publicado_en` | timestamp | Sí | `2026-10-25 16:45:00` | Desde aquí no cambia (RN-023) |
 | `created_at`, `updated_at` | timestamp | No | | |
 
@@ -726,10 +754,11 @@ Qué empresas acompaña cada consultor. Un consultor puede tener una o varias; u
 
 | Tabla | Para qué |
 |---|---|
-| `password_reset_tokens` | Un enlace de contraseña nueva por correo (cifrado). Pedir otro reemplaza el anterior (RN-006). |
+| `password_reset_tokens` | Enlace de "¿Olvidaste tu contraseña?" por correo (cifrado). Vence a los 10 minutos; pedir otro reemplaza el anterior (RN-006). |
+| `invitaciones_tokens` | Enlace de invitación para crear la primera contraseña (cifrado). No vence hasta usarlo. Misma forma que la anterior: `email` (llave), `token`, `created_at` (migración `2026_11_04_000002`, ERR-09). Al crear la contraseña se borran los dos enlaces de la cuenta. |
 | `sessions` | Sesiones abiertas (`SESSION_DRIVER=database`). |
 | `cache`, `cache_locks` | Caché, incluidos los contadores del límite de intentos. |
-| `jobs`, `job_batches`, `failed_jobs` | Colas (se usarán para el análisis de la IA). |
+| `jobs`, `job_batches`, `failed_jobs` | Colas: análisis de la IA, los dos PDF y los correos. |
 
 ### Para entregar la base de datos
 

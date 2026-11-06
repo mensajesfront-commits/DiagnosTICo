@@ -1,6 +1,6 @@
 # Frontend
 
-**Estado:** COMPLETO (T-088). Todas las pantallas del alcance están construidas (14 de octubre de 2026).
+**Estado:** COMPLETO (T-088). Todas las pantallas del alcance están construidas, incluidas las del Consultor (C1 y C2). Actualizado para la entrega `v1.0.0` (5 de noviembre de 2026).
 
 Cómo está organizado el frontend y, sobre todo, **qué datos espera cada pantalla**. Esa es la parte que necesita el backend para conectar los controladores.
 
@@ -41,7 +41,9 @@ resources/js/
 │   ├── contrasena.ts  Requisitos de contraseña (RN-001)
 │   ├── menu.ts        Secciones del menú por rol y permiso
 │   ├── niveles.ts     Niveles y colores del resultado
-│   └── rutas.ts       URLs de las pantallas en un solo lugar
+│   ├── legales.ts     Términos y Condiciones y Política de Privacidad oficiales (L2)
+│   ├── soporte.ts     Correo de soporte (prop compartida `soporte`, de SOPORTE_EMAIL)
+│   └── rutas.ts       URLs de las pantallas en un solo lugar (`resultados.pdf(id, 'resumen')`)
 ├── pages/             Una página por pantalla del wireframe
 └── types/             Tipos de los datos que llegan del backend
 ```
@@ -358,10 +360,25 @@ Rutas: `GET /historial` (la empresa) y `GET /empresas/{id}/historial` (el Admini
 Ruta: `GET /resultados/{medicion}`. Props: `medicion` (`CabeceraResultado`), `resultado` (`Resultado`, en `types/resultados.ts`) e `interno` (lo abre el equipo de NuevasTIC: la flecha vuelve a la ficha A3.1 y no a Inicio).
 
 - Pestañas: **Resumen** (encabezado con anillo, nivel, frase, variación, barra de categorías por nivel —`por_nivel`— y las tarjetas «Lo que más urge» y «Lo más fuerte» —`mas_fuerte`—; debajo, «Qué hacer ahora» con las 3 categorías más débiles y «Tus categorías» en barras o en el mapa, con `SelectorCompacto`), **Categorías** (lista de tarjetas con puntaje, barra de color, nivel, importancia y variación; al elegir una, el análisis de la categoría en `components/resultados/AnalisisCategoria.vue` —diagnóstico, lo que encontró el método por grupos, lo que ya hace bien y las recomendaciones— y después cada pregunta en `PreguntaResultado.vue`) y **Recomendaciones** (la principal de cada categoría con sus pasos, de la más débil a la más fuerte). Cada recomendación se dibuja con `components/resultados/TarjetaRecomendacion.vue` (pasos, plazo y "Cómo saber si funcionó"); A4.7 "Probar" usa la misma. Los resultados viejos sin `hallazgos` ni `recomendaciones` muestran la observación y la recomendación de siempre.
-- "Ver mis respuestas" (E9) y "Ver informe PDF" (`Boton` con `archivo`: enlace normal, sin Inertia, para descargar).
+- "Ver mis respuestas" (E9) y el PDF (`Boton` con `archivo`: enlace normal, sin Inertia, para descargar). La empresa tiene "Ver informe PDF", que descarga el resumen. En A3.3, el Administrador y el Consultor tienen "Resumen para la empresa" (`rutas.resultados.pdf(id, 'resumen')`) e "Informe completo PDF" (RN-024).
 
 - El método con el que la IA analizó cada categoría se ve con `components/resultados/EtiquetaMetodo.vue` (en las prioridades, el detalle y las recomendaciones; el motivo, al pasar el cursor).
-- **A2.6 · Resultado de ejemplo (HU-030):** la misma página con la prop `ejemplo` (`caso`, `etiqueta`, `volver`, `pdf`): "Así se vería el resultado", el selector Mejor caso / Caso medio / Peor caso junto a las pestañas, "Volver a la vista previa" y "Ver formato del PDF" (otra pestaña). Se abre desde "Resultado de ejemplo" en A2.4.
+- **A2.6 · Resultado de ejemplo (HU-030):** la misma página con la prop `ejemplo` (`caso`, `etiqueta`, `volver`, `pdf`, `pdf_resumen`): "Así se vería el resultado", el selector Mejor caso / Caso medio / Peor caso junto a las pestañas, "Volver a la vista previa", "Ver formato del PDF" (el completo) y "Ver resumen de la empresa", los dos en otra pestaña. Se abre desde "Resultado de ejemplo" en A2.4.
+
+### C1 · Inicio del Consultor (`inicio/Consultor`)
+
+Ruta: `GET /dashboard` con el rol Consultor. Props: `resumen` y `avisos` (`DatosInicioConsultor::resumen` y `::avisos`).
+
+- Saludo y cuatro cifras: empresas, puntaje promedio, mejoraron / bajaron y mediciones pendientes.
+- **Qué atender** (HU-086 CA-005): vencidas, puntajes que bajaron, mediciones sin empezar hace una semana y resultados nuevos; «Todo al día» si no hay.
+- Resultados recientes, cómo están por nivel y próximas fechas límite. Solo lectura.
+
+### C2 · Mis empresas (`empresas/MisEmpresas`)
+
+Ruta: `GET /empresas` con el rol Consultor (no tiene la lista A3). Props: `empresas` (`DatosEmpresas::lista`, solo las vinculadas, con los datos extra del consultor).
+
+- Una tarjeta por empresa: último puntaje y nivel, variación, evolución, última medición y la pendiente. «Ver empresa» abre A3.1, «Historial» A3.4 y «Último resultado» A3.3.
+- Filtros, orden y, con 7 empresas o más, un buscador. Solo filtran y ordenan lo que llega.
 
 ### E9 / A3.5 · Mis respuestas (`resultados/Respuestas`)
 
