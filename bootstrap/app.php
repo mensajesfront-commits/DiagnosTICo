@@ -31,6 +31,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
 
+        // Producción: un proxy (Apache o Nginx del servidor) pone HTTPS delante y
+        // manda X-Forwarded-*. El contenedor solo escucha en 127.0.0.1, así que
+        // aceptarlos de cualquier origen es seguro (docs/20_DESPLIEGUE.md).
+        $middleware->trustProxies(at: '*');
+
         // ERR-06: cabeceras de seguridad en todas las respuestas.
         $middleware->append(CabecerasSeguridad::class);
 
