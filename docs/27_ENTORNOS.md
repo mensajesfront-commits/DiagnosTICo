@@ -2,7 +2,7 @@
 
 **Estado:** COMPLETO (T-032).
 
-Los dos desarrolladores usan el mismo **entorno local** con Laravel Sail. El sistema se va a desplegar (DEC-006 cambió el 4 de noviembre): el entorno de producción se describe en `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio.
+Los dos desarrolladores usan el mismo **entorno local** con Laravel Sail. El sistema se va a desplegar (DEC-006 cambió el 4 de noviembre): el entorno de producción (Docker Compose en https://diagnostico.captter.com) se describe en `20_DESPLIEGUE.md`.
 
 ## Entorno local con Sail
 
@@ -38,13 +38,13 @@ Para no escribir `./vendor/bin/sail` cada vez, se puede crear el alias `alias sa
 
 Todas están explicadas en `.env.example`.
 
-| Variable | Local con Sail | Pruebas automáticas (`phpunit.xml`) |
-|---|---|---|
-| `DB_CONNECTION` / `DB_HOST` | `pgsql` / `pgsql` | La misma conexión, con la base `testing` |
-| `MAIL_MAILER` | `smtp` hacia `mailpit:1025` | `array` (no envía) |
-| `QUEUE_CONNECTION` | `database` | `sync` |
-| `OPENAI_API_KEY` | La de cada desarrollador | No se usa: las pruebas simulan OpenAI (`OpenAI::fake()`) |
-| `LARAVEL_PDF_CHROME_PATH` | `/usr/local/bin/chromium` | No se usa: las pruebas simulan el PDF (`Pdf::fake()`) |
+| Variable | Local con Sail | Pruebas automáticas (`phpunit.xml`) | Producción (`.env.production.example`) |
+|---|---|---|---|
+| `DB_CONNECTION` / `DB_HOST` | `pgsql` / `pgsql` | La misma conexión, con la base `testing` | `pgsql` / `postgres` |
+| `MAIL_MAILER` | `smtp` hacia `mailpit:1025` | `array` (no envía) | `smtp` real |
+| `QUEUE_CONNECTION` / `CACHE_STORE` | `database` / `database` | `sync` / `array` | `redis` / `redis` |
+| `OPENAI_API_KEY` | La de cada desarrollador | No se usa: las pruebas simulan OpenAI (`OpenAI::fake()`) | La de NuevasTIC |
+| `LARAVEL_PDF_CHROME_PATH` | `/usr/local/bin/chromium` | No se usa: las pruebas simulan el PDF (`Pdf::fake()`) | `/usr/bin/chromium` |
 
 ## Correo
 
@@ -66,7 +66,12 @@ Todas están explicadas en `.env.example`.
 
 ## Producción
 
-El sistema se va a desplegar (DEC-006 cambió el 4 de noviembre). Las variables de producción y los pasos están en `20_DESPLIEGUE.md`. **[INFORMACIÓN PENDIENTE]** Servidor y dominio.
+Se despliega con Docker Compose (DEC-024) en **https://diagnostico.captter.com**. Apache del servidor tiene el SSL y reenvía a `127.0.0.1:8200`.
+
+- Archivos: `docker-compose.prod.yml`, `docker/php/Dockerfile.prod`, `docker/nginx/Dockerfile.prod` y `.env.production.example`.
+- Servicios: `nginx`, `app`, `queue`, `scheduler`, `postgres` y `redis` (`16_INFRAESTRUCTURA.md`).
+- El `.env` del servidor se arma con `.env.production.example`; las claves reales solo viven ahí.
+- Pasos de instalación y actualización: `20_DESPLIEGUE.md`.
 
 ## WhatsApp
 

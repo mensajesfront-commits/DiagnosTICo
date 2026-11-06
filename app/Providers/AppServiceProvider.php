@@ -12,6 +12,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -51,6 +52,13 @@ class AppServiceProvider extends ServiceProvider
     protected function configureDefaults(): void
     {
         Date::use(CarbonImmutable::class);
+
+        // Con APP_URL en https (producción detrás de Apache), todos los enlaces
+        // que arma Laravel salen en https, también los de los correos que se
+        // envían desde la cola, donde no hay una petición que diga el esquema.
+        if (str_starts_with((string) config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),

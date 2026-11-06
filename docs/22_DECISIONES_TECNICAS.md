@@ -29,6 +29,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
 | DEC-021 | Consultor: rol del sistema, de solo lectura, con empresas vinculadas | Vigente |
 | DEC-022 | Dos PDF por resultado: resumen para la empresa e informe completo | Vigente |
 | DEC-023 | Enlaces de invitación aparte de los de recuperación | Vigente |
+| DEC-024 | Producción con Docker Compose detrás de Apache | Vigente |
 
 ---
 
@@ -275,3 +276,15 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - El de una invitación sirve hasta usarlo (broker `invitaciones`, tabla `invitaciones_tokens`).
   - `ElegirEnlaceContrasena` hace que L4 acepte los dos. Al crear la contraseña se borran los dos enlaces de la cuenta.
 - **Por qué:** un enlace de recuperación que vale un año es un riesgo; uno de invitación que vence a los 10 minutos dejaría sin entrar a quien no abrió el correo a tiempo.
+
+### DEC-024 — Producción con Docker Compose detrás de Apache
+
+- **Decisión (5 de noviembre de 2026):**
+  - El servidor corre el sistema con `docker-compose.prod.yml`: `nginx`, `app` (PHP 8.4-FPM), `queue`, `scheduler`, `postgres` (18) y `redis`.
+  - `app`, `queue` y `scheduler` usan la misma imagen (`docker/php/Dockerfile.prod`), con Node 24 y Chromium para los PDF. Nginx (`docker/nginx/Dockerfile.prod`) copia `public/` de esa imagen.
+  - Solo Nginx publica un puerto, en `127.0.0.1:${NGINX_PORT:-8200}`. Apache del servidor tiene el SSL de `diagnostico.captter.com` y reenvía a ese puerto.
+  - Redis guarda la caché y la cola. Las sesiones siguen en PostgreSQL porque el sistema borra filas de `sessions` al desactivar una cuenta o cambiarle el rol.
+  - Laravel confía en el proxy inmediato (`trustProxies`) para saber que la petición llegó por HTTPS, y fuerza `https` en los enlaces cuando `APP_URL` empieza por `https://`.
+- **Por qué:** es la misma forma en que el equipo despliega sus otros proyectos (pedido del 5 de noviembre, "igual que en Kiasmer"); deja todo el entorno en el repositorio y no instala PHP ni Chromium en el servidor.
+- **Descartado:** instalar PHP, Supervisor y cron directo en el servidor (la sección "Sin Docker" de `20_DESPLIEGUE.md` lo deja como alternativa); sesiones en Redis.
+- **[INFORMACIÓN PENDIENTE]** Los archivos de Kiasmer no estaban disponibles en la sesión en que se escribieron estos: se armaron con lo pedido. Si Kiasmer usa nombres o pasos distintos, se ajustan.

@@ -1,0 +1,81 @@
+# syntax=docker/dockerfile:1
+# =============================================================================
+# Imagen de producción de la aplicación (PHP 8.4-FPM).
+#
+# La misma imagen corre tres servicios de docker-compose.prod.yml:
+#   app       → php-fpm (atiende lo que le pasa Nginx)
+#   queue     → php artisan queue:work (análisis de la IA, PDF y correos)
+#   scheduler → php artisan schedule:work (routes/console.php)
+#
+# Trae Node 24 y Chromium porque spatie/laravel-pdf genera los PDF con
+# Browsershot (Puppeteer + Chromium), también desde la web (ResultadosController).
+# Se construye desde la raíz del repositorio: docs/20_DESPLIEGUE.md.
+# =============================================================================
+
+FROM node:24-bookworm-slim AS node
+FROM composer:2 AS composer
+
+FROM php:8.4-fpm-bookworm
+
+ARG VITE_APP_NAME=Captter
+
+ENV TZ=UTC \
+    COMPOSER_ALLOW_SUPERUSER=1 \
+    PUPPETEER_SKIP_DOWNLOAD=true \
+    LARAVEL_PDF_CHROME_PATH=/usr/bin/chromium \
+    LARAVEL_PDF_NO_SANDBOX=true
+
+# Paquetes del sistema: Chromium (el de Debian sí funciona en Docker) y fuentes
+# para que los PDF salgan con letras y emojis.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        chromium fonts-liberation fonts-noto-color-emoji fonts-dejavu-core \
+        git unzip ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Extensiones de PHP: PostgreSQL, Redis, intl, gd, bcmath, zip, opcache y pcntl
+# (pcntl deja que queue:work termine el trabajo en curso al reiniciar).
+COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
+RUN install-php-extensions pdo_pgsql pgsql redis intl gd bcmath zip opcache pcntl exif
+
+# Node 24 (.nvmrc) y Composer.
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+    && ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
+    && node --version && chromium --version
+COPY --from=composer /usr/bin/composer /usr/local/bin/composer
+
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/zz-diagnostico.ini
+COPY docker/php/www.conf /usr/local/etc/php-fpm.d/zz-diagnostico.conf
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
+
+WORKDIR /var/www/html
+
+# Dependencias primero, para que Docker reutilice la capa si no cambian.
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction --no-progress
+
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+# El código. El .env no entra a la imagen (.dockerignore): las variables llegan
+# del archivo .env del servidor por env_file en docker-compose.prod.yml.
+COPY . .
+
+# Autoload optimizado y frontend compilado. Wayfinder corre php artisan durante
+# el build. node_modules se queda: Browsershot necesita puppeteer al generar PDF.
+RUN composer dump-autoload --optimize --no-dev --no-interaction \
+    && VITE_APP_NAME="${VITE_APP_NAME}" npm run build \
+    && rm -rf node_modules/.cache public/hot \
+    && mkdir -p storage/app/private storage/framework/cache/data storage/framework/sessions \
+        storage/framework/views storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache /var/www
+
+USER www-data
+
+EXPOSE 9000
+
+ENTRYPOINT ["entrypoint"]
+CMD ["php-fpm"]

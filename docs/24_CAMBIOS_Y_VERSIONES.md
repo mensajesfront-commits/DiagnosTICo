@@ -4,6 +4,18 @@
 
 La versión de entrega es `v1.0.0` (T-152). Hasta ella, los cambios se agrupan por semana del cronograma.
 
+## Después de v1.0.0 · archivos de producción (5 y 6 de noviembre de 2026)
+
+- **Despliegue con Docker Compose (DEC-024)** en https://diagnostico.captter.com. Apache del servidor tiene el SSL y reenvía a `127.0.0.1:8200`.
+  - `docker-compose.prod.yml`: `nginx`, `app` (PHP 8.4-FPM), `queue`, `scheduler`, `postgres` 18 y `redis`. Solo Nginx publica un puerto (`127.0.0.1:${NGINX_PORT:-8200}:80`).
+  - `docker/php/Dockerfile.prod`: PHP 8.4-FPM con `pdo_pgsql`, `redis`, `intl`, `gd`, `bcmath`, `zip`, `opcache` y `pcntl`; Node 24 y Chromium para los PDF; `composer install --no-dev` y `npm run build`. Con `php.ini`, `www.conf` y `entrypoint.sh`.
+  - `docker/nginx/Dockerfile.prod` y `default.conf`: sirven `public/` y pasan lo demás a php-fpm.
+  - `.env.production.example`: plantilla del `.env` del servidor, solo con marcadores. Caché y cola en Redis; sesiones en PostgreSQL.
+  - `.dockerignore`: el `.env` nunca entra a la imagen.
+- **Detrás de un proxy:** `bootstrap/app.php` confía en el proxy inmediato (`trustProxies`). `AppServiceProvider` fuerza `https` en los enlaces cuando `APP_URL` empieza por `https://`, también en los correos de la cola.
+- docs/16, docs/20, docs/22 (DEC-024) y docs/27 explican la instalación, Apache y las variables.
+- **[INFORMACIÓN PENDIENTE]** Los archivos de Kiasmer no estaban disponibles al escribir estos; si Kiasmer usa otros nombres o pasos, se ajustan.
+
 ## v1.0.0 · versión de entrega (5 de noviembre de 2026)
 
 - `develop` se unió a `main` con el PR #13 (commit `2838f4a`), después de #11 y #12. CI en verde.
