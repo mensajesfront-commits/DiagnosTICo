@@ -1,0 +1,138 @@
+# =============================================================================
+# Producción (docs/20_DESPLIEGUE.md). El entorno local sigue siendo Sail (compose.yaml).
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Lee el .env de la raíz: Laravel lo recibe por env_file y Compose lo usa para
+# ${...}. Solo "web" publica un puerto, y solo en 127.0.0.1: el proxy del
+# servidor (Apache o Nginx) pone HTTPS delante.
+# =============================================================================
+
+x-app: &app
+    image: diagnostico-app:latest
+    env_file: .env
+    volumes:
+        - storage_data:/var/www/html/storage
+    depends_on:
+        pgsql:
+            condition: service_healthy
+    networks:
+        - diagnostico
+    restart: unless-stopped
+    # Chromium (PDF) necesita más memoria compartida que los 64 MB por defecto.
+    shm_size: 1gb
+
+services:
+    # ─── PHP-FPM (Laravel + Inertia) ────────────────────────────────────────────
+    app:
+        <<: *app
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile.prod
+            target: app
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'php artisan --version > /dev/null 2>&1 || exit 1',
+                ]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+
+    # ─── Nginx (archivos públicos + proxy a PHP-FPM) ────────────────────────────
+    web:
+        image: diagnostico-web:latest
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile.prod
+            target: web
+        ports:
+            - '127.0.0.1:${WEB_PORT:-8200}:80'
+        volumes:
+            - storage_data:/var/www/html/storage:ro
+        depends_on:
+            app:
+                condition: service_healthy
+        networks:
+            - diagnostico
+        restart: unless-stopped
+        healthcheck:
+            test:
+                ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1/up']
+            interval: 30s
+            timeout: 5s
+            retries: 5
+            start_period: 15s
+
+    # ─── Cola: análisis de la IA, PDF y correos ─────────────────────────────────
+    queue:
+        <<: *app
+        command:
+            [
+                'php',
+                'artisan',
+                'queue:work',
+                '--tries=3',
+                '--sleep=1',
+                '--max-time=3600',
+            ]
+        depends_on:
+            app:
+                condition: service_healthy
+        stop_grace_period: 60s
+
+    # ─── Tareas programadas (routes/console.php) ────────────────────────────────
+    scheduler:
+        <<: *app
+        command: ['php', 'artisan', 'schedule:work']
+        depends_on:
+            app:
+                condition: service_healthy
+
+    # ─── PostgreSQL 18 ──────────────────────────────────────────────────────────
+    pgsql:
+        image: postgres:18-alpine
+        environment:
+            POSTGRES_DB: ${DB_DATABASE:-diagnostico}
+            POSTGRES_USER: ${DB_USERNAME:-diagnostico}
+            POSTGRES_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD en .env}
+        # PostgreSQL 18 guarda los datos en /var/lib/postgresql (no en .../data).
+        volumes:
+            - pgsql_data:/var/lib/postgresql
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'pg_isready -U ${DB_USERNAME:-diagnostico} -d ${DB_DATABASE:-diagnostico}',
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+        networks:
+            - diagnostico
+        restart: unless-stopped
+        # Sin puertos publicados: solo accesible dentro de la red de Docker.
+
+    # ─── Comandos puntuales (perfil "tools"; los usa deploy-production.sh) ──────
+    migrate:
+        <<: *app
+        restart: 'no'
+        entrypoint: ['php', 'artisan']
+        command: ['migrate', '--force', '--no-interaction']
+        profiles: ['tools']
+
+    artisan:
+        <<: *app
+        restart: 'no'
+        entrypoint: ['php', 'artisan']
+        profiles: ['tools']
+
+volumes:
+    pgsql_data:
+    storage_data:
+
+networks:
+    diagnostico:
+        driver: bridge

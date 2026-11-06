@@ -4,7 +4,7 @@ Sistema de Diagnóstico de Marketing Digital para **NuevasTIC**. Las empresas re
 
 - **Stack:** Laravel 13 · Vue 3 + Inertia 3 · Tailwind CSS 4 · PostgreSQL 18 · OpenAI.
 - **Equipo:** Cristian Andrés Penagos Simanca (frontend) y Luis Carlos Sánchez Muñoz (backend).
-- **Versión de entrega:** `v1.0.0` (5 de noviembre de 2026). Producción en https://diagnostico.captter.com con Docker Compose (`docker-compose.prod.yml`, `deploy-production.sh`): pasos en [`docs/20_DESPLIEGUE.md`](docs/20_DESPLIEGUE.md).
+- **Versiones:** `v1.0.0` es la de entrega (5 de noviembre de 2026); `v1.1.0` es la que corre en el servidor (6 de noviembre). Producción en https://diagnostico.captter.com con Docker Compose (`docker-compose.prod.yml`, `deploy-production.sh`): pasos en [`docs/20_DESPLIEGUE.md`](docs/20_DESPLIEGUE.md).
 - **Documentación:** [`docs/00_INDICE.md`](docs/00_INDICE.md). Las reglas para trabajar en el repositorio están en [`CLAUDE.md`](CLAUDE.md).
 
 ## Requisitos
