@@ -1,0 +1,124 @@
+# =============================================================================
+# Imágenes de producción (docker-compose.prod.yml). Build context: raíz del repo.
+#
+#   --target app  → PHP-FPM 8.4 + Chromium (Browsershot) para app, queue y scheduler
+#   --target web  → Nginx con public/ y los assets de Vite ya compilados
+#
+# Las dos salen de este mismo archivo porque Nginx necesita public/build, y el
+# build de Vite necesita PHP (el plugin de Wayfinder corre php artisan).
+# =============================================================================
+
+# ─── Base: PHP-FPM 8.4, extensiones, Node y Chromium ─────────────────────────
+FROM php:8.4-fpm-bookworm AS base
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl git unzip \
+        libpq-dev libicu-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" pdo_pgsql intl zip gd bcmath pcntl opcache exif \
+    # Node 24 (.nvmrc): compila el frontend y corre Browsershot
+    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Chromium para los PDF (spatie/laravel-pdf + Browsershot). Igual que en Sail
+# (docker/8.4/Dockerfile): se instala con Playwright, con sus dependencias del sistema.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+RUN npx -y playwright@1.56.1 install --with-deps chromium \
+    && ln -sf "$(find /opt/pw-browsers -path '*chrome-linux*/chrome' -type f | head -n 1)" /usr/local/bin/chromium \
+    && chmod -R a+rx /opt/pw-browsers \
+    && /usr/local/bin/chromium --version \
+    && rm -rf /var/lib/apt/lists/* /root/.npm
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/zz-diagnostico.ini
+COPY docker/php/opcache.prod.ini /usr/local/etc/php/conf.d/zz-opcache-prod.ini
+COPY docker/php/www.conf /usr/local/etc/php-fpm.d/zz-www.conf
+
+WORKDIR /var/www/html
+
+# ─── Dependencias de PHP (cacheable mientras no cambie composer.lock) ────────
+FROM base AS vendor
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
+
+# ─── Assets del frontend (Vite) ──────────────────────────────────────────────
+FROM base AS assets
+
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci
+
+COPY . .
+COPY --from=vendor /var/www/html/vendor ./vendor
+# Sin .env: Wayfinder solo necesita leer las rutas, no la base de datos.
+# APP_ENV=local solo en este paso: las páginas de la prueba técnica importan
+# sus rutas, y Laravel solo las carga en local. En producción no existen.
+RUN composer dump-autoload --no-interaction \
+    && APP_ENV=local npm run build
+
+# Puppeteer para Browsershot, aparte del proyecto: en package.json es de
+# desarrollo y la imagen final no lleva node_modules. Usa el Chromium de arriba.
+FROM base AS browsershot
+
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+COPY package.json /tmp/package.json
+RUN mkdir -p /opt/browsershot && cd /opt/browsershot \
+    && npm init -y > /dev/null \
+    && npm install --omit=dev "puppeteer@$(node -p "require('/tmp/package.json').devDependencies.puppeteer")" \
+    && rm -rf /root/.npm
+
+# ─── app: PHP-FPM con el código, vendor y los assets ─────────────────────────
+FROM base AS app
+
+COPY . .
+COPY --from=vendor /var/www/html/vendor ./vendor
+COPY --from=assets /var/www/html/public/build ./public/build
+# node_modules mínimo: puppeteer (Browsershot lo busca subiendo desde
+# vendor/spatie/browsershot/bin) y lo que las plantillas PDF incrustan desde
+# node_modules (app/Support/RecursosPdf.php): Chart.js y las fuentes, con las
+# versiones del lock. Carpeta real, no un enlace: Node no resolvía "puppeteer"
+# a través de un node_modules enlazado.
+COPY --from=browsershot /opt/browsershot/node_modules ./node_modules
+COPY --from=assets /var/www/html/node_modules/chart.js ./node_modules/chart.js
+COPY --from=assets /var/www/html/node_modules/@fontsource ./node_modules/@fontsource
+
+# storage/ y bootstrap/cache están en .gitignore: se crean aquí para que existan
+# aunque el volumen de storage llegue vacío la primera vez.
+RUN mkdir -p \
+        storage/framework/cache/data \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/app/public \
+        storage/app/private \
+        storage/logs \
+        bootstrap/cache \
+    && composer dump-autoload --optimize --classmap-authoritative --no-dev --no-interaction \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+COPY docker/php/entrypoint.prod.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Chromium necesita una carpeta personal escribible (si no, falla con
+# "chrome_crashpad_handler: --database is required"); la de www-data es de root.
+ENV LARAVEL_PDF_CHROME_PATH=/usr/local/bin/chromium \
+    LARAVEL_PDF_NO_SANDBOX=true \
+    HOME=/tmp \
+    XDG_CONFIG_HOME=/tmp/.chromium \
+    XDG_CACHE_HOME=/tmp/.chromium
+
+USER www-data
+EXPOSE 9000
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["php-fpm"]
+
+# ─── web: Nginx con los archivos públicos ────────────────────────────────────
+FROM nginx:1.27-alpine AS web
+
+COPY docker/nginx/default.prod.conf /etc/nginx/conf.d/default.conf
+COPY public /var/www/html/public
+COPY --from=assets /var/www/html/public/build /var/www/html/public/build
+
+EXPOSE 80
