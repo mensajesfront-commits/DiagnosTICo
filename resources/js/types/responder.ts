@@ -109,4 +109,15 @@ export type InicioEmpresa = {
     mediciones: MedicionTerminada[];
     areas: AreaATrabajar[];
     soporte: string;
+    /** "Tu consultor": quienes acompañan a la empresa (RN-030). */
+    consultores: ConsultorDeEmpresa[];
+};
+
+export type ConsultorDeEmpresa = {
+    id: number;
+    nombre: string;
+    cargo: string | null;
+    email: string;
+    /** E.164 ("+573001234567") o null. */
+    telefono: string | null;
 };

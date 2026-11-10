@@ -229,8 +229,11 @@ Ruta: `GET /diagnosticos/crear?sector={id}`.
 | `sectorId` | `number \| null` | Sector preseleccionado si se viene desde A2. |
 | `categorias` | `{ id, nombre }[]` | Categorías activas del catálogo. |
 | `publicados` | `DiagnosticoPublicado[]` | Última versión publicada de cada diagnóstico, de todos los sectores, con los nombres de sus categorías. |
+| `plantilla` | `string` | Plantilla de ejemplo para «Pegar el contenido» (`LectorPlantilla::EJEMPLO`). |
 
-Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1 y abre el editor (A2.1).
+Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia` | `pegar`), `categorias[]` (en blanco), `copiar_de` (en copia) y `texto` (al pegar). El backend crea el borrador v1 y abre el editor (A2.1).
+
+**Pegar el contenido (HU-020 CA-005, 10 de noviembre de 2026):** la tercera tarjeta muestra un recuadro para pegar el texto, con «Copiar la plantilla» y «Usar el ejemplo». «Revisar el contenido» llama a `POST /diagnosticos/plantilla/revisar` con `enviarJson` y muestra lo que se entendió (categorías, preguntas, opciones e importancia), los errores en rojo y los avisos de publicación en ámbar. Cada uno trae «Línea N», que lleva el cursor a esa línea del recuadro. «Crear y abrir el editor» solo se activa si el texto revisado no cambió y no tiene errores.
 
 ### A3 · Empresas (`empresas/Index`)
 
@@ -248,10 +251,12 @@ Ruta: `GET /empresas` (`EmpresasController@index`, datos de `App\Support\DatosEm
 
 ### A3.1 · Ficha de la empresa (`empresas/Ver`)
 
-Ruta: `GET /empresas/{empresa}` (`EmpresasController@ver`, `DatosEmpresas::ficha()` + `opciones()`). Props en el tipo `FichaEmpresa`.
+Ruta: `GET /empresas/{empresa}` (`EmpresasController@ver`, `DatosEmpresas::ficha()` + `opciones()` + `vencidas`, de `DatosHistorial::vencidas`). Props en el tipo `FichaEmpresa`.
+
+- La tabla de mediciones incluye, por fecha, las vencidas que se cancelaron o reemplazaron, con «Vencida · cancelada» y «Respondió N de M»; el título de la fila (`detalleVencida`) da las fechas, el último aviso y quién la asignó y la canceló (10 de noviembre de 2026).
 
 - **Historial:** tarjetas Último puntaje, Variación (desde la 2.ª) y Medición pendiente; gráfica `graficas/EvolucionPuntaje.vue` (línea con las franjas de nivel y el puntaje sobre cada punto); tabla de mediciones paginada; a la derecha la pendiente con "Cambiar fecha" y "Cancelar medición", y "Asignar otra medición" (formulario corto; si hay pendiente, confirma el reemplazo con `ModalReemplazarMedicion`, A3.1c).
-- **Datos de la cuenta (A3.1d):** `components/empresas/CamposEmpresa.vue` (el mismo de A3.2), "Estado de la cuenta" (estado, registro, último acceso, mediciones y colaboradores en solo lectura) y "Acciones": Ver como, Asignar medición, Desactivar cuenta (`ModalDesactivarEmpresa`, A3.1f) o Reactivar. `?pestana=cuenta` abre esta pestaña.
+- **Datos de la cuenta (A3.1d):** `components/empresas/CamposEmpresa.vue` (el mismo de A3.2), "Estado de la cuenta" (estado, registro, último acceso, mediciones y colaboradores en solo lectura) y "Acciones": Ver como, Asignar medición, Desactivar cuenta (`ModalDesactivarEmpresa`, A3.1f) o Reactivar. Desactivada y con `usuarios.gestionar`, también "Eliminar empresa" (`ModalEliminarEmpresa`: se escribe el nombre a mano; recuperable 90 días desde A5). `?pestana=cuenta` abre esta pestaña.
 - **Consultores (HU-085):** solo con `usuarios.gestionar` (`components/empresas/PanelConsultores.vue`). Lista de consultores vinculados con sus empresas y "Quitar" (con confirmación); a la derecha, "Vincular un consultor" y qué ve un consultor. `?pestana=consultores` abre esta pestaña.
 - La pendiente muestra su último aviso y "Enviar recordatorio" (en curso) o "Reenviar aviso" (`ModalCorreoAviso`).
 - "Ver resultado" abre A3.3 (HU-038). La gráfica tiene "Ver:" para el puntaje total o una categoría (`graficas/SelectorEvolucion.vue`).
@@ -315,6 +320,7 @@ Ruta: `GET /mi-inicio`. Props en el tipo `InicioEmpresa` (`types/responder.ts`).
 - La medición pendiente según su estado: primera vez, no iniciada (mensaje del equipo, fecha límite y días que quedan), en curso (avance y "Continuar diagnóstico"), vencida ("Pedir una nueva fecha" y el correo de soporte; "Nueva medición solicitada" si ya la pidió) o enviada. Sin pendiente: "No tienes diagnósticos pendientes".
 - Primera vez: "Cómo funciona" en 3 pasos. Con resultados: el último (anillo `graficas/AnilloPuntaje.vue`, nivel, variación y `graficas/MiniEvolucion.vue`) y "Tus 3 áreas a trabajar" o "Mis mediciones".
 - "Ver resultado" abre E6, "Ver informe PDF" descarga el PDF y "Ver historial completo" abre E8.
+- Al final, «Tu consultor» (`consultores`, `ConsultorDeEmpresa`): los consultores activos que acompañan a la empresa, con iniciales, nombre, cargo, correo (`mailto:`) y teléfono (`tel:`). Solo si tiene alguno (HU-086 CA-006, 10 de noviembre de 2026).
 
 ### E2–E4 · Responder, revisar y enviado (`responder/Responder`, `responder/Revisar`, `responder/Enviado`)
 
@@ -353,6 +359,7 @@ Rutas: `GET /historial` (la empresa) y `GET /empresas/{id}/historial` (el Admini
 - La medición pendiente: la empresa la continúa si está en curso o ve el avance si se envió; no se inicia aquí (HU-067 CA-005). El Administrador puede cambiar la fecha o cancelarla (los mismos modales de A3.1) y "Asignar medición".
 - La gráfica de evolución (`graficas/EvolucionPuntaje.vue`) desde la 2.ª medición terminada.
 - La tabla de terminadas, paginada con las filas que caben, con "Ver resultado", "Ver mis respuestas" y "Ver informe PDF".
+- En la misma tabla, ordenadas por fecha, las vencidas que se cancelaron (`vencidas`, `MedicionVencida`): «Vencida sin responder · cancelada», cuándo se asignó, cuándo venció y cuándo se canceló, cuántas preguntas se respondieron y el último aviso por correo. En A3.4 también quién la asignó y quién la canceló. Con alguna, el título pasa a «Mediciones» (10 de noviembre de 2026).
 - Se llega desde "Ver historial completo" en E1 y en A3.1, y desde "Mi historial" en el menú.
 
 ### E6 / A3.3 · Resultado (`resultados/Resultado`)

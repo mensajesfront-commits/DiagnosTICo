@@ -4,11 +4,18 @@
  *
  * Nace como borrador v1 (RN-010). En blanco se eligen las categorías del
  * catálogo y la importancia empieza repartida en partes iguales; copiando, se
- * trae todo un diagnóstico publicado de cualquier sector.
+ * trae todo un diagnóstico publicado de cualquier sector; pegando (HU-020 CA-005),
+ * se escribe todo en la plantilla de texto y el borrador se llena solo.
  *
  * Envía: nombre (máx. 60), sector_id, descripcion (opcional),
- * punto_partida ("blanco" | "copia"), categorias[] (en blanco) y
- * copiar_de (en copia). Al crearlo, el backend abre el editor (A2.1).
+ * punto_partida ("blanco" | "copia" | "pegar"), categorias[] (en blanco),
+ * copiar_de (en copia) y texto (al pegar). Al crearlo, el backend abre el
+ * editor (A2.1), donde todo se puede corregir.
+ *
+ * Pegar: "Revisar el contenido" lo lee en el servidor sin guardar nada
+ * (`DiagnosticosController::revisarPlantilla`) y muestra qué entendió, los
+ * errores que impiden crearlo y lo que faltaría para publicarlo, cada uno con
+ * su número de línea (un clic lleva a esa línea del texto).
  *
  * Diseño: dos pasos numerados (1 · Datos, 2 · Punto de partida). El punto de
  * partida se elige con dos tarjetas; las categorías, con recuadros que se
@@ -16,8 +23,15 @@
  * crearlo" como línea de pasos.
  */
 import { Head, useForm } from '@inertiajs/vue3';
-import { Check, Copy, FilePlus2, Lightbulb } from '@lucide/vue';
-import { computed } from 'vue';
+import {
+    Check,
+    ClipboardPaste,
+    Copy,
+    FilePlus2,
+    Lightbulb,
+    TriangleAlert,
+} from '@lucide/vue';
+import { computed, ref } from 'vue';
 import AreaTexto from '@/components/base/AreaTexto.vue';
 import Boton from '@/components/base/Boton.vue';
 import Campo from '@/components/base/Campo.vue';
@@ -25,6 +39,7 @@ import EncabezadoPagina from '@/components/base/EncabezadoPagina.vue';
 import Entrada from '@/components/base/Entrada.vue';
 import Etiqueta from '@/components/base/Etiqueta.vue';
 import Seleccion from '@/components/base/Seleccion.vue';
+import { enviarJson } from '@/lib/ia';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import type { DiagnosticoPublicado, Sector } from '@/types/diagnosticos';
@@ -41,6 +56,8 @@ const props = withDefaults(
         categorias: { id: number; nombre: string }[];
         /** Última versión publicada de cada diagnóstico, de todos los sectores. */
         publicados: DiagnosticoPublicado[];
+        /** Plantilla de ejemplo para pegar el contenido (HU-020 CA-005). */
+        plantilla: string;
     }>(),
     { sectorId: null },
 );
@@ -49,9 +66,10 @@ const form = useForm<{
     nombre: string;
     sector_id: number | '';
     descripcion: string;
-    punto_partida: 'blanco' | 'copia';
+    punto_partida: 'blanco' | 'copia' | 'pegar';
     categorias: number[];
     copiar_de: number | '';
+    texto: string;
 }>({
     nombre: '',
     sector_id: props.sectorId ?? '',
@@ -59,7 +77,90 @@ const form = useForm<{
     punto_partida: 'blanco',
     categorias: [],
     copiar_de: '',
+    texto: '',
 });
+
+/** Lo que el servidor entendió del texto pegado (HU-020 CA-005). */
+type Hallazgo = { linea: number; mensaje: string };
+type Lectura = {
+    resumen: {
+        categorias: {
+            nombre: string;
+            importancia: number;
+            preguntas: number;
+        }[];
+        preguntas: number;
+        opciones: number;
+    };
+    errores: Hallazgo[];
+    avisos: Hallazgo[];
+};
+
+const MAXIMO_TEXTO = 100000;
+const lectura = ref<Lectura | null>(null);
+/** Texto exacto que se revisó: si cambia, hay que revisar otra vez. */
+const textoRevisado = ref('');
+const revisando = ref(false);
+const errorRevision = ref('');
+const plantillaCopiada = ref(false);
+
+const lecturaVigente = computed(
+    () => lectura.value !== null && textoRevisado.value === form.texto,
+);
+
+async function revisar(): Promise<void> {
+    revisando.value = true;
+    errorRevision.value = '';
+    const texto = form.texto;
+    const r = await enviarJson<Lectura>(rutas.diagnosticos.revisarPlantilla(), {
+        texto,
+    });
+    revisando.value = false;
+
+    if (!r.ok) {
+        errorRevision.value = r.mensaje;
+        lectura.value = null;
+
+        return;
+    }
+
+    lectura.value = r.datos;
+    textoRevisado.value = texto;
+}
+
+async function copiarPlantilla(): Promise<void> {
+    try {
+        await navigator.clipboard.writeText(props.plantilla);
+        plantillaCopiada.value = true;
+        setTimeout(() => (plantillaCopiada.value = false), 2000);
+    } catch {
+        // Sin permiso para el portapapeles: se pone el ejemplo en el recuadro.
+        usarEjemplo();
+    }
+}
+
+function usarEjemplo(): void {
+    form.texto = props.plantilla;
+}
+
+/** Lleva el cursor a la línea del texto donde está el problema. */
+function irALinea(linea: number): void {
+    const area = document.getElementById('texto');
+
+    if (!(area instanceof HTMLTextAreaElement)) {
+        return;
+    }
+
+    const lineas = form.texto.split('\n');
+    const inicio = lineas
+        .slice(0, linea - 1)
+        .reduce((total, l) => total + l.length + 1, 0);
+    const fin = inicio + (lineas.at(linea - 1)?.length ?? 0);
+    area.focus();
+    area.setSelectionRange(inicio, fin);
+    const alto = parseFloat(getComputedStyle(area).lineHeight) || 16;
+    area.scrollTop = Math.max(0, (linea - 3) * alto);
+}
 
 const sectorElegido = computed(() =>
     props.sectores.find((s) => s.id === form.sector_id),
@@ -112,6 +213,12 @@ const puntos = [
         texto: 'Traes todo un diagnóstico de cualquier sector.',
         icono: Copy,
     },
+    {
+        valor: 'pegar' as const,
+        titulo: 'Pegar el contenido',
+        texto: 'Pegas todo en la plantilla y se llena solo.',
+        icono: ClipboardPaste,
+    },
 ];
 
 const pasos = [
@@ -121,7 +228,7 @@ const pasos = [
     },
     {
         titulo: 'Importancia inicial',
-        texto: 'Si copias, se copian la importancia y las preguntas. En blanco, empieza repartida en partes iguales (suma 100%).',
+        texto: 'Si copias o pegas, se traen la importancia y las preguntas. En blanco (o si la plantilla no la trae), empieza repartida en partes iguales (suma 100%).',
     },
     {
         titulo: 'Se abre el editor',
@@ -139,7 +246,11 @@ const listo = computed(
         form.sector_id !== '' &&
         (form.punto_partida === 'blanco'
             ? form.categorias.length > 0
-            : form.copiar_de !== ''),
+            : form.punto_partida === 'copia'
+              ? form.copiar_de !== ''
+              : lecturaVigente.value &&
+                lectura.value !== null &&
+                lectura.value.errores.length === 0),
 );
 
 function crear(): void {
@@ -147,6 +258,7 @@ function crear(): void {
         ...datos,
         categorias: datos.punto_partida === 'blanco' ? datos.categorias : [],
         copiar_de: datos.punto_partida === 'copia' ? datos.copiar_de : null,
+        texto: datos.punto_partida === 'pegar' ? datos.texto : null,
     })).post(rutas.diagnosticos.guardar());
 }
 </script>
@@ -275,7 +387,7 @@ function crear(): void {
                     </header>
 
                     <div
-                        class="grid gap-3 sm:grid-cols-2"
+                        class="grid gap-3 sm:grid-cols-3"
                         role="radiogroup"
                         aria-labelledby="titulo-punto-partida"
                     >
@@ -443,7 +555,10 @@ function crear(): void {
                         </p>
                     </div>
 
-                    <div v-else class="flex flex-col gap-3">
+                    <div
+                        v-else-if="form.punto_partida === 'copia'"
+                        class="flex flex-col gap-3"
+                    >
                         <Campo
                             obligatorio
                             etiqueta="Copiar de"
@@ -532,6 +647,248 @@ function crear(): void {
                                 {{ origen.sector_nombre }}: revisa el lenguaje
                                 para {{ sectorElegido.nombre }} antes de
                                 publicar.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Pegar el contenido (HU-020 CA-005) -->
+                    <div v-else class="flex flex-col gap-3">
+                        <div
+                            class="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-linea bg-lienzo/60 p-4 text-xs text-tinta-suave"
+                        >
+                            <p class="max-w-prose">
+                                Escribe el diagnóstico con la
+                                <strong class="text-tinta">plantilla</strong>:
+                                cada categoría con «CATEGORÍA:», cada pregunta
+                                con «PREGUNTA:», «TIPO:», «INDICACIÓN:» y sus
+                                opciones como «- puntaje | texto». Los nombres
+                                de las categorías deben ser los del catálogo.
+                            </p>
+                            <div class="flex shrink-0 flex-wrap gap-2">
+                                <Boton
+                                    type="button"
+                                    variante="secundario"
+                                    tamano="sm"
+                                    @click="copiarPlantilla"
+                                >
+                                    <Check
+                                        v-if="plantillaCopiada"
+                                        class="size-3.5"
+                                        aria-hidden="true"
+                                    />
+                                    <Copy
+                                        v-else
+                                        class="size-3.5"
+                                        aria-hidden="true"
+                                    />
+                                    {{
+                                        plantillaCopiada
+                                            ? 'Plantilla copiada'
+                                            : 'Copiar la plantilla'
+                                    }}
+                                </Boton>
+                                <Boton
+                                    type="button"
+                                    variante="secundario"
+                                    tamano="sm"
+                                    @click="usarEjemplo"
+                                >
+                                    Usar el ejemplo
+                                </Boton>
+                            </div>
+                        </div>
+
+                        <Campo
+                            obligatorio
+                            etiqueta="Contenido del diagnóstico"
+                            para="texto"
+                            ayuda="Pega aquí todo el diagnóstico. Antes de crearlo, revísalo: verás qué se entendió y lo que hay que corregir."
+                            :contador="`${form.texto.length.toLocaleString('es-CO')}/${MAXIMO_TEXTO.toLocaleString('es-CO')}`"
+                            :error="form.errors.texto"
+                        >
+                            <AreaTexto
+                                id="texto"
+                                v-model="form.texto"
+                                rows="16"
+                                spellcheck="false"
+                                :maxlength="MAXIMO_TEXTO"
+                                :invalida="!!form.errors.texto"
+                                class="font-mono text-xs leading-5"
+                                placeholder="CATEGORÍA: Presencia en línea&#10;IMPORTANCIA: 50&#10;&#10;PREGUNTA: ¿Tu negocio tiene página web propia?&#10;TIPO: Opción única&#10;INDICACIÓN: Cuenta solo una página con dominio propio.&#10;OPCIONES:&#10;- 100 | Sí&#10;- 0 | No"
+                            />
+                        </Campo>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <Boton
+                                type="button"
+                                variante="secundario"
+                                :disabled="form.texto.trim() === ''"
+                                :cargando="revisando"
+                                @click="revisar"
+                            >
+                                Revisar el contenido
+                            </Boton>
+                            <p
+                                v-if="lectura && !lecturaVigente"
+                                class="text-xs text-alerta"
+                            >
+                                Cambiaste el texto: revísalo otra vez antes de
+                                crear.
+                            </p>
+                            <p
+                                v-if="errorRevision"
+                                class="text-xs text-aviso"
+                                role="alert"
+                            >
+                                {{ errorRevision }}
+                            </p>
+                        </div>
+
+                        <div
+                            v-if="lectura && lecturaVigente"
+                            class="flex flex-col gap-3"
+                            aria-live="polite"
+                        >
+                            <div
+                                class="rounded-xl border border-linea bg-white p-4 text-sm"
+                            >
+                                <p class="font-semibold">
+                                    Se entendió:
+                                    <span class="font-mono">{{
+                                        lectura.resumen.categorias.length
+                                    }}</span>
+                                    {{
+                                        lectura.resumen.categorias.length === 1
+                                            ? 'categoría'
+                                            : 'categorías'
+                                    }}
+                                    ·
+                                    <span class="font-mono">{{
+                                        lectura.resumen.preguntas
+                                    }}</span>
+                                    {{
+                                        lectura.resumen.preguntas === 1
+                                            ? 'pregunta'
+                                            : 'preguntas'
+                                    }}
+                                    ·
+                                    <span class="font-mono">{{
+                                        lectura.resumen.opciones
+                                    }}</span>
+                                    {{
+                                        lectura.resumen.opciones === 1
+                                            ? 'opción'
+                                            : 'opciones'
+                                    }}
+                                </p>
+                                <ul
+                                    v-if="lectura.resumen.categorias.length > 0"
+                                    class="mt-3 flex flex-col divide-y divide-linea text-xs"
+                                >
+                                    <li
+                                        v-for="categoria in lectura.resumen
+                                            .categorias"
+                                        :key="categoria.nombre"
+                                        class="flex items-center justify-between gap-3 py-1.5"
+                                    >
+                                        <span class="font-medium">{{
+                                            categoria.nombre
+                                        }}</span>
+                                        <span class="text-tinta-suave">
+                                            <span class="font-mono">{{
+                                                categoria.preguntas
+                                            }}</span>
+                                            {{
+                                                categoria.preguntas === 1
+                                                    ? 'pregunta'
+                                                    : 'preguntas'
+                                            }}
+                                            ·
+                                            <span class="font-mono"
+                                                >{{
+                                                    categoria.importancia
+                                                }}%</span
+                                            >
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div
+                                v-if="lectura.errores.length > 0"
+                                class="rounded-xl bg-aviso-suave p-4 text-xs text-aviso"
+                                role="alert"
+                            >
+                                <p
+                                    class="flex items-center gap-2 text-sm font-semibold"
+                                >
+                                    <TriangleAlert
+                                        class="size-4"
+                                        aria-hidden="true"
+                                    />
+                                    {{
+                                        lectura.errores.length === 1
+                                            ? '1 error'
+                                            : `${lectura.errores.length} errores`
+                                    }}
+                                    · corrígelos en el texto para poder crearlo
+                                </p>
+                                <ul class="mt-2 flex flex-col gap-1">
+                                    <li
+                                        v-for="(error, i) in lectura.errores"
+                                        :key="`e${i}`"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="mr-1 font-mono font-semibold underline underline-offset-2"
+                                            @click="irALinea(error.linea)"
+                                        >
+                                            Línea {{ error.linea }}
+                                        </button>
+                                        {{ error.mensaje }}
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div
+                                v-if="lectura.avisos.length > 0"
+                                class="rounded-xl bg-alerta-suave p-4 text-xs text-alerta"
+                            >
+                                <p class="text-sm font-semibold">
+                                    Se puede crear, pero falta esto para
+                                    publicarlo
+                                </p>
+                                <p class="mt-0.5">
+                                    Corrígelo ahora en el texto o después en el
+                                    editor.
+                                </p>
+                                <ul class="mt-2 flex flex-col gap-1">
+                                    <li
+                                        v-for="(aviso, i) in lectura.avisos"
+                                        :key="`a${i}`"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="mr-1 font-mono font-semibold underline underline-offset-2"
+                                            @click="irALinea(aviso.linea)"
+                                        >
+                                            Línea {{ aviso.linea }}
+                                        </button>
+                                        {{ aviso.mensaje }}
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <p
+                                v-if="
+                                    lectura.errores.length === 0 &&
+                                    lectura.avisos.length === 0
+                                "
+                                class="rounded-lg bg-exito-suave px-3 py-2 text-xs text-exito"
+                            >
+                                Todo en orden: cumple los requisitos para
+                                publicarse. Al crearlo se abre el editor para
+                                que lo revises.
                             </p>
                         </div>
                     </div>

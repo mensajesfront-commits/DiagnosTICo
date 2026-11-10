@@ -13,8 +13,13 @@
  * reintentar solo esas (CA-004); el Administrador ya recibió un correo.
  *
  * Suele tardar 1 o 2 minutos. Pasados 3 minutos sin terminar, avisa que está
- * tardando más de lo normal y a quién escribir. Las animaciones se apagan si
- * la persona pidió reducir el movimiento (motion-safe).
+ * tardando más de lo normal y a quién escribir.
+ *
+ * Movimiento: el halo late (ping) y el arco gira. Si el equipo pide reducir
+ * el movimiento (Windows sin «Efectos de animación», Android con «Quitar
+ * animaciones» o ahorro de batería, «Reducir movimiento» en Mac o iPhone), el
+ * halo solo cambia de intensidad (pulse) y el arco gira más despacio: antes
+ * todo se apagaba y la pantalla parecía congelada (10 de noviembre de 2026).
  */
 import { Head, router } from '@inertiajs/vue3';
 import {
@@ -200,7 +205,7 @@ function reintentar(): void {
                     <!-- Halo suave mientras analiza -->
                     <span
                         v-if="!listo && !fallo"
-                        class="absolute inset-3 rounded-full bg-marca/15 motion-safe:animate-ping"
+                        class="absolute inset-3 rounded-full bg-marca/15 motion-safe:animate-ping motion-reduce:animate-pulse"
                         style="animation-duration: 2.4s"
                     />
                     <svg viewBox="0 0 120 120" class="relative size-40">
@@ -243,8 +248,7 @@ function reintentar(): void {
                             stroke-width="2"
                             stroke-dasharray="30 347"
                             stroke-linecap="round"
-                            class="origin-center motion-safe:animate-spin"
-                            style="animation-duration: 3s"
+                            class="origin-center animate-spin [animation-duration:3s] motion-reduce:[animation-duration:6s]"
                         />
                     </svg>
                     <div
@@ -351,7 +355,7 @@ function reintentar(): void {
                             />
                             <LoaderCircle
                                 v-else-if="c.vista === 'analizando'"
-                                class="size-5 shrink-0 text-marca motion-safe:animate-spin"
+                                class="size-5 shrink-0 animate-spin text-marca motion-reduce:[animation-duration:2s]"
                                 aria-hidden="true"
                             />
                             <CircleAlert

@@ -10,7 +10,11 @@
  * - Último puntaje con su nivel, variación frente a la anterior (RN-020; no
  *   hay en la primera) y la medición pendiente.
  * - Gráfica de la evolución con las franjas de nivel.
- * - Tabla de mediciones, paginada con las filas que caben.
+ * - Tabla de mediciones, paginada con las filas que caben. Incluye, por
+ *   fecha, las vencidas que se cancelaron o reemplazaron (`vencidas`): cuándo
+ *   venció y se canceló, cuántas preguntas respondió y, al pasar el cursor,
+ *   el último aviso por correo y quién la asignó y la canceló (10 de
+ *   noviembre de 2026).
  * - A la derecha, la medición pendiente con "Cambiar fecha" y "Cancelar
  *   medición" (A3.1c), y "Asignar otra medición": el formulario corto; si ya
  *   hay una pendiente, pide confirmar el reemplazo (A3.1c). "Abrir el
@@ -19,7 +23,9 @@
  * Datos de la cuenta: datos de la empresa y de su usuario principal, el
  * estado de la cuenta con sus colaboradores en solo lectura (HU-033 CA-003)
  * y las acciones "Ver como esta empresa", "Asignar medición" y "Desactivar
- * cuenta" (A3.1f) o "Reactivar cuenta". No existe "restablecer contraseña"
+ * cuenta" (A3.1f) o "Reactivar cuenta". Una empresa desactivada se puede
+ * eliminar (solo con usuarios.gestionar, ModalEliminarEmpresa): se recupera
+ * 90 días desde A5. No existe "restablecer contraseña"
  * (RN-006). Si la empresa se quedó sin cuenta principal (pasó al equipo de
  * NuevasTIC), "Dar una cuenta principal" abre ModalCuentaPrincipal; sin ella
  * no se reactiva.
@@ -59,6 +65,7 @@ import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.v
 import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
 import ModalCuentaPrincipal from '@/components/empresas/ModalCuentaPrincipal.vue';
 import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa.vue';
+import ModalEliminarEmpresa from '@/components/empresas/ModalEliminarEmpresa.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import PanelConsultores from '@/components/empresas/PanelConsultores.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
@@ -75,9 +82,18 @@ import { usePermisos } from '@/composables/usePermisos';
 import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
-import type { FichaEmpresa } from '@/types/empresas';
+import type { FichaEmpresa, MedicionFicha } from '@/types/empresas';
+import type { MedicionVencida } from '@/types/historial';
 
-const props = defineProps<FichaEmpresa>();
+const props = withDefaults(
+    defineProps<
+        FichaEmpresa & {
+            /** Vencidas que se cancelaron o reemplazaron (DatosHistorial). */
+            vencidas?: MedicionVencida[];
+        }
+    >(),
+    { vencidas: () => [] },
+);
 
 const { puede } = usePermisos();
 
@@ -160,8 +176,41 @@ const { porPagina, medir, ajustar } = useFilasQueCaben(contenedor, {
     movil: 6,
     minimo: 2,
 });
+/** Mediciones y vencidas canceladas juntas, de la más reciente a la primera. */
+type FilaTabla =
+    | { tipo: 'medicion'; clave: string; fecha: string; m: MedicionFicha }
+    | { tipo: 'vencida'; clave: string; fecha: string; v: MedicionVencida };
+
+const filas = computed<FilaTabla[]>(() =>
+    [
+        ...props.mediciones.map((m): FilaTabla => ({
+            tipo: 'medicion',
+            clave: `m${m.id}`,
+            fecha: m.terminada ?? m.asignada ?? '',
+            m,
+        })),
+        ...props.vencidas.map((v): FilaTabla => ({
+            tipo: 'vencida',
+            clave: `v${v.id}`,
+            fecha: v.cancelada ?? v.vence ?? '',
+            v,
+        })),
+    ].sort((a, b) => b.fecha.localeCompare(a.fecha)),
+);
+
+/** Lo que dice la fila de una vencida al pasar el cursor. */
+const detalleVencida = (v: MedicionVencida) =>
+    [
+        `Asignada el ${fecha(v.asignada)}${v.asignada_por ? ` por ${v.asignada_por}` : ''}`,
+        `venció el ${fecha(v.vence)}`,
+        `cancelada el ${fecha(v.cancelada)}${v.cancelada_por ? ` por ${v.cancelada_por}` : ''}`,
+        v.ultimo_aviso
+            ? `aviso por correo el ${fecha(v.ultimo_aviso)}`
+            : 'sin aviso por correo',
+    ].join(' · ');
+
 const { pagina, paginas, total, desde, visibles } = usePaginacion(
-    () => props.mediciones,
+    () => filas.value,
     porPagina,
 );
 
@@ -172,6 +221,7 @@ watch(visibles, ajustar);
 const modalFecha = ref(false);
 const modalCancelar = ref(false);
 const modalDesactivar = ref(false);
+const modalEliminar = ref(false);
 const modalReemplazar = ref(false);
 const modalCorreo = ref(false);
 
@@ -523,7 +573,7 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                     class="flex flex-col rounded-2xl border border-linea bg-white lg:min-h-0 lg:flex-1"
                 >
                     <p
-                        v-if="mediciones.length === 0"
+                        v-if="filas.length === 0"
                         class="flex flex-1 items-center justify-center px-5 py-8 text-center text-sm text-tinta-suave"
                     >
                         Todavía no tiene mediciones.
@@ -556,138 +606,229 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr
-                                        v-for="m in visibles"
-                                        :key="m.id"
-                                        class="border-b border-linea last:border-b-0"
+                                    <template
+                                        v-for="fila in visibles"
+                                        :key="fila.clave"
                                     >
-                                        <td
-                                            class="px-4 py-2.5 font-semibold whitespace-nowrap"
+                                        <!-- Vencida y cancelada: prueba de que se asignó -->
+                                        <tr
+                                            v-if="fila.tipo === 'vencida'"
+                                            class="border-b border-linea last:border-b-0"
+                                            :title="detalleVencida(fila.v)"
                                         >
-                                            Medición {{ m.numero }}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2.5 whitespace-nowrap"
-                                        >
-                                            {{
-                                                m.terminada
-                                                    ? fecha(m.terminada)
-                                                    : `Asignada ${fecha(m.asignada)}`
-                                            }}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2.5 text-tinta-suave"
-                                            :title="m.diagnostico ?? undefined"
-                                        >
-                                            {{
-                                                m.version
-                                                    ? `v${m.version}`
-                                                    : '—'
-                                            }}
-                                        </td>
-                                        <td class="px-4 py-2.5">
-                                            <span
-                                                class="flex items-center gap-2.5"
+                                            <td
+                                                class="px-4 py-2.5 font-semibold whitespace-nowrap"
                                             >
-                                                <AnilloPuntaje
+                                                Medición {{ fila.v.numero }}
+                                            </td>
+                                            <td
+                                                class="px-4 py-2.5 whitespace-nowrap"
+                                            >
+                                                Venció {{ fecha(fila.v.vence) }}
+                                            </td>
+                                            <td
+                                                class="px-4 py-2.5 text-tinta-suave"
+                                                :title="
+                                                    fila.v.diagnostico ??
+                                                    undefined
+                                                "
+                                            >
+                                                {{
+                                                    fila.v.version
+                                                        ? `v${fila.v.version}`
+                                                        : '—'
+                                                }}
+                                            </td>
+                                            <td class="px-4 py-2.5">
+                                                <span
+                                                    class="flex items-center gap-2.5"
+                                                >
+                                                    <span
+                                                        class="flex size-9 items-center justify-center rounded-full border-2 border-dashed border-linea-fuerte text-tinta-suave"
+                                                        aria-hidden="true"
+                                                        >–</span
+                                                    >
+                                                    <span
+                                                        class="rounded-full bg-aviso-suave px-2 py-0.5 text-xs font-medium whitespace-nowrap text-aviso"
+                                                        >Vencida · cancelada
+                                                        {{
+                                                            fecha(
+                                                                fila.v
+                                                                    .cancelada,
+                                                            )
+                                                        }}</span
+                                                    >
+                                                </span>
+                                            </td>
+                                            <td
+                                                class="px-4 py-2.5 text-tinta-suave"
+                                            >
+                                                —
+                                            </td>
+                                            <td
+                                                class="px-4 py-2.5 text-right text-xs whitespace-nowrap text-tinta-suave"
+                                            >
+                                                Respondió
+                                                {{ fila.v.respondidas }} de
+                                                {{ fila.v.preguntas }}
+                                            </td>
+                                        </tr>
+                                        <tr
+                                            v-else
+                                            class="border-b border-linea last:border-b-0"
+                                        >
+                                            <td
+                                                class="px-4 py-2.5 font-semibold whitespace-nowrap"
+                                            >
+                                                Medición {{ fila.m.numero }}
+                                            </td>
+                                            <td
+                                                class="px-4 py-2.5 whitespace-nowrap"
+                                            >
+                                                {{
+                                                    fila.m.terminada
+                                                        ? fecha(
+                                                              fila.m.terminada,
+                                                          )
+                                                        : `Asignada ${fecha(fila.m.asignada)}`
+                                                }}
+                                            </td>
+                                            <td
+                                                class="px-4 py-2.5 text-tinta-suave"
+                                                :title="
+                                                    fila.m.diagnostico ??
+                                                    undefined
+                                                "
+                                            >
+                                                {{
+                                                    fila.m.version
+                                                        ? `v${fila.m.version}`
+                                                        : '—'
+                                                }}
+                                            </td>
+                                            <td class="px-4 py-2.5">
+                                                <span
+                                                    class="flex items-center gap-2.5"
+                                                >
+                                                    <AnilloPuntaje
+                                                        v-if="
+                                                            fila.m.puntaje !==
+                                                                null &&
+                                                            fila.m.nivel
+                                                        "
+                                                        :puntaje="
+                                                            fila.m.puntaje
+                                                        "
+                                                        :nivel="fila.m.nivel"
+                                                        :tamano="36"
+                                                    />
+                                                    <span
+                                                        v-else
+                                                        class="flex size-9 items-center justify-center rounded-full border-2 border-dashed border-linea-fuerte text-tinta-suave"
+                                                        aria-hidden="true"
+                                                        >–</span
+                                                    >
+                                                    <EtiquetaNivel
+                                                        v-if="fila.m.nivel"
+                                                        :nivel="fila.m.nivel"
+                                                    />
+                                                    <EtiquetaEstado
+                                                        v-else
+                                                        :estado="fila.m.estado"
+                                                    />
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-2.5">
+                                                <span
                                                     v-if="
-                                                        m.puntaje !== null &&
-                                                        m.nivel
+                                                        fila.m.variacion !==
+                                                        null
                                                     "
-                                                    :puntaje="m.puntaje"
-                                                    :nivel="m.nivel"
-                                                    :tamano="36"
-                                                />
+                                                    :class="
+                                                        cn(
+                                                            'rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap',
+                                                            fila.m.variacion > 0
+                                                                ? 'bg-nivel-sigue-suave text-nivel-sigue-texto'
+                                                                : fila.m
+                                                                        .variacion <
+                                                                    0
+                                                                  ? 'bg-nivel-critico-suave text-nivel-critico-texto'
+                                                                  : 'bg-lienzo-oscuro text-tinta-suave',
+                                                        )
+                                                    "
+                                                    >{{
+                                                        fila.m.variacion > 0
+                                                            ? `▲ +${fila.m.variacion}`
+                                                            : fila.m.variacion <
+                                                                0
+                                                              ? `▼ ${fila.m.variacion}`
+                                                              : '= 0'
+                                                    }}</span
+                                                >
                                                 <span
                                                     v-else
-                                                    class="flex size-9 items-center justify-center rounded-full border-2 border-dashed border-linea-fuerte text-tinta-suave"
-                                                    aria-hidden="true"
-                                                    >–</span
+                                                    class="text-tinta-suave"
+                                                    >—</span
                                                 >
-                                                <EtiquetaNivel
-                                                    v-if="m.nivel"
-                                                    :nivel="m.nivel"
-                                                />
-                                                <EtiquetaEstado
-                                                    v-else
-                                                    :estado="m.estado"
-                                                />
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-2.5">
-                                            <span
-                                                v-if="m.variacion !== null"
-                                                :class="
-                                                    cn(
-                                                        'rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap',
-                                                        m.variacion > 0
-                                                            ? 'bg-nivel-sigue-suave text-nivel-sigue-texto'
-                                                            : m.variacion < 0
-                                                              ? 'bg-nivel-critico-suave text-nivel-critico-texto'
-                                                              : 'bg-lienzo-oscuro text-tinta-suave',
-                                                    )
-                                                "
-                                                >{{
-                                                    m.variacion > 0
-                                                        ? `▲ +${m.variacion}`
-                                                        : m.variacion < 0
-                                                          ? `▼ ${m.variacion}`
-                                                          : '= 0'
-                                                }}</span
+                                            </td>
+                                            <td
+                                                class="px-4 py-2.5 text-right whitespace-nowrap"
                                             >
-                                            <span
-                                                v-else
-                                                class="text-tinta-suave"
-                                                >—</span
-                                            >
-                                        </td>
-                                        <td
-                                            class="px-4 py-2.5 text-right whitespace-nowrap"
-                                        >
-                                            <button
-                                                v-if="
-                                                    pendiente &&
-                                                    m.id === pendiente.id &&
-                                                    m.estado !== 'enviada' &&
-                                                    puede('mediciones.asignar')
-                                                "
-                                                type="button"
-                                                :class="enlace"
-                                                @click="modalFecha = true"
-                                            >
-                                                Cambiar fecha
-                                            </button>
-                                            <Link
-                                                v-else-if="
-                                                    m.estado === 'terminada' &&
-                                                    puede('resultados.ver')
-                                                "
-                                                :href="
-                                                    rutas.resultados.ver(m.id)
-                                                "
-                                                :class="enlace"
-                                            >
-                                                Ver resultado
-                                            </Link>
-                                            <a
-                                                v-if="
-                                                    m.estado === 'terminada' &&
-                                                    puede('resultados.pdf')
-                                                "
-                                                :href="
-                                                    rutas.resultados.pdf(m.id)
-                                                "
-                                                class="ml-3 inline-flex size-7 items-center justify-center rounded-md align-middle text-tinta-suave hover:bg-lienzo hover:text-marca"
-                                                :aria-label="`Descargar el informe completo de la medición ${m.numero}`"
-                                                title="Descargar informe completo (PDF)"
-                                            >
-                                                <FileDown
-                                                    class="size-4"
-                                                    aria-hidden="true"
-                                                />
-                                            </a>
-                                        </td>
-                                    </tr>
+                                                <button
+                                                    v-if="
+                                                        pendiente &&
+                                                        fila.m.id ===
+                                                            pendiente.id &&
+                                                        fila.m.estado !==
+                                                            'enviada' &&
+                                                        puede(
+                                                            'mediciones.asignar',
+                                                        )
+                                                    "
+                                                    type="button"
+                                                    :class="enlace"
+                                                    @click="modalFecha = true"
+                                                >
+                                                    Cambiar fecha
+                                                </button>
+                                                <Link
+                                                    v-else-if="
+                                                        fila.m.estado ===
+                                                            'terminada' &&
+                                                        puede('resultados.ver')
+                                                    "
+                                                    :href="
+                                                        rutas.resultados.ver(
+                                                            fila.m.id,
+                                                        )
+                                                    "
+                                                    :class="enlace"
+                                                >
+                                                    Ver resultado
+                                                </Link>
+                                                <a
+                                                    v-if="
+                                                        fila.m.estado ===
+                                                            'terminada' &&
+                                                        puede('resultados.pdf')
+                                                    "
+                                                    :href="
+                                                        rutas.resultados.pdf(
+                                                            fila.m.id,
+                                                        )
+                                                    "
+                                                    class="ml-3 inline-flex size-7 items-center justify-center rounded-md align-middle text-tinta-suave hover:bg-lienzo hover:text-marca"
+                                                    :aria-label="`Descargar el informe completo de la medición ${fila.m.numero}`"
+                                                    title="Descargar informe completo (PDF)"
+                                                >
+                                                    <FileDown
+                                                        class="size-4"
+                                                        aria-hidden="true"
+                                                    />
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </tbody>
                             </table>
                         </div>
@@ -1193,6 +1334,15 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                 Reactivar cuenta
                             </Boton>
                         </template>
+                        <Boton
+                            v-if="
+                                !empresa.activa && puede('usuarios.gestionar')
+                            "
+                            variante="peligro"
+                            @click="modalEliminar = true"
+                        >
+                            Eliminar empresa
+                        </Boton>
                     </div>
                     <p
                         v-if="puede('empresas.registrar')"
@@ -1203,7 +1353,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                 ? 'Desactivar impide entrar a la empresa; sus mediciones y resultados se conservan.'
                                 : !principal
                                   ? 'Para reactivarla, primero dale una cuenta principal.'
-                                  : 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar.'
+                                  : puede('usuarios.gestionar')
+                                    ? 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar. Si no se va a usar más, elimínala: se puede recuperar durante 90 días.'
+                                    : 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar.'
                         }}
                     </p>
                 </section>
@@ -1250,6 +1402,14 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
         v-if="!principal"
         v-model:abierto="modalCuenta"
         :empresa="empresa"
+    />
+    <ModalEliminarEmpresa
+        v-if="!empresa.activa && puede('usuarios.gestionar')"
+        v-model:abierto="modalEliminar"
+        :empresa="empresa"
+        :principal="principal?.name ?? null"
+        :mediciones="terminadas"
+        :colaboradores="colaboradores.length"
     />
     <ModalDesactivarEmpresa
         v-model:abierto="modalDesactivar"

@@ -99,7 +99,8 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | GET | `/diagnosticos` | `diagnosticos.ver` | A2·T: todos los diagnósticos | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos?sector={id}` | `diagnosticos.ver` | A2 / A2b: un sector | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos/crear?sector={id}` | `diagnosticos.editar` | A2.5 | Props de `diagnosticos/Crear` |
-| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1 y abre el editor (A2.1) | `nombre` (máx. 60, único en el sector), `sector_id`, `descripcion`, `punto_partida`, `categorias[]`, `copiar_de` |
+| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1 y abre el editor (A2.1) | `nombre` (máx. 60, único en el sector), `sector_id`, `descripcion`, `punto_partida` (`blanco`, `copia` o `pegar`), `categorias[]`, `copiar_de`, `texto` (máx. 100 000) |
+| POST | `/diagnosticos/plantilla/revisar` | `diagnosticos.editar` (30 por minuto) | A2.5 · Pegar el contenido: lee el texto sin guardar nada (`LectorPlantilla`) | `texto` → JSON `resumen`, `errores` y `avisos`, cada uno con `linea` |
 | GET | `/diagnosticos/{id}/editar` | `diagnosticos.editar` | A2.1 · editor (`?categoria=` parte, `?pregunta=`) | Props de `diagnosticos/Editor` |
 | GET | `/diagnosticos/{id}/vista-previa` | `diagnosticos.ver` | A2.4 · vista previa del borrador o de una versión (`?version=`) | Props de `diagnosticos/VistaPrevia` |
 | POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 y abre el editor | `nombre` (máx. 60, único en el sector), `sector_id` |
@@ -221,6 +222,7 @@ Reglas que valida el servidor:
 | PUT | `/empresas/{empresa}` | `empresas.actualizar` | `empresas.registrar` | A3.1d · datos de la empresa y del usuario principal. Cambiar el sector no toca las mediciones; si cambia el correo, cierra sus sesiones |
 | POST | `/empresas/{empresa}/desactivar` | `empresas.desactivar` | `empresas.registrar` | A3.1f · empresa y cuenta principal inactivas, cierra las sesiones de todos sus usuarios; motivo y aviso (`EmpresaDesactivada`) opcionales |
 | POST | `/empresas/{empresa}/reactivar` | `empresas.reactivar` | `empresas.registrar` | Vuelve a activar empresa y cuenta principal |
+| DELETE | `/empresas/{empresa}` | `empresas.eliminar` | `usuarios.gestionar` | A3.1 · Solo desactivadas, con `confirmacion` = el nombre exacto. Marca eliminadas la empresa y todas sus cuentas con la misma hora (se recuperan juntas 90 días desde A5, DEC-017), cierra sus sesiones y borra sus enlaces de invitación; `cuentas:purgar` las borra después (HU-035 CA-007) |
 | GET | `/mediciones/asignar` | `mediciones.crear` | `mediciones.asignar` | A3.1b (`?empresa=`) |
 | POST | `/mediciones` | `mediciones.guardar` | `mediciones.asignar` | Asigna. Si hay una pendiente, sin `reemplazar` responde un error en `reemplazar`; con `reemplazar` la cancela y la nueva toma su número (A3.1c) |
 | POST | `/mediciones/{medicion}/cancelar` | `mediciones.cancelar` | `mediciones.asignar` | Cancela la pendiente (no enviada) |

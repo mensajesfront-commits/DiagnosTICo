@@ -101,7 +101,7 @@ withDefaults(
                 class="inline-flex items-center gap-1.5 text-xs text-tinta-suave"
             >
                 <LoaderCircle
-                    class="size-3.5 motion-safe:animate-spin"
+                    class="size-3.5 animate-spin motion-reduce:[animation-duration:2s]"
                     aria-hidden="true"
                 />
                 Guardando…

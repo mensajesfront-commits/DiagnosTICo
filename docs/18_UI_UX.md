@@ -155,6 +155,7 @@ El sistema se llama **Captter** (6 de octubre). Aparece junto al logo en el men�
 | L2, A6, E11 | País → departamento → ciudad en listas con búsqueda; la etiqueta del departamento cambia según el país (Estado, Provincia, Región). | Pedido por el equipo (8 de octubre, DEC-016). El wireframe muestra solo ciudad y país. |
 | L2 | Los Términos y Condiciones y la Política de Privacidad solo están en el registro y se abren en una ventana sin salir del formulario. | Pedido por el equipo (16 de octubre). Desde el 4 de noviembre son los textos oficiales de Captter (`lib/legales.ts`). |
 | A2.5 | En blanco, se eligen las categorías con casillas y se muestra cuánto vale cada una al empezar. | HU-020 pide elegir las categorías; el wireframe solo muestra la opción de copiar. |
+| A2.5 | Tercera opción «Pegar el contenido»: se pega el diagnóstico escrito en la plantilla, se revisa y se crea lleno. | Sin wireframe: pedido del equipo el 10 de noviembre de 2026 (HU-020 CA-005). |
 | A2.3 | Si la categoría nunca se respondió, la acción es «Eliminar» en vez de «Archivar». | HU-019 y RN-009. El wireframe solo muestra «Archivar». |
 | A2.3 | Al abrir, el panel muestra la primera categoría; con «Cancelar» queda vacío con una indicación. | El wireframe solo muestra el panel con una categoría elegida. |
 | Todas | Dice «Captter» donde el wireframe dice «Diagnóstico Empresarial». | Nombre del sistema decidido por el equipo (6 de octubre). |

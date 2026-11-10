@@ -27,8 +27,9 @@ Antes de medir a una empresa, su sector necesita un diagnóstico **publicado**.
 1. Ve a **Diagnósticos** (A2) y elige el sector a la izquierda. Si no existe, pulsa **+ Crear sector**.
 2. Pulsa **+ Crear diagnóstico** (A2.5):
    - Ponle nombre.
-   - Elige empezar en blanco o copiar otro diagnóstico.
-   - Marca las categorías. La importancia se reparte sola y la ajustas después.
+   - Elige empezar en blanco, copiar otro diagnóstico o **pegar el contenido**.
+   - En blanco, marca las categorías. La importancia se reparte sola y la ajustas después.
+   - **Pegar el contenido:** escribe el diagnóstico con la plantilla (botón **Copiar la plantilla**) y pégalo en el recuadro. Pulsa **Revisar el contenido**: verás cuántas categorías, preguntas y opciones se leyeron y, si algo está mal, el error con su número de línea (un clic te lleva a esa línea). Cuando no haya errores, pulsa **Crear y abrir el editor**: el borrador queda lleno y lo revisas en el editor.
 3. En el **editor** (A2.1), agrega las preguntas de cada categoría (A2.1b):
    - **Tipo:** abierta, opción única o selección múltiple.
    - **Indicación (obligatoria):** lo que ve la empresa en "Cómo responder".
@@ -104,7 +105,7 @@ En los tres casos la solicitud queda atendida.
 - Dos PDF (E10):
   - **Informe completo PDF**: el «Informe de Diagnóstico y Estrategia de Marketing Digital», con portada, ficha técnica, resumen ejecutivo, metodología, resultados, una página por categoría, DOFA, conclusiones, fichas de acción, cronograma, KPI y glosario. En este informe los niveles tienen nombres más formales: «Se puede mejorar» es «Requiere mejora», «Vas en buen camino» es «Desempeño satisfactorio» y «Sigue así» es «Desempeño óptimo».
   - **Resumen para la empresa**: el PDF corto que recibe la empresa. Sirve para entregárselo o revisarlo con ella.
-- **Ver historial completo** (A3.4).
+- **Ver historial completo** (A3.4). En la tabla de la ficha y en el historial completo también salen las mediciones que vencieron sin responderse y se cancelaron, con las fechas, cuántas preguntas respondió la empresa, el último aviso por correo y quién la asignó y la canceló. Sirve para mostrarle a una empresa que sí recibió el diagnóstico.
 
 ## A.7 Configurar la IA
 
@@ -127,6 +128,7 @@ En **Usuarios y roles** (A5):
 - **Invitar** cuentas internas. Si eliges el rol **Consultor**, la ventana pasa a «Invitar consultor» y puedes marcar en «Empresas que acompaña» las empresas que va a ver.
 - **Desactivar o reactivar** una cuenta.
 - **Eliminar** una cuenta: se escribe el correo exacto para confirmar y se puede recuperar durante 90 días.
+- **Eliminar una empresa que no se va a usar más:** primero desactívala. Después, en su ficha (A3.1) → **Datos de la cuenta** → **Eliminar empresa**, escribe su nombre a mano y confirma. Se van la empresa, su cuenta principal y sus colaboradores. Si fue un error, recupérala antes de 90 días aquí, en Usuarios y roles: filtra por Estado «Eliminadas» y pulsa **Recuperar** en su cuenta principal. Pasados los 90 días se borra para siempre y sus mediciones terminadas quedan sin nombre, solo para las estadísticas.
 - **Cambiar el rol** de una cuenta. Si es la cuenta principal de una empresa, el sistema avisa qué pasa con sus colaboradores y su medición pendiente.
 - **Roles:** crear roles con los permisos que elijas. Los roles Administrador, Empresa, Colaborador y Consultor no se borran.
 - **Consultores de una empresa:** también se vinculan después, en la ficha de la empresa (A3.1), pestaña **Consultores** → «Vincular un consultor» → **Vincular**. Ahí mismo, **Quitar** lo desvincula (pide confirmación). Un consultor puede acompañar varias empresas.
@@ -149,6 +151,8 @@ En **Mi perfil** (A6) cambias tu nombre, tu foto, tu correo y tu contraseña.
 3. **Paso 2 · Tu usuario:** tus datos, tu correo y una contraseña con al menos 8 caracteres, una mayúscula, un número y un carácter especial. Marca la casilla «Acepto los **Términos y Condiciones** y la **Política de Privacidad**» (cada nombre abre su texto) y pasa el captcha.
 4. Te llega un correo con un **código de 6 dígitos**. Escríbelo en la ventana «Verifica tu correo» (L2b). Si no lo verificas en 7 días, el registro se borra.
 5. Entra con tu correo y tu contraseña. Cuando NuevasTIC te asigne un diagnóstico, aparecerá en tu inicio y, si así lo eligió, te llegará un correo.
+
+Si NuevasTIC te asignó un consultor, al final de tu inicio aparece **Tu consultor**, con su nombre, su cargo, su correo y su teléfono para escribirle.
 
 ## B.2 Responder el diagnóstico
 
@@ -203,6 +207,8 @@ Además:
 ## B.5 Tu historial
 
 En **Mi historial** (E8) ves todas tus mediciones terminadas. Desde la segunda medición aparece la gráfica de evolución; con **Ver:** eliges el total o una categoría.
+
+Si una medición venció sin que la enviaras y NuevasTIC la canceló, también aparece en la lista, marcada «Vencida sin responder · cancelada», con sus fechas y cuántas preguntas alcanzaste a responder.
 
 ## B.6 Si tu medición venció
 

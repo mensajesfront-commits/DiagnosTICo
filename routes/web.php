@@ -69,6 +69,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:diagnosticos.editar')->group(function () {
         Route::get('diagnosticos/crear', [DiagnosticosController::class, 'crear'])->name('diagnosticos.crear');
         Route::post('diagnosticos', [DiagnosticosController::class, 'guardar'])->name('diagnosticos.guardar');
+        // A2.5 · Pegar el contenido (HU-020 CA-005): revisa el texto sin guardar nada.
+        Route::post('diagnosticos/plantilla/revisar', [DiagnosticosController::class, 'revisarPlantilla'])
+            ->middleware('throttle:30,1')->name('diagnosticos.plantilla.revisar');
         Route::post('diagnosticos/{diagnostico}/duplicar', [DiagnosticosController::class, 'duplicar'])->name('diagnosticos.duplicar');
         Route::post('diagnosticos/{diagnostico}/archivar', [DiagnosticosController::class, 'archivar'])->name('diagnosticos.archivar');
         Route::post('diagnosticos/{diagnostico}/restaurar', [DiagnosticosController::class, 'restaurar'])->name('diagnosticos.restaurar');
@@ -172,6 +175,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // HU-085 · Consultores de una empresa (A3.1, RN-030).
         Route::post('empresas/{empresa}/consultores', [ConsultoresController::class, 'vincular'])->name('empresas.consultores.vincular');
+        // A3.1 · Eliminar una empresa desactivada, recuperable 90 días (DEC-017).
+        Route::delete('empresas/{empresa}', [EmpresasController::class, 'eliminar'])->whereNumber('empresa')->name('empresas.eliminar');
         Route::delete('empresas/{empresa}/consultores/{consultor}', [ConsultoresController::class, 'quitar'])->name('empresas.consultores.quitar');
     });
 

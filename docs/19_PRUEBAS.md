@@ -40,20 +40,21 @@ En Sail se antepone `./vendor/bin/sail`.
 | `AdministradorPrincipalTest` | 3 | Cuenta principal del Administrador y `admin:invitar` |
 | `CatalogoCiiuTest` | 9 | Catálogo CIIU y actividades por sector |
 | `DiagnosticosYCatalogoTest` | 18 | A2: sectores (crear, reasignar, desactivar, eliminar), categorías (RN-009), crear, duplicar, archivar y eliminar diagnósticos |
+| `PlantillaDiagnosticoTest` | 9 | A2.5 · Pegar el contenido (HU-020 CA-005): la plantilla de ejemplo, tipos y marcas, importancia repartida, errores y avisos con su línea, crear el borrador lleno y permisos |
 | `EditorDiagnosticoTest` | 19 | A2.1: preguntas, opciones, "Ninguna", "Otro", orden, importancia, estado (RN-012) y publicar una versión congelada |
 | `ResultadoEjemploTest` | 7 | HU-030: mejor, medio y peor caso con el mismo cálculo, y sus dos PDF |
-| `EmpresasTest` | 14 | A3: lista, registrar con invitación, editar, desactivar y asignar (RN-014) |
+| `EmpresasTest` | 17 | A3: lista, registrar con invitación, editar, desactivar, eliminar una desactivada (recuperar y borrar a los 90 días) y asignar (RN-014) |
 | `PlazosTest` | 4 | RN-016: al menos 3 días para responder y fecha límite a las 11:59 p. m. de la empresa |
 | `CorreoAvisoTest` | 9 | A3.1e: plantilla, variables, correo de prueba y recordatorio (HU-008) |
 | `SolicitudesMedicionTest` | 7 | HU-083: aviso en A1, la lista, la ficha y Asignar; se atiende al asignar, dar nueva fecha o cancelar |
 | `InicioTest` | 7 | A1: indicadores, pestañas, orden de la tabla y vencidas por fecha |
 | `ResponderTest` | 11 | E1–E4: inicio, responder, avance, enviar, vencidas, solicitud, "Ninguna" y "Otro" |
-| `ResultadosTest` | 18 | Cálculo (RN-018), análisis por categoría, variación, prompt por capas, falla y reintento, permisos de E6/E9 y los dos PDF: la empresa recibe el resumen y el Administrador, el completo |
-| `HistorialTest` | 3 | E8 y A3.4: terminadas, evolución total y por categoría, pendiente |
+| `ResultadosTest` | 20 | Cálculo (RN-018), análisis por categoría, variación, prompt por capas, falla y reintento, permisos de E6/E9 y los dos PDF: la empresa recibe el resumen y el Administrador, el completo |
+| `HistorialTest` | 6 | E8 y A3.4: terminadas, evolución total y por categoría, pendiente, y las vencidas canceladas o reemplazadas (con quién en A3.4) |
 | `ConfiguracionIaTest` | 7 | A4: guardar por capas, quitar un ajuste, vista previa, probar (con el límite diario) y permisos |
 | `UsuariosYRolesTest` | 28 | A5: lista, invitar, desactivar, eliminar y recuperar, cambiar rol, roles (RN-027) y medición pendiente de la cuenta principal |
 | `RolesYPermisosTest` | 7 | Seeder de roles y permisos y protección de rutas |
-| `ConsultorTest` | 23 | EP-014 y RN-030: vincular y quitar, solo sus empresas (otra da 404), solo lectura, C1 y C2 |
+| `ConsultorTest` | 24 | EP-014 y RN-030: vincular y quitar, solo sus empresas (otra da 404), solo lectura, C1, C2 y «Tu consultor» en el inicio de la empresa |
 | `VerComoTest` | 5 | RN-026: solo lectura, registro, salir y no sobre administradores |
 | `ColaboradoresTest` | 21 | E12 y RN-025, incluidas las páginas que ve cada colaborador |
 | `PerfilTest` | 22 | A6 y E11: datos, contraseña, foto, datos de la empresa y eliminar la cuenta |

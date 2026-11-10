@@ -25,6 +25,9 @@ use Illuminate\Support\Carbon;
  * @property string|null $correo_asunto
  * @property string|null $correo_cuerpo
  * @property Carbon|null $ultimo_aviso_en
+ * @property Carbon|null $cancelada_en
+ * @property string|null $estado_al_cancelar
+ * @property int|null $cancelada_por
  * @property Carbon|null $enviada_en
  * @property Carbon|null $terminada_en
  * @property Carbon|null $created_at

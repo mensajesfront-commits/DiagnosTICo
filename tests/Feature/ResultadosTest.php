@@ -13,7 +13,9 @@ use App\Models\User;
 use App\Notifications\AnalisisFallido;
 use App\Notifications\ResultadoListo;
 use App\Services\Ia\Analizador;
+use App\Services\Ia\AnalizadorDeCategoria;
 use App\Services\Ia\ArmadorPrompt;
+use App\Services\Ia\RespuestaIaInvalida;
 use App\Services\Resultados\CalculadoraPuntajes;
 use App\Services\Resultados\InformePdf;
 use App\Support\DatosResultado;
@@ -367,6 +369,41 @@ it('una opcional respondida es un dato extra: la IA la lee, pero no cuenta en el
         ->and($p4['puntaje'])->toBeNull()
         ->and(AnalisisCategoria::where('medicion_id', $this->medicion->id)->where('categoria_ref', 'c1')->value('prompt'))
         ->toContain('dato_extra');
+});
+
+it('si la IA no califica una abierta opcional, el análisis vale; una abierta obligatoria sin puntaje se reintenta', function () {
+    $respuesta = fn (?int $puntaje) => json_encode([
+        'preguntas' => [['id' => 'p9', 'puntaje' => $puntaje, 'observacion' => 'Habla de pocas reservas por internet.']],
+        'metodo' => 'CAME',
+        'metodo_motivo' => 'El problema está claro.',
+        'observacion_categoria' => 'Recibe pocas reservas.',
+        'impacto' => 'Pierde turistas.',
+        'hallazgos' => [['grupo' => 'Corregir', 'puntos' => ['Responder más rápido.']]],
+        'fortalezas' => [], 'debilidades' => [], 'oportunidades' => [], 'amenazas' => [], 'faltante' => [],
+        'recomendaciones' => [['titulo' => 'Responde el mismo día', 'detalle' => 'x', 'pasos' => ['a', 'b', 'c']]],
+    ]);
+    $opcional = ['preguntas' => [['id' => 'p9', 'tipo' => 'abierta', 'dato_extra' => 'Pregunta opcional']]];
+    $obligatoria = ['preguntas' => [['id' => 'p9', 'tipo' => 'abierta']]];
+
+    expect(AnalizadorDeCategoria::validar($respuesta(null), $opcional)['preguntas'][0])
+        ->toMatchArray(['puntaje' => null, 'observacion' => 'Habla de pocas reservas por internet.'])
+        // Aunque la califique, una opcional no cuenta.
+        ->and(AnalizadorDeCategoria::validar($respuesta(70), $opcional)['preguntas'][0]['puntaje'])->toBeNull()
+        ->and(AnalizadorDeCategoria::validar($respuesta(70), $obligatoria)['preguntas'][0]['puntaje'])->toBe(70)
+        ->and(fn () => AnalizadorDeCategoria::validar($respuesta(null), $obligatoria))
+        ->toThrow(RespuestaIaInvalida::class, 'no calificó la pregunta abierta p9');
+});
+
+it('a la abierta opcional no se le pide puntaje en el prompt; a la obligatoria sí', function () {
+    $categoria = ['preguntas' => [
+        ['ref' => 'pa', 'tipo' => 'abierta', 'texto' => '¿Qué dificultades tienes?', 'obligatoria' => false, 'criterio_ia' => 'Pregunta opcional. No se califica.'],
+        ['ref' => 'pb', 'tipo' => 'abierta', 'texto' => 'Describe a tu cliente.', 'obligatoria' => true, 'criterio_ia' => '100: concreto.'],
+    ]];
+    $lista = app(ArmadorPrompt::class)->preguntas($categoria, ['pa' => ['opciones' => [], 'texto' => 'Pocas reservas'], 'pb' => ['opciones' => [], 'texto' => 'Familias']]);
+
+    expect($lista[0]['calificar'])->toContain('No la califiques')
+        ->and($lista[0])->toHaveKey('dato_extra')
+        ->and($lista[1]['calificar'])->toContain('Califica esta respuesta con un entero de 0 a 100');
 });
 
 it('al borrar para siempre la empresa conserva sus mediciones terminadas sin nombre', function () {

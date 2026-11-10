@@ -13,11 +13,14 @@ use App\Rules\TelefonoValido;
 use App\Services\Mediciones\AsignarMedicion;
 use App\Support\DatosConsultores;
 use App\Support\DatosEmpresas;
+use App\Support\DatosHistorial;
+use App\Support\Fechas;
 use App\Support\Invitaciones;
 use App\Support\Plazos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -102,6 +105,8 @@ class EmpresasController extends Controller
 
         return Inertia::render('empresas/Ver', [
             ...DatosEmpresas::ficha($empresa),
+            // Vencidas que se cancelaron: también en la tabla de la ficha (HU-039 CA-005).
+            'vencidas' => DatosHistorial::vencidas($empresa, interno: true),
             'opciones' => DatosEmpresas::opciones(),
             // Pestaña "Consultores" (HU-085): solo quien gestiona usuarios.
             'consultores' => $yo->can('usuarios.gestionar') ? DatosConsultores::deEmpresa($empresa) : null,
@@ -162,6 +167,62 @@ class EmpresasController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => "Cuenta de «{$empresa->nombre}» desactivada."]);
 
         return back();
+    }
+
+    /**
+     * A3.1 · Eliminar una empresa desactivada que no se va a usar más
+     * (pedido del 10 de noviembre de 2026; solo con usuarios.gestionar).
+     *
+     * Es igual que eliminar su cuenta principal en A5 (DEC-017): la empresa y
+     * todas sus cuentas se marcan eliminadas con la misma hora, salen de las
+     * listas y nadie entra. Durante 90 días se recuperan juntas desde
+     * Usuarios y roles, recuperando la cuenta principal; después
+     * `cuentas:purgar` las borra para siempre y deja sus mediciones
+     * terminadas sin nombre (Anonimizar). Se confirma escribiendo el nombre.
+     */
+    public function eliminar(Request $request, Empresa $empresa): RedirectResponse
+    {
+        if ($empresa->activa) {
+            throw ValidationException::withMessages([
+                'confirmacion' => 'Primero desactiva la empresa: solo se eliminan empresas desactivadas.',
+            ]);
+        }
+
+        $request->validate(['confirmacion' => ['required', 'string']], [
+            'confirmacion.required' => 'Escribe el nombre de la empresa para confirmar.',
+        ]);
+
+        if (trim($request->string('confirmacion')->value()) !== $empresa->nombre) {
+            throw ValidationException::withMessages([
+                'confirmacion' => 'El nombre no coincide. Escríbelo exactamente como aparece.',
+            ]);
+        }
+
+        $principal = DatosEmpresas::principal($empresa);
+        $cuentas = $empresa->usuarios()->get(['id', 'email']);
+        // La misma marca para todas, para recuperarlas juntas.
+        $ahora = now();
+
+        DB::transaction(function () use ($empresa, $cuentas, $ahora): void {
+            DB::table('sessions')->whereIn('user_id', $cuentas->modelKeys())->delete();
+            Invitaciones::borrarEnlaces($cuentas->pluck('email')->all());
+            User::whereKey($cuentas->modelKeys())->update(['deleted_at' => $ahora]);
+            $empresa->forceFill(['deleted_at' => $ahora])->save();
+        });
+
+        Log::info('Empresa eliminada (recuperable)', [
+            'empresa_id' => $empresa->id,
+            'cuentas' => $cuentas->count(),
+            'por' => $request->user()?->id,
+        ]);
+
+        $hasta = Fechas::larga($ahora->copy()->addDays((int) config('diagnostico.eliminacion.dias')));
+        $mensaje = $principal !== null
+            ? "«{$empresa->nombre}» eliminada con sus cuentas. Se puede recuperar hasta el {$hasta} desde Usuarios y roles, recuperando la cuenta de {$principal->name}."
+            : "«{$empresa->nombre}» eliminada. No tenía cuenta principal: no se puede recuperar.";
+        Inertia::flash('toast', ['type' => 'success', 'message' => $mensaje]);
+
+        return to_route('empresas.index');
     }
 
     /**

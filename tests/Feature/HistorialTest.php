@@ -6,7 +6,11 @@ use App\Models\Medicion;
 use App\Models\Resultado;
 use App\Models\Sector;
 use App\Models\User;
+use App\Services\Mediciones\AsignarMedicion;
+use App\Support\DatosHistorial;
+use App\Support\Plazos;
 use Database\Seeders\RolesYPermisosSeeder;
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /*
@@ -77,4 +81,81 @@ it('sin mediciones terminadas el resumen viene vacío', function () {
 
     $this->actingAs($this->laura)->get(route('historial.mio'))
         ->assertInertia(fn (Assert $p) => $p->where('resumen', null)->has('mediciones', 0));
+});
+
+// --- Vencidas canceladas (pedido del 10 de noviembre de 2026) --------------------
+
+it('una vencida que se cancela sale en el historial como prueba de que se asignó', function () {
+    $this->pendiente->forceFill([
+        'estado' => 'vencida',
+        'fecha_limite' => today()->subDays(3),
+        'ultimo_aviso_en' => now()->subDays(10),
+        'asignada_por' => $this->admin->id,
+    ])->save();
+    DB::table('respuestas')->insert([
+        'medicion_id' => $this->pendiente->id, 'pregunta_ref' => 'p1', 'texto' => 'Algo', 'created_at' => now(), 'updated_at' => now(),
+    ]);
+
+    $this->actingAs($this->admin)->post(route('mediciones.cancelar', $this->pendiente))->assertSessionHasNoErrors();
+
+    expect($this->pendiente->fresh())
+        ->estado->toBe('cancelada')
+        ->estado_al_cancelar->toBe('vencida')
+        ->cancelada_por->toBe($this->admin->id);
+
+    // La empresa la ve, sin nombres de quién la asignó o la canceló.
+    $this->actingAs($this->laura)->get(route('historial.mio'))
+        ->assertInertia(fn (Assert $p) => $p
+            ->has('vencidas', 1)
+            ->where('vencidas.0.numero', 3)
+            ->where('vencidas.0.vence', today()->subDays(3)->toDateString())
+            ->where('vencidas.0.respondidas', 1)
+            ->where('vencidas.0.ultimo_aviso', now()->subDays(10)->setTimezone(Plazos::zona($this->empresa->id))->toDateString())
+            ->where('vencidas.0.asignada_por', null)
+            ->where('vencidas.0.cancelada_por', null)
+            // Las terminadas y sus cifras no cambian.
+            ->has('mediciones', 2)
+            ->where('resumen.cantidad', 2));
+
+    // El equipo de NuevasTIC (A3.4) ve también quién la asignó y quién la canceló.
+    $this->actingAs($this->admin)->get(route('empresas.historial', $this->empresa))
+        ->assertInertia(fn (Assert $p) => $p
+            ->has('vencidas', 1)
+            ->where('vencidas.0.asignada_por', $this->admin->name)
+            ->where('vencidas.0.cancelada_por', $this->admin->name));
+
+    // También en la tabla de la ficha A3.1.
+    $this->actingAs($this->admin)->get(route('empresas.ver', $this->empresa))
+        ->assertInertia(fn (Assert $p) => $p->component('empresas/Ver')
+            ->has('vencidas', 1)
+            ->where('vencidas.0.numero', 3)
+            ->where('vencidas.0.cancelada_por', $this->admin->name));
+});
+
+it('no salen las canceladas antes de vencer; sí las antiguas cuya fecha límite ya había pasado', function () {
+    // Cancelada a tiempo (la reemplazaron antes de su fecha límite): no es vencida.
+    $this->pendiente->forceFill(['estado' => 'cancelada', 'cancelada_en' => now(), 'estado_al_cancelar' => 'en_curso'])->save();
+    // Cancelada antes de guardar el estado previo, pero ya había vencido: sí.
+    $antigua = Medicion::factory()->create([
+        'empresa_id' => $this->empresa->id, 'version_diagnostico_id' => $this->pendiente->version_diagnostico_id,
+        'numero' => 5, 'estado' => 'cancelada', 'fecha_limite' => today()->subDays(20), 'cancelada_en' => now()->subDays(15),
+    ]);
+
+    $this->actingAs($this->admin)->get(route('empresas.historial', $this->empresa))
+        ->assertInertia(fn (Assert $p) => $p
+            ->has('vencidas', 1)
+            ->where('vencidas.0.id', $antigua->id));
+});
+
+it('reemplazar una vencida la deja en el historial con quién la reemplazó', function () {
+    $this->pendiente->forceFill(['estado' => 'vencida', 'fecha_limite' => today()->subDay()])->save();
+    $diagnostico = $this->pendiente->version->diagnostico;
+
+    app(AsignarMedicion::class)
+        ->asignar($this->empresa, $diagnostico, today()->addDays(10)->toDateString(), null, false, $this->admin, reemplazar: true);
+
+    expect($this->pendiente->fresh())
+        ->estado_al_cancelar->toBe('vencida')
+        ->cancelada_por->toBe($this->admin->id);
+    expect(DatosHistorial::vencidas($this->empresa))->toHaveCount(1);
 });

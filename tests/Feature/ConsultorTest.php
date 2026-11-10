@@ -377,3 +377,26 @@ it('al dejar de ser Consultor pierde sus empresas', function () {
 
     expect($this->consultor->fresh()->empresasAsesoradas()->count())->toBe(0);
 });
+
+it('la empresa y su colaborador ven en su inicio el consultor que los acompaña', function () {
+    $this->consultor->forceFill(['cargo' => 'Asesora de marketing', 'telefono' => '+573001234567'])->save();
+    $inactivo = User::factory()->create(['name' => 'Bruno Inactivo', 'activo' => false])->assignRole('Consultor');
+    $inactivo->empresasAsesoradas()->attach($this->suya->id);
+    $laura = User::factory()->create(['empresa_id' => $this->suya->id])->assignRole('Empresa');
+    $colaborador = User::factory()->create(['empresa_id' => $this->suya->id])->assignRole('Colaborador');
+    $deOtra = User::factory()->create(['empresa_id' => $this->otra->id])->assignRole('Empresa');
+
+    foreach ([$laura, $colaborador] as $cuenta) {
+        $this->actingAs($cuenta)->get(route('inicio.empresa'))
+            ->assertInertia(fn (Assert $p) => $p
+                ->has('consultores', 1)
+                ->where('consultores.0.nombre', 'Valeria Consultora')
+                ->where('consultores.0.cargo', 'Asesora de marketing')
+                ->where('consultores.0.email', $this->consultor->email)
+                ->where('consultores.0.telefono', '+573001234567'));
+    }
+
+    // Una empresa sin consultor no ve a nadie.
+    $this->actingAs($deOtra)->get(route('inicio.empresa'))
+        ->assertInertia(fn (Assert $p) => $p->has('consultores', 0));
+});
