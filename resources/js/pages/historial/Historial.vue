@@ -12,10 +12,16 @@
  *   medición (CA-001, CA-002).
  * - Las mediciones terminadas con fecha, puntaje, nivel y variación (RN-020)
  *   y "Ver resultado", "Ver mis respuestas" y "Ver informe PDF".
+ * - En la misma lista, por fecha, las vencidas que se cancelaron: cuándo se
+ *   asignó, cuándo venció, cuándo se canceló, cuántas preguntas respondió y
+ *   el último correo de aviso. Sirven de prueba si la empresa dice que no le
+ *   llegó el diagnóstico (10 de noviembre de 2026). En A3.4 dicen además
+ *   quién la asignó y quién la canceló.
  */
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
     ArrowLeft,
+    CalendarX2,
     ChartLine,
     ClipboardCheck,
     ClipboardList,
@@ -44,7 +50,8 @@ import { useFilasQueCaben, usePaginacion } from '@/lib/paginacion';
 import { rutas } from '@/lib/rutas';
 import { cn } from '@/lib/utils';
 import { empresa as inicioEmpresa } from '@/routes/inicio';
-import type { Historial } from '@/types/historial';
+import type { MedicionFicha } from '@/types/empresas';
+import type { Historial, MedicionVencida } from '@/types/historial';
 
 const props = defineProps<
     Historial & {
@@ -102,8 +109,33 @@ const { porPagina, ajustar } = useFilasQueCaben(contenedor, {
     fila: '[data-fila]',
     encabezado: null,
 });
+/** Terminadas y vencidas canceladas juntas, de la más reciente a la primera. */
+type Fila =
+    | { tipo: 'terminada'; clave: string; fecha: string; m: MedicionFicha }
+    | { tipo: 'vencida'; clave: string; fecha: string; v: MedicionVencida };
+
+const filas = computed<Fila[]>(() =>
+    [
+        ...props.mediciones.map((m): Fila => ({
+            tipo: 'terminada',
+            clave: `t${m.id}`,
+            fecha: m.terminada ?? m.asignada ?? '',
+            m,
+        })),
+        ...(props.vencidas ?? []).map((v): Fila => ({
+            tipo: 'vencida',
+            clave: `v${v.id}`,
+            fecha: v.cancelada ?? v.vence ?? '',
+            v,
+        })),
+    ].sort((a, b) => b.fecha.localeCompare(a.fecha)),
+);
+
+/** "Más reciente" va en la última terminada, no en una vencida. */
+const masReciente = computed(() => props.mediciones.at(0)?.id ?? null);
+
 const { pagina, paginas, total, desde, visibles } = usePaginacion(
-    () => props.mediciones,
+    () => filas.value,
     porPagina,
 );
 watch(visibles, ajustar);
@@ -442,7 +474,9 @@ const modalCancelar = ref(false);
                             {{
                                 vistaDerecha === 'categorias'
                                     ? 'Por categoría'
-                                    : 'Mediciones terminadas'
+                                    : vencidas?.length
+                                      ? 'Mediciones'
+                                      : 'Mediciones terminadas'
                             }}
                         </h2>
                         <SelectorCompacto
@@ -456,7 +490,9 @@ const modalCancelar = ref(false);
                         {{
                             vistaDerecha === 'categorias'
                                 ? 'De la primera a la última medición, de la que más bajó a la que más subió. Toca una para verla en la gráfica.'
-                                : 'De la más reciente a la primera. La variación es frente a la medición anterior.'
+                                : vencidas?.length
+                                  ? 'De la más reciente a la primera, también las que vencieron sin responderse. La variación es frente a la medición terminada anterior.'
+                                  : 'De la más reciente a la primera. La variación es frente a la medición anterior.'
                         }}
                     </p>
                 </div>
@@ -567,48 +603,132 @@ const modalCancelar = ref(false);
                     ref="contenedor"
                     class="px-3 lg:min-h-0 lg:flex-1 lg:overflow-hidden"
                 >
-                    <ol v-if="mediciones.length" class="flex flex-col">
+                    <ol v-if="filas.length" class="flex flex-col">
                         <li
-                            v-for="(m, i) in visibles"
-                            :key="m.id"
+                            v-for="fila in visibles"
+                            :key="fila.clave"
                             data-fila
                             class="border-b border-linea py-1 last:border-b-0"
                         >
+                            <!-- Vencida y cancelada: prueba de que se asignó -->
                             <div
+                                v-if="fila.tipo === 'vencida'"
+                                class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 rounded-xl px-2 py-2.5"
+                            >
+                                <span
+                                    class="flex size-[52px] items-center justify-center rounded-full bg-lienzo-oscuro text-tinta-suave"
+                                    aria-hidden="true"
+                                >
+                                    <CalendarX2 class="size-6" />
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p
+                                        class="flex flex-wrap items-center gap-2"
+                                    >
+                                        <strong
+                                            >Medición
+                                            {{ fila.v.numero }}</strong
+                                        >
+                                        <span
+                                            class="rounded-full bg-aviso-suave px-2 py-0.5 text-xs font-medium text-aviso"
+                                            >Vencida sin responder ·
+                                            cancelada</span
+                                        >
+                                        <span
+                                            v-if="interno && fila.v.diagnostico"
+                                            class="text-xs text-tinta-suave"
+                                            >{{ fila.v.diagnostico }} v{{
+                                                fila.v.version
+                                            }}</span
+                                        >
+                                    </p>
+                                    <p class="mt-0.5 text-xs text-tinta-suave">
+                                        Asignada el
+                                        {{ fecha(fila.v.asignada) }} · venció el
+                                        {{ fecha(fila.v.vence) }} · cancelada el
+                                        {{ fecha(fila.v.cancelada) }}
+                                    </p>
+                                    <p class="text-xs text-tinta-suave">
+                                        {{
+                                            interno
+                                                ? `Respondió ${fila.v.respondidas} de ${fila.v.preguntas} preguntas`
+                                                : `Respondiste ${fila.v.respondidas} de ${fila.v.preguntas} preguntas`
+                                        }}
+                                        ·
+                                        {{
+                                            fila.v.ultimo_aviso
+                                                ? `aviso por correo el ${fecha(fila.v.ultimo_aviso)}`
+                                                : 'sin aviso por correo'
+                                        }}
+                                        <template
+                                            v-if="
+                                                interno &&
+                                                (fila.v.asignada_por ||
+                                                    fila.v.cancelada_por)
+                                            "
+                                        >
+                                            ·
+                                            <template v-if="fila.v.asignada_por"
+                                                >asignó
+                                                {{
+                                                    fila.v.asignada_por
+                                                }}</template
+                                            ><template
+                                                v-if="
+                                                    fila.v.asignada_por &&
+                                                    fila.v.cancelada_por
+                                                "
+                                                >, </template
+                                            ><template
+                                                v-if="fila.v.cancelada_por"
+                                                >canceló
+                                                {{
+                                                    fila.v.cancelada_por
+                                                }}</template
+                                            >
+                                        </template>
+                                    </p>
+                                </div>
+                            </div>
+                            <div
+                                v-else
                                 class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-xl px-2 py-2.5 hover:bg-lienzo sm:grid-cols-[auto_minmax(0,1fr)_auto]"
                             >
                                 <AnilloPuntaje
-                                    v-if="m.nivel"
-                                    :puntaje="m.puntaje ?? 0"
-                                    :nivel="m.nivel"
+                                    v-if="fila.m.nivel"
+                                    :puntaje="fila.m.puntaje ?? 0"
+                                    :nivel="fila.m.nivel"
                                     :tamano="52"
                                 />
                                 <div class="min-w-0 flex-1">
                                     <p
                                         class="flex flex-wrap items-center gap-2"
                                     >
-                                        <strong>Medición {{ m.numero }}</strong>
+                                        <strong
+                                            >Medición
+                                            {{ fila.m.numero }}</strong
+                                        >
                                         <span
-                                            v-if="pagina === 1 && i === 0"
+                                            v-if="fila.m.id === masReciente"
                                             class="rounded-full bg-marca px-2 py-0.5 text-[11px] font-medium text-white"
                                             >Más reciente</span
                                         >
                                         <span
-                                            v-if="m.variacion !== null"
+                                            v-if="fila.m.variacion !== null"
                                             :class="[
                                                 'rounded-full px-2 py-0.5 text-xs font-medium',
-                                                m.variacion > 0
+                                                fila.m.variacion > 0
                                                     ? 'bg-nivel-sigue-suave text-nivel-sigue-texto'
-                                                    : m.variacion < 0
+                                                    : fila.m.variacion < 0
                                                       ? 'bg-nivel-critico-suave text-nivel-critico-texto'
                                                       : 'bg-lienzo-oscuro text-tinta-suave',
                                             ]"
                                         >
                                             {{
-                                                m.variacion > 0
-                                                    ? `▲ +${m.variacion}`
-                                                    : m.variacion < 0
-                                                      ? `▼ ${m.variacion}`
+                                                fila.m.variacion > 0
+                                                    ? `▲ +${fila.m.variacion}`
+                                                    : fila.m.variacion < 0
+                                                      ? `▼ ${fila.m.variacion}`
                                                       : '= 0'
                                             }}
                                         </span>
@@ -621,10 +741,12 @@ const modalCancelar = ref(false);
                                     <p
                                         class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-tinta-suave"
                                     >
-                                        <span>{{ fecha(m.terminada) }}</span>
+                                        <span>{{
+                                            fecha(fila.m.terminada)
+                                        }}</span>
                                         <EtiquetaNivel
-                                            v-if="m.nivel"
-                                            :nivel="m.nivel"
+                                            v-if="fila.m.nivel"
+                                            :nivel="fila.m.nivel"
                                         />
                                     </p>
                                 </div>
@@ -634,13 +756,15 @@ const modalCancelar = ref(false);
                                     <Boton
                                         variante="secundario"
                                         class="flex-1 sm:flex-none"
-                                        :href="rutas.resultados.ver(m.id)"
+                                        :href="rutas.resultados.ver(fila.m.id)"
                                     >
                                         Ver resultado
                                     </Boton>
                                     <Link
                                         :href="
-                                            rutas.resultados.respuestas(m.id)
+                                            rutas.resultados.respuestas(
+                                                fila.m.id,
+                                            )
                                         "
                                         class="flex size-10 items-center justify-center rounded-md text-tinta-suave hover:bg-lienzo-oscuro hover:text-marca"
                                         :title="
@@ -658,7 +782,7 @@ const modalCancelar = ref(false);
                                     </Link>
                                     <a
                                         v-if="puede('resultados.pdf')"
-                                        :href="rutas.resultados.pdf(m.id)"
+                                        :href="rutas.resultados.pdf(fila.m.id)"
                                         class="flex size-10 items-center justify-center rounded-md text-tinta-suave hover:bg-lienzo-oscuro hover:text-marca"
                                         title="Ver informe PDF"
                                     >

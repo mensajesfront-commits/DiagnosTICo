@@ -21,6 +21,7 @@ export const rutas = {
                 ? `/diagnosticos/crear?sector=${sectorId}`
                 : '/diagnosticos/crear',
         guardar: () => '/diagnosticos',
+        revisarPlantilla: () => '/diagnosticos/plantilla/revisar',
         restaurar: (id: number) => `/diagnosticos/${id}/restaurar`,
         eliminarArchivado: (id: number) => `/diagnosticos/${id}/archivado`,
         editar: (id: number, parte?: number, pregunta?: number) =>
@@ -99,6 +100,7 @@ export const rutas = {
         actualizar: (id: number) => `/empresas/${id}`,
         desactivar: (id: number) => `/empresas/${id}/desactivar`,
         reactivar: (id: number) => `/empresas/${id}/reactivar`,
+        eliminar: (id: number) => `/empresas/${id}`,
         cuentaPrincipal: (id: number) => `/empresas/${id}/cuenta-principal`,
         // HU-085 · Consultores de la empresa (RN-030).
         consultores: {

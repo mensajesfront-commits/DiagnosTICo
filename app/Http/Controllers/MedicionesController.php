@@ -139,10 +139,16 @@ class MedicionesController extends Controller
     }
 
     /** A3.1c · Cancelar la medición pendiente sin reemplazarla. */
-    public function cancelar(Medicion $medicion): RedirectResponse
+    public function cancelar(Request $request, Medicion $medicion): RedirectResponse
     {
         $this->soloPendiente($medicion);
-        $medicion->forceFill(['estado' => 'cancelada', 'cancelada_en' => now()])->save();
+        // Se guarda cómo estaba: una vencida cancelada sale en el historial (E8, A3.4).
+        $medicion->forceFill([
+            'estado' => 'cancelada',
+            'cancelada_en' => now(),
+            'estado_al_cancelar' => $medicion->estado,
+            'cancelada_por' => $request->user()?->id,
+        ])->save();
         // Cancelar la vencida también responde la solicitud de la empresa (HU-083).
         SolicitudMedicion::atender($medicion->empresa_id);
 

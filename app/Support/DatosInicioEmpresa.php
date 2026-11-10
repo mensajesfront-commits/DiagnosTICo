@@ -60,6 +60,19 @@ class DatosInicioEmpresa
             'mediciones' => $veResultados ? array_reverse($filas) : [],
             'areas' => $veResultados && $ultima ? self::areas($terminadas->last()) : [],
             'soporte' => config('diagnostico.soporte_email'),
+            // "Tu consultor" (pedido del 10 de noviembre de 2026): los consultores
+            // activos que acompañan a la empresa (RN-030), para escribirles.
+            'consultores' => $empresa->consultores()
+                ->where('activo', true)
+                ->orderBy('name')
+                ->get(['users.id', 'users.name', 'users.cargo', 'users.email', 'users.telefono'])
+                ->map(fn (User $c) => [
+                    'id' => $c->id,
+                    'nombre' => $c->name,
+                    'cargo' => $c->cargo,
+                    'email' => $c->email,
+                    'telefono' => $c->telefono,
+                ])->values()->all(),
         ];
     }
 

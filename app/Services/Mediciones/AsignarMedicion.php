@@ -61,7 +61,12 @@ class AsignarMedicion
             }
 
             if ($pendiente) {
-                $pendiente->forceFill(['estado' => 'cancelada', 'cancelada_en' => now()])->save();
+                $pendiente->forceFill([
+                    'estado' => 'cancelada',
+                    'cancelada_en' => now(),
+                    'estado_al_cancelar' => $pendiente->estado,
+                    'cancelada_por' => $por?->id,
+                ])->save();
             }
 
             $numero = $pendiente->numero

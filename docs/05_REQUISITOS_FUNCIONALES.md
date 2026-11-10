@@ -2481,6 +2481,14 @@ Da el cuestionario que responderán las empresas de un sector, en blanco o a par
 
 **Entonces** se avisa y no se crea.
 
+#### CA-005 — Pegar el contenido (agregado el 10 de noviembre de 2026)
+
+**Dado** que elijo «Pegar el contenido» y pego el diagnóstico escrito con la plantilla (categorías, importancia, preguntas, tipo, indicación, criterio y opciones con su puntaje),
+
+**Cuando** pulso «Revisar el contenido»,
+
+**Entonces** veo qué se entendió (categorías, preguntas y opciones), los errores que impiden crearlo y lo que faltaría para publicarlo, cada uno con su número de línea; sin errores, «Crear y abrir el editor» crea el borrador v1 ya lleno y lo puedo corregir en el editor.
+
 ### Reglas de negocio
 
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
@@ -2492,14 +2500,16 @@ Da el cuestionario que responderán las empresas de un sector, en blanco o a par
 - Nombre obligatorio.
 - Sector obligatorio.
 - La importancia de las categorías debe sumar 100% para poder publicar.
+- Al pegar (CA-005): las categorías deben existir en el catálogo y no repetirse; cada pregunta lleva tipo; las opciones van como «- puntaje | texto», con puntaje de 0 a 100 y máximo 10 por pregunta; «NINGUNA» solo en selección múltiple; los mismos límites de texto del editor (RN-013). La importancia es opcional: si ninguna categoría la trae, se reparte en partes iguales.
 
 ### Casos alternativos
 
-- Empezar en blanco o copiar otro diagnóstico.
+- Empezar en blanco, copiar otro diagnóstico o pegar su contenido en la plantilla (CA-005).
 
 ### Casos de error
 
 - Falta el nombre o el sector: se avisa y no se crea.
+- El texto pegado tiene errores: no se crea nada y se dicen los errores con su línea.
 
 ### Dependencias
 
@@ -4214,6 +4224,14 @@ Permite impedir el acceso de una empresa sin perder su información.
 
 **Entonces** la empresa puede volver a entrar.
 
+#### CA-007 — Eliminar una empresa desactivada (agregado el 10 de noviembre de 2026)
+
+**Dado** que la cuenta está desactivada, la empresa no se va a usar más y tengo el permiso de gestionar usuarios,
+
+**Cuando** pulso «Eliminar empresa» en Datos de la cuenta y escribo a mano su nombre exacto,
+
+**Entonces** la empresa y todas sus cuentas salen de las listas y nadie entra. Se recuperan juntas durante 90 días desde Usuarios y roles, recuperando la cuenta principal (DEC-017); después se borran para siempre y sus mediciones terminadas quedan sin nombre. Una empresa activa no se elimina.
+
 ### Reglas de negocio
 
 - RN-004 — Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar.
@@ -4664,6 +4682,14 @@ Permite ver cómo ha evolucionado una empresa a lo largo de sus mediciones.
 **Cuando** elijo reasignarla,
 
 **Entonces** se abre la asignación de medición.
+
+#### CA-005 — Vencidas canceladas (agregado el 10 de noviembre de 2026)
+
+**Dado** que la empresa tuvo una medición que venció sin enviarse y se canceló o se reemplazó,
+
+**Cuando** abro su historial,
+
+**Entonces** la veo como en E8 (HU-067 CA-006) y además quién la asignó y quién la canceló, para responder si la empresa dice que nunca recibió el diagnóstico. También sale en la tabla de mediciones de la ficha (A3.1), con el detalle al pasar el cursor.
 
 ### Reglas de negocio
 
@@ -8008,6 +8034,14 @@ Permite ver todas las mediciones y la evolución para saber si la empresa ha mej
 
 **Entonces** no aparece “Iniciar diagnóstico”.
 
+#### CA-006 — Vencidas canceladas (agregado el 10 de noviembre de 2026)
+
+**Dado** que se me asignó una medición, venció sin que la enviara y NuevasTIC la canceló o la reemplazó,
+
+**Cuando** abro “Mi historial”,
+
+**Entonces** la veo en la lista, por fecha, marcada «Vencida sin responder · cancelada», con la fecha en que se asignó, la fecha límite, la fecha en que se canceló, cuántas preguntas respondí y la fecha del último aviso por correo. Sirve de prueba de que el diagnóstico sí se entregó.
+
 ### Reglas de negocio
 
 - RN-019 — Niveles fijos: Crítico 0–29, Se puede mejorar 30–59, Vas en buen camino 60–79, Sigue así 80–100.
@@ -9874,6 +9908,14 @@ Agregada el 3 de noviembre de 2026: en la presentación se decidió incluir el r
 4. un resultado publicado en los últimos 7 días.
 
 Cada aviso abre el resultado ("bajó" y "nuevo") o la ficha (lo pendiente). Se ven 4 y "Ver los N avisos" muestra el resto. Si no hay avisos, la franja no aparece. No se usa "desde tu último acceso" porque el último acceso se actualiza al entrar.
+
+#### CA-006 — La empresa ve a su consultor (agregado el 10 de noviembre de 2026)
+
+**Dado** que el Administrador me vinculó a una empresa y mi cuenta está activa,
+
+**Cuando** la empresa o su colaborador abren su inicio (E1),
+
+**Entonces** ven la tarjeta «Tu consultor» con mi nombre, mi cargo, mi correo y mi teléfono (si lo tengo en Mi perfil), para escribirme. Una empresa sin consultor no ve la tarjeta.
 
 ### Reglas de negocio
 

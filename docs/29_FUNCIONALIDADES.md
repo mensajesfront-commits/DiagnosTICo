@@ -46,7 +46,7 @@
   - crear, editar, reasignar empresas, desactivar y eliminar (HU-012 a HU-016, RN-008).
 - **Catálogo de categorías:** crear, editar, archivar, restaurar y eliminar (HU-017 a HU-019, RN-009).
 - **Crear y mantener diagnósticos:**
-  - crear en blanco o copiando otro (HU-020);
+  - crear en blanco, copiando otro o pegando su contenido en la plantilla (HU-020);
   - duplicar a otro sector (HU-021);
   - archivar y eliminar, también varios a la vez (HU-022).
 - **Editor (A2.1):**

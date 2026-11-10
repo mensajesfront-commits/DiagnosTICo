@@ -11,6 +11,69 @@ La versión de entrega es `v1.0.0` (T-152); hasta ella, los cambios se agrupan p
 
 Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` para una corrección, `v1.2.0` para algo nuevo).
 
+## Después de v1.1.0 · mejoras pedidas por el equipo (10 de noviembre de 2026, en curso)
+
+### Agregado · A2.5 «Pegar el contenido» (HU-020 CA-005)
+
+- Tercera forma de crear un diagnóstico, junto a «En blanco» y «Copiar uno publicado»: se pega todo el diagnóstico escrito en una plantilla de texto y el borrador se crea lleno.
+- **Plantilla:**
+  - `CATEGORÍA:` con el nombre del catálogo e `IMPORTANCIA:` opcional; sin importancia en ninguna categoría, se reparte en partes iguales.
+  - Cada pregunta con `PREGUNTA:`, `TIPO:` (Abierta, Opción única o Selección múltiple), `OBLIGATORIA:`, `INDICACIÓN:` y, en las abiertas, `CRITERIO:`.
+  - Las opciones van debajo de `OPCIONES:` como `- puntaje | texto`, con `OTRO`, `NINGUNA` y `TEN EN CUENTA: …`.
+  - Las etiquetas no distinguen mayúsculas ni tildes, y un texto puede ocupar varias líneas.
+- **Revisar antes de crear:** `POST /diagnosticos/plantilla/revisar` lee el texto sin guardar nada y devuelve:
+  - lo que entendió;
+  - los errores que impiden crearlo (categoría fuera del catálogo, tipo desconocido, puntaje fuera de 0–100, límites del editor);
+  - los avisos de lo que falta para publicar (RN-012).
+  Cada uno lleva su número de línea.
+- **Código:**
+  - `App\Services\Diagnosticos\LectorPlantilla` convierte el texto en el mismo contenido que usa «Copiar» (`ContenidoDiagnostico::aplicar`).
+  - Los avisos salen de `EstadoDiagnostico`, igual que en el editor.
+- Pruebas en `tests/Feature/PlantillaDiagnosticoTest.php` (9). Docs 05, 14, 15, 18, 19, 29 y 31.
+- No se tocó nada del correo.
+
+### Corregido · la espera del análisis (E4) ya no se ve congelada (ISSUE-014)
+
+- En los equipos que piden reducir el movimiento, la animación de E4 se apagaba del todo y la pantalla parecía quieta (en el servidor se veía así; en localhost, desde otro equipo, se movía).
+- Ahora, con ese ajuste, el halo late suave (`pulse`) y el arco gira más despacio. Los indicadores de carga de E4, E1 y la barra de guardado giran siempre. Sin el ajuste, todo queda igual que antes.
+
+### Agregado · la empresa ve a su consultor (HU-086 CA-006)
+
+- Al final del inicio de la empresa (E1) sale la tarjeta «Tu consultor» (o «Tus consultores») con el nombre, el cargo, el correo y el teléfono de cada consultor activo que la acompaña. La ven la cuenta principal y sus colaboradores.
+- Los datos salen de la cuenta del consultor (Mi perfil); el teléfono solo si lo tiene. Un consultor desactivado o eliminado no aparece, y una empresa sin consultor no ve la tarjeta.
+- Código: `DatosInicioEmpresa` (`consultores`) y `pages/inicio/Empresa.vue`. Prueba en `ConsultorTest` (1). Docs 05, 07, 14, 19 y 31.
+
+### Agregado · eliminar una empresa desactivada (HU-035 CA-007)
+
+- En A3.1 → Datos de la cuenta → Acciones, una empresa **desactivada** tiene «Eliminar empresa». Solo con el permiso `usuarios.gestionar` (el Administrador).
+- Se confirma escribiendo a mano el nombre exacto de la empresa.
+- Es la misma eliminación de DEC-017:
+  - la empresa y todas sus cuentas salen de las listas y nadie entra;
+  - se recuperan juntas durante 90 días desde A5, recuperando la cuenta principal;
+  - después, `cuentas:purgar` las borra para siempre y deja sus mediciones terminadas sin nombre (`Anonimizar`).
+- Una empresa activa no se elimina: primero hay que desactivarla. Si no tiene cuenta principal, la ventana avisa que no se podrá recuperar.
+- Código: `DELETE /empresas/{empresa}` (`EmpresasController::eliminar`) y `components/empresas/ModalEliminarEmpresa.vue`. Pruebas en `EmpresasTest` (3). Docs 05, 14, 15, 17, 19, 22 y 31.
+
+### Agregado · las vencidas canceladas salen en el historial (HU-067 CA-006, HU-039 CA-005)
+
+- Antes, una medición cancelada desaparecía del historial. Ahora, si había vencido sin enviarse, sale en E8 y A3.4 entre las terminadas, por fecha, como «Vencida sin responder · cancelada». Sirve de prueba si la empresa dice que no recibió el diagnóstico.
+- Muestra cuándo se asignó, la fecha límite, cuándo se canceló, cuántas preguntas se respondieron y el último correo de aviso. En A3.4, además, quién la asignó y quién la canceló.
+- También en la tabla de mediciones de la ficha A3.1: «Venció 4 nov», «Vencida · cancelada 10 nov» y «Respondió 1 de 13». Al pasar el cursor sobre la fila, las fechas, el último aviso y quién la asignó y la canceló.
+- **Base de datos:** migración `2026_11_10_000001`, con dos columnas nuevas en `mediciones`:
+  - `estado_al_cancelar`, que guardan «Cancelar medición» y «Reemplazar»;
+  - `cancelada_por`.
+  Las canceladas antes de esta migración cuentan como vencidas si su fecha límite ya había pasado ese día.
+- Las canceladas antes de vencer no salen. Las cifras de arriba y la gráfica siguen contando solo las terminadas.
+- Código: `DatosHistorial::vencidas`. Pruebas en `HistorialTest` (3). Docs 05, 12, 14, 19 y 31.
+- **Al actualizar el servidor:** `./deploy-production.sh --migrate`, porque hay una migración nueva.
+
+### Corregido · la IA y las abiertas opcionales (ISSUE-013)
+
+- El análisis de una categoría fallaba cuando la empresa respondía una pregunta abierta **opcional**. La IA, siguiendo el criterio «No se califica», devolvía puntaje `null` y el sistema rechazaba la respuesta y reintentaba hasta fallar.
+- Ahora a la opcional se le pide no calificarla (`ArmadorPrompt::preguntas`) y `AnalizadorDeCategoria::validar` la acepta sin puntaje; la obligatoria sigue necesitando su puntaje.
+- El texto de fábrica de la Tarea (paso 2) también lo dice. Si en A4 se guardaron instrucciones generales propias, conservan su texto, pero la corrección funciona igual, porque va en cada pregunta y en la validación.
+- Pruebas nuevas en `ResultadosTest` (2).
+
 ## v1.1.0 · despliegue en el servidor (6 de noviembre de 2026)
 
 - **Etiqueta `v1.1.0` sobre `main`** (commit `c419a43`, después de los PR #16 a #19). La crea el equipo en GitHub (Releases → *Draft a new release*). `v1.0.0` no se mueve: sigue marcando lo entregado el 5 de noviembre.

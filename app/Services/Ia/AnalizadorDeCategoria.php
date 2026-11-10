@@ -42,7 +42,7 @@ class AnalizadorDeCategoria implements Analizador
                             'id' => ['type' => 'string'],
                             'puntaje' => [
                                 'type' => ['integer', 'null'],
-                                'description' => 'Obligatorio en las preguntas de tipo "abierta": un entero de 0 a 100. Null en las demás.',
+                                'description' => 'Obligatorio en las preguntas de tipo "abierta": un entero de 0 a 100. Null en las demás y en las opcionales (las que traen "dato_extra").',
                             ],
                             'observacion' => ['type' => 'string'],
                         ],
@@ -183,8 +183,12 @@ class AnalizadorDeCategoria implements Analizador
             }
 
             $puntaje = null;
+            // Una opcional respondida es un dato extra y no cuenta en el puntaje
+            // (PublicarResultado::calcular la deja en null): si la IA no la
+            // califica, que es lo correcto, la respuesta sigue siendo válida.
+            $opcional = isset($pregunta['dato_extra']);
 
-            if ($pregunta['tipo'] === 'abierta') {
+            if ($pregunta['tipo'] === 'abierta' && ! $opcional) {
                 $valor = $analisis['puntaje'] ?? null;
 
                 // Algunos modelos devuelven 45.0 o "45": se aceptan si son un número.

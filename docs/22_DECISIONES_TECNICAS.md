@@ -190,6 +190,7 @@ Cada decisión registra qué se decidió, por qué y qué se descartó. Si una d
   - La cuenta eliminada **sale de la vista** y nadie puede entrar con ella, pero **sigue en la base de datos 90 días** (`deleted_at`). En ese tiempo el Administrador la recupera desde el filtro Estado «Eliminadas» → "Recuperar". Si la persona intenta entrar con la contraseña correcta, ve hasta qué fecha puede pedir que la recuperen.
   - Pasados los 90 días, la tarea diaria `cuentas:purgar` (03:10) la **borra para siempre**: la fila, su rol, sus sesiones, su foto y el logo de la empresa.
   - Si es la **cuenta principal** de una empresa, se eliminan también la empresa y sus colaboradores, y se recuperan juntos. Un colaborador eliminado con su empresa no se recupera solo.
+  - **Desde la ficha (10 de noviembre de 2026):** una empresa **desactivada** también se elimina en A3.1 → Datos de la cuenta → «Eliminar empresa», escribiendo su nombre (permiso `usuarios.gestionar`). Es lo mismo: la empresa y todas sus cuentas con la misma hora, recuperables juntas desde A5 recuperando la cuenta principal. Si la empresa no tiene cuenta principal, la ventana avisa que no se podrá recuperar.
   - No se puede eliminar la propia cuenta ni el **último Administrador**.
   - En el log queda una constancia con los id (cuenta, empresa y quién la eliminó), sin datos personales.
 - **Por qué:** lo pidió el equipo (8 de octubre de 2026): limpiar cuentas y atender solicitudes de borrado de datos (Ley 1581 de 2012), dando 90 días por si la empresa se arrepiente.
