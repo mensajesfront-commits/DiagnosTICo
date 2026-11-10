@@ -175,6 +175,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // HU-085 · Consultores de una empresa (A3.1, RN-030).
         Route::post('empresas/{empresa}/consultores', [ConsultoresController::class, 'vincular'])->name('empresas.consultores.vincular');
+        // A3.1 · Eliminar una empresa desactivada, recuperable 90 días (DEC-017).
+        Route::delete('empresas/{empresa}', [EmpresasController::class, 'eliminar'])->whereNumber('empresa')->name('empresas.eliminar');
         Route::delete('empresas/{empresa}/consultores/{consultor}', [ConsultoresController::class, 'quitar'])->name('empresas.consultores.quitar');
     });
 

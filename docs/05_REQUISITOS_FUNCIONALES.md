@@ -4224,6 +4224,14 @@ Permite impedir el acceso de una empresa sin perder su información.
 
 **Entonces** la empresa puede volver a entrar.
 
+#### CA-007 — Eliminar una empresa desactivada (agregado el 10 de noviembre de 2026)
+
+**Dado** que la cuenta está desactivada, la empresa no se va a usar más y tengo el permiso de gestionar usuarios,
+
+**Cuando** pulso «Eliminar empresa» en Datos de la cuenta y escribo a mano su nombre exacto,
+
+**Entonces** la empresa y todas sus cuentas salen de las listas y nadie entra. Se recuperan juntas durante 90 días desde Usuarios y roles, recuperando la cuenta principal (DEC-017); después se borran para siempre y sus mediciones terminadas quedan sin nombre. Una empresa activa no se elimina.
+
 ### Reglas de negocio
 
 - RN-004 — Una cuenta desactivada no puede iniciar sesión y su información no se borra; se puede reactivar.

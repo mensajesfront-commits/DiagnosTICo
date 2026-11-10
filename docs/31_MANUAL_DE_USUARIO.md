@@ -128,6 +128,7 @@ En **Usuarios y roles** (A5):
 - **Invitar** cuentas internas. Si eliges el rol **Consultor**, la ventana pasa a «Invitar consultor» y puedes marcar en «Empresas que acompaña» las empresas que va a ver.
 - **Desactivar o reactivar** una cuenta.
 - **Eliminar** una cuenta: se escribe el correo exacto para confirmar y se puede recuperar durante 90 días.
+- **Eliminar una empresa que no se va a usar más:** primero desactívala. Después, en su ficha (A3.1) → **Datos de la cuenta** → **Eliminar empresa**, escribe su nombre a mano y confirma. Se van la empresa, su cuenta principal y sus colaboradores. Si fue un error, recupérala antes de 90 días aquí, en Usuarios y roles: filtra por Estado «Eliminadas» y pulsa **Recuperar** en su cuenta principal. Pasados los 90 días se borra para siempre y sus mediciones terminadas quedan sin nombre, solo para las estadísticas.
 - **Cambiar el rol** de una cuenta. Si es la cuenta principal de una empresa, el sistema avisa qué pasa con sus colaboradores y su medición pendiente.
 - **Roles:** crear roles con los permisos que elijas. Los roles Administrador, Empresa, Colaborador y Consultor no se borran.
 - **Consultores de una empresa:** también se vinculan después, en la ficha de la empresa (A3.1), pestaña **Consultores** → «Vincular un consultor» → **Vincular**. Ahí mismo, **Quitar** lo desvincula (pide confirmación). Un consultor puede acompañar varias empresas.

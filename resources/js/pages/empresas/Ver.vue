@@ -23,7 +23,9 @@
  * Datos de la cuenta: datos de la empresa y de su usuario principal, el
  * estado de la cuenta con sus colaboradores en solo lectura (HU-033 CA-003)
  * y las acciones "Ver como esta empresa", "Asignar medición" y "Desactivar
- * cuenta" (A3.1f) o "Reactivar cuenta". No existe "restablecer contraseña"
+ * cuenta" (A3.1f) o "Reactivar cuenta". Una empresa desactivada se puede
+ * eliminar (solo con usuarios.gestionar, ModalEliminarEmpresa): se recupera
+ * 90 días desde A5. No existe "restablecer contraseña"
  * (RN-006). Si la empresa se quedó sin cuenta principal (pasó al equipo de
  * NuevasTIC), "Dar una cuenta principal" abre ModalCuentaPrincipal; sin ella
  * no se reactiva.
@@ -63,6 +65,7 @@ import ModalCancelarMedicion from '@/components/empresas/ModalCancelarMedicion.v
 import ModalCorreoAviso from '@/components/empresas/ModalCorreoAviso.vue';
 import ModalCuentaPrincipal from '@/components/empresas/ModalCuentaPrincipal.vue';
 import ModalDesactivarEmpresa from '@/components/empresas/ModalDesactivarEmpresa.vue';
+import ModalEliminarEmpresa from '@/components/empresas/ModalEliminarEmpresa.vue';
 import ModalReemplazarMedicion from '@/components/empresas/ModalReemplazarMedicion.vue';
 import PanelConsultores from '@/components/empresas/PanelConsultores.vue';
 import AnilloPuntaje from '@/components/graficas/AnilloPuntaje.vue';
@@ -218,6 +221,7 @@ watch(visibles, ajustar);
 const modalFecha = ref(false);
 const modalCancelar = ref(false);
 const modalDesactivar = ref(false);
+const modalEliminar = ref(false);
 const modalReemplazar = ref(false);
 const modalCorreo = ref(false);
 
@@ -1330,6 +1334,15 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                 Reactivar cuenta
                             </Boton>
                         </template>
+                        <Boton
+                            v-if="
+                                !empresa.activa && puede('usuarios.gestionar')
+                            "
+                            variante="peligro"
+                            @click="modalEliminar = true"
+                        >
+                            Eliminar empresa
+                        </Boton>
                     </div>
                     <p
                         v-if="puede('empresas.registrar')"
@@ -1340,7 +1353,9 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
                                 ? 'Desactivar impide entrar a la empresa; sus mediciones y resultados se conservan.'
                                 : !principal
                                   ? 'Para reactivarla, primero dale una cuenta principal.'
-                                  : 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar.'
+                                  : puede('usuarios.gestionar')
+                                    ? 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar. Si no se va a usar más, elimínala: se puede recuperar durante 90 días.'
+                                    : 'Al reactivarla, la empresa y sus colaboradores vuelven a entrar.'
                         }}
                     </p>
                 </section>
@@ -1387,6 +1402,14 @@ const enlace = 'text-marca underline underline-offset-2 hover:text-marca-hover';
         v-if="!principal"
         v-model:abierto="modalCuenta"
         :empresa="empresa"
+    />
+    <ModalEliminarEmpresa
+        v-if="!empresa.activa && puede('usuarios.gestionar')"
+        v-model:abierto="modalEliminar"
+        :empresa="empresa"
+        :principal="principal?.name ?? null"
+        :mediciones="terminadas"
+        :colaboradores="colaboradores.length"
     />
     <ModalDesactivarEmpresa
         v-model:abierto="modalDesactivar"

@@ -30,6 +30,7 @@ Son los **15 permisos en 6 bloques** del wireframe A5.2 (A5.1 "Crear rol" usa la
 | | `diagnosticos.publicar` | Publicar versiones | Publicar una versión (la ruta pide este permiso además de `diagnosticos.editar`) | A2.1c |
 | Empresas | `empresas.ver` | Ver empresas | Ver empresas y su ficha | A3, A3.1 |
 | | `empresas.registrar` | Registrar empresas | Registrar empresas, editar sus datos, desactivar y reactivar | A3.1d, A3.1f, A3.2 |
+| | `usuarios.gestionar` (también) | — | Eliminar una empresa desactivada, recuperable 90 días (HU-035 CA-007) | A3.1 |
 | | `mediciones.asignar` | Asignar mediciones | Asignar mediciones, dar nueva fecha, recordatorios, correo de aviso y solicitudes | A1b–A1d, A3.1b, A3.1e |
 | Mediciones y resultados | `diagnostico.responder` | Responder el diagnóstico | Responder, revisar y enviar el diagnóstico | E2–E5 |
 | | `resultados.ver` | Ver resultados y respuestas | Ver resultados, historial y respuestas | A3.3–A3.5, E6–E10 |

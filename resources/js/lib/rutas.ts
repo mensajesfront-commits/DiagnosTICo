@@ -100,6 +100,7 @@ export const rutas = {
         actualizar: (id: number) => `/empresas/${id}`,
         desactivar: (id: number) => `/empresas/${id}/desactivar`,
         reactivar: (id: number) => `/empresas/${id}/reactivar`,
+        eliminar: (id: number) => `/empresas/${id}`,
         cuentaPrincipal: (id: number) => `/empresas/${id}/cuenta-principal`,
         // HU-085 · Consultores de la empresa (RN-030).
         consultores: {

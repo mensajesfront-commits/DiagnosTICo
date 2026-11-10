@@ -222,6 +222,7 @@ Reglas que valida el servidor:
 | PUT | `/empresas/{empresa}` | `empresas.actualizar` | `empresas.registrar` | A3.1d · datos de la empresa y del usuario principal. Cambiar el sector no toca las mediciones; si cambia el correo, cierra sus sesiones |
 | POST | `/empresas/{empresa}/desactivar` | `empresas.desactivar` | `empresas.registrar` | A3.1f · empresa y cuenta principal inactivas, cierra las sesiones de todos sus usuarios; motivo y aviso (`EmpresaDesactivada`) opcionales |
 | POST | `/empresas/{empresa}/reactivar` | `empresas.reactivar` | `empresas.registrar` | Vuelve a activar empresa y cuenta principal |
+| DELETE | `/empresas/{empresa}` | `empresas.eliminar` | `usuarios.gestionar` | A3.1 · Solo desactivadas, con `confirmacion` = el nombre exacto. Marca eliminadas la empresa y todas sus cuentas con la misma hora (se recuperan juntas 90 días desde A5, DEC-017), cierra sus sesiones y borra sus enlaces de invitación; `cuentas:purgar` las borra después (HU-035 CA-007) |
 | GET | `/mediciones/asignar` | `mediciones.crear` | `mediciones.asignar` | A3.1b (`?empresa=`) |
 | POST | `/mediciones` | `mediciones.guardar` | `mediciones.asignar` | Asigna. Si hay una pendiente, sin `reemplazar` responde un error en `reemplazar`; con `reemplazar` la cancela y la nueva toma su número (A3.1c) |
 | POST | `/mediciones/{medicion}/cancelar` | `mediciones.cancelar` | `mediciones.asignar` | Cancela la pendiente (no enviada) |

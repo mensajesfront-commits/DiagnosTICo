@@ -43,7 +43,7 @@ En Sail se antepone `./vendor/bin/sail`.
 | `PlantillaDiagnosticoTest` | 9 | A2.5 · Pegar el contenido (HU-020 CA-005): la plantilla de ejemplo, tipos y marcas, importancia repartida, errores y avisos con su línea, crear el borrador lleno y permisos |
 | `EditorDiagnosticoTest` | 19 | A2.1: preguntas, opciones, "Ninguna", "Otro", orden, importancia, estado (RN-012) y publicar una versión congelada |
 | `ResultadoEjemploTest` | 7 | HU-030: mejor, medio y peor caso con el mismo cálculo, y sus dos PDF |
-| `EmpresasTest` | 14 | A3: lista, registrar con invitación, editar, desactivar y asignar (RN-014) |
+| `EmpresasTest` | 17 | A3: lista, registrar con invitación, editar, desactivar, eliminar una desactivada (recuperar y borrar a los 90 días) y asignar (RN-014) |
 | `PlazosTest` | 4 | RN-016: al menos 3 días para responder y fecha límite a las 11:59 p. m. de la empresa |
 | `CorreoAvisoTest` | 9 | A3.1e: plantilla, variables, correo de prueba y recordatorio (HU-008) |
 | `SolicitudesMedicionTest` | 7 | HU-083: aviso en A1, la lista, la ficha y Asignar; se atiende al asignar, dar nueva fecha o cancelar |

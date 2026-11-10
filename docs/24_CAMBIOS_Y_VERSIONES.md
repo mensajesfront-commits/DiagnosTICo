@@ -32,6 +32,17 @@ Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` p
 - Pruebas en `tests/Feature/PlantillaDiagnosticoTest.php` (9). Docs 05, 14, 15, 18, 19, 29 y 31.
 - No se tocó nada del correo.
 
+### Agregado · eliminar una empresa desactivada (HU-035 CA-007)
+
+- En A3.1 → Datos de la cuenta → Acciones, una empresa **desactivada** tiene «Eliminar empresa». Solo con el permiso `usuarios.gestionar` (el Administrador).
+- Se confirma escribiendo a mano el nombre exacto de la empresa.
+- Es la misma eliminación de DEC-017:
+  - la empresa y todas sus cuentas salen de las listas y nadie entra;
+  - se recuperan juntas durante 90 días desde A5, recuperando la cuenta principal;
+  - después, `cuentas:purgar` las borra para siempre y deja sus mediciones terminadas sin nombre (`Anonimizar`).
+- Una empresa activa no se elimina: primero hay que desactivarla. Si no tiene cuenta principal, la ventana avisa que no se podrá recuperar.
+- Código: `DELETE /empresas/{empresa}` (`EmpresasController::eliminar`) y `components/empresas/ModalEliminarEmpresa.vue`. Pruebas en `EmpresasTest` (3). Docs 05, 14, 15, 17, 19, 22 y 31.
+
 ### Agregado · las vencidas canceladas salen en el historial (HU-067 CA-006, HU-039 CA-005)
 
 - Antes, una medición cancelada desaparecía del historial. Ahora, si había vencido sin enviarse, sale en E8 y A3.4 entre las terminadas, por fecha, como «Vencida sin responder · cancelada». Sirve de prueba si la empresa dice que no recibió el diagnóstico.

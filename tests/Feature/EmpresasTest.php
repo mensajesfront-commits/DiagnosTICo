@@ -278,3 +278,60 @@ it('sin cuenta principal se pueden guardar los datos de la empresa sin los del u
 
     expect($empresa->fresh()->nombre)->toBe('La Esquina Gourmet');
 });
+
+// --- Eliminar una empresa desactivada (pedido del 10 de noviembre de 2026) ----------
+
+it('elimina una empresa desactivada con todas sus cuentas, recuperable 90 días', function () {
+    $empresa = empresaCon($this->sector);
+    $laura = User::where('email', 'laura@laesquina.co')->firstOrFail();
+    $colaborador = User::factory()->create(['empresa_id' => $empresa->id])->assignRole('Colaborador');
+    $this->actingAs($this->admin)->post(route('empresas.desactivar', $empresa))->assertSessionHasNoErrors();
+
+    // El nombre debe coincidir.
+    $this->actingAs($this->admin)->delete(route('empresas.eliminar', $empresa), ['confirmacion' => 'Otra empresa'])
+        ->assertSessionHasErrors(['confirmacion' => 'El nombre no coincide. Escríbelo exactamente como aparece.']);
+
+    $this->actingAs($this->admin)->delete(route('empresas.eliminar', $empresa), ['confirmacion' => 'Restaurante La Esquina'])
+        ->assertRedirect(route('empresas.index'));
+
+    $eliminada = Empresa::withTrashed()->findOrFail($empresa->id);
+    expect($eliminada->trashed())->toBeTrue()
+        ->and(Empresa::find($empresa->id))->toBeNull()
+        ->and($laura->fresh()->deleted_at?->toIso8601String())->toBe($eliminada->deleted_at?->toIso8601String())
+        ->and($colaborador->fresh()->trashed())->toBeTrue();
+
+    // Ya no sale en la lista ni se abre su ficha.
+    $this->actingAs($this->admin)->get(route('empresas.ver', $empresa->id))->assertNotFound();
+
+    // Se recupera junto con sus cuentas desde A5, recuperando la cuenta principal.
+    $this->actingAs($this->admin)->post(route('usuarios.recuperar', $laura->id))->assertSessionHasNoErrors();
+    expect(Empresa::find($empresa->id))->not->toBeNull()
+        ->and($colaborador->fresh()->trashed())->toBeFalse()
+        ->and(Empresa::find($empresa->id)->activa)->toBeFalse();
+});
+
+it('a los 90 días la tarea diaria borra para siempre la empresa eliminada', function () {
+    $empresa = empresaCon($this->sector);
+    $this->actingAs($this->admin)->post(route('empresas.desactivar', $empresa));
+    $this->actingAs($this->admin)->delete(route('empresas.eliminar', $empresa), ['confirmacion' => 'Restaurante La Esquina']);
+
+    $this->travel(91)->days();
+    $this->artisan('cuentas:purgar')->assertSuccessful();
+
+    expect(Empresa::withTrashed()->find($empresa->id))->toBeNull()
+        ->and(User::withTrashed()->where('email', 'laura@laesquina.co')->exists())->toBeFalse();
+});
+
+it('solo se elimina una empresa desactivada y solo quien gestiona usuarios', function () {
+    $empresa = empresaCon($this->sector);
+
+    $this->actingAs($this->admin)->delete(route('empresas.eliminar', $empresa), ['confirmacion' => 'Restaurante La Esquina'])
+        ->assertSessionHasErrors(['confirmacion' => 'Primero desactiva la empresa: solo se eliminan empresas desactivadas.']);
+    expect(Empresa::find($empresa->id))->not->toBeNull();
+
+    $this->actingAs($this->admin)->post(route('empresas.desactivar', $empresa));
+    $consultor = User::factory()->create()->assignRole('Consultor');
+    $this->actingAs($consultor)->delete(route('empresas.eliminar', $empresa), ['confirmacion' => 'Restaurante La Esquina'])
+        ->assertForbidden();
+    expect(Empresa::find($empresa->id))->not->toBeNull();
+});
