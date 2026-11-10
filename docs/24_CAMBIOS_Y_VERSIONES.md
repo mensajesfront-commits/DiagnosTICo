@@ -32,6 +32,11 @@ Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` p
 - Pruebas en `tests/Feature/PlantillaDiagnosticoTest.php` (9). Docs 05, 14, 15, 18, 19, 29 y 31.
 - No se tocó nada del correo.
 
+### Corregido · la espera del análisis (E4) ya no se ve congelada (ISSUE-014)
+
+- En los equipos que piden reducir el movimiento, la animación de E4 se apagaba del todo y la pantalla parecía quieta (en el servidor se veía así; en localhost, desde otro equipo, se movía).
+- Ahora, con ese ajuste, el halo late suave (`pulse`) y el arco gira más despacio. Los indicadores de carga de E4, E1 y la barra de guardado giran siempre. Sin el ajuste, todo queda igual que antes.
+
 ### Agregado · la empresa ve a su consultor (HU-086 CA-006)
 
 - Al final del inicio de la empresa (E1) sale la tarjeta «Tu consultor» (o «Tus consultores») con el nombre, el cargo, el correo y el teléfono de cada consultor activo que la acompaña. La ven la cuenta principal y sus colaboradores.

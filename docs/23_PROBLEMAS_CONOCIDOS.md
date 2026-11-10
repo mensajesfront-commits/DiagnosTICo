@@ -19,6 +19,7 @@ Problemas que aparecieron al instalar o al programar, con su solución. Formato:
 | ISSUE-011 | Docker Desktop en Windows no abre un puerto ("ports are not available") | Resuelto |
 | ISSUE-012 | `git pull` se detiene por cambios locales en `package-lock.json` | Resuelto |
 | ISSUE-013 | El análisis de la IA falla cuando la empresa responde una abierta opcional | Resuelto (10 de noviembre de 2026) |
+| ISSUE-014 | La pantalla de espera del análisis (E4) se ve quieta en algunos equipos | Resuelto (10 de noviembre de 2026) |
 
 ---
 
@@ -107,3 +108,9 @@ Problemas que aparecieron al instalar o al programar, con su solución. Formato:
 - **Síntoma:** en local y en el servidor, el análisis de una categoría se queda en reintentos y termina en «falló» cuando la empresa respondió una pregunta abierta opcional. En el registro: «La IA no calificó la pregunta abierta …».
 - **Causa:** a la IA se le pedía calificar toda abierta de 0 a 100, pero el criterio de la opcional dice «No se califica», y la IA devolvía puntaje `null`. `AnalizadorDeCategoria::validar` exigía un número en toda abierta y rechazaba la respuesta, aunque `PublicarResultado` no usa ese puntaje (la opcional no cuenta, decisión del 23 de octubre).
 - **Solución:** la abierta opcional (la que va con `dato_extra`) lleva la instrucción «No la califiques: devuelve puntaje null» y `validar` la acepta sin puntaje. La abierta obligatoria sigue necesitando su puntaje de 0 a 100. Pruebas en `ResultadosTest`.
+
+### ISSUE-014 — E4 se ve quieta en algunos equipos
+
+- **Síntoma:** en el servidor, la animación de «Estamos analizando» (el halo y el arco que gira) no se mueve; en localhost sí.
+- **Causa:** no era el despliegue: el CSS compilado trae las animaciones. Las clases `motion-safe:` las apagaban del todo cuando el equipo pide reducir el movimiento: Windows sin «Efectos de animación», Android con «Quitar animaciones» o ahorro de batería, «Reducir movimiento» en Mac o iPhone. Se comprobó con el navegador: con ese ajuste no corría ninguna animación.
+- **Solución:** con movimiento reducido, el halo solo cambia de intensidad (`pulse`) y el arco gira más despacio (6 s por vuelta). Los indicadores de carga (`LoaderCircle` en E4, en E1 y en la barra de guardado de E2) giran siempre, más despacio con ese ajuste.

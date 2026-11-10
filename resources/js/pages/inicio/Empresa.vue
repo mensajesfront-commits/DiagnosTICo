@@ -277,7 +277,7 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                     >
                         <LoaderCircle
                             v-if="p.estado === 'enviada'"
-                            class="size-12 motion-safe:animate-spin"
+                            class="size-12 animate-spin motion-reduce:[animation-duration:2s]"
                         />
                         <Rocket v-else class="size-12" />
                     </span>
