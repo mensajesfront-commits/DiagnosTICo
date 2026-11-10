@@ -391,8 +391,14 @@ class LectorPlantilla
         $partes = array_map('trim', explode('|', $linea));
         $puntaje = rtrim((string) array_shift($partes), ' pts.');
 
-        if (! ctype_digit($puntaje) || (int) $puntaje > 100) {
+        if (! ctype_digit($puntaje)) {
             $this->error($n, 'La opción debe empezar con su puntaje de 0 a 100 y una barra: «- 100 | Texto de la opción».');
+
+            return null;
+        }
+
+        if ((int) $puntaje > 100) {
+            $this->error($n, "El puntaje de la opción es {$puntaje}: debe ser de 0 a 100.");
 
             return null;
         }

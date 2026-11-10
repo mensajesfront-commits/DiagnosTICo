@@ -114,6 +114,7 @@ it('da cada error con su línea: categoría fuera del catálogo, tipo, puntaje y
         ->and(collect($lectura['errores'])->pluck('mensaje')->join(' '))
         ->toContain('Tipo «Verdadero o falso» no reconocido')
         ->toContain('puntaje de 0 a 100')
+        ->toContain('El puntaje de la opción es 150')
         ->toContain('no lleva opciones')
         // Con errores no se calculan los avisos de publicación.
         ->and($lectura['avisos'])->toBe([]);
