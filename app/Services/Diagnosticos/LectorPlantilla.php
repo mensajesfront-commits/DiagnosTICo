@@ -389,7 +389,7 @@ class LectorPlantilla
     private function opcion(string $linea, int $n): ?array
     {
         $partes = array_map('trim', explode('|', $linea));
-        $puntaje = rtrim(array_shift($partes) ?? '', ' pts.');
+        $puntaje = rtrim((string) array_shift($partes), ' pts.');
 
         if (! ctype_digit($puntaje) || (int) $puntaje > 100) {
             $this->error($n, 'La opción debe empezar con su puntaje de 0 a 100 y una barra: «- 100 | Texto de la opción».');

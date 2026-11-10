@@ -168,7 +168,7 @@ it('crea el borrador lleno desde el texto pegado y abre el editor', function () 
         ->and($multiple->opciones)->toHaveCount(5)
         ->and($multiple->opciones->firstWhere('texto', 'Otra')->con_texto)->toBeTrue()
         ->and($multiple->opciones->firstWhere('texto', 'Ninguna')->exclusiva)->toBeTrue()
-        ->and($diagnostico->preguntas()->where('tipo', 'abierta')->where('obligatoria', true)->value('criterio_ia'))->toContain("60: describe al cliente");
+        ->and($diagnostico->preguntas()->where('tipo', 'abierta')->where('obligatoria', true)->value('criterio_ia'))->toContain('60: describe al cliente');
 });
 
 it('con errores en el texto no crea nada y dice cuáles', function () {
