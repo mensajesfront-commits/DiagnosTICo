@@ -195,6 +195,8 @@ erDiagram
         text correo_cuerpo "null = el de la plantilla (A3.1e)"
         bigint reemplazada_por FK "medición nueva que la reemplazó (A3.1c)"
         timestamp cancelada_en
+        string estado_al_cancelar "vencida, no_iniciada o en_curso: cómo estaba al cancelarla"
+        bigint cancelada_por FK "quién la canceló o la reemplazó"
         bigint asignada_por FK
         timestamp enviada_en
         timestamp terminada_en
@@ -500,6 +502,8 @@ Las 10 categorías del wireframe las carga `CategoriasSeeder`.
 | `ultimo_aviso_en` | timestamp | No | `2026-10-13 15:20:00` | Último correo de aviso enviado: al asignar, "Recordatorio" o "Reenviar aviso" (HU-008 CA-003) |
 | `reemplazada_por` | bigint → `mediciones.id` | No | `null` | La medición nueva que la reemplazó (A3.1c) |
 | `cancelada_en` | timestamp | No | `null` | |
+| `estado_al_cancelar` | varchar(20) | No | `vencida` | Cómo estaba al cancelarla o reemplazarla. Si es `vencida` (o, en las canceladas antes del 10 de noviembre de 2026, si la fecha límite ya había pasado), sale en el historial E8 y A3.4 (HU-067 CA-006) |
+| `cancelada_por` | bigint → `users.id` | No | `1` | Quién la canceló o la reemplazó; se ve en A3.4. Migración `2026_11_10_000001` |
 | `asignada_por` | bigint → `users.id` | No | `1` | |
 | `enviada_en`, `terminada_en` | timestamp | No | `2026-10-25 16:40:00` | |
 | `created_at`, `updated_at` | timestamp | No | | |

@@ -34,7 +34,7 @@ class HistorialController extends Controller
         $yo = $request->user();
         abort_unless($yo->puedeVerEmpresa($empresa->id), 404);
 
-        $datos = DatosHistorial::de($empresa);
+        $datos = DatosHistorial::de($empresa, interno: true);
 
         return Inertia::render('historial/Historial', [
             ...$datos,

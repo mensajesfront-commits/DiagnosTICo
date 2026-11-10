@@ -105,7 +105,7 @@ En los tres casos la solicitud queda atendida.
 - Dos PDF (E10):
   - **Informe completo PDF**: el «Informe de Diagnóstico y Estrategia de Marketing Digital», con portada, ficha técnica, resumen ejecutivo, metodología, resultados, una página por categoría, DOFA, conclusiones, fichas de acción, cronograma, KPI y glosario. En este informe los niveles tienen nombres más formales: «Se puede mejorar» es «Requiere mejora», «Vas en buen camino» es «Desempeño satisfactorio» y «Sigue así» es «Desempeño óptimo».
   - **Resumen para la empresa**: el PDF corto que recibe la empresa. Sirve para entregárselo o revisarlo con ella.
-- **Ver historial completo** (A3.4).
+- **Ver historial completo** (A3.4). Ahí también salen las mediciones que vencieron sin responderse y se cancelaron, con las fechas, cuántas preguntas respondió la empresa, el último aviso por correo y quién la asignó y la canceló. Sirve para mostrarle a una empresa que sí recibió el diagnóstico.
 
 ## A.7 Configurar la IA
 
@@ -204,6 +204,8 @@ Además:
 ## B.5 Tu historial
 
 En **Mi historial** (E8) ves todas tus mediciones terminadas. Desde la segunda medición aparece la gráfica de evolución; con **Ver:** eliges el total o una categoría.
+
+Si una medición venció sin que la enviaras y NuevasTIC la canceló, también aparece en la lista, marcada «Vencida sin responder · cancelada», con sus fechas y cuántas preguntas alcanzaste a responder.
 
 ## B.6 Si tu medición venció
 

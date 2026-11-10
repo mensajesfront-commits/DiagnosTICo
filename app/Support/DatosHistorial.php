@@ -3,18 +3,24 @@
 namespace App\Support;
 
 use App\Models\Empresa;
+use App\Models\Medicion;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 /**
  * E8 · Mi historial (HU-067) y A3.4 · Historial de una empresa (HU-039): lo
  * mismo para la empresa y para el Administrador. Sale de la ficha de A3.1
  * (`DatosEmpresas::ficha`) para que los números coincidan.
  *
- * Solo lista las mediciones terminadas con resultado; la pendiente va aparte.
+ * Lista las mediciones terminadas con resultado; la pendiente va aparte.
+ * También las vencidas que se cancelaron (`vencidas`, pedido del 10 de
+ * noviembre de 2026): prueban que la empresa recibió el diagnóstico y no lo
+ * respondió a tiempo, por si dice que nunca le llegó.
  */
 class DatosHistorial
 {
     /** @return array<string, mixed> */
-    public static function de(Empresa $empresa): array
+    public static function de(Empresa $empresa, bool $interno = false): array
     {
         $ficha = DatosEmpresas::ficha($empresa);
         /** @var array<string, mixed>|null $pendiente */
@@ -33,10 +39,84 @@ class DatosHistorial
                 'id', 'numero', 'estado', 'avance', 'diagnostico', 'version', 'asignada', 'vence', 'fecha_minima', 'tiene_respuestas', 'solicitud',
             ])),
             'mediciones' => $terminadas,
+            'vencidas' => self::vencidas($empresa, $interno),
             'resumen' => self::resumen($terminadas),
             'evolucion' => $ficha['evolucion'],
             'evolucion_categorias' => $ficha['evolucion_categorias'],
         ];
+    }
+
+    /**
+     * Mediciones que vencieron sin enviarse y luego se cancelaron (o se
+     * reemplazaron por otra), de la más reciente a la más antigua. Cuentan
+     * como vencidas si lo estaban al cancelarlas (`estado_al_cancelar`) o, en
+     * las canceladas antes de guardar ese dato, si la fecha límite ya había
+     * pasado ese día en la hora de la empresa (como `Plazos::vencio`).
+     *
+     * Quién la asignó y quién la canceló solo va en la vista interna (A3.4).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function vencidas(Empresa $empresa, bool $interno = false): array
+    {
+        $canceladas = $empresa->mediciones()
+            ->where('estado', 'cancelada')
+            ->whereNotNull('fecha_limite')
+            ->with(['version:id,diagnostico_id,numero,contenido', 'version.diagnostico:id,nombre'])
+            ->orderByDesc('cancelada_en')
+            ->orderByDesc('id')
+            ->get();
+
+        if ($canceladas->isEmpty()) {
+            return [];
+        }
+
+        $zona = Plazos::zona($empresa->id);
+        $respondidas = DB::table('respuestas')
+            ->whereIn('medicion_id', $canceladas->modelKeys())
+            ->selectRaw('medicion_id, count(distinct pregunta_ref) as total')
+            ->groupBy('medicion_id')
+            ->pluck('total', 'medicion_id');
+        $nombres = $interno
+            ? User::withTrashed()
+                ->whereIn('id', $canceladas->pluck('asignada_por')->merge($canceladas->pluck('cancelada_por'))->filter()->unique()->values())
+                ->pluck('name', 'id')
+            : collect();
+        $lista = [];
+
+        foreach ($canceladas as $m) {
+            /** @var Medicion $m */
+            $cancelada = $m->cancelada_en?->setTimezone($zona)->toDateString();
+            $vencio = $m->estado_al_cancelar === 'vencida'
+                || ($m->estado_al_cancelar !== 'enviada' && $cancelada !== null
+                    && $m->fecha_limite !== null && $m->fecha_limite->toDateString() < $cancelada);
+
+            if (! $vencio) {
+                continue;
+            }
+
+            /** @var list<array<string, mixed>> $categorias */
+            $categorias = $m->version?->contenido['categorias'] ?? [];
+            $asignadaPor = $m->getAttribute('asignada_por');
+
+            $lista[] = [
+                'id' => $m->id,
+                'numero' => $m->numero,
+                'diagnostico' => $m->version?->diagnostico?->nombre,
+                'version' => $m->version?->numero,
+                'asignada' => $m->created_at?->setTimezone($zona)->toDateString(),
+                'vence' => $m->fecha_limite?->toDateString(),
+                'cancelada' => $cancelada,
+                'respondidas' => (int) ($respondidas[$m->id] ?? 0),
+                'preguntas' => array_sum(array_map(fn (array $c) => count($c['preguntas'] ?? []), $categorias)),
+                // Fecha del último correo de aviso o recordatorio que salió (EnviarAviso).
+                'ultimo_aviso' => $m->ultimo_aviso_en?->setTimezone($zona)->toDateString(),
+                'asignada_por' => $interno && $asignadaPor ? ($nombres[$asignadaPor] ?? null) : null,
+                'cancelada_por' => $interno && $m->cancelada_por ? ($nombres[$m->cancelada_por] ?? null) : null,
+            ];
+        }
+
+        return $lista;
     }
 
     /**

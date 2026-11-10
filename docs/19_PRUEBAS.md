@@ -50,7 +50,7 @@ En Sail se antepone `./vendor/bin/sail`.
 | `InicioTest` | 7 | A1: indicadores, pestañas, orden de la tabla y vencidas por fecha |
 | `ResponderTest` | 11 | E1–E4: inicio, responder, avance, enviar, vencidas, solicitud, "Ninguna" y "Otro" |
 | `ResultadosTest` | 20 | Cálculo (RN-018), análisis por categoría, variación, prompt por capas, falla y reintento, permisos de E6/E9 y los dos PDF: la empresa recibe el resumen y el Administrador, el completo |
-| `HistorialTest` | 3 | E8 y A3.4: terminadas, evolución total y por categoría, pendiente |
+| `HistorialTest` | 6 | E8 y A3.4: terminadas, evolución total y por categoría, pendiente, y las vencidas canceladas o reemplazadas (con quién en A3.4) |
 | `ConfiguracionIaTest` | 7 | A4: guardar por capas, quitar un ajuste, vista previa, probar (con el límite diario) y permisos |
 | `UsuariosYRolesTest` | 28 | A5: lista, invitar, desactivar, eliminar y recuperar, cambiar rol, roles (RN-027) y medición pendiente de la cuenta principal |
 | `RolesYPermisosTest` | 7 | Seeder de roles y permisos y protección de rutas |

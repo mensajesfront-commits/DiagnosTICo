@@ -32,6 +32,18 @@ Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` p
 - Pruebas en `tests/Feature/PlantillaDiagnosticoTest.php` (9). Docs 05, 14, 15, 18, 19, 29 y 31.
 - No se tocó nada del correo.
 
+### Agregado · las vencidas canceladas salen en el historial (HU-067 CA-006, HU-039 CA-005)
+
+- Antes, una medición cancelada desaparecía del historial. Ahora, si había vencido sin enviarse, sale en E8 y A3.4 entre las terminadas, por fecha, como «Vencida sin responder · cancelada». Sirve de prueba si la empresa dice que no recibió el diagnóstico.
+- Muestra cuándo se asignó, la fecha límite, cuándo se canceló, cuántas preguntas se respondieron y el último correo de aviso. En A3.4, además, quién la asignó y quién la canceló.
+- **Base de datos:** migración `2026_11_10_000001`, con dos columnas nuevas en `mediciones`:
+  - `estado_al_cancelar`, que guardan «Cancelar medición» y «Reemplazar»;
+  - `cancelada_por`.
+  Las canceladas antes de esta migración cuentan como vencidas si su fecha límite ya había pasado ese día.
+- Las canceladas antes de vencer no salen. Las cifras de arriba y la gráfica siguen contando solo las terminadas.
+- Código: `DatosHistorial::vencidas`. Pruebas en `HistorialTest` (3). Docs 05, 12, 14, 19 y 31.
+- **Al actualizar el servidor:** `./deploy-production.sh --migrate`, porque hay una migración nueva.
+
 ### Corregido · la IA y las abiertas opcionales (ISSUE-013)
 
 - El análisis de una categoría fallaba cuando la empresa respondía una pregunta abierta **opcional**. La IA, siguiendo el criterio «No se califica», devolvía puntaje `null` y el sistema rechazaba la respuesta y reintentaba hasta fallar.

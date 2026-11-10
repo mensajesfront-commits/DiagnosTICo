@@ -356,6 +356,7 @@ Rutas: `GET /historial` (la empresa) y `GET /empresas/{id}/historial` (el Admini
 - La medición pendiente: la empresa la continúa si está en curso o ve el avance si se envió; no se inicia aquí (HU-067 CA-005). El Administrador puede cambiar la fecha o cancelarla (los mismos modales de A3.1) y "Asignar medición".
 - La gráfica de evolución (`graficas/EvolucionPuntaje.vue`) desde la 2.ª medición terminada.
 - La tabla de terminadas, paginada con las filas que caben, con "Ver resultado", "Ver mis respuestas" y "Ver informe PDF".
+- En la misma tabla, ordenadas por fecha, las vencidas que se cancelaron (`vencidas`, `MedicionVencida`): «Vencida sin responder · cancelada», cuándo se asignó, cuándo venció y cuándo se canceló, cuántas preguntas se respondieron y el último aviso por correo. En A3.4 también quién la asignó y quién la canceló. Con alguna, el título pasa a «Mediciones» (10 de noviembre de 2026).
 - Se llega desde "Ver historial completo" en E1 y en A3.1, y desde "Mi historial" en el menú.
 
 ### E6 / A3.3 · Resultado (`resultados/Resultado`)

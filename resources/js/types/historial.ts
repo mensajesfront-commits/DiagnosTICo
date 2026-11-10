@@ -14,6 +14,12 @@ export type Historial = {
     pendiente: Omit<PendienteFicha, 'ultimo_aviso'> | null;
     /** Solo las terminadas con resultado, de la más reciente a la primera. */
     mediciones: MedicionFicha[];
+    /**
+     * Vencidas sin enviarse que después se cancelaron o reemplazaron, de la
+     * más reciente a la primera: prueban que la empresa recibió el
+     * diagnóstico (10 de noviembre de 2026).
+     */
+    vencidas: MedicionVencida[];
     /** Cifras de arriba: última, cambio desde la primera y la mejor; null sin mediciones. */
     resumen?: {
         cantidad: number;
@@ -27,4 +33,22 @@ export type Historial = {
     evolucion_categorias: EvolucionCategoria[];
     /** Lo abre el equipo de NuevasTIC (A3.4). */
     interno: boolean;
+};
+
+export type MedicionVencida = {
+    id: number;
+    numero: number;
+    diagnostico: string | null;
+    version: number | null;
+    /** Fechas "AAAA-MM-DD" en la zona de la empresa. */
+    asignada: string | null;
+    vence: string | null;
+    cancelada: string | null;
+    respondidas: number;
+    preguntas: number;
+    /** Último correo de aviso o recordatorio que salió; null si no salió ninguno. */
+    ultimo_aviso: string | null;
+    /** Solo en la vista interna (A3.4). */
+    asignada_por: string | null;
+    cancelada_por: string | null;
 };

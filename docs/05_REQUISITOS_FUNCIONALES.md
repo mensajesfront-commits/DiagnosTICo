@@ -4675,6 +4675,14 @@ Permite ver cómo ha evolucionado una empresa a lo largo de sus mediciones.
 
 **Entonces** se abre la asignación de medición.
 
+#### CA-005 — Vencidas canceladas (agregado el 10 de noviembre de 2026)
+
+**Dado** que la empresa tuvo una medición que venció sin enviarse y se canceló o se reemplazó,
+
+**Cuando** abro su historial,
+
+**Entonces** la veo como en E8 (HU-067 CA-006) y además quién la asignó y quién la canceló, para responder si la empresa dice que nunca recibió el diagnóstico.
+
 ### Reglas de negocio
 
 - RN-020 — La variación se calcula contra la medición anterior de la misma empresa y solo existe desde la 2.ª medición.
@@ -8017,6 +8025,14 @@ Permite ver todas las mediciones y la evolución para saber si la empresa ha mej
 **Cuando** reviso la pantalla,
 
 **Entonces** no aparece “Iniciar diagnóstico”.
+
+#### CA-006 — Vencidas canceladas (agregado el 10 de noviembre de 2026)
+
+**Dado** que se me asignó una medición, venció sin que la enviara y NuevasTIC la canceló o la reemplazó,
+
+**Cuando** abro “Mi historial”,
+
+**Entonces** la veo en la lista, por fecha, marcada «Vencida sin responder · cancelada», con la fecha en que se asignó, la fecha límite, la fecha en que se canceló, cuántas preguntas respondí y la fecha del último aviso por correo. Sirve de prueba de que el diagnóstico sí se entregó.
 
 ### Reglas de negocio
 
