@@ -251,7 +251,9 @@ Ruta: `GET /empresas` (`EmpresasController@index`, datos de `App\Support\DatosEm
 
 ### A3.1 · Ficha de la empresa (`empresas/Ver`)
 
-Ruta: `GET /empresas/{empresa}` (`EmpresasController@ver`, `DatosEmpresas::ficha()` + `opciones()`). Props en el tipo `FichaEmpresa`.
+Ruta: `GET /empresas/{empresa}` (`EmpresasController@ver`, `DatosEmpresas::ficha()` + `opciones()` + `vencidas`, de `DatosHistorial::vencidas`). Props en el tipo `FichaEmpresa`.
+
+- La tabla de mediciones incluye, por fecha, las vencidas que se cancelaron o reemplazaron, con «Vencida · cancelada» y «Respondió N de M»; el título de la fila (`detalleVencida`) da las fechas, el último aviso y quién la asignó y la canceló (10 de noviembre de 2026).
 
 - **Historial:** tarjetas Último puntaje, Variación (desde la 2.ª) y Medición pendiente; gráfica `graficas/EvolucionPuntaje.vue` (línea con las franjas de nivel y el puntaje sobre cada punto); tabla de mediciones paginada; a la derecha la pendiente con "Cambiar fecha" y "Cancelar medición", y "Asignar otra medición" (formulario corto; si hay pendiente, confirma el reemplazo con `ModalReemplazarMedicion`, A3.1c).
 - **Datos de la cuenta (A3.1d):** `components/empresas/CamposEmpresa.vue` (el mismo de A3.2), "Estado de la cuenta" (estado, registro, último acceso, mediciones y colaboradores en solo lectura) y "Acciones": Ver como, Asignar medición, Desactivar cuenta (`ModalDesactivarEmpresa`, A3.1f) o Reactivar. `?pestana=cuenta` abre esta pestaña.

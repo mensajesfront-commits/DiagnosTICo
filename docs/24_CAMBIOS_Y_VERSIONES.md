@@ -36,6 +36,7 @@ Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` p
 
 - Antes, una medición cancelada desaparecía del historial. Ahora, si había vencido sin enviarse, sale en E8 y A3.4 entre las terminadas, por fecha, como «Vencida sin responder · cancelada». Sirve de prueba si la empresa dice que no recibió el diagnóstico.
 - Muestra cuándo se asignó, la fecha límite, cuándo se canceló, cuántas preguntas se respondieron y el último correo de aviso. En A3.4, además, quién la asignó y quién la canceló.
+- También en la tabla de mediciones de la ficha A3.1: «Venció 4 nov», «Vencida · cancelada 10 nov» y «Respondió 1 de 13». Al pasar el cursor sobre la fila, las fechas, el último aviso y quién la asignó y la canceló.
 - **Base de datos:** migración `2026_11_10_000001`, con dos columnas nuevas en `mediciones`:
   - `estado_al_cancelar`, que guardan «Cancelar medición» y «Reemplazar»;
   - `cancelada_por`.

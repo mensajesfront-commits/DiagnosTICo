@@ -4681,7 +4681,7 @@ Permite ver cómo ha evolucionado una empresa a lo largo de sus mediciones.
 
 **Cuando** abro su historial,
 
-**Entonces** la veo como en E8 (HU-067 CA-006) y además quién la asignó y quién la canceló, para responder si la empresa dice que nunca recibió el diagnóstico.
+**Entonces** la veo como en E8 (HU-067 CA-006) y además quién la asignó y quién la canceló, para responder si la empresa dice que nunca recibió el diagnóstico. También sale en la tabla de mediciones de la ficha (A3.1), con el detalle al pasar el cursor.
 
 ### Reglas de negocio
 

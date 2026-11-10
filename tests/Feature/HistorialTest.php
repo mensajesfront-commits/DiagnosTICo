@@ -123,6 +123,13 @@ it('una vencida que se cancela sale en el historial como prueba de que se asign�
             ->has('vencidas', 1)
             ->where('vencidas.0.asignada_por', $this->admin->name)
             ->where('vencidas.0.cancelada_por', $this->admin->name));
+
+    // También en la tabla de la ficha A3.1.
+    $this->actingAs($this->admin)->get(route('empresas.ver', $this->empresa))
+        ->assertInertia(fn (Assert $p) => $p->component('empresas/Ver')
+            ->has('vencidas', 1)
+            ->where('vencidas.0.numero', 3)
+            ->where('vencidas.0.cancelada_por', $this->admin->name));
 });
 
 it('no salen las canceladas antes de vencer; sí las antiguas cuya fecha límite ya había pasado', function () {

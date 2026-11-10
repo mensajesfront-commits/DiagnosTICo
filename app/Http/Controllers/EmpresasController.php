@@ -13,6 +13,7 @@ use App\Rules\TelefonoValido;
 use App\Services\Mediciones\AsignarMedicion;
 use App\Support\DatosConsultores;
 use App\Support\DatosEmpresas;
+use App\Support\DatosHistorial;
 use App\Support\Invitaciones;
 use App\Support\Plazos;
 use Illuminate\Http\RedirectResponse;
@@ -102,6 +103,8 @@ class EmpresasController extends Controller
 
         return Inertia::render('empresas/Ver', [
             ...DatosEmpresas::ficha($empresa),
+            // Vencidas que se cancelaron: también en la tabla de la ficha (HU-039 CA-005).
+            'vencidas' => DatosHistorial::vencidas($empresa, interno: true),
             'opciones' => DatosEmpresas::opciones(),
             // Pestaña "Consultores" (HU-085): solo quien gestiona usuarios.
             'consultores' => $yo->can('usuarios.gestionar') ? DatosConsultores::deEmpresa($empresa) : null,
