@@ -49,7 +49,7 @@ En Sail se antepone `./vendor/bin/sail`.
 | `SolicitudesMedicionTest` | 7 | HU-083: aviso en A1, la lista, la ficha y Asignar; se atiende al asignar, dar nueva fecha o cancelar |
 | `InicioTest` | 7 | A1: indicadores, pestañas, orden de la tabla y vencidas por fecha |
 | `ResponderTest` | 11 | E1–E4: inicio, responder, avance, enviar, vencidas, solicitud, "Ninguna" y "Otro" |
-| `ResultadosTest` | 18 | Cálculo (RN-018), análisis por categoría, variación, prompt por capas, falla y reintento, permisos de E6/E9 y los dos PDF: la empresa recibe el resumen y el Administrador, el completo |
+| `ResultadosTest` | 20 | Cálculo (RN-018), análisis por categoría, variación, prompt por capas, falla y reintento, permisos de E6/E9 y los dos PDF: la empresa recibe el resumen y el Administrador, el completo |
 | `HistorialTest` | 3 | E8 y A3.4: terminadas, evolución total y por categoría, pendiente |
 | `ConfiguracionIaTest` | 7 | A4: guardar por capas, quitar un ajuste, vista previa, probar (con el límite diario) y permisos |
 | `UsuariosYRolesTest` | 28 | A5: lista, invitar, desactivar, eliminar y recuperar, cambiar rol, roles (RN-027) y medición pendiente de la cuenta principal |

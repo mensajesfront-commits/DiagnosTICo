@@ -68,7 +68,7 @@ class ArmadorPrompt
         'tarea' => <<<'TXT'
         Analiza todas las respuestas de la empresa en esta categoría: {respuestas_categoria}.
         1. Escribe una observación breve y concreta para cada pregunta, basada en lo que respondió la empresa.
-        2. Califica de 0 a 100 solo las preguntas de tipo "abierta", según su "criterio". En las demás devuelve puntaje null: su puntaje ya está calculado y no lo cambias.
+        2. Califica de 0 a 100 solo las preguntas de tipo "abierta", según su "criterio". En las demás, y en las opcionales (las que traen "dato_extra"), devuelve puntaje null: las cerradas ya tienen su puntaje y las opcionales no cuentan.
         3. Escribe el diagnóstico de la categoría en 2 o 3 frases: qué pasa, por qué pasa y qué le cuesta a la empresa (clientes, ventas, tiempo o dinero).
         4. Elige un método de análisis y escribe lo que encontraste con él, en sus grupos: de 1 a 3 frases cortas por grupo, solo en los grupos donde las respuestas digan algo.
         5. Escribe el impacto: por qué importa, qué le cuesta o qué riesgo trae para la presencia, la comunicación o la captación de clientes.
@@ -364,8 +364,12 @@ class ArmadorPrompt
 
             if ($p['tipo'] === 'abierta') {
                 $item['criterio'] = (string) ($p['criterio_ia'] ?? '');
-                // Los modelos pequeños a veces dejan la abierta sin calificar.
-                $item['calificar'] = 'Califica esta respuesta con un entero de 0 a 100 según el criterio.';
+                // Los modelos pequeños a veces dejan la abierta sin calificar. La
+                // opcional no se califica: pedírselo chocaba con su criterio
+                // ("no se califica") y la IA devolvía null.
+                $item['calificar'] = isset($item['dato_extra'])
+                    ? 'No la califiques: devuelve puntaje null. Usa la respuesta solo para entender mejor a la empresa en las observaciones y las recomendaciones.'
+                    : 'Califica esta respuesta con un entero de 0 a 100 según el criterio.';
             } else {
                 /** @var list<array<string, mixed>> $opciones */
                 $opciones = $p['opciones'] ?? [];

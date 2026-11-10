@@ -32,6 +32,13 @@ Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` p
 - Pruebas en `tests/Feature/PlantillaDiagnosticoTest.php` (9). Docs 05, 14, 15, 18, 19, 29 y 31.
 - No se tocó nada del correo.
 
+### Corregido · la IA y las abiertas opcionales (ISSUE-013)
+
+- El análisis de una categoría fallaba cuando la empresa respondía una pregunta abierta **opcional**. La IA, siguiendo el criterio «No se califica», devolvía puntaje `null` y el sistema rechazaba la respuesta y reintentaba hasta fallar.
+- Ahora a la opcional se le pide no calificarla (`ArmadorPrompt::preguntas`) y `AnalizadorDeCategoria::validar` la acepta sin puntaje; la obligatoria sigue necesitando su puntaje.
+- El texto de fábrica de la Tarea (paso 2) también lo dice. Si en A4 se guardaron instrucciones generales propias, conservan su texto, pero la corrección funciona igual, porque va en cada pregunta y en la validación.
+- Pruebas nuevas en `ResultadosTest` (2).
+
 ## v1.1.0 · despliegue en el servidor (6 de noviembre de 2026)
 
 - **Etiqueta `v1.1.0` sobre `main`** (commit `c419a43`, después de los PR #16 a #19). La crea el equipo en GitHub (Releases → *Draft a new release*). `v1.0.0` no se mueve: sigue marcando lo entregado el 5 de noviembre.
