@@ -54,7 +54,7 @@ En Sail se antepone `./vendor/bin/sail`.
 | `ConfiguracionIaTest` | 7 | A4: guardar por capas, quitar un ajuste, vista previa, probar (con el límite diario) y permisos |
 | `UsuariosYRolesTest` | 28 | A5: lista, invitar, desactivar, eliminar y recuperar, cambiar rol, roles (RN-027) y medición pendiente de la cuenta principal |
 | `RolesYPermisosTest` | 7 | Seeder de roles y permisos y protección de rutas |
-| `ConsultorTest` | 23 | EP-014 y RN-030: vincular y quitar, solo sus empresas (otra da 404), solo lectura, C1 y C2 |
+| `ConsultorTest` | 24 | EP-014 y RN-030: vincular y quitar, solo sus empresas (otra da 404), solo lectura, C1, C2 y «Tu consultor» en el inicio de la empresa |
 | `VerComoTest` | 5 | RN-026: solo lectura, registro, salir y no sobre administradores |
 | `ColaboradoresTest` | 21 | E12 y RN-025, incluidas las páginas que ve cada colaborador |
 | `PerfilTest` | 22 | A6 y E11: datos, contraseña, foto, datos de la empresa y eliminar la cuenta |

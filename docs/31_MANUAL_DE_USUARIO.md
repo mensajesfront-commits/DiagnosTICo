@@ -152,6 +152,8 @@ En **Mi perfil** (A6) cambias tu nombre, tu foto, tu correo y tu contraseña.
 4. Te llega un correo con un **código de 6 dígitos**. Escríbelo en la ventana «Verifica tu correo» (L2b). Si no lo verificas en 7 días, el registro se borra.
 5. Entra con tu correo y tu contraseña. Cuando NuevasTIC te asigne un diagnóstico, aparecerá en tu inicio y, si así lo eligió, te llegará un correo.
 
+Si NuevasTIC te asignó un consultor, al final de tu inicio aparece **Tu consultor**, con su nombre, su cargo, su correo y su teléfono para escribirle.
+
 ## B.2 Responder el diagnóstico
 
 1. En tu **inicio** (E1) pulsa **Iniciar diagnóstico**, o **Continuar diagnóstico** si ya empezaste.

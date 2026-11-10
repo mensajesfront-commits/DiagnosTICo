@@ -25,6 +25,9 @@
  * "Ver resultado" abre E6 y "Ver informe PDF" descarga el PDF guardado.
  *
  * "Ver historial completo" abre E8 (HU-067).
+ *
+ * Al final, "Tu consultor": quién acompaña a la empresa (RN-030), con su
+ * cargo, correo y teléfono para escribirle (10 de noviembre de 2026).
  */
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
@@ -39,6 +42,7 @@ import {
     Layers,
     LoaderCircle,
     Mail,
+    Phone,
     Rocket,
     Save,
     Sparkles,
@@ -53,6 +57,7 @@ import { usePermisos } from '@/composables/usePermisos';
 import { diaYMes, fechaLocal } from '@/lib/fechas';
 import { rutas } from '@/lib/rutas';
 import { niveles } from '@/lib/niveles';
+import { iniciales } from '@/lib/usuarios';
 import { cn } from '@/lib/utils';
 import type { InicioEmpresa } from '@/types/responder';
 
@@ -823,5 +828,69 @@ const enVerComo = computed(() => !!usePage().props.verComo);
                 </ol>
             </section>
         </div>
+
+        <!-- Tu consultor (RN-030) -->
+        <section
+            v-if="consultores?.length"
+            class="rounded-2xl border border-linea bg-white p-5"
+        >
+            <h2 class="text-lg font-semibold">
+                {{
+                    consultores.length === 1
+                        ? 'Tu consultor'
+                        : 'Tus consultores'
+                }}
+            </h2>
+            <p class="text-xs text-tinta-suave">
+                {{
+                    consultores.length === 1
+                        ? 'Te acompaña en tus diagnósticos y ve tus resultados. Escríbele si tienes dudas.'
+                        : 'Te acompañan en tus diagnósticos y ven tus resultados. Escríbeles si tienes dudas.'
+                }}
+            </p>
+            <ul class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <li
+                    v-for="c in consultores"
+                    :key="c.id"
+                    class="flex items-start gap-3 rounded-xl border border-linea p-3"
+                >
+                    <span
+                        class="flex size-10 shrink-0 items-center justify-center rounded-full bg-marca-suave font-semibold text-marca"
+                        aria-hidden="true"
+                    >
+                        {{ iniciales(c.nombre) }}
+                    </span>
+                    <span class="min-w-0 flex-1 text-sm">
+                        <span class="block font-semibold">{{ c.nombre }}</span>
+                        <span
+                            v-if="c.cargo"
+                            class="block text-xs text-tinta-suave"
+                            >{{ c.cargo }}</span
+                        >
+                        <a
+                            :href="`mailto:${c.email}`"
+                            class="mt-1 flex items-center gap-1.5 truncate text-xs text-marca hover:text-marca-hover"
+                        >
+                            <Mail
+                                class="size-3.5 shrink-0"
+                                aria-hidden="true"
+                            />
+                            <span class="truncate">{{ c.email }}</span>
+                        </a>
+                        <a
+                            v-if="c.telefono"
+                            :href="`tel:${c.telefono}`"
+                            class="mt-0.5 flex items-center gap-1.5 text-xs text-marca hover:text-marca-hover"
+                        >
+                            <Phone
+                                class="size-3.5 shrink-0"
+                                aria-hidden="true"
+                            />
+                            {{ c.telefono }}
+                        </a>
+                    </span>
+                </li>
+            </ul>
+        </section>
     </div>
 </template>

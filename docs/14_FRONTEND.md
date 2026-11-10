@@ -320,6 +320,7 @@ Ruta: `GET /mi-inicio`. Props en el tipo `InicioEmpresa` (`types/responder.ts`).
 - La medición pendiente según su estado: primera vez, no iniciada (mensaje del equipo, fecha límite y días que quedan), en curso (avance y "Continuar diagnóstico"), vencida ("Pedir una nueva fecha" y el correo de soporte; "Nueva medición solicitada" si ya la pidió) o enviada. Sin pendiente: "No tienes diagnósticos pendientes".
 - Primera vez: "Cómo funciona" en 3 pasos. Con resultados: el último (anillo `graficas/AnilloPuntaje.vue`, nivel, variación y `graficas/MiniEvolucion.vue`) y "Tus 3 áreas a trabajar" o "Mis mediciones".
 - "Ver resultado" abre E6, "Ver informe PDF" descarga el PDF y "Ver historial completo" abre E8.
+- Al final, «Tu consultor» (`consultores`, `ConsultorDeEmpresa`): los consultores activos que acompañan a la empresa, con iniciales, nombre, cargo, correo (`mailto:`) y teléfono (`tel:`). Solo si tiene alguno (HU-086 CA-006, 10 de noviembre de 2026).
 
 ### E2–E4 · Responder, revisar y enviado (`responder/Responder`, `responder/Revisar`, `responder/Enviado`)
 

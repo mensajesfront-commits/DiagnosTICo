@@ -9909,6 +9909,14 @@ Agregada el 3 de noviembre de 2026: en la presentación se decidió incluir el r
 
 Cada aviso abre el resultado ("bajó" y "nuevo") o la ficha (lo pendiente). Se ven 4 y "Ver los N avisos" muestra el resto. Si no hay avisos, la franja no aparece. No se usa "desde tu último acceso" porque el último acceso se actualiza al entrar.
 
+#### CA-006 — La empresa ve a su consultor (agregado el 10 de noviembre de 2026)
+
+**Dado** que el Administrador me vinculó a una empresa y mi cuenta está activa,
+
+**Cuando** la empresa o su colaborador abren su inicio (E1),
+
+**Entonces** ven la tarjeta «Tu consultor» con mi nombre, mi cargo, mi correo y mi teléfono (si lo tengo en Mi perfil), para escribirme. Una empresa sin consultor no ve la tarjeta.
+
 ### Reglas de negocio
 
 - RN-030.

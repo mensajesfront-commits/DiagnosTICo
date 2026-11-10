@@ -32,6 +32,12 @@ Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` p
 - Pruebas en `tests/Feature/PlantillaDiagnosticoTest.php` (9). Docs 05, 14, 15, 18, 19, 29 y 31.
 - No se tocó nada del correo.
 
+### Agregado · la empresa ve a su consultor (HU-086 CA-006)
+
+- Al final del inicio de la empresa (E1) sale la tarjeta «Tu consultor» (o «Tus consultores») con el nombre, el cargo, el correo y el teléfono de cada consultor activo que la acompaña. La ven la cuenta principal y sus colaboradores.
+- Los datos salen de la cuenta del consultor (Mi perfil); el teléfono solo si lo tiene. Un consultor desactivado o eliminado no aparece, y una empresa sin consultor no ve la tarjeta.
+- Código: `DatosInicioEmpresa` (`consultores`) y `pages/inicio/Empresa.vue`. Prueba en `ConsultorTest` (1). Docs 05, 07, 14, 19 y 31.
+
 ### Agregado · eliminar una empresa desactivada (HU-035 CA-007)
 
 - En A3.1 → Datos de la cuenta → Acciones, una empresa **desactivada** tiene «Eliminar empresa». Solo con el permiso `usuarios.gestionar` (el Administrador).
