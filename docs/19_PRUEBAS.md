@@ -40,6 +40,7 @@ En Sail se antepone `./vendor/bin/sail`.
 | `AdministradorPrincipalTest` | 3 | Cuenta principal del Administrador y `admin:invitar` |
 | `CatalogoCiiuTest` | 9 | Catálogo CIIU y actividades por sector |
 | `DiagnosticosYCatalogoTest` | 18 | A2: sectores (crear, reasignar, desactivar, eliminar), categorías (RN-009), crear, duplicar, archivar y eliminar diagnósticos |
+| `PlantillaDiagnosticoTest` | 9 | A2.5 · Pegar el contenido (HU-020 CA-005): la plantilla de ejemplo, tipos y marcas, importancia repartida, errores y avisos con su línea, crear el borrador lleno y permisos |
 | `EditorDiagnosticoTest` | 19 | A2.1: preguntas, opciones, "Ninguna", "Otro", orden, importancia, estado (RN-012) y publicar una versión congelada |
 | `ResultadoEjemploTest` | 7 | HU-030: mejor, medio y peor caso con el mismo cálculo, y sus dos PDF |
 | `EmpresasTest` | 14 | A3: lista, registrar con invitación, editar, desactivar y asignar (RN-014) |

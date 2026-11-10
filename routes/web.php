@@ -69,6 +69,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:diagnosticos.editar')->group(function () {
         Route::get('diagnosticos/crear', [DiagnosticosController::class, 'crear'])->name('diagnosticos.crear');
         Route::post('diagnosticos', [DiagnosticosController::class, 'guardar'])->name('diagnosticos.guardar');
+        // A2.5 · Pegar el contenido (HU-020 CA-005): revisa el texto sin guardar nada.
+        Route::post('diagnosticos/plantilla/revisar', [DiagnosticosController::class, 'revisarPlantilla'])
+            ->middleware('throttle:30,1')->name('diagnosticos.plantilla.revisar');
         Route::post('diagnosticos/{diagnostico}/duplicar', [DiagnosticosController::class, 'duplicar'])->name('diagnosticos.duplicar');
         Route::post('diagnosticos/{diagnostico}/archivar', [DiagnosticosController::class, 'archivar'])->name('diagnosticos.archivar');
         Route::post('diagnosticos/{diagnostico}/restaurar', [DiagnosticosController::class, 'restaurar'])->name('diagnosticos.restaurar');

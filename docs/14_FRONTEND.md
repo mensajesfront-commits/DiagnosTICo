@@ -229,8 +229,11 @@ Ruta: `GET /diagnosticos/crear?sector={id}`.
 | `sectorId` | `number \| null` | Sector preseleccionado si se viene desde A2. |
 | `categorias` | `{ id, nombre }[]` | Categorías activas del catálogo. |
 | `publicados` | `DiagnosticoPublicado[]` | Última versión publicada de cada diagnóstico, de todos los sectores, con los nombres de sus categorías. |
+| `plantilla` | `string` | Plantilla de ejemplo para «Pegar el contenido» (`LectorPlantilla::EJEMPLO`). |
 
-Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia`), `categorias[]` (en blanco) y `copiar_de` (en copia). El backend crea el borrador v1 y abre el editor (A2.1).
+Envía a `POST /diagnosticos`: `nombre` (máx. 60), `sector_id`, `descripcion` (opcional), `punto_partida` (`blanco` | `copia` | `pegar`), `categorias[]` (en blanco), `copiar_de` (en copia) y `texto` (al pegar). El backend crea el borrador v1 y abre el editor (A2.1).
+
+**Pegar el contenido (HU-020 CA-005, 10 de noviembre de 2026):** la tercera tarjeta muestra un recuadro para pegar el texto, con «Copiar la plantilla» y «Usar el ejemplo». «Revisar el contenido» llama a `POST /diagnosticos/plantilla/revisar` con `enviarJson` y muestra lo que se entendió (categorías, preguntas, opciones e importancia), los errores en rojo y los avisos de publicación en ámbar. Cada uno trae «Línea N», que lleva el cursor a esa línea del recuadro. «Crear y abrir el editor» solo se activa si el texto revisado no cambió y no tiene errores.
 
 ### A3 · Empresas (`empresas/Index`)
 

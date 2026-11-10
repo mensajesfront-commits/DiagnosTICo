@@ -27,8 +27,9 @@ Antes de medir a una empresa, su sector necesita un diagnóstico **publicado**.
 1. Ve a **Diagnósticos** (A2) y elige el sector a la izquierda. Si no existe, pulsa **+ Crear sector**.
 2. Pulsa **+ Crear diagnóstico** (A2.5):
    - Ponle nombre.
-   - Elige empezar en blanco o copiar otro diagnóstico.
-   - Marca las categorías. La importancia se reparte sola y la ajustas después.
+   - Elige empezar en blanco, copiar otro diagnóstico o **pegar el contenido**.
+   - En blanco, marca las categorías. La importancia se reparte sola y la ajustas después.
+   - **Pegar el contenido:** escribe el diagnóstico con la plantilla (botón **Copiar la plantilla**) y pégalo en el recuadro. Pulsa **Revisar el contenido**: verás cuántas categorías, preguntas y opciones se leyeron y, si algo está mal, el error con su número de línea (un clic te lleva a esa línea). Cuando no haya errores, pulsa **Crear y abrir el editor**: el borrador queda lleno y lo revisas en el editor.
 3. En el **editor** (A2.1), agrega las preguntas de cada categoría (A2.1b):
    - **Tipo:** abierta, opción única o selección múltiple.
    - **Indicación (obligatoria):** lo que ve la empresa en "Cómo responder".

@@ -21,6 +21,7 @@ export const rutas = {
                 ? `/diagnosticos/crear?sector=${sectorId}`
                 : '/diagnosticos/crear',
         guardar: () => '/diagnosticos',
+        revisarPlantilla: () => '/diagnosticos/plantilla/revisar',
         restaurar: (id: number) => `/diagnosticos/${id}/restaurar`,
         eliminarArchivado: (id: number) => `/diagnosticos/${id}/archivado`,
         editar: (id: number, parte?: number, pregunta?: number) =>

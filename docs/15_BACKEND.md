@@ -99,7 +99,8 @@ Se quitaron las páginas de ajustes del kit (`/settings/profile`, `/settings/sec
 | GET | `/diagnosticos` | `diagnosticos.ver` | A2·T: todos los diagnósticos | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos?sector={id}` | `diagnosticos.ver` | A2 / A2b: un sector | Props de `diagnosticos/Index` |
 | GET | `/diagnosticos/crear?sector={id}` | `diagnosticos.editar` | A2.5 | Props de `diagnosticos/Crear` |
-| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1 y abre el editor (A2.1) | `nombre` (máx. 60, único en el sector), `sector_id`, `descripcion`, `punto_partida`, `categorias[]`, `copiar_de` |
+| POST | `/diagnosticos` | `diagnosticos.editar` | Crea el borrador v1 y abre el editor (A2.1) | `nombre` (máx. 60, único en el sector), `sector_id`, `descripcion`, `punto_partida` (`blanco`, `copia` o `pegar`), `categorias[]`, `copiar_de`, `texto` (máx. 100 000) |
+| POST | `/diagnosticos/plantilla/revisar` | `diagnosticos.editar` (30 por minuto) | A2.5 · Pegar el contenido: lee el texto sin guardar nada (`LectorPlantilla`) | `texto` → JSON `resumen`, `errores` y `avisos`, cada uno con `linea` |
 | GET | `/diagnosticos/{id}/editar` | `diagnosticos.editar` | A2.1 · editor (`?categoria=` parte, `?pregunta=`) | Props de `diagnosticos/Editor` |
 | GET | `/diagnosticos/{id}/vista-previa` | `diagnosticos.ver` | A2.4 · vista previa del borrador o de una versión (`?version=`) | Props de `diagnosticos/VistaPrevia` |
 | POST | `/diagnosticos/{id}/duplicar` | `diagnosticos.editar` | A2.7: copia en borrador v1 y abre el editor | `nombre` (máx. 60, único en el sector), `sector_id` |

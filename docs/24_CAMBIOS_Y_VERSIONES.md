@@ -11,6 +11,27 @@ La versión de entrega es `v1.0.0` (T-152); hasta ella, los cambios se agrupan p
 
 Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` para una corrección, `v1.2.0` para algo nuevo).
 
+## Después de v1.1.0 · mejoras pedidas por el equipo (10 de noviembre de 2026, en curso)
+
+### Agregado · A2.5 «Pegar el contenido» (HU-020 CA-005)
+
+- Tercera forma de crear un diagnóstico, junto a «En blanco» y «Copiar uno publicado»: se pega todo el diagnóstico escrito en una plantilla de texto y el borrador se crea lleno.
+- **Plantilla:**
+  - `CATEGORÍA:` con el nombre del catálogo e `IMPORTANCIA:` opcional; sin importancia en ninguna categoría, se reparte en partes iguales.
+  - Cada pregunta con `PREGUNTA:`, `TIPO:` (Abierta, Opción única o Selección múltiple), `OBLIGATORIA:`, `INDICACIÓN:` y, en las abiertas, `CRITERIO:`.
+  - Las opciones van debajo de `OPCIONES:` como `- puntaje | texto`, con `OTRO`, `NINGUNA` y `TEN EN CUENTA: …`.
+  - Las etiquetas no distinguen mayúsculas ni tildes, y un texto puede ocupar varias líneas.
+- **Revisar antes de crear:** `POST /diagnosticos/plantilla/revisar` lee el texto sin guardar nada y devuelve:
+  - lo que entendió;
+  - los errores que impiden crearlo (categoría fuera del catálogo, tipo desconocido, puntaje fuera de 0–100, límites del editor);
+  - los avisos de lo que falta para publicar (RN-012).
+  Cada uno lleva su número de línea.
+- **Código:**
+  - `App\Services\Diagnosticos\LectorPlantilla` convierte el texto en el mismo contenido que usa «Copiar» (`ContenidoDiagnostico::aplicar`).
+  - Los avisos salen de `EstadoDiagnostico`, igual que en el editor.
+- Pruebas en `tests/Feature/PlantillaDiagnosticoTest.php` (9). Docs 05, 14, 15, 18, 19, 29 y 31.
+- No se tocó nada del correo.
+
 ## v1.1.0 · despliegue en el servidor (6 de noviembre de 2026)
 
 - **Etiqueta `v1.1.0` sobre `main`** (commit `c419a43`, después de los PR #16 a #19). La crea el equipo en GitHub (Releases → *Draft a new release*). `v1.0.0` no se mueve: sigue marcando lo entregado el 5 de noviembre.

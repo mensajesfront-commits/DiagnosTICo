@@ -2481,6 +2481,14 @@ Da el cuestionario que responderán las empresas de un sector, en blanco o a par
 
 **Entonces** se avisa y no se crea.
 
+#### CA-005 — Pegar el contenido (agregado el 10 de noviembre de 2026)
+
+**Dado** que elijo «Pegar el contenido» y pego el diagnóstico escrito con la plantilla (categorías, importancia, preguntas, tipo, indicación, criterio y opciones con su puntaje),
+
+**Cuando** pulso «Revisar el contenido»,
+
+**Entonces** veo qué se entendió (categorías, preguntas y opciones), los errores que impiden crearlo y lo que faltaría para publicarlo, cada uno con su número de línea; sin errores, «Crear y abrir el editor» crea el borrador v1 ya lleno y lo puedo corregir en el editor.
+
 ### Reglas de negocio
 
 - RN-010 — Un diagnóstico nace como borrador v1; las versiones publicadas son inmutables y los resultados guardan la versión con la que se hicieron.
@@ -2492,14 +2500,16 @@ Da el cuestionario que responderán las empresas de un sector, en blanco o a par
 - Nombre obligatorio.
 - Sector obligatorio.
 - La importancia de las categorías debe sumar 100% para poder publicar.
+- Al pegar (CA-005): las categorías deben existir en el catálogo y no repetirse; cada pregunta lleva tipo; las opciones van como «- puntaje | texto», con puntaje de 0 a 100 y máximo 10 por pregunta; «NINGUNA» solo en selección múltiple; los mismos límites de texto del editor (RN-013). La importancia es opcional: si ninguna categoría la trae, se reparte en partes iguales.
 
 ### Casos alternativos
 
-- Empezar en blanco o copiar otro diagnóstico.
+- Empezar en blanco, copiar otro diagnóstico o pegar su contenido en la plantilla (CA-005).
 
 ### Casos de error
 
 - Falta el nombre o el sector: se avisa y no se crea.
+- El texto pegado tiene errores: no se crea nada y se dicen los errores con su línea.
 
 ### Dependencias
 

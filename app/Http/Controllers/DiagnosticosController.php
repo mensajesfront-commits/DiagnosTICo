@@ -7,10 +7,13 @@ use App\Models\DiagnosticoCategoria;
 use App\Models\Sector;
 use App\Rules\NombreDiagnosticoUnico;
 use App\Services\Diagnosticos\ContenidoDiagnostico;
+use App\Services\Diagnosticos\LectorPlantilla;
 use App\Support\CatalogoCiiu;
 use App\Support\DatosDiagnosticos;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -20,6 +23,7 @@ use Inertia\Response;
 /**
  * A2, A2·T, A2b · Diagnósticos por sector y "Todos" (T-050), A2.5 · Crear,
  * A2.7 · Duplicar, archivar y eliminar (HU-010, HU-011, HU-020 a HU-022).
+ * A2.5 también crea el borrador pegando su contenido en la plantilla (HU-020 CA-005).
  *
  * Crear y duplicar llevan al editor (A2.1, `EditorDiagnosticoController`).
  */
@@ -48,28 +52,68 @@ class DiagnosticosController extends Controller
         return Inertia::render('diagnosticos/Crear', [
             'sectores' => DatosDiagnosticos::sectores(soloActivos: true),
             'sectorId' => $request->filled('sector') ? $request->integer('sector') : null,
-            'categorias' => DB::table('categorias')->whereNull('archivado_en')->orderBy('nombre')->get(['id', 'nombre']),
+            'categorias' => self::categoriasActivas(),
             'publicados' => DatosDiagnosticos::publicados(),
+            // HU-020 CA-005: la plantilla de ejemplo que se copia para pegar el contenido.
+            'plantilla' => LectorPlantilla::EJEMPLO,
+        ]);
+    }
+
+    /**
+     * A2.5 · «Pegar el contenido» (HU-020 CA-005): lee el texto sin guardar nada y
+     * devuelve qué se entendió, los errores que impiden crearlo y lo que
+     * faltaría para publicarlo, con su número de línea.
+     */
+    public function revisarPlantilla(Request $request, LectorPlantilla $lector): JsonResponse
+    {
+        $datos = $request->validate([
+            'texto' => ['required', 'string', 'max:'.LectorPlantilla::MAXIMO],
+        ], ['texto.required' => 'Pega el contenido del diagnóstico.'], ['texto' => 'contenido']);
+
+        $lectura = $lector->leer($datos['texto'], self::categoriasActivas());
+
+        return response()->json([
+            'resumen' => $lectura['resumen'],
+            'errores' => $lectura['errores'],
+            'avisos' => $lectura['avisos'],
         ]);
     }
 
     /** A2.5 · Crea el borrador v1, en blanco o copiando un publicado (HU-020). */
-    public function guardar(Request $request): RedirectResponse
+    public function guardar(Request $request, LectorPlantilla $lector): RedirectResponse
     {
         $datos = $request->validate([
             'nombre' => ['required', 'string', 'max:60', new NombreDiagnosticoUnico($request->input('sector_id'))],
             'sector_id' => ['required', 'integer', Rule::exists('sectores', 'id')->where('activo', true)],
             'descripcion' => ['nullable', 'string', 'max:500'],
-            'punto_partida' => ['required', Rule::in(['blanco', 'copia'])],
+            'punto_partida' => ['required', Rule::in(['blanco', 'copia', 'pegar'])],
             'categorias' => ['required_if:punto_partida,blanco', 'array'],
             'categorias.*' => ['integer', Rule::exists('categorias', 'id')->whereNull('archivado_en')],
             'copiar_de' => ['required_if:punto_partida,copia', 'nullable', 'integer', Rule::exists('diagnosticos', 'id')->where('estado', Diagnostico::PUBLICADO)],
+            'texto' => ['required_if:punto_partida,pegar', 'nullable', 'string', 'max:'.LectorPlantilla::MAXIMO],
         ], [
             'categorias.required_if' => 'Elige al menos una categoría.',
             'copiar_de.required_if' => 'Elige el diagnóstico que quieres copiar.',
-        ], ['sector_id' => 'sector', 'copiar_de' => 'diagnóstico a copiar']);
+            'texto.required_if' => 'Pega el contenido del diagnóstico.',
+        ], ['sector_id' => 'sector', 'copiar_de' => 'diagnóstico a copiar', 'texto' => 'contenido']);
 
-        $diagnostico = DB::transaction(function () use ($datos, $request): Diagnostico {
+        // HU-020 CA-005: el texto se vuelve a leer aquí; con errores no se crea nada.
+        $lectura = null;
+
+        if ($datos['punto_partida'] === 'pegar') {
+            $lectura = $lector->leer((string) $datos['texto'], self::categoriasActivas());
+
+            if ($lectura['errores'] !== []) {
+                $primeros = array_map(fn (array $e) => "línea {$e['linea']}: {$e['mensaje']}", array_slice($lectura['errores'], 0, 3));
+                $total = count($lectura['errores']);
+
+                throw ValidationException::withMessages([
+                    'texto' => ($total === 1 ? 'El contenido tiene 1 error' : "El contenido tiene {$total} errores").' · '.implode(' · ', $primeros),
+                ]);
+            }
+        }
+
+        $diagnostico = DB::transaction(function () use ($datos, $request, $lectura): Diagnostico {
             $diagnostico = Diagnostico::create([
                 'sector_id' => $datos['sector_id'],
                 'nombre' => NombreDiagnosticoUnico::limpiar($datos['nombre']),
@@ -79,7 +123,9 @@ class DiagnosticosController extends Controller
                 'creado_por' => $request->user()?->id,
             ]);
 
-            if ($datos['punto_partida'] === 'copia') {
+            if ($lectura !== null) {
+                $this->contenido->aplicar($diagnostico, $lectura['contenido']);
+            } elseif ($datos['punto_partida'] === 'copia') {
                 /** @var Diagnostico $origen */
                 $origen = Diagnostico::with('ultimaVersion')->findOrFail($datos['copiar_de']);
                 $this->contenido->aplicar($diagnostico, $origen->ultimaVersion->contenido ?? []);
@@ -99,7 +145,12 @@ class DiagnosticosController extends Controller
             return $diagnostico;
         });
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => "Borrador «{$diagnostico->nombre}» creado. Agrega sus preguntas."]);
+        $mensaje = match (true) {
+            $lectura === null => "Borrador «{$diagnostico->nombre}» creado. Agrega sus preguntas.",
+            $lectura['avisos'] === [] => "Borrador «{$diagnostico->nombre}» creado con {$lectura['resumen']['preguntas']} preguntas. Revísalo y publícalo.",
+            default => "Borrador «{$diagnostico->nombre}» creado con {$lectura['resumen']['preguntas']} preguntas. Corrige lo que falta para publicarlo.",
+        };
+        Inertia::flash('toast', ['type' => 'success', 'message' => $mensaje]);
 
         return to_route('diagnosticos.editar', $diagnostico);
     }
@@ -237,5 +288,12 @@ class DiagnosticosController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => "Se descartaron los cambios. «{$diagnostico->nombre}» queda en la v{$version->numero}."]);
 
         return back();
+    }
+
+    /** @return Collection<int, object{id: int, nombre: string}> */
+    private static function categoriasActivas(): Collection
+    {
+        /** @var Collection<int, object{id: int, nombre: string}> */
+        return DB::table('categorias')->whereNull('archivado_en')->orderBy('nombre')->get(['id', 'nombre']);
     }
 }
