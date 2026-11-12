@@ -119,7 +119,7 @@ it('no deja repetir el nombre de un diagnóstico en el mismo sector, sin mirar m
     ])->assertSessionHasErrors('nombre');
 
     // Un archivado del sector también cuenta.
-    $existente->update(['estado' => Diagnostico::ARCHIVADO, 'archivado_en' => now()]);
+    $existente->forceFill(['estado' => Diagnostico::ARCHIVADO, 'archivado_en' => now()])->save();
     $crear('Diagnóstico general', $sector->id)->assertSessionHasErrors('nombre');
 
     // En otro sector sí se puede, y se guarda sin espacios de más.

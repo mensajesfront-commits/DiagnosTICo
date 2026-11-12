@@ -149,7 +149,7 @@ it('una medición vencida no se responde; se pide una nueva una sola vez y les l
 });
 
 it('sin pendiente muestra el último resultado, la variación y las 3 áreas más débiles', function () {
-    $this->medicion->update(['estado' => 'terminada', 'terminada_en' => now()->subMonths(6)]);
+    $this->medicion->forceFill(['estado' => 'terminada', 'terminada_en' => now()->subMonths(6)])->save();
     Resultado::create(['medicion_id' => $this->medicion->id, 'puntaje_total' => 41, 'nivel' => 'mejorar', 'por_categoria' => [], 'publicado_en' => now()]);
     $segunda = Medicion::factory()->create(['empresa_id' => $this->empresa->id, 'version_diagnostico_id' => $this->version->id, 'numero' => 2, 'estado' => 'terminada', 'terminada_en' => now()]);
     Resultado::create(['medicion_id' => $segunda->id, 'puntaje_total' => 57, 'nivel' => 'mejorar', 'publicado_en' => now(), 'por_categoria' => [

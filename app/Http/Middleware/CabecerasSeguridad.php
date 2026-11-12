@@ -15,9 +15,12 @@ use Symfony\Component\HttpFoundation\Response;
  * - Al seguir un enlace externo solo se manda el dominio, no la ruta.
  * - Sin cámara, micrófono ni ubicación: la app no los usa.
  * - Con HTTPS, HSTS para que el navegador no vuelva a pedir por HTTP.
- *
- * No se agrega una CSP completa de scripts: Vite en desarrollo y el
- * `data-page` de Inertia la complican; queda para el despliegue (#46).
+ * - Los scripts solo pueden venir del propio sitio (`script-src 'self'`):
+ *   si algún día se colara un XSS, el navegador no ejecutaría scripts
+ *   ajenos ni en línea. En producción los scripts los compila Vite y salen
+ *   del mismo origen; la plantilla raíz no trae scripts en línea (Inertia
+ *   usa el atributo `data-page`, no un `<script>`). En desarrollo esta parte
+ *   no se aplica, porque Vite recarga en caliente con scripts en línea (#46).
  */
 class CabecerasSeguridad
 {
@@ -25,9 +28,18 @@ class CabecerasSeguridad
     {
         $respuesta = $next($request);
 
+        // En desarrollo (Vite con recarga en caliente) solo se limita quién
+        // puede enmarcar la página; fuera de desarrollo se restringe también
+        // de dónde salen los scripts.
+        $csp = ["frame-ancestors 'self'"];
+
+        if (! app()->environment('local')) {
+            array_unshift($csp, "script-src 'self'", "object-src 'none'", "base-uri 'self'");
+        }
+
         $cabeceras = [
             'X-Frame-Options' => 'SAMEORIGIN',
-            'Content-Security-Policy' => "frame-ancestors 'self'",
+            'Content-Security-Policy' => implode('; ', $csp),
             'X-Content-Type-Options' => 'nosniff',
             'Referrer-Policy' => 'strict-origin-when-cross-origin',
             'Permissions-Policy' => 'camera=(), microphone=(), geolocation=()',
