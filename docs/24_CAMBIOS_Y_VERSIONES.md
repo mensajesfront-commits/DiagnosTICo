@@ -13,6 +13,14 @@ Las etiquetas no se mueven: un cambio nuevo lleva una versión nueva (`v1.1.1` p
 
 ## Después de v1.1.0 · mejoras pedidas por el equipo (10 de noviembre de 2026, en curso)
 
+### Endurecido · seguridad tras una revisión del código (12 de noviembre de 2026)
+
+Revisión del código buscando fallos (permisos, IDOR, inyección SQL, XSS, subida de archivos, autenticación). No se encontró ninguna vulnerabilidad explotable; se cerraron dos puntos de defensa:
+
+- **CSP de scripts.** `CabecerasSeguridad` ahora manda, fuera de desarrollo, `Content-Security-Policy: script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'`. Si algún día se colara un XSS, el navegador no ejecutaría scripts ajenos ni en línea. En producción los scripts los compila Vite y salen del mismo origen; la plantilla raíz no trae scripts en línea (Inertia usa el atributo `data-page`). En desarrollo se deja solo `frame-ancestors 'self'`, porque Vite recarga en caliente con scripts en línea (cierra el pendiente #46). Probado en el navegador: inicio de sesión y páginas internas cargan sin ninguna violación de CSP.
+- **Asignación masiva.** Los modelos ya declaraban sus campos editables con `#[Fillable([...])]`. Se añadió, fuera de producción, `Model::preventSilentlyDiscardingAttributes(...)`: si se le pasa a `create`/`update` un campo fuera de la lista, lanza un error en vez de descartarlo en silencio. Al activarlo salieron tres pruebas que escribían campos internos (`terminada_en`, `archivado_en`) por asignación masiva, donde se descartaban sin aviso; ahora usan `forceFill`, igual que el código de la app.
+- Docs 06 y 17. La prueba `AuditoriaQaTest` comprueba la CSP nueva. No se tocó nada del correo.
+
 ### Agregado · A2.5 «Pegar el contenido» (HU-020 CA-005)
 
 - Tercera forma de crear un diagnóstico, junto a «En blanco» y «Copiar uno publicado»: se pega todo el diagnóstico escrito en una plantilla de texto y el borrador se crea lleno.

@@ -9,6 +9,7 @@ use App\Services\Ia\AnalizadorDeCategoria;
 use App\Support\Plazos;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -62,6 +63,15 @@ class AppServiceProvider extends ServiceProvider
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
+        );
+
+        // Cada modelo ya declara sus campos con #[Fillable]. Fuera de
+        // producción, además, si algún día se le pasa a update() o create()
+        // un campo que no está en esa lista, en vez de descartarlo en
+        // silencio se lanza un error, para notarlo al desarrollar y al
+        // correr las pruebas (defensa frente a asignación masiva).
+        Model::preventSilentlyDiscardingAttributes(
+            ! app()->isProduction(),
         );
 
         // RN-001, igual en todos los entornos: mínimo 8 caracteres, una

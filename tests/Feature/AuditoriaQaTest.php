@@ -105,7 +105,9 @@ it('manda las cabeceras de seguridad', function () {
         ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
         ->assertHeader('X-Content-Type-Options', 'nosniff')
         ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
-        ->assertHeader('Content-Security-Policy', "frame-ancestors 'self'");
+        // Fuera de «local» (producción y pruebas) los scripts solo salen del
+        // propio sitio; en «local» solo se limita quién puede enmarcarla.
+        ->assertHeader('Content-Security-Policy', "script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'");
 });
 
 // --- ERR-04 · Sectores y categorías sin distinguir mayúsculas ----------------------

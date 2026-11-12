@@ -95,7 +95,7 @@ it('si no se atiende, la vencida queda como está y la solicitud sigue abierta (
 });
 
 it('una terminada con otra sin iniciar no dice "en curso"', function () {
-    $this->vencida->update(['estado' => 'terminada', 'terminada_en' => now()]);
+    $this->vencida->forceFill(['estado' => 'terminada', 'terminada_en' => now()])->save();
     Resultado::create(['medicion_id' => $this->vencida->id, 'puntaje_total' => 50, 'nivel' => 'mejorar', 'por_categoria' => [], 'publicado_en' => now()]);
     Medicion::factory()->create([
         'empresa_id' => $this->empresa->id, 'version_diagnostico_id' => $this->vencida->version_diagnostico_id,

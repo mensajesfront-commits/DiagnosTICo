@@ -88,7 +88,7 @@ Cómo debe comportarse el sistema, además de lo que hace. RNF-001 a RNF-006 vie
 - Las contraseñas se guardan cifradas con bcrypt.
 - La sesión dura 120 minutos sin actividad (`SESSION_LIFETIME`). Se cierra si desactivan la cuenta.
 - En una presentación o en producción: `APP_ENV=production`, `APP_DEBUG=false` e `INERTIA_DEVTOOLS_ENABLED=false` (auditoría QA, ERR-07). Con HTTPS, además: `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
-- Cabeceras de seguridad en todas las respuestas (`CabecerasSeguridad`, ERR-06): `X-Frame-Options`, `frame-ancestors`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y, con HTTPS, HSTS.
+- Cabeceras de seguridad en todas las respuestas (`CabecerasSeguridad`, ERR-06): `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, con HTTPS HSTS y una `Content-Security-Policy` que fuera de desarrollo limita los scripts al propio sitio (`script-src 'self'`).
 - El enlace de recuperación de contraseña vence a los 10 minutos; el de invitación sirve hasta usarlo (RN-006).
 
 ### RNF-011 · Datos personales
